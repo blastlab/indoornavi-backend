@@ -1,0 +1,12 @@
+# Generated DB schema image
+graph.png
+
+# Netbeans and Maven
+*/target/
+nb-configuration.xml
+nbactions.xml
+
+# Linux
+*~
+.directory
+*.bak

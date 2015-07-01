@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.3.xsd">
+	<changeSet author="mradzikowski" id="1">
+		<createTable tableName="Person">
+			<column autoIncrement="true" name="id" type="INT">
+				<constraints primaryKey="true"/>
+			</column>
+			<column name="email" type="VARCHAR(255)">
+				<constraints nullable="false" unique="true"/>
+			</column>
+		</createTable>
+	</changeSet>
+	<changeSet author="mradzikowski" id="2">
+		<createTable tableName="Complex">
+			<column autoIncrement="true" name="id" type="INT">
+				<constraints primaryKey="true"/>
+			</column>
+			<column name="name" type="VARCHAR(255)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="person_id" type="INT">
+				<constraints nullable="false"/>
+			</column>
+		</createTable>
+		<addForeignKeyConstraint baseColumnNames="person_id" baseTableName="Complex"
+								 referencedColumnNames="id" referencedTableName="Person"
+								 constraintName="FK_Complex_Person" onDelete="CASCADE" onUpdate="CASCADE"/>
+	</changeSet>
+	<changeSet author="mradzikowski" id="3">
+		<createTable tableName="Building">
+			<column autoIncrement="true" name="id" type="INT">
+				<constraints primaryKey="true"/>
+			</column>
+			<column name="name" type="VARCHAR(255)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="minimumFloor" type="TINYINT" defaultValueNumeric="0">
+				<constraints nullable="false"/>
+			</column>
+			<column name="degree" type="DOUBLE" defaultValueNumeric="0">
+				<constraints nullable="false"/>
+			</column>
+			<column name="complex_id" type="INT">
+				<constraints nullable="false"/>
+			</column>
+		</createTable>
+		<addForeignKeyConstraint baseColumnNames="complex_id" baseTableName="Building"
+								 referencedColumnNames="id" referencedTableName="Complex"
+								 constraintName="FK_Building_Complex" onDelete="CASCADE" onUpdate="CASCADE"/>
+	</changeSet>
+	<changeSet author="mradzikowski" id="4">
+		<createTable tableName="Floor">
+			<column autoIncrement="true" name="id" type="INT">
+				<constraints primaryKey="true"/>
+			</column>
+			<column name="number" type="TINYINT">
+				<constraints nullable="false"/>
+			</column>
+			<column name="bitmap" type="MEDIUMBLOB">
+				<constraints nullable="false"/>
+			</column>
+			<column name="mToPix" type="DOUBLE">
+				<constraints nullable="false"/>
+			</column>
+			<column name="startZoom" type="DOUBLE">
+				<constraints nullable="false"/>
+			</column>
+			<column name="building_id" type="INT">
+				<constraints nullable="false"/>
+			</column>
+		</createTable>
+		<addForeignKeyConstraint baseColumnNames="building_id" baseTableName="Floor"
+								 referencedColumnNames="id" referencedTableName="Building"
+								 constraintName="FK_Floor_Building" onDelete="CASCADE" onUpdate="CASCADE"/>
+	</changeSet>
+	<changeSet author="mradzikowski" id="5">
+		<createTable tableName="Beacon">
+			<column autoIncrement="true" name="id" type="INT">
+				<constraints primaryKey="true"/>
+			</column>
+			<column name="mac" type="VARCHAR(12)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="x" type="DOUBLE">
+				<constraints nullable="false"/>
+			</column>
+			<column name="y" type="DOUBLE">
+				<constraints nullable="false"/>
+			</column>
+			<column name="z" type="DOUBLE">
+				<constraints nullable="false"/>
+			</column>
+			<column name="floor_id" type="INT">
+				<constraints nullable="false"/>
+			</column>
+		</createTable>
+		<addForeignKeyConstraint baseColumnNames="floor_id" baseTableName="Beacon"
+								 referencedColumnNames="id" referencedTableName="Floor"
+								 constraintName="FK_Beacon_Floor" onDelete="CASCADE" onUpdate="CASCADE"/>
+	</changeSet>
+	<changeSet author="mradzikowski" id="6">
+		<createTable tableName="Waypoint">
+			<column autoIncrement="true" name="id" type="INT">
+				<constraints primaryKey="true"/>
+			</column>
+			<column name="x" type="DOUBLE">
+				<constraints nullable="false"/>
+			</column>
+			<column name="y" type="DOUBLE">
+				<constraints nullable="false"/>
+			</column>
+			<column name="timeToCheckout" type="INT" defaultValueNumeric="60">
+				<constraints nullable="false"/>
+			</column>
+			<column name="distance" type="DOUBLE">
+				<constraints nullable="false"/>
+			</column>
+			<column name="details" type="VARCHAR(255)"/>
+			<column name="floor_id" type="INT">
+				<constraints nullable="false"/>
+			</column>
+		</createTable>
+		<addForeignKeyConstraint baseColumnNames="floor_id" baseTableName="Waypoint"
+								 referencedColumnNames="id" referencedTableName="Floor"
+								 constraintName="FK_Waypoint_Floor" onDelete="CASCADE" onUpdate="CASCADE"/>
+	</changeSet>
+	<changeSet author="mradzikowski" id="7">
+		<createTable tableName="Vertex">
+			<column autoIncrement="true" name="id" type="INT">
+				<constraints primaryKey="true"/>
+			</column>
+			<column name="x" type="DOUBLE">
+				<constraints nullable="false"/>
+			</column>
+			<column name="y" type="DOUBLE">
+				<constraints nullable="false"/>
+			</column>
+			<column name="isFloorDownChangeable" type="BOOL" defaultValue="0">
+				<constraints nullable="false"/>
+			</column>
+			<column name="isFloorUpChangeable" type="BOOL" defaultValue="0">
+				<constraints nullable="false"/>
+			</column>
+			<column name="floor_id" type="INT">
+				<constraints nullable="false"/>
+			</column>
+		</createTable>
+		<addForeignKeyConstraint baseColumnNames="floor_id" baseTableName="Vertex"
+								 referencedColumnNames="id" referencedTableName="Floor"
+								 constraintName="FK_Vertex_Floor" onDelete="CASCADE" onUpdate="CASCADE"/>
+	</changeSet>
+</databaseChangeLog>
