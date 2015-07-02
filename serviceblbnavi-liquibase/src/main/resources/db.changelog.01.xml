@@ -149,4 +149,9 @@
 								 referencedColumnNames="id" referencedTableName="Floor"
 								 constraintName="FK_Vertex_Floor" onDelete="CASCADE" onUpdate="CASCADE"/>
 	</changeSet>
+	<changeSet id="8" author="mkoszalka">
+		<addColumn tableName="Person">
+			<column name="authToken" type="VARCHAR(32)"/>
+		</addColumn>
+	</changeSet>
 </databaseChangeLog>
