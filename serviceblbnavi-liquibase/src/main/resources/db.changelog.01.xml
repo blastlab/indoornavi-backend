@@ -149,9 +149,105 @@
 								 referencedColumnNames="id" referencedTableName="Floor"
 								 constraintName="FK_Vertex_Floor" onDelete="CASCADE" onUpdate="CASCADE"/>
 	</changeSet>
+
 	<changeSet id="8" author="mkoszalka">
 		<addColumn tableName="Person">
 			<column name="authToken" type="VARCHAR(32)"/>
 		</addColumn>
-	</changeSet>
+
+		<changeSet author="mradzikowski" id="8">
+			<modifyDataType tableName="Waypoint" columnName="details" newDataType="VARCHAR(10000)"/>
+		</changeSet>
+		<changeSet author="mradzikowski" id="9">
+			<createTable tableName="Goal">
+				<column autoIncrement="true" name="id" type="INT">
+					<constraints primaryKey="true"/>
+				</column>
+				<column name="name" type="VARCHAR(255)">
+					<constraints nullable="false"/>
+				</column>
+				<column name="building_id" type="INT">
+					<constraints nullable="false"/>
+				</column>
+				<column name="vertex_id" type="INT">
+					<constraints nullable="false"/>
+				</column>
+			</createTable>
+			<addForeignKeyConstraint baseColumnNames="building_id" baseTableName="Goal"
+									 referencedColumnNames="id" referencedTableName="Building"
+									 constraintName="FK_Goal_Building" onDelete="CASCADE" onUpdate="CASCADE"/>
+			<addForeignKeyConstraint baseColumnNames="vertex_id" baseTableName="Goal"
+									 referencedColumnNames="id" referencedTableName="Vertex"
+									 constraintName="FK_Goal_Vertex" onDelete="CASCADE" onUpdate="CASCADE"/>
+		</changeSet>
+		<changeSet author="mradzikowski" id="10">
+			<createTable tableName="Edge">
+				<column autoIncrement="true" name="id" type="INT">
+					<constraints primaryKey="true"/>
+				</column>
+				<column name="weight" type="DOUBLE">
+					<constraints nullable="false"/>
+				</column>
+				<column name="source_id" type="INT">
+					<constraints nullable="false"/>
+				</column>
+				<column name="target_id" type="INT">
+					<constraints nullable="false"/>
+				</column>
+			</createTable>
+			<addForeignKeyConstraint baseColumnNames="source_id" baseTableName="Edge"
+									 referencedColumnNames="id" referencedTableName="Vertex"
+									 constraintName="FK_Edge_Vertex_source" onDelete="CASCADE" onUpdate="CASCADE"/>
+			<addForeignKeyConstraint baseColumnNames="target_id" baseTableName="Edge"
+									 referencedColumnNames="id" referencedTableName="Vertex"
+									 constraintName="FK_Edge_Vertex_target" onDelete="CASCADE" onUpdate="CASCADE"/>
+		</changeSet>
+		<changeSet author="mradzikowski" id="11">
+			<createTable tableName="Exit">
+				<column autoIncrement="true" name="id" type="INT">
+					<constraints primaryKey="true"/>
+				</column>
+				<column name="latitude" type="DOUBLE">
+					<constraints nullable="false"/>
+				</column>
+				<column name="longitude" type="DOUBLE">
+					<constraints nullable="false"/>
+				</column>
+				<column name="in" type="BOOL" defaultValue="1">
+					<constraints nullable="false"/>
+				</column>
+				<column name="out" type="BOOL" defaultValue="1">
+					<constraints nullable="false"/>
+				</column>
+				<column name="vertex_id" type="INT">
+					<constraints nullable="false"/>
+				</column>
+			</createTable>
+			<addForeignKeyConstraint baseColumnNames="vertex_id" baseTableName="Exit"
+									 referencedColumnNames="id" referencedTableName="Vertex"
+									 constraintName="FK_Exit_Vertex" onDelete="CASCADE" onUpdate="CASCADE"/>
+		</changeSet>
+		<changeSet author="mradzikowski" id="12">
+			<createTable tableName="BuildingConnection">
+				<column autoIncrement="true" name="id" type="INT">
+					<constraints primaryKey="true"/>
+				</column>
+				<column name="distance" type="DOUBLE">
+					<constraints nullable="false"/>
+				</column>
+				<column name="source_id" type="INT">
+					<constraints nullable="false"/>
+				</column>
+				<column name="target_id" type="INT">
+					<constraints nullable="false"/>
+				</column>
+			</createTable>
+			<addForeignKeyConstraint baseColumnNames="source_id" baseTableName="BuildingConnection"
+									 referencedColumnNames="id" referencedTableName="Exit"
+									 constraintName="FK_BuildingConnection_Exit_source" onDelete="CASCADE" onUpdate="CASCADE"/>
+			<addForeignKeyConstraint baseColumnNames="target_id" baseTableName="BuildingConnection"
+									 referencedColumnNames="id" referencedTableName="Exit"
+									 constraintName="FK_BuildingConnection_Exit_target" onDelete="CASCADE" onUpdate="CASCADE"/>
+
+		</changeSet>
 </databaseChangeLog>
