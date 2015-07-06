@@ -36,6 +36,17 @@ public class Building implements Serializable {
 	@OneToMany(mappedBy = "building")
 	private List<Floor> floors;
 
+	@OneToMany(mappedBy = "building")
+	private List<Goal> goals;
+
+	public List<Goal> getGoals() {
+		return goals;
+	}
+
+	public void setGoals(List<Goal> goals) {
+		this.goals = goals;
+	}
+
 	public List<Floor> getFloors() {
 		return floors;
 	}

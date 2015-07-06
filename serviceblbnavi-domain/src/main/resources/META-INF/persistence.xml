@@ -3,7 +3,7 @@
 	
 	<persistence-unit name="NaviPU" transaction-type="JTA">
 		<provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
-				<jta-data-source>jdbc/Navi</jta-data-source>
+		<jta-data-source>jdbc/Navi</jta-data-source>
 
 		<exclude-unlisted-classes>false</exclude-unlisted-classes> <!-- Import all entity classes -->
 		

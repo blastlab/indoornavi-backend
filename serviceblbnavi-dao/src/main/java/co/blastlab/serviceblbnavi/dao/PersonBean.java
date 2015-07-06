@@ -12,27 +12,37 @@ import javax.persistence.NoResultException;
  */
 @Stateless
 public class PersonBean {
-	
+
 	@Inject
 	private EntityManager em;
-	
-	public void create(Person person){
+
+	public void create(Person person) {
 		em.persist(person);
 		em.refresh(person);
 	}
-	
+
 	public Person get(Long id) {
 		return em.find(Person.class, id);
 	}
-	
+
 	public Person getByEmail(String email) {
 		Person person;
 		try {
 			person = em.createNamedQuery(Person.FIND_BY_EMAIL, Person.class).setParameter("email", email).getSingleResult();
-		} catch(NoResultException e) {
+		} catch (NoResultException e) {
 			person = null;
 		}
 		return person;
 	}
-	
+
+	public Person findByAuthToken(String authToken) {
+		Person person;
+		try {
+			person = em.createNamedQuery(Person.FIND_BY_AUTH_TOKEN, Person.class).setParameter("authToken", authToken).getSingleResult();
+		} catch (NoResultException e) {
+			person = null;
+		}
+		return person;
+	}
+
 }

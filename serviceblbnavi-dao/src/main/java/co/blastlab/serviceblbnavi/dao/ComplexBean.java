@@ -13,16 +13,16 @@ import javax.persistence.EntityManager;
  */
 @Stateless
 public class ComplexBean {
-	
+
 	@Inject
 	private EntityManager em;
-	
+
 	public void add(Complex complex) {
 		em.persist(complex);
 	}
-	
+
 	public List<Complex> getAll(Person person) {
 		return em.createNamedQuery(Complex.FIND_BY_PERSON, Complex.class).getResultList();
 	}
-	
+
 }

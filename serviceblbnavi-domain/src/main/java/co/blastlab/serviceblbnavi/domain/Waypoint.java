@@ -90,7 +90,5 @@ public class Waypoint implements Serializable {
 	public void setFloor(Floor floor) {
 		this.floor = floor;
 	}
-	
-	
 
 }

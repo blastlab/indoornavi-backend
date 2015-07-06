@@ -1,10 +1,12 @@
 package co.blastlab.serviceblbnavi.domain;
 
 import java.io.Serializable;
+import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -32,8 +34,52 @@ public class Vertex implements Serializable {
 
 	private boolean isFloorUpChangeable;
 
+	@OneToMany(mappedBy = "vertex")
+	private List<Exit> exits;
+
+	@OneToMany(mappedBy = "target")
+	private List<Edge> targetEdges;
+
+	@OneToMany(mappedBy = "source")
+	private List<Edge> sourceEdges;
+
+	@OneToMany(mappedBy = "vertex")
+	private List<Goal> goals;
+
 	@ManyToOne
 	private Floor floor;
+
+	public List<Exit> getExits() {
+		return exits;
+	}
+
+	public void setExits(List<Exit> exits) {
+		this.exits = exits;
+	}
+
+	public List<Edge> getTargetEdges() {
+		return targetEdges;
+	}
+
+	public void setTargetEdges(List<Edge> targetEdges) {
+		this.targetEdges = targetEdges;
+	}
+
+	public List<Edge> getSourceEdges() {
+		return sourceEdges;
+	}
+
+	public void setSourceEdges(List<Edge> sourceEdges) {
+		this.sourceEdges = sourceEdges;
+	}
+
+	public List<Goal> getGoals() {
+		return goals;
+	}
+
+	public void setGoals(List<Goal> goals) {
+		this.goals = goals;
+	}
 
 	public Long getId() {
 		return id;

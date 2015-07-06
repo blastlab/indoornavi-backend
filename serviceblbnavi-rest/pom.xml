@@ -40,8 +40,8 @@
 			<scope>provided</scope>
 			<type>jar</type>
 		</dependency>
+		
 	</dependencies>
-
 	<build>
 		<plugins>
 			<plugin>

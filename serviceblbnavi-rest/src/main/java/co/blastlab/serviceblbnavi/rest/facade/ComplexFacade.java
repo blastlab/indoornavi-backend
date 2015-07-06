@@ -13,10 +13,10 @@ import javax.ws.rs.core.Response;
  */
 @Path("/complex")
 public class ComplexFacade {
-	
+
 	@EJB
 	private ComplexBean complexBean;
-	
+
 	@POST
 	public Response add(Complex complex) {
 		return Response.ok().build();

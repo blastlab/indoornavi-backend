@@ -16,22 +16,19 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Entity
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-public class Beacon implements Serializable {
+public class BuildingConnection implements Serializable {
 
 	@Id
 	@GeneratedValue
 	private Long id;
 
-	private String mac;
-
-	private Double x;
-
-	private Double y;
-
-	private Double z;
+	private Double distance;
 
 	@ManyToOne
-	private Floor floor;
+	private Exit source;
+
+	@ManyToOne
+	private Exit target;
 
 	public Long getId() {
 		return id;
@@ -41,44 +38,28 @@ public class Beacon implements Serializable {
 		this.id = id;
 	}
 
-	public String getMac() {
-		return mac;
+	public Double getDistance() {
+		return distance;
 	}
 
-	public void setMac(String mac) {
-		this.mac = mac;
+	public void setDistance(Double distance) {
+		this.distance = distance;
 	}
 
-	public Double getX() {
-		return x;
+	public Exit getSource() {
+		return source;
 	}
 
-	public void setX(Double x) {
-		this.x = x;
+	public void setSource(Exit source) {
+		this.source = source;
 	}
 
-	public Double getY() {
-		return y;
+	public Exit getTarget() {
+		return target;
 	}
 
-	public void setY(Double y) {
-		this.y = y;
-	}
-
-	public Double getZ() {
-		return z;
-	}
-
-	public void setZ(Double z) {
-		this.z = z;
-	}
-
-	public Floor getFloor() {
-		return floor;
-	}
-
-	public void setFloor(Floor floor) {
-		this.floor = floor;
+	public void setTarget(Exit target) {
+		this.target = target;
 	}
 
 }
