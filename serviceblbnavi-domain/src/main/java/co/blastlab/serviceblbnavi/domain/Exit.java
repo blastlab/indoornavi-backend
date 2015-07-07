@@ -7,9 +7,11 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
@@ -32,6 +34,7 @@ public class Exit implements Serializable {
 
 	private boolean out;
 
+	@XmlTransient
 	@ManyToOne
 	private Vertex vertex;
 
@@ -40,6 +43,17 @@ public class Exit implements Serializable {
 
 	@OneToMany(mappedBy = "source")
 	private List<BuildingConnection> sourceConnections;
+
+	@Transient
+	private Long vertexId;
+
+	public Long getVertexId() {
+		return vertexId;
+	}
+
+	public void setVertexId(Long vertexId) {
+		this.vertexId = vertexId;
+	}
 
 	public List<BuildingConnection> getTargetConnections() {
 		return targetConnections;

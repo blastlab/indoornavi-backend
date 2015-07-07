@@ -15,8 +15,21 @@ public class FloorBean {
 	@Inject
 	private EntityManager em;
 
-	public void add(Floor floor) {
+	public void create(Floor floor) {
 		em.persist(floor);
+	}
+
+	public Floor find(Long id) {
+		return em.find(Floor.class, id);
+	}
+
+	public void update(Floor floor) {
+		em.merge(floor);
+//		em.refresh(floor);
+	}
+
+	public void delete(Floor floor) {
+		em.remove(em.contains(floor) ? floor : em.merge(floor));
 	}
 
 }

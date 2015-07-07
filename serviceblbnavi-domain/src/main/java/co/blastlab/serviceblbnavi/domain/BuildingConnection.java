@@ -5,9 +5,11 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
@@ -24,11 +26,35 @@ public class BuildingConnection implements Serializable {
 
 	private Double distance;
 
+	@XmlTransient
 	@ManyToOne
 	private Exit source;
 
+	@XmlTransient
 	@ManyToOne
 	private Exit target;
+
+	@Transient
+	private Long sourceId;
+
+	@Transient
+	private Long targetId;
+
+	public Long getSourceId() {
+		return sourceId;
+	}
+
+	public void setSourceId(Long sourceId) {
+		this.sourceId = sourceId;
+	}
+
+	public Long getTargetId() {
+		return targetId;
+	}
+
+	public void setTargetId(Long targetId) {
+		this.targetId = targetId;
+	}
 
 	public Long getId() {
 		return id;

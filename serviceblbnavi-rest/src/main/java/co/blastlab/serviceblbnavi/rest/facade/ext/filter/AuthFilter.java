@@ -20,7 +20,7 @@ import javax.ws.rs.ext.Provider;
  * @author Michal Koszalka
  */
 @RequestScoped
-//@Provider
+@Provider
 @Priority(Priorities.AUTHENTICATION)
 public class AuthFilter implements ContainerRequestFilter {
 
@@ -41,7 +41,7 @@ public class AuthFilter implements ContainerRequestFilter {
 
 		String path = requestCtx.getUriInfo().getAbsolutePath().toString();
 
-		if (!path.endsWith("/person") && (!path.contains("rest"))) {
+		if (!path.endsWith("/person")) {
 			String authToken = requestCtx.getHeaderString(AUTH_TOKEN);
 			if (authToken == null) {
 				throw new WebApplicationException(Response.Status.UNAUTHORIZED);

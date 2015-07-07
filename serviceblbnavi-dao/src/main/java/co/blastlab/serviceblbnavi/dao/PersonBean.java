@@ -1,5 +1,6 @@
 package co.blastlab.serviceblbnavi.dao;
 
+import co.blastlab.serviceblbnavi.domain.Complex;
 import co.blastlab.serviceblbnavi.domain.Person;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
@@ -17,15 +18,19 @@ public class PersonBean {
 	private EntityManager em;
 
 	public void create(Person person) {
+		Complex complex = new Complex();
+		complex.setName("complex");
 		em.persist(person);
 		em.refresh(person);
+		complex.setPerson(person);
+		em.persist(complex);
 	}
 
-	public Person get(Long id) {
+	public Person find(Long id) {
 		return em.find(Person.class, id);
 	}
 
-	public Person getByEmail(String email) {
+	public Person findByEmail(String email) {
 		Person person;
 		try {
 			person = em.createNamedQuery(Person.FIND_BY_EMAIL, Person.class).setParameter("email", email).getSingleResult();

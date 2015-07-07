@@ -1,5 +1,6 @@
 package co.blastlab.serviceblbnavi.rest.facade;
 
+import co.blastlab.serviceblbnavi.dao.ComplexBean;
 import co.blastlab.serviceblbnavi.dao.PersonBean;
 import co.blastlab.serviceblbnavi.domain.Person;
 import javax.ejb.EJB;
@@ -23,7 +24,7 @@ public class PersonFacade {
 
 	@POST
 	public Person register(Person person) {
-		if (personBean.getByEmail(person.getEmail()) != null) {
+		if (personBean.findByEmail(person.getEmail()) != null) {
 			throw new EntityExistsException();
 		}
 		person.generateAuthToken();
@@ -34,7 +35,7 @@ public class PersonFacade {
 	@GET
 	@Path("/{id: \\d+}")
 	public Person get(@PathParam("id") Long id) {
-		Person person = personBean.get(id);
+		Person person = personBean.find(id);
 		if (person == null) {
 			throw new EntityNotFoundException();
 		}

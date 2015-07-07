@@ -6,19 +6,28 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
+import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
  * @author Michał Koszałka
  */
+@NamedQueries({
+	@NamedQuery(name = Building.FIND_BY_COMPLEX, query = "SELECT b FROM Building b WHERE b.complex = :complex")
+})
 @Entity
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Building implements Serializable {
+
+	public static final String FIND_BY_COMPLEX = "Building.findByComplex";
 
 	@Id
 	@GeneratedValue
@@ -30,6 +39,7 @@ public class Building implements Serializable {
 
 	private Double degree;
 
+	@XmlTransient
 	@ManyToOne
 	private Complex complex;
 
@@ -38,6 +48,9 @@ public class Building implements Serializable {
 
 	@OneToMany(mappedBy = "building")
 	private List<Goal> goals;
+
+	@Transient
+	private Long complexId;
 
 	public List<Goal> getGoals() {
 		return goals;
@@ -93,6 +106,14 @@ public class Building implements Serializable {
 
 	public void setComplex(Complex complex) {
 		this.complex = complex;
+	}
+
+	public Long getComplexId() {
+		return complexId;
+	}
+
+	public void setComplexId(Long complexId) {
+		this.complexId = complexId;
 	}
 
 }

@@ -7,9 +7,11 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
@@ -28,11 +30,12 @@ public class Vertex implements Serializable {
 
 	private Double y;
 
-	private Double z;
-
 	private boolean isFloorDownChangeable;
 
 	private boolean isFloorUpChangeable;
+
+	@Transient
+	private Long floorId;
 
 	@OneToMany(mappedBy = "vertex")
 	private List<Exit> exits;
@@ -46,8 +49,17 @@ public class Vertex implements Serializable {
 	@OneToMany(mappedBy = "vertex")
 	private List<Goal> goals;
 
+	@XmlTransient
 	@ManyToOne
 	private Floor floor;
+
+	public Long getFloorId() {
+		return floorId;
+	}
+
+	public void setFloorId(Long floorId) {
+		this.floorId = floorId;
+	}
 
 	public List<Exit> getExits() {
 		return exits;
@@ -103,14 +115,6 @@ public class Vertex implements Serializable {
 
 	public void setY(Double y) {
 		this.y = y;
-	}
-
-	public Double getZ() {
-		return z;
-	}
-
-	public void setZ(Double z) {
-		this.z = z;
 	}
 
 	public Floor getFloor() {

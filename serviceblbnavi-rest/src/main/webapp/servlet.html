@@ -9,9 +9,20 @@
             File:
             <input type="file" name="file" id="file" /> <br/>
             Destination:
-            <input type="text" value="/tmp" name="destination"/>
+			<br/>
+            <input type="text" value="/tmp" name="destination"/> 
+			</br>
+            <input type="number" value="" name="building"/>
             </br>
             <input type="submit" value="Upload" name="upload" id="upload" />
+			</br>
         </form>
+		<form method="GET" action="/rest/v1/file/upload" >
+            Destination:
+			<br/>
+            <input type="number" value="" name="floor"/>
+			</br>
+			<input type="submit" value="Download" name="download" id="download" />
+		</form>
     </body>
 </html>

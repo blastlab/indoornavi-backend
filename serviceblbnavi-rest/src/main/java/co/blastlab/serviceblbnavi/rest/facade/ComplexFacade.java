@@ -18,7 +18,7 @@ public class ComplexFacade {
 	private ComplexBean complexBean;
 
 	@POST
-	public Response add(Complex complex) {
+	public Response create(Complex complex) {
 		return Response.ok().build();
 	}
 }

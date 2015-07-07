@@ -5,6 +5,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -30,8 +31,39 @@ public class Beacon implements Serializable {
 
 	private Double z;
 
+	private Integer minor;
+
+	private Integer major;
+
+	@Transient
+	private Long floorId;
+
 	@ManyToOne
 	private Floor floor;
+
+	public Long getFloorId() {
+		return floorId;
+	}
+
+	public void setFloorId(Long floorId) {
+		this.floorId = floorId;
+	}
+
+	public Integer getMinor() {
+		return minor;
+	}
+
+	public void setMinor(Integer minor) {
+		this.minor = minor;
+	}
+
+	public Integer getMajor() {
+		return major;
+	}
+
+	public void setMajor(Integer major) {
+		this.major = major;
+	}
 
 	public Long getId() {
 		return id;

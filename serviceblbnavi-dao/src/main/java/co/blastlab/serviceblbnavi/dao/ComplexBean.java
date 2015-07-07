@@ -17,11 +17,11 @@ public class ComplexBean {
 	@Inject
 	private EntityManager em;
 
-	public void add(Complex complex) {
+	public void create(Complex complex) {
 		em.persist(complex);
 	}
 
-	public List<Complex> getAll(Person person) {
+	public List<Complex> findAll(Person person) {
 		return em.createNamedQuery(Complex.FIND_BY_PERSON, Complex.class).getResultList();
 	}
 

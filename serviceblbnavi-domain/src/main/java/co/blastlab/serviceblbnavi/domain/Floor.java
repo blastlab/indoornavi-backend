@@ -7,9 +7,11 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
@@ -32,6 +34,7 @@ public class Floor implements Serializable {
 
 	private Double startZoom;
 
+	@XmlTransient
 	@ManyToOne
 	private Building building;
 
@@ -43,6 +46,9 @@ public class Floor implements Serializable {
 
 	@OneToMany(mappedBy = "floor")
 	private List<Beacon> beacons;
+
+	@Transient
+	private Long buildingId;
 
 	public Long getId() {
 		return id;
@@ -114,6 +120,14 @@ public class Floor implements Serializable {
 
 	public void setBeacons(List<Beacon> beacons) {
 		this.beacons = beacons;
+	}
+
+	public Long getBuildingId() {
+		return buildingId;
+	}
+
+	public void setBuildingId(Long buildingId) {
+		this.buildingId = buildingId;
 	}
 
 }

@@ -5,9 +5,11 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
@@ -32,8 +34,20 @@ public class Waypoint implements Serializable {
 
 	private String details;
 
+	@Transient
+	private Long floorId;
+
+	@XmlTransient
 	@ManyToOne
 	private Floor floor;
+
+	public Long getFloorId() {
+		return floorId;
+	}
+
+	public void setFloorId(Long floorId) {
+		this.floorId = floorId;
+	}
 
 	public Long getId() {
 		return id;

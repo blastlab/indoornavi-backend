@@ -254,9 +254,9 @@
 		<dropNotNullConstraint tableName="Floor" columnName="bitmap" columnDataType="MEDIUMBLOB" />
 		<dropNotNullConstraint tableName="Floor" columnName="mToPix" columnDataType="DOUBLE" />
 		<dropNotNullConstraint tableName="Floor" columnName="startZoom" columnDataType="DOUBLE" />
-			<addColumn tableName="Beacon">
-				<column name="minor" type="INT"/>
-				<column name="major" type="INT"/>
-			</addColumn>
+		<addColumn tableName="Beacon">
+			<column name="minor" type="INT"/>
+			<column name="major" type="INT"/>
+		</addColumn>
 	</changeSet>
 </databaseChangeLog>
