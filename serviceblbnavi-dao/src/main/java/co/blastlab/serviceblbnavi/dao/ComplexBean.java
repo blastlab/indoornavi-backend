@@ -21,6 +21,10 @@ public class ComplexBean {
 		em.persist(complex);
 	}
 
+	public Complex find(Long id) {
+		return em.find(Complex.class, id);
+	}
+
 	public List<Complex> findAll(Person person) {
 		return em.createNamedQuery(Complex.FIND_BY_PERSON, Complex.class).getResultList();
 	}

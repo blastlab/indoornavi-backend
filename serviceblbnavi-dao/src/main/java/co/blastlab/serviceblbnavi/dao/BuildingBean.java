@@ -6,8 +6,6 @@ import java.util.List;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
-import javax.persistence.EntityNotFoundException;
-import javax.persistence.NoResultException;
 
 /**
  *
@@ -33,6 +31,10 @@ public class BuildingBean {
 
 	public void delete(Building building) {
 		em.remove(em.contains(building) ? building : em.merge(building));
+	}
+
+	public void update(Building building) {
+		em.merge(building);
 	}
 
 }

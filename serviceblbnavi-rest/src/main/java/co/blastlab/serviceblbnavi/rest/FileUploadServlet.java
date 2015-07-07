@@ -1,20 +1,9 @@
 package co.blastlab.serviceblbnavi.rest;
 
-import co.blastlab.serviceblbnavi.dao.BuildingBean;
 import co.blastlab.serviceblbnavi.dao.FloorBean;
-import co.blastlab.serviceblbnavi.domain.Building;
 import co.blastlab.serviceblbnavi.domain.Floor;
 import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.sql.Blob;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.ejb.EJB;
 import javax.persistence.EntityNotFoundException;
 import javax.servlet.ServletException;
@@ -24,18 +13,21 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
+import javax.ws.rs.BadRequestException;
 import org.apache.commons.io.IOUtils;
 
 /**
  *
  * @author Michał Koszałka
  */
-@WebServlet(name = "FileUploadServlet", urlPatterns = {"/rest/v1/file/upload"})
+@WebServlet(name = "FileUploadServlet", urlPatterns = {"/rest/v1/floor/image/*"})
 @MultipartConfig
 public class FileUploadServlet extends HttpServlet {
 
 	@EJB
 	private FloorBean floorBean;
+
+	private static final Integer SEPARATOR_INDEX = 1;
 
 	@Override
 	protected void doPost(HttpServletRequest request,
@@ -44,7 +36,7 @@ public class FileUploadServlet extends HttpServlet {
 		response.setContentType("text/html;charset=UTF-8");
 
 		final Long floorId = Long.parseLong(request.getParameter("floor"));
-		final Part filePart = request.getPart("file");
+		final Part filePart = request.getPart("image");
 
 		byte[] bytes = IOUtils.toByteArray(filePart.getInputStream());
 
@@ -56,8 +48,13 @@ public class FileUploadServlet extends HttpServlet {
 
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		final Long floorId = Long.parseLong(req.getParameter("floor"));
-
+		Long floorId;
+		String path = req.getPathInfo();
+		try {
+			floorId = Long.parseLong(path.substring(SEPARATOR_INDEX));
+		} catch (NumberFormatException e) {
+			throw new BadRequestException();
+		}
 		Floor floor = floorBean.find(floorId);
 		if (floor == null) {
 			throw new EntityNotFoundException();

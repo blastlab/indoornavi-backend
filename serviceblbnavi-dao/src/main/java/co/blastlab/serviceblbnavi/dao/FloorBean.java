@@ -25,7 +25,6 @@ public class FloorBean {
 
 	public void update(Floor floor) {
 		em.merge(floor);
-//		em.refresh(floor);
 	}
 
 	public void delete(Floor floor) {

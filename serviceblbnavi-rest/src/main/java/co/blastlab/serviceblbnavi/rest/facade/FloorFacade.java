@@ -4,6 +4,11 @@ import co.blastlab.serviceblbnavi.dao.BuildingBean;
 import co.blastlab.serviceblbnavi.dao.FloorBean;
 import co.blastlab.serviceblbnavi.domain.Building;
 import co.blastlab.serviceblbnavi.domain.Floor;
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.ApiParam;
+import com.wordnik.swagger.annotations.ApiResponse;
+import com.wordnik.swagger.annotations.ApiResponses;
 import javax.ejb.EJB;
 import javax.persistence.EntityNotFoundException;
 import javax.ws.rs.DELETE;
@@ -19,6 +24,7 @@ import javax.ws.rs.core.Response;
  * @author Michał Koszałka
  */
 @Path("/floor")
+@Api("/floor")
 public class FloorFacade {
 
 	@EJB
@@ -28,7 +34,11 @@ public class FloorFacade {
 	private BuildingBean buildingBean;
 
 	@POST
-	public Floor create(Floor floor) {
+	@ApiOperation(value = "create floor", response = Floor.class)
+	@ApiResponses({
+		@ApiResponse(code = 404, message = "building id empty or building doesn't exist")
+	})
+	public Floor create(@ApiParam(value = "floor", required = true) Floor floor) {
 		if (floor.getBuildingId() != null) {
 			Building building = buildingBean.find(floor.getBuildingId());
 			if (building != null) {
@@ -45,7 +55,11 @@ public class FloorFacade {
 
 	@GET
 	@Path("/{id: \\d+}")
-	public Floor get(@PathParam("id") Long id) {
+	@ApiOperation(value = "find floor", response = Floor.class)
+	@ApiResponses({
+		@ApiResponse(code = 404, message = "floor with given id wasn't found")
+	})
+	public Floor find(@PathParam("id") @ApiParam(value = "id", required = true) Long id) {
 		Floor floor = floorBean.find(id);
 		if (floor == null) {
 			throw new EntityNotFoundException();
@@ -55,7 +69,11 @@ public class FloorFacade {
 
 	@DELETE
 	@Path("/{id: \\d+}")
-	public Response delete(@PathParam("id") Long id) {
+	@ApiOperation(value = "delete floor", response = Response.class)
+	@ApiResponses({
+		@ApiResponse(code = 404, message = "floor with given doesn't exist")
+	})
+	public Response delete(@PathParam("id") @ApiParam(value = "id", required = true) Long id) {
 		Floor floor = floorBean.find(id);
 		if (floor == null) {
 			throw new EntityNotFoundException();
@@ -64,8 +82,13 @@ public class FloorFacade {
 		return Response.ok().build();
 	}
 
+	//TODO: refactor
 	@PUT
-	public Floor update(Floor floor) {
+	@ApiOperation(value = "update floor", response = Floor.class)
+	@ApiResponses({
+		@ApiResponse(code = 404, message = "building id or building empty or doesn't exist")
+	})
+	public Floor update(@ApiParam(value = "floor", required = true) Floor floor) {
 		if (floor.getBuilding() == null) {
 			if (floor.getBuildingId() != null) {
 				Building building = buildingBean.find(floor.getBuildingId());
@@ -77,6 +100,8 @@ public class FloorFacade {
 			} else {
 				throw new EntityNotFoundException();
 			}
+		} else {
+			throw new EntityNotFoundException();
 		}
 		floorBean.update(floor);
 		return floor;
