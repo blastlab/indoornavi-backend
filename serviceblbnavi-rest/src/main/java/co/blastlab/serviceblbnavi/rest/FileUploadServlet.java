@@ -4,6 +4,7 @@ import co.blastlab.serviceblbnavi.dao.FloorBean;
 import co.blastlab.serviceblbnavi.domain.Floor;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.Base64;
 import javax.ejb.EJB;
 import javax.persistence.EntityNotFoundException;
 import javax.servlet.ServletException;
@@ -59,7 +60,7 @@ public class FileUploadServlet extends HttpServlet {
 		if (floor == null) {
 			throw new EntityNotFoundException();
 		}
-		IOUtils.copy(new ByteArrayInputStream(floor.getBitmap()), resp.getOutputStream());
+		IOUtils.copy(new ByteArrayInputStream(Base64.getEncoder().encode(floor.getBitmap())), resp.getOutputStream());
 
 	}
 
