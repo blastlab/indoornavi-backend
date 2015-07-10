@@ -19,6 +19,8 @@ public class RestResponseFilter implements ContainerResponseFilter {
 		responseContext.getHeaders().putSingle("Access-Control-Allow-Credentials", "true");
 		responseContext.getHeaders().putSingle("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT");
 		responseContext.getHeaders().putSingle("Access-Control-Allow-Headers", "Content-Type, Accept");
+                responseContext.getHeaders().putSingle("Access-Control-Allow-Headers", "Content-Type, authorization");
+                responseContext.getHeaders().putSingle("Access-Control-Allow-Headers", "Content-Type, auth_token");
 	}
 
 }
