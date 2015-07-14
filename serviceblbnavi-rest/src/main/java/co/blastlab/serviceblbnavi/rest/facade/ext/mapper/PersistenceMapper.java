@@ -10,7 +10,7 @@ import javax.ws.rs.ext.Provider;
 /**
  * @author Maciej Radzikowski
  */
-//@Provider
+@Provider
 public class PersistenceMapper implements ExceptionMapper<PersistenceException> {
 
 	@Override

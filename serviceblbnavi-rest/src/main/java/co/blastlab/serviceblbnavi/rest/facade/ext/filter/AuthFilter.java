@@ -17,6 +17,7 @@ import javax.ws.rs.ext.Provider;
 
 /**
  * Filter that checks all requests and perform authentication.
+ *
  * @author Michal Koszalka
  */
 @RequestScoped

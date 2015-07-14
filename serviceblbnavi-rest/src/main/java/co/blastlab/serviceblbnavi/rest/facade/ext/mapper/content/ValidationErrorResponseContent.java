@@ -16,7 +16,9 @@ public class ValidationErrorResponseContent extends ErrorResponseContent {
 
 	private final List<Error> errors = new ArrayList<>();
 
-	/** No-argument constructor for JAX-B serialization. */
+	/**
+	 * No-argument constructor for JAX-B serialization.
+	 */
 	public ValidationErrorResponseContent() {
 	}
 

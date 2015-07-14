@@ -2,6 +2,7 @@ package co.blastlab.serviceblbnavi.domain;
 
 import java.io.Serializable;
 import java.util.List;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -26,7 +27,8 @@ public class Floor implements Serializable {
 	@GeneratedValue
 	private Long id;
 
-	private Integer number;
+	@Column(name = "number")
+	private Integer level;
 
 	private byte[] bitmap;
 
@@ -58,12 +60,12 @@ public class Floor implements Serializable {
 		this.id = id;
 	}
 
-	public Integer getNumber() {
-		return number;
+	public Integer getLevel() {
+		return level;
 	}
 
-	public void setNumber(Integer number) {
-		this.number = number;
+	public void setLevel(Integer level) {
+		this.level = level;
 	}
 
 	public byte[] getBitmap() {

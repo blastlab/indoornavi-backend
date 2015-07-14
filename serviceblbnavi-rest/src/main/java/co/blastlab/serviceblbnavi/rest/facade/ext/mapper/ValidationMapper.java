@@ -9,7 +9,7 @@ import javax.ws.rs.ext.Provider;
 /**
  * @author Maciej Radzikowski
  */
-//@Provider
+@Provider
 public class ValidationMapper implements ExceptionMapper<ConstraintViolationException> {
 
 	@Override
