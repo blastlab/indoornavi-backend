@@ -9,6 +9,7 @@ import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
 import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
+import java.util.List;
 import javax.ejb.EJB;
 import javax.persistence.EntityNotFoundException;
 import javax.ws.rs.DELETE;
@@ -105,6 +106,23 @@ public class FloorFacade {
 		}
 		floorBean.update(floor);
 		return floor;
+	}
+
+	@PUT
+	@Path("/{id: \\d+}")
+	@ApiOperation(value = "update floors", response = Response.class)
+	public Response updateFloors(@PathParam("id") Long buildingId, @ApiParam(value = "floors", required = true) List<Floor> floors) {
+
+		Building building = buildingBean.find(buildingId);
+		if (building != null) {
+			for (Floor floor : floors) {
+				floor.setBuilding(building);
+			}
+		} else {
+			throw new EntityNotFoundException();
+		}
+		floorBean.updateFloors(floors);
+		return Response.ok().build();
 	}
 
 }

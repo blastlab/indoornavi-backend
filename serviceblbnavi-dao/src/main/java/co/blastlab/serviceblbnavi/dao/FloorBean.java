@@ -1,6 +1,7 @@
 package co.blastlab.serviceblbnavi.dao;
 
 import co.blastlab.serviceblbnavi.domain.Floor;
+import java.util.List;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
@@ -29,6 +30,12 @@ public class FloorBean {
 
 	public void delete(Floor floor) {
 		em.remove(em.contains(floor) ? floor : em.merge(floor));
+	}
+	
+	public void updateFloors(List<Floor> floors) {
+		for(Floor f : floors) {
+			em.merge(f);
+		}
 	}
 
 }
