@@ -34,7 +34,9 @@ public class FloorBean {
 	
 	public void updateFloors(List<Floor> floors) {
 		for(Floor f : floors) {
-			em.merge(f);
+			Floor floor = find(f.getId());
+			floor.setLevel(floor.getLevel());
+			update(floor);
 		}
 	}
 
