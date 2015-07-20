@@ -15,6 +15,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 import javax.ws.rs.BadRequestException;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response;
 import org.apache.commons.io.IOUtils;
 
 /**
@@ -58,7 +60,7 @@ public class FileUploadServlet extends HttpServlet {
 		}
 		Floor floor = floorBean.find(floorId);
 		if (floor == null) {
-			throw new EntityNotFoundException();
+			throw new WebApplicationException(Response.Status.NOT_FOUND);
 		}
 		IOUtils.copy(new ByteArrayInputStream(Base64.getEncoder().encode(floor.getBitmap())), resp.getOutputStream());
 
