@@ -9,13 +9,14 @@ import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import javax.ws.rs.core.Request;
 
 /**
  *
  * @author mkoszalka
  */
 public class CORSFilter implements Filter {
+	
+	public static final Integer UNAUTHORIZED = 401;
 
 	@Override
 	public void init(FilterConfig filterConfig) throws ServletException {
@@ -24,23 +25,24 @@ public class CORSFilter implements Filter {
 	@Override
 	public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain chain) throws IOException, ServletException {
 		HttpServletRequest request = (HttpServletRequest) servletRequest;
-		System.out.println(request.getMethod());
 
-		HttpServletResponse resp = (HttpServletResponse) servletResponse;
-		resp.addHeader("Access-Control-Allow-Origin", "*");
-		resp.addHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-		resp.addHeader("Access-Control-Allow-Credentials", "true");
-		resp.addHeader("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT");
-		resp.addHeader("Access-Control-Allow-Headers", "Content-Type, Accept");
-		resp.addHeader("Access-Control-Allow-Headers", "Content-Type, authorization");
-		resp.addHeader("Access-Control-Allow-Headers", "Content-Type, auth_token");
+		HttpServletResponse response = (HttpServletResponse) servletResponse;
+		response.addHeader("Access-Control-Allow-Origin", "*");
+		response.addHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+		response.addHeader("Access-Control-Allow-Credentials", "true");
+		response.addHeader("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT");
+		response.addHeader("Access-Control-Allow-Headers", "Content-Type, Accept");
+		response.addHeader("Access-Control-Allow-Headers", "Content-Type, authorization");
+		response.addHeader("Access-Control-Allow-Headers", "Content-Type, auth_token");
 
-		// Just ACCEPT and REPLY OK if OPTIONS
 		if (request.getMethod().equals("OPTIONS")) {
-			resp.setStatus(HttpServletResponse.SC_OK);
+			response.setStatus(HttpServletResponse.SC_OK);
 			return;
 		}
+		
+		if(response.getStatus() != UNAUTHORIZED) {
 		chain.doFilter(request, servletResponse);
+		}
 	}
 
 	@Override

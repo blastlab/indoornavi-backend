@@ -10,6 +10,7 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import javax.persistence.OrderBy;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -20,7 +21,7 @@ import javax.xml.bind.annotation.XmlTransient;
  * @author Michał Koszałka
  */
 @NamedQueries({
-	@NamedQuery(name = Complex.FIND_BY_PERSON, query = "SELECT c FROM Complex c WHERE c.person = :person")
+	@NamedQuery(name = Complex.FIND_BY_PERSON, query = "SELECT c FROM Complex c WHERE c.person = :person ORDER BY c.name")
 })
 @Entity
 @XmlRootElement
@@ -40,6 +41,7 @@ public class Complex implements Serializable {
 	private Person person;
 
 	@OneToMany(mappedBy = "complex")
+	@OrderBy("name")
 	private List<Building> buildings;
 
 	public Long getId() {

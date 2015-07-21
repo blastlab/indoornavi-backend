@@ -2,7 +2,7 @@ package co.blastlab.serviceblbnavi.rest.facade.ext.filter;
 
 import co.blastlab.serviceblbnavi.dao.PersonBean;
 import co.blastlab.serviceblbnavi.domain.Person;
-import co.blastlab.serviceblbnavi.rest.ejb.AuthorizationBean;
+import co.blastlab.serviceblbnavi.rest.bean.AuthorizationBean;
 import java.io.IOException;
 import javax.annotation.Priority;
 import javax.ejb.EJB;

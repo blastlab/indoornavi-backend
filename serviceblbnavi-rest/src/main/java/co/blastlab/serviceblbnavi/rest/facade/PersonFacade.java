@@ -2,7 +2,7 @@ package co.blastlab.serviceblbnavi.rest.facade;
 
 import co.blastlab.serviceblbnavi.dao.PersonBean;
 import co.blastlab.serviceblbnavi.domain.Person;
-import co.blastlab.serviceblbnavi.rest.ejb.AuthorizationBean;
+import co.blastlab.serviceblbnavi.rest.bean.AuthorizationBean;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;

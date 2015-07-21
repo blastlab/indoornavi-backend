@@ -1,11 +1,16 @@
 package co.blastlab.serviceblbnavi.rest;
 
 import co.blastlab.serviceblbnavi.dao.FloorBean;
+import co.blastlab.serviceblbnavi.dao.PersonBean;
 import co.blastlab.serviceblbnavi.domain.Floor;
+import co.blastlab.serviceblbnavi.domain.Person;
+import co.blastlab.serviceblbnavi.rest.bean.AuthorizationBean;
+import co.blastlab.serviceblbnavi.rest.facade.ext.filter.CORSFilter;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Base64;
 import javax.ejb.EJB;
+import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
@@ -29,6 +34,12 @@ public class FileUploadServlet extends HttpServlet {
 
 	@EJB
 	private FloorBean floorBean;
+	
+	@EJB
+	private PersonBean personBean;
+	
+	@Inject
+	private AuthorizationBean authorizationBean;
 
 	private static final Integer SEPARATOR_INDEX = 1;
 
@@ -36,6 +47,7 @@ public class FileUploadServlet extends HttpServlet {
 	protected void doPost(HttpServletRequest request,
 		HttpServletResponse response)
 		throws ServletException, IOException {
+		if(authorize(request, response)) {
 		response.setContentType("text/html;charset=UTF-8");
 
 		final Long floorId = Long.parseLong(request.getParameter("floor"));
@@ -46,11 +58,13 @@ public class FileUploadServlet extends HttpServlet {
 		Floor floor = floorBean.find(floorId);
 		floor.setBitmap(bytes);
 		floorBean.update(floor);
+		}
 
 	}
 
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		if(authorize(req, resp)) {
 		Long floorId;
 		String path = req.getPathInfo();
 		try {
@@ -63,7 +77,20 @@ public class FileUploadServlet extends HttpServlet {
 			throw new WebApplicationException(Response.Status.NOT_FOUND);
 		}
 		IOUtils.copy(new ByteArrayInputStream(Base64.getEncoder().encode(floor.getBitmap())), resp.getOutputStream());
-
+		}
+	}
+	
+	private boolean authorize(HttpServletRequest request, HttpServletResponse response) {
+		String authToken = request.getHeader("auth_token");
+		if(authToken != null) {
+			Person person = personBean.findByAuthToken(authToken);
+			if(person != null) {
+				authorizationBean.setCurrentUser(person);
+				return true;
+			}
+		}
+		response.setStatus(CORSFilter.UNAUTHORIZED);
+		return false;
 	}
 
 }

@@ -32,7 +32,7 @@ public class FloorBean {
 		em.remove(em.contains(floor) ? floor : em.merge(floor));
 	}
 	
-	public void updateFloors(List<Floor> floors) {
+	public void updateFloorLevels(List<Floor> floors) {
 		for(Floor f : floors) {
 			Floor floor = find(f.getId());
 			floor.setLevel(f.getLevel());

@@ -30,9 +30,9 @@ public class Exit implements Serializable {
 
 	private Double longitude;
 
-	private boolean in;
+	private boolean exitIn;
 
-	private boolean out;
+	private boolean exitOut;
 
 	@XmlTransient
 	@ManyToOne
@@ -95,20 +95,20 @@ public class Exit implements Serializable {
 		this.longitude = longitude;
 	}
 
-	public boolean isIn() {
-		return in;
+	public boolean isExitIn() {
+		return exitIn;
 	}
 
-	public void setIn(boolean in) {
-		this.in = in;
+	public void setExitIn(boolean exitIn) {
+		this.exitIn = exitIn;
 	}
 
-	public boolean isOut() {
-		return out;
+	public boolean isExitOut() {
+		return exitOut;
 	}
 
-	public void setOut(boolean out) {
-		this.out = out;
+	public void setExitOut(boolean exitOut) {
+		this.exitOut = exitOut;
 	}
 
 	public Vertex getVertex() {

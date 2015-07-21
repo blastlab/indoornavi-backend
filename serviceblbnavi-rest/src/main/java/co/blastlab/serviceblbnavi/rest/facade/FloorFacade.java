@@ -46,12 +46,9 @@ public class FloorFacade {
 				floor.setBuilding(building);
 				floorBean.create(floor);
 				return floor;
-			} else {
-				throw new EntityNotFoundException();
 			}
-		} else {
-			throw new EntityNotFoundException();
 		}
+		throw new EntityNotFoundException();
 	}
 
 	@GET
@@ -83,7 +80,6 @@ public class FloorFacade {
 		return Response.ok().build();
 	}
 
-	//TODO: refactor
 	@PUT
 	@ApiOperation(value = "update floor", response = Floor.class)
 	@ApiResponses({
@@ -95,34 +91,27 @@ public class FloorFacade {
 				Building building = buildingBean.find(floor.getBuildingId());
 				if (building != null) {
 					floor.setBuilding(building);
-				} else {
-					throw new EntityNotFoundException();
+					floorBean.update(floor);
+					return floor;
 				}
-			} else {
-				throw new EntityNotFoundException();
 			}
-		} else {
-			throw new EntityNotFoundException();
 		}
-		floorBean.update(floor);
-		return floor;
+		throw new EntityNotFoundException();
 	}
 
 	@PUT
 	@Path("/{id: \\d+}")
 	@ApiOperation(value = "update floors", response = Response.class)
 	public Response updateFloors(@PathParam("id") Long buildingId, @ApiParam(value = "floors", required = true) List<Floor> floors) {
-
 		Building building = buildingBean.find(buildingId);
 		if (building != null) {
 			for (Floor floor : floors) {
 				floor.setBuilding(building);
+				floorBean.updateFloorLevels(floors);
+				return Response.ok().build();
 			}
-		} else {
-			throw new EntityNotFoundException();
 		}
-		floorBean.updateFloors(floors);
-		return Response.ok().build();
+		throw new EntityNotFoundException();
 	}
 
 }

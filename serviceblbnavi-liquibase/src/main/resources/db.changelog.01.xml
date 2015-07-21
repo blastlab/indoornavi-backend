@@ -251,12 +251,17 @@
 		</addColumn>
 	</changeSet>
 	<changeSet id="14" author="mkoszalka">
-		<dropNotNullConstraint tableName="Floor" columnName="bitmap" columnDataType="MEDIUMBLOB" />
-		<dropNotNullConstraint tableName="Floor" columnName="mToPix" columnDataType="DOUBLE" />
-		<dropNotNullConstraint tableName="Floor" columnName="startZoom" columnDataType="DOUBLE" />
+		<dropNotNullConstraint tableName="Floor" columnName="bitmap" columnDataType="MEDIUMBLOB"/>
+		<dropNotNullConstraint tableName="Floor" columnName="mToPix" columnDataType="DOUBLE"/>
+		<dropNotNullConstraint tableName="Floor" columnName="startZoom" columnDataType="DOUBLE"/>
 		<addColumn tableName="Beacon">
 			<column name="minor" type="INT"/>
 			<column name="major" type="INT"/>
 		</addColumn>
+	</changeSet>
+	<changeSet id="15" author="mkoszalka">
+		<renameColumn tableName="Floor" oldColumnName="number" newColumnName="level" columnDataType="TINYINT"/>
+		<renameColumn tableName="Exit" oldColumnName="in" newColumnName="exitIn" columnDataType="TINYINT"/>
+		<renameColumn tableName="Exit" oldColumnName="out" newColumnName="exitOut" columnDataType="TINYINT"/>
 	</changeSet>
 </databaseChangeLog>

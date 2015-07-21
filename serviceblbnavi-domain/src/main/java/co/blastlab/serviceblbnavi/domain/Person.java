@@ -10,6 +10,7 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import javax.persistence.OrderBy;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -40,6 +41,7 @@ public class Person implements Serializable {
 	private String authToken;
 
 	@OneToMany(mappedBy = "person")
+	@OrderBy("name")
 	private List<Complex> complexs;
 
 	public String getAuthToken() {

@@ -1,4 +1,4 @@
-package co.blastlab.serviceblbnavi.rest.ejb;
+package co.blastlab.serviceblbnavi.rest.bean;
 
 import co.blastlab.serviceblbnavi.domain.Person;
 import javax.enterprise.context.RequestScoped;

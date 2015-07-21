@@ -4,7 +4,7 @@ import co.blastlab.serviceblbnavi.dao.BuildingBean;
 import co.blastlab.serviceblbnavi.dao.ComplexBean;
 import co.blastlab.serviceblbnavi.domain.Building;
 import co.blastlab.serviceblbnavi.domain.Complex;
-import co.blastlab.serviceblbnavi.rest.ejb.AuthorizationBean;
+import co.blastlab.serviceblbnavi.rest.bean.AuthorizationBean;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
@@ -62,7 +62,7 @@ public class BuildingFacade {
 		return building;
 	}
 
-	//TODO: refactor
+	//TODO: refactor add @valid annotations and validate it in model.
 	@PUT
 	@ApiOperation(value = "update building", response = Building.class)
 	@ApiResponses({
@@ -75,16 +75,11 @@ public class BuildingFacade {
 				if (complex != null) {
 					building.setComplex(complex);
 					buildingBean.update(building);
-				} else {
-					throw new EntityNotFoundException();
-				}
-			} else {
-				throw new EntityNotFoundException();
+					return building;
+				} 
 			}
-		} else {
-			throw new EntityNotFoundException();
 		}
-		return building;
+		throw new EntityNotFoundException();
 	}
 
 	@DELETE

@@ -27,9 +27,9 @@ public class Floor implements Serializable {
 	@GeneratedValue
 	private Long id;
 
-	@Column(name = "number")
 	private Integer level;
 
+	@XmlTransient
 	private byte[] bitmap;
 
 	private Double mToPix;
