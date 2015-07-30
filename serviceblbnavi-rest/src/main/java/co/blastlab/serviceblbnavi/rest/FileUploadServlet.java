@@ -73,7 +73,7 @@ public class FileUploadServlet extends HttpServlet {
 			throw new BadRequestException();
 		}
 		Floor floor = floorBean.find(floorId);
-		if (floor == null) {
+		if (floor == null || floor.getBitmap() == null) {
 			throw new WebApplicationException(Response.Status.NOT_FOUND);
 		}
 		IOUtils.copy(new ByteArrayInputStream(Base64.getEncoder().encode(floor.getBitmap())), resp.getOutputStream());
