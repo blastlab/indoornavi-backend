@@ -28,7 +28,7 @@ public class CORSFilter implements Filter {
 
 		HttpServletResponse response = (HttpServletResponse) servletResponse;
 		response.addHeader("Access-Control-Allow-Origin", "*");
-		response.addHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+		response.addHeader("Access-Control-Allow-Headers","Pragma, Origin, X-Requested-With, Content-Type, Accept");
 		response.addHeader("Access-Control-Allow-Credentials", "true");
 		response.addHeader("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT");
 		response.addHeader("Access-Control-Allow-Headers", "Content-Type, Accept");
@@ -42,6 +42,7 @@ public class CORSFilter implements Filter {
 		
 		if(response.getStatus() != UNAUTHORIZED) {
 		chain.doFilter(request, servletResponse);
+			System.out.println("filtering");
 		}
 	}
 
