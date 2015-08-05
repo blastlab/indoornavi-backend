@@ -1,5 +1,7 @@
 package co.blastlab.serviceblbnavi.domain;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -16,8 +18,7 @@ import javax.xml.bind.annotation.XmlTransient;
  * @author Michał Koszałka
  */
 @Entity
-@XmlRootElement
-@XmlAccessorType(XmlAccessType.FIELD)
+@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY, setterVisibility = JsonAutoDetect.Visibility.NONE, getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class Beacon implements Serializable {
 
 	@Id
@@ -40,7 +41,7 @@ public class Beacon implements Serializable {
 	private Long floorId;
 
 	@ManyToOne
-	@XmlTransient
+	@JsonIgnore
 	private Floor floor;
 
 	public Long getFloorId() {

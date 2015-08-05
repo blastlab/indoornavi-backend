@@ -23,7 +23,7 @@ public class RestApplication extends Application {
 
 		BeanConfig beanConfig = new BeanConfig();
 		beanConfig.setVersion("1.0.0");
-		beanConfig.setSchemes(new String[]{"https"});
+		beanConfig.setSchemes(new String[]{"http"});
 		beanConfig.setBasePath("/rest/v1");
 		beanConfig.setResourcePackage("co.blastlab.serviceblbnavi.rest.facade");
 		beanConfig.setDescription("<p>For most of rest methods auth_token is needed to be executed. Only: <ul>"

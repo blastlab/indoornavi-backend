@@ -1,6 +1,7 @@
 package co.blastlab.serviceblbnavi.domain;
 
 import co.blastlab.serviceblbnavi.security.PasswordEncoder;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import java.io.Serializable;
 import java.util.List;
 import javax.persistence.Entity;
@@ -9,12 +10,7 @@ import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import javax.persistence.OrderBy;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
@@ -25,8 +21,7 @@ import javax.xml.bind.annotation.XmlTransient;
 	@NamedQuery(name = Person.FIND_BY_AUTH_TOKEN, query = "SELECT p FROM Person p WHERE p.authToken = :authToken")
 })
 @Entity
-@XmlRootElement
-@XmlAccessorType(XmlAccessType.FIELD)
+@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY, setterVisibility = JsonAutoDetect.Visibility.NONE, getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class Person implements Serializable {
 
 	public static final String FIND_BY_EMAIL = "Person.findByEmail";

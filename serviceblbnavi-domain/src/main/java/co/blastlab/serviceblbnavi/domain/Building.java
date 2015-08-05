@@ -1,5 +1,7 @@
 package co.blastlab.serviceblbnavi.domain;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
 import java.util.List;
 import javax.persistence.Entity;
@@ -11,10 +13,6 @@ import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
 import javax.persistence.Transient;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
@@ -24,8 +22,7 @@ import javax.xml.bind.annotation.XmlTransient;
 	@NamedQuery(name = Building.FIND_BY_COMPLEX, query = "SELECT b FROM Building b WHERE b.complex = :complex ORDER BY b.name")
 })
 @Entity
-@XmlRootElement
-@XmlAccessorType(XmlAccessType.FIELD)
+@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY, setterVisibility = JsonAutoDetect.Visibility.NONE, getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class Building implements Serializable {
 
 	public static final String FIND_BY_COMPLEX = "Building.findByComplex";
@@ -40,7 +37,7 @@ public class Building implements Serializable {
 
 	private Double degree;
 
-	@XmlTransient
+	@JsonIgnore
 	@ManyToOne
 	private Complex complex;
 
