@@ -1,2 +1,8 @@
 *target*
 *.classpath_nb
+
+*nb-configuration.xml
+*jboss.xml
+*jboss-app.xml
+*jboss-web.xml
+

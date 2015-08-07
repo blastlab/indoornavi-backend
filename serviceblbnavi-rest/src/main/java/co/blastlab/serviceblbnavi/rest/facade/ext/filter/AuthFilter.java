@@ -43,6 +43,7 @@ public class AuthFilter implements ContainerRequestFilter {
 		String path = requestCtx.getUriInfo().getAbsolutePath().toString();
 
 		if (!path.endsWith("/person") && !path.contains("/api") && !path.contains("swagger.json")) {
+                    System.out.println("authorization filtering");
 			String authToken = requestCtx.getHeaderString(AUTH_TOKEN);
 			if (authToken == null) {
 				throw new WebApplicationException(Response.Status.UNAUTHORIZED);

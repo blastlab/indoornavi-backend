@@ -26,7 +26,7 @@ public class Floor implements Serializable {
 
 	private Integer level;
 
-	@XmlTransient
+	@JsonIgnore
 	private byte[] bitmap;
 
 	private Double mToPix;

@@ -41,7 +41,6 @@ public class CORSFilter implements Filter {
 		
 		if(response.getStatus() != UNAUTHORIZED) {
 		chain.doFilter(request, servletResponse);
-			System.out.println("filtering");
 		}
 	}
 
