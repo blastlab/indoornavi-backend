@@ -69,7 +69,7 @@ public class FloorFacade {
 	@Path("/{id: \\d+}")
 	@ApiOperation(value = "delete floor", response = Response.class)
 	@ApiResponses({
-		@ApiResponse(code = 404, message = "floor with given doesn't exist")
+		@ApiResponse(code = 404, message = "floor with given id doesn't exist")
 	})
 	public Response delete(@PathParam("id") @ApiParam(value = "id", required = true) Long id) {
 		Floor floor = floorBean.find(id);
@@ -86,7 +86,6 @@ public class FloorFacade {
 		@ApiResponse(code = 404, message = "building id or building empty or doesn't exist")
 	})
 	public Floor update(@ApiParam(value = "floor", required = true) Floor floor) {
-		if (floor.getBuilding() == null) {
 			if (floor.getBuildingId() != null) {
 				Building building = buildingBean.find(floor.getBuildingId());
 				if (building != null) {
@@ -95,7 +94,6 @@ public class FloorFacade {
 					return floor;
 				}
 			}
-		}
 		throw new EntityNotFoundException();
 	}
 
