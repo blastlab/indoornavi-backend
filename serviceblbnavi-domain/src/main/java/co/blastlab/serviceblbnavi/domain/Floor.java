@@ -40,6 +40,7 @@ public class Floor implements Serializable {
     @OneToMany(mappedBy = "floor")
     private List<Waypoint> waypoints;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "floor")
     private List<Vertex> vertexs;
 
