@@ -12,7 +12,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlAccessorType(XmlAccessType.NONE)
 public abstract class ErrorResponseContent {
 
-	@XmlElement
-	public abstract String getError();
+    @XmlElement
+    public abstract String getError();
 
 }

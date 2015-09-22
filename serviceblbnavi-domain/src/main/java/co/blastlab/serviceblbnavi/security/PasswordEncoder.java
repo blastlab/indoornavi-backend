@@ -9,10 +9,10 @@ import org.apache.commons.lang.RandomStringUtils;
  */
 public class PasswordEncoder {
 
-	private static final int AUTH_TOKEN_LENGTH = 32;
+    private static final int AUTH_TOKEN_LENGTH = 32;
 
-	public static String getAuthToken() {
-		return RandomStringUtils.randomAlphanumeric(AUTH_TOKEN_LENGTH);
-	}
+    public static String getAuthToken() {
+        return RandomStringUtils.randomAlphanumeric(AUTH_TOKEN_LENGTH);
+    }
 
 }

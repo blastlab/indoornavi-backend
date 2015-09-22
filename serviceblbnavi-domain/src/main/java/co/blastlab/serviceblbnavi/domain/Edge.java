@@ -7,6 +7,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Transient;
 
 /**
@@ -14,75 +16,88 @@ import javax.persistence.Transient;
  * @author Michał Koszałka
  */
 @Entity
-@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY, setterVisibility = JsonAutoDetect.Visibility.NONE, getterVisibility = JsonAutoDetect.Visibility.NONE)
+@NamedQueries({
+    @NamedQuery(name = Edge.FIND_BY_TARGET_AND_SOURCE, query = "SELECT e FROM Edge e WHERE e.source = :source AND e.target = :target")
+})
+@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.ANY, getterVisibility = JsonAutoDetect.Visibility.ANY)
 public class Edge implements Serializable {
 
-	@Id
-	@GeneratedValue
-	private Long id;
+    public static final String FIND_BY_TARGET_AND_SOURCE = "Edge.findByTargetAndSource";
 
-	private Double weight;
+    @Id
+    @GeneratedValue
+    private Long id;
 
-	@JsonIgnore
-	@ManyToOne
-	private Vertex source;
+    private Double weight;
 
-	@JsonIgnore
-	@ManyToOne
-	private Vertex target;
+    @JsonIgnore
+    @ManyToOne
+    private Vertex source;
 
-	@Transient
-	private Long sourceId;
+    @JsonIgnore
+    @ManyToOne
+    private Vertex target;
 
-	@Transient
-	private Long targetId;
+    @Transient
+    private Long sourceId;
 
-	public Long getSourceId() {
-		return sourceId;
-	}
+    @Transient
+    private Long targetId;
 
-	public void setSourceId(Long sourceId) {
-		this.sourceId = sourceId;
-	}
+    public Long getSourceId() {
+        if (this.source != null) {
+            return this.source.getId();
+        } else {
+            return sourceId;
+        }
+    }
 
-	public Long getTargetId() {
-		return targetId;
-	}
+    public void setSourceId(Long sourceId) {
+        this.sourceId = sourceId;
+    }
 
-	public void setTargetId(Long targetId) {
-		this.targetId = targetId;
-	}
+    public Long getTargetId() {
+        if (this.target != null) {
+            return this.target.getId();
+        } else {
+            return targetId;
+        }
+    }
 
-	public Long getId() {
-		return id;
-	}
+    public void setTargetId(Long targetId) {
+        this.targetId = targetId;
+    }
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+    public Long getId() {
+        return id;
+    }
 
-	public Double getWeight() {
-		return weight;
-	}
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-	public void setWeight(Double weight) {
-		this.weight = weight;
-	}
+    public Double getWeight() {
+        return weight;
+    }
 
-	public Vertex getSource() {
-		return source;
-	}
+    public void setWeight(Double weight) {
+        this.weight = weight;
+    }
 
-	public void setSource(Vertex source) {
-		this.source = source;
-	}
+    public Vertex getSource() {
+        return source;
+    }
 
-	public Vertex getTarget() {
-		return target;
-	}
+    public void setSource(Vertex source) {
+        this.source = source;
+    }
 
-	public void setTarget(Vertex target) {
-		this.target = target;
-	}
+    public Vertex getTarget() {
+        return target;
+    }
+
+    public void setTarget(Vertex target) {
+        this.target = target;
+    }
 
 }

@@ -11,14 +11,14 @@ import javax.enterprise.context.RequestScoped;
 @RequestScoped
 public class AuthorizationBean {
 
-	private Person currentUser;
+    private Person currentUser;
 
-	public Person getCurrentUser() {
-		return currentUser;
-	}
+    public Person getCurrentUser() {
+        return currentUser;
+    }
 
-	public void setCurrentUser(Person currentUser) {
-		this.currentUser = currentUser;
-	}
+    public void setCurrentUser(Person currentUser) {
+        this.currentUser = currentUser;
+    }
 
 }

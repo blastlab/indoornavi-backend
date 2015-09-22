@@ -14,44 +14,44 @@ import javax.xml.bind.annotation.XmlElement;
  */
 public class ValidationErrorResponseContent extends ErrorResponseContent {
 
-	private final List<Error> errors = new ArrayList<>();
+    private final List<Error> errors = new ArrayList<>();
 
-	/**
-	 * No-argument constructor for JAX-B serialization.
-	 */
-	public ValidationErrorResponseContent() {
-	}
+    /**
+     * No-argument constructor for JAX-B serialization.
+     */
+    public ValidationErrorResponseContent() {
+    }
 
-	public ValidationErrorResponseContent(ConstraintViolationException exception) {
-		Set<ConstraintViolation<?>> violations = exception.getConstraintViolations();
-		for (ConstraintViolation<?> violation : violations) {
-			errors.add(new Error(violation.getPropertyPath().toString(), violation.getMessage()));
-		}
-	}
+    public ValidationErrorResponseContent(ConstraintViolationException exception) {
+        Set<ConstraintViolation<?>> violations = exception.getConstraintViolations();
+        for (ConstraintViolation<?> violation : violations) {
+            errors.add(new Error(violation.getPropertyPath().toString(), violation.getMessage()));
+        }
+    }
 
-	@Override
-	public String getError() {
-		return "constraint_violation";
-	}
+    @Override
+    public String getError() {
+        return "constraint_violation";
+    }
 
-	@XmlElement
-	public List<Error> getViolations() {
-		return errors;
-	}
+    @XmlElement
+    public List<Error> getViolations() {
+        return errors;
+    }
 
-	@XmlAccessorType(XmlAccessType.FIELD)
-	public static class Error {
+    @XmlAccessorType(XmlAccessType.FIELD)
+    public static class Error {
 
-		private String key;
-		private String value;
+        private String key;
+        private String value;
 
-		public Error() {
-		}
+        public Error() {
+        }
 
-		public Error(String key, String value) {
-			this.key = key;
-			this.value = value;
-		}
+        public Error(String key, String value) {
+            this.key = key;
+            this.value = value;
+        }
 
         public String getKey() {
             return key;
@@ -68,7 +68,6 @@ public class ValidationErrorResponseContent extends ErrorResponseContent {
         public void setValue(String value) {
             this.value = value;
         }
-                
-                
-	}
+
+    }
 }

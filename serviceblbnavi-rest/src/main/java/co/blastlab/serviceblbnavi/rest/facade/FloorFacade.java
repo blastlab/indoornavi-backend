@@ -28,88 +28,88 @@ import javax.ws.rs.core.Response;
 @Api("/floor")
 public class FloorFacade {
 
-	@EJB
-	private FloorBean floorBean;
+    @EJB
+    private FloorBean floorBean;
 
-	@EJB
-	private BuildingBean buildingBean;
+    @EJB
+    private BuildingBean buildingBean;
 
-	@POST
-	@ApiOperation(value = "create floor", response = Floor.class)
-	@ApiResponses({
-		@ApiResponse(code = 404, message = "building id empty or building doesn't exist")
-	})
-	public Floor create(@ApiParam(value = "floor", required = true) Floor floor) {
-		if (floor.getBuildingId() != null) {
-			Building building = buildingBean.find(floor.getBuildingId());
-			if (building != null) {
-				floor.setBuilding(building);
-				floorBean.create(floor);
-				return floor;
-			}
-		}
-		throw new EntityNotFoundException();
-	}
+    @POST
+    @ApiOperation(value = "create floor", response = Floor.class)
+    @ApiResponses({
+        @ApiResponse(code = 404, message = "building id empty or building doesn't exist")
+    })
+    public Floor create(@ApiParam(value = "floor", required = true) Floor floor) {
+        if (floor.getBuildingId() != null) {
+            Building building = buildingBean.find(floor.getBuildingId());
+            if (building != null) {
+                floor.setBuilding(building);
+                floorBean.create(floor);
+                return floor;
+            }
+        }
+        throw new EntityNotFoundException();
+    }
 
-	@GET
-	@Path("/{id: \\d+}")
-	@ApiOperation(value = "find floor", response = Floor.class)
-	@ApiResponses({
-		@ApiResponse(code = 404, message = "floor with given id wasn't found")
-	})
-	public Floor find(@PathParam("id") @ApiParam(value = "id", required = true) Long id) {
-		Floor floor = floorBean.find(id);
-		if (floor == null) {
-			throw new EntityNotFoundException();
-		}
-		return floor;
-	}
+    @GET
+    @Path("/{id: \\d+}")
+    @ApiOperation(value = "find floor", response = Floor.class)
+    @ApiResponses({
+        @ApiResponse(code = 404, message = "floor with given id wasn't found")
+    })
+    public Floor find(@PathParam("id") @ApiParam(value = "id", required = true) Long id) {
+        Floor floor = floorBean.find(id);
+        if (floor == null) {
+            throw new EntityNotFoundException();
+        }
+        return floor;
+    }
 
-	@DELETE
-	@Path("/{id: \\d+}")
-	@ApiOperation(value = "delete floor", response = Response.class)
-	@ApiResponses({
-		@ApiResponse(code = 404, message = "floor with given id doesn't exist")
-	})
-	public Response delete(@PathParam("id") @ApiParam(value = "id", required = true) Long id) {
-		Floor floor = floorBean.find(id);
-		if (floor == null) {
-			throw new EntityNotFoundException();
-		}
-		floorBean.delete(floor);
-		return Response.ok().build();
-	}
+    @DELETE
+    @Path("/{id: \\d+}")
+    @ApiOperation(value = "delete floor", response = Response.class)
+    @ApiResponses({
+        @ApiResponse(code = 404, message = "floor with given id doesn't exist")
+    })
+    public Response delete(@PathParam("id") @ApiParam(value = "id", required = true) Long id) {
+        Floor floor = floorBean.find(id);
+        if (floor == null) {
+            throw new EntityNotFoundException();
+        }
+        floorBean.delete(floor);
+        return Response.ok().build();
+    }
 
-	@PUT
-	@ApiOperation(value = "update floor", response = Floor.class)
-	@ApiResponses({
-		@ApiResponse(code = 404, message = "building id or building empty or doesn't exist")
-	})
-	public Floor update(@ApiParam(value = "floor", required = true) Floor floor) {
-			if (floor.getBuildingId() != null) {
-				Building building = buildingBean.find(floor.getBuildingId());
-				if (building != null) {
-					floor.setBuilding(building);
-					floorBean.update(floor);
-					return floor;
-				}
-			}
-		throw new EntityNotFoundException();
-	}
+    @PUT
+    @ApiOperation(value = "update floor", response = Floor.class)
+    @ApiResponses({
+        @ApiResponse(code = 404, message = "building id or building empty or doesn't exist")
+    })
+    public Floor update(@ApiParam(value = "floor", required = true) Floor floor) {
+        if (floor.getBuildingId() != null) {
+            Building building = buildingBean.find(floor.getBuildingId());
+            if (building != null) {
+                floor.setBuilding(building);
+                floorBean.update(floor);
+                return floor;
+            }
+        }
+        throw new EntityNotFoundException();
+    }
 
-	@PUT
-	@Path("/{id: \\d+}")
-	@ApiOperation(value = "update floors", response = Response.class)
-	public Response updateFloors(@PathParam("id") Long buildingId, @ApiParam(value = "floors", required = true) List<Floor> floors) {
-		Building building = buildingBean.find(buildingId);
-		if (building != null) {
-			for (Floor floor : floors) {
-				floor.setBuilding(building);
-				floorBean.updateFloorLevels(floors);
-				return Response.ok().build();
-			}
-		}
-		throw new EntityNotFoundException();
-	}
+    @PUT
+    @Path("/{id: \\d+}")
+    @ApiOperation(value = "update floors", response = Response.class)
+    public Response updateFloors(@PathParam("id") Long buildingId, @ApiParam(value = "floors", required = true) List<Floor> floors) {
+        Building building = buildingBean.find(buildingId);
+        if (building != null) {
+            for (Floor floor : floors) {
+                floor.setBuilding(building);
+                floorBean.updateFloorLevels(floors);
+                return Response.ok().build();
+            }
+        }
+        throw new EntityNotFoundException();
+    }
 
 }

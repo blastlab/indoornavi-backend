@@ -8,6 +8,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Transient;
 
@@ -16,126 +18,129 @@ import javax.persistence.Transient;
  * @author Michał Koszałka
  */
 @Entity
+@NamedQueries({
+    @NamedQuery(name = Vertex.FIND_BY_FLOOR, query = "SELECT v FROM Vertex v WHERE v.floor = :floor")
+})
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY, setterVisibility = JsonAutoDetect.Visibility.NONE, getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class Vertex implements Serializable {
 
-	@Id
-	@GeneratedValue
-	private Long id;
+    public static final String FIND_BY_FLOOR = "Vertex.findByFloor";
 
-	private Double x;
+    @Id
+    @GeneratedValue
+    private Long id;
 
-	private Double y;
+    private Double x;
 
-	private boolean isFloorDownChangeable;
+    private Double y;
 
-	private boolean isFloorUpChangeable;
+    private boolean isFloorDownChangeable;
 
-	@Transient
-	private Long floorId;
+    private boolean isFloorUpChangeable;
 
-	@OneToMany(mappedBy = "vertex")
-	private List<Exit> exits;
+    @Transient
+    private Long floorId;
 
-	@OneToMany(mappedBy = "target")
-	private List<Edge> targetEdges;
+//	@OneToMany(mappedBy = "vertex")
+//	private List<Exit> exits;
+    @OneToMany(mappedBy = "target")
+    private List<Edge> targetEdges;
 
-	@OneToMany(mappedBy = "source")
-	private List<Edge> sourceEdges;
+    @OneToMany(mappedBy = "source")
+    private List<Edge> sourceEdges;
 
-	@OneToMany(mappedBy = "vertex")
-	private List<Goal> goals;
+    @OneToMany(mappedBy = "vertex")
+    private List<Goal> goals;
 
-	@JsonIgnore
-	@ManyToOne
-	private Floor floor;
+    @JsonIgnore
+    @ManyToOne
+    private Floor floor;
 
-	public Long getFloorId() {
-		return floorId;
-	}
+    public Long getFloorId() {
+        return floorId;
+    }
 
-	public void setFloorId(Long floorId) {
-		this.floorId = floorId;
-	}
+    public void setFloorId(Long floorId) {
+        this.floorId = floorId;
+    }
 
-	public List<Exit> getExits() {
-		return exits;
-	}
+//	public List<Exit> getExits() {
+//		return exits;
+//	}
+//
+//	public void setExits(List<Exit> exits) {
+//		this.exits = exits;
+//	}
+    public List<Edge> getTargetEdges() {
+        return targetEdges;
+    }
 
-	public void setExits(List<Exit> exits) {
-		this.exits = exits;
-	}
+    public void setTargetEdges(List<Edge> targetEdges) {
+        this.targetEdges = targetEdges;
+    }
 
-	public List<Edge> getTargetEdges() {
-		return targetEdges;
-	}
+    public List<Edge> getSourceEdges() {
+        return sourceEdges;
+    }
 
-	public void setTargetEdges(List<Edge> targetEdges) {
-		this.targetEdges = targetEdges;
-	}
+    public void setSourceEdges(List<Edge> sourceEdges) {
+        this.sourceEdges = sourceEdges;
+    }
 
-	public List<Edge> getSourceEdges() {
-		return sourceEdges;
-	}
+    public List<Goal> getGoals() {
+        return goals;
+    }
 
-	public void setSourceEdges(List<Edge> sourceEdges) {
-		this.sourceEdges = sourceEdges;
-	}
+    public void setGoals(List<Goal> goals) {
+        this.goals = goals;
+    }
 
-	public List<Goal> getGoals() {
-		return goals;
-	}
+    public Long getId() {
+        return id;
+    }
 
-	public void setGoals(List<Goal> goals) {
-		this.goals = goals;
-	}
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-	public Long getId() {
-		return id;
-	}
+    public Double getX() {
+        return x;
+    }
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+    public void setX(Double x) {
+        this.x = x;
+    }
 
-	public Double getX() {
-		return x;
-	}
+    public Double getY() {
+        return y;
+    }
 
-	public void setX(Double x) {
-		this.x = x;
-	}
+    public void setY(Double y) {
+        this.y = y;
+    }
 
-	public Double getY() {
-		return y;
-	}
+    public Floor getFloor() {
+        return floor;
+    }
 
-	public void setY(Double y) {
-		this.y = y;
-	}
+    public void setFloor(Floor floor) {
+        this.floor = floor;
+    }
 
-	public Floor getFloor() {
-		return floor;
-	}
+    public boolean isIsFloorDownChangeable() {
+        return isFloorDownChangeable;
+    }
 
-	public void setFloor(Floor floor) {
-		this.floor = floor;
-	}
+    public void setIsFloorDownChangeable(boolean isFloorDownChangeable) {
+        this.isFloorDownChangeable = isFloorDownChangeable;
+    }
 
-	public boolean isIsFloorDownChangeable() {
-		return isFloorDownChangeable;
-	}
+    public boolean isIsFloorUpChangeable() {
+        return isFloorUpChangeable;
+    }
 
-	public void setIsFloorDownChangeable(boolean isFloorDownChangeable) {
-		this.isFloorDownChangeable = isFloorDownChangeable;
-	}
-
-	public boolean isIsFloorUpChangeable() {
-		return isFloorUpChangeable;
-	}
-
-	public void setIsFloorUpChangeable(boolean isFloorUpChangeable) {
-		this.isFloorUpChangeable = isFloorUpChangeable;
-	}
+    public void setIsFloorUpChangeable(boolean isFloorUpChangeable) {
+        this.isFloorUpChangeable = isFloorUpChangeable;
+    }
 
 }

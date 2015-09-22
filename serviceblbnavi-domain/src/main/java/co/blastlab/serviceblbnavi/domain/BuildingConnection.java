@@ -17,72 +17,72 @@ import javax.persistence.Transient;
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY, setterVisibility = JsonAutoDetect.Visibility.NONE, getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class BuildingConnection implements Serializable {
 
-	@Id
-	@GeneratedValue
-	private Long id;
+    @Id
+    @GeneratedValue
+    private Long id;
 
-	private Double distance;
+    private Double distance;
 
-	@JsonIgnore
-	@ManyToOne
-	private Exit source;
+    @JsonIgnore
+    @ManyToOne
+    private Exit source;
 
-	@JsonIgnore
-	@ManyToOne
-	private Exit target;
+    @JsonIgnore
+    @ManyToOne
+    private Exit target;
 
-	@Transient
-	private Long sourceId;
+    @Transient
+    private Long sourceId;
 
-	@Transient
-	private Long targetId;
+    @Transient
+    private Long targetId;
 
-	public Long getSourceId() {
-		return sourceId;
-	}
+    public Long getSourceId() {
+        return sourceId;
+    }
 
-	public void setSourceId(Long sourceId) {
-		this.sourceId = sourceId;
-	}
+    public void setSourceId(Long sourceId) {
+        this.sourceId = sourceId;
+    }
 
-	public Long getTargetId() {
-		return targetId;
-	}
+    public Long getTargetId() {
+        return targetId;
+    }
 
-	public void setTargetId(Long targetId) {
-		this.targetId = targetId;
-	}
+    public void setTargetId(Long targetId) {
+        this.targetId = targetId;
+    }
 
-	public Long getId() {
-		return id;
-	}
+    public Long getId() {
+        return id;
+    }
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-	public Double getDistance() {
-		return distance;
-	}
+    public Double getDistance() {
+        return distance;
+    }
 
-	public void setDistance(Double distance) {
-		this.distance = distance;
-	}
+    public void setDistance(Double distance) {
+        this.distance = distance;
+    }
 
-	public Exit getSource() {
-		return source;
-	}
+    public Exit getSource() {
+        return source;
+    }
 
-	public void setSource(Exit source) {
-		this.source = source;
-	}
+    public void setSource(Exit source) {
+        this.source = source;
+    }
 
-	public Exit getTarget() {
-		return target;
-	}
+    public Exit getTarget() {
+        return target;
+    }
 
-	public void setTarget(Exit target) {
-		this.target = target;
-	}
+    public void setTarget(Exit target) {
+        this.target = target;
+    }
 
 }

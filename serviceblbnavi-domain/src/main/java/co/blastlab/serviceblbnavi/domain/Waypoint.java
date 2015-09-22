@@ -17,89 +17,89 @@ import javax.persistence.Transient;
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY, setterVisibility = JsonAutoDetect.Visibility.NONE, getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class Waypoint implements Serializable {
 
-	@Id
-	@GeneratedValue
-	private Long id;
+    @Id
+    @GeneratedValue
+    private Long id;
 
-	private Double x;
+    private Double x;
 
-	private Double y;
+    private Double y;
 
-	private Integer timeToCheckout;
+    private Integer timeToCheckout;
 
-	private Double distance;
+    private Double distance;
 
-	private String details;
+    private String details;
 
-	@Transient
-	private Long floorId;
+    @Transient
+    private Long floorId;
 
-	@JsonIgnore
-	@ManyToOne
-	private Floor floor;
+    @JsonIgnore
+    @ManyToOne
+    private Floor floor;
 
-	public Long getFloorId() {
-		return floorId;
-	}
+    public Long getFloorId() {
+        return floorId;
+    }
 
-	public void setFloorId(Long floorId) {
-		this.floorId = floorId;
-	}
+    public void setFloorId(Long floorId) {
+        this.floorId = floorId;
+    }
 
-	public Long getId() {
-		return id;
-	}
+    public Long getId() {
+        return id;
+    }
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-	public Double getX() {
-		return x;
-	}
+    public Double getX() {
+        return x;
+    }
 
-	public void setX(Double x) {
-		this.x = x;
-	}
+    public void setX(Double x) {
+        this.x = x;
+    }
 
-	public Double getY() {
-		return y;
-	}
+    public Double getY() {
+        return y;
+    }
 
-	public void setY(Double y) {
-		this.y = y;
-	}
+    public void setY(Double y) {
+        this.y = y;
+    }
 
-	public Integer getTimeToCheckout() {
-		return timeToCheckout;
-	}
+    public Integer getTimeToCheckout() {
+        return timeToCheckout;
+    }
 
-	public void setTimeToCheckout(Integer timeToCheckout) {
-		this.timeToCheckout = timeToCheckout;
-	}
+    public void setTimeToCheckout(Integer timeToCheckout) {
+        this.timeToCheckout = timeToCheckout;
+    }
 
-	public Double getDistance() {
-		return distance;
-	}
+    public Double getDistance() {
+        return distance;
+    }
 
-	public void setDistance(Double distance) {
-		this.distance = distance;
-	}
+    public void setDistance(Double distance) {
+        this.distance = distance;
+    }
 
-	public String getDetails() {
-		return details;
-	}
+    public String getDetails() {
+        return details;
+    }
 
-	public void setDetails(String details) {
-		this.details = details;
-	}
+    public void setDetails(String details) {
+        this.details = details;
+    }
 
-	public Floor getFloor() {
-		return floor;
-	}
+    public Floor getFloor() {
+        return floor;
+    }
 
-	public void setFloor(Floor floor) {
-		this.floor = floor;
-	}
+    public void setFloor(Floor floor) {
+        this.floor = floor;
+    }
 
 }

@@ -30,84 +30,84 @@ import javax.ws.rs.core.Response;
 @Api("/building")
 public class BuildingFacade {
 
-	@EJB
-	private BuildingBean buildingBean;
+    @EJB
+    private BuildingBean buildingBean;
 
-	@EJB
-	private ComplexBean complexBean;
+    @EJB
+    private ComplexBean complexBean;
 
-	@Inject
-	private AuthorizationBean authorizationBean;
+    @Inject
+    private AuthorizationBean authorizationBean;
 
-	@POST
-	@ApiOperation(value = "create", response = Building.class)
-	public Building create(@ApiParam(value = "building", required = true) Building building) {
-		Complex complex = authorizationBean.getCurrentUser().getComplexs().get(0);
-		building.setComplex(complex);
-		buildingBean.create(building);
-		return building;
-	}
+    @POST
+    @ApiOperation(value = "create", response = Building.class)
+    public Building create(@ApiParam(value = "building", required = true) Building building) {
+        Complex complex = authorizationBean.getCurrentUser().getComplexs().get(0);
+        building.setComplex(complex);
+        buildingBean.create(building);
+        return building;
+    }
 
-	@GET
-	@Path("/{id: \\d+}")
-	@ApiOperation(value = "find building")
-	@ApiResponses({
-		@ApiResponse(code = 404, message = "building with given id wasn't found")
-	})
-	public Building find(@PathParam("id") @ApiParam(value = "id", required = true) Long id) {
-		Building building = buildingBean.find(id);
-		if (building == null) {
-			throw new EntityNotFoundException();
-		}
-		return building;
-	}
+    @GET
+    @Path("/{id: \\d+}")
+    @ApiOperation(value = "find building")
+    @ApiResponses({
+        @ApiResponse(code = 404, message = "building with given id wasn't found")
+    })
+    public Building find(@PathParam("id") @ApiParam(value = "id", required = true) Long id) {
+        Building building = buildingBean.find(id);
+        if (building == null) {
+            throw new EntityNotFoundException();
+        }
+        return building;
+    }
 
-	//TODO: refactor add @valid annotations and validate it in model.
-	@PUT
-	@ApiOperation(value = "update building", response = Building.class)
-	@ApiResponses({
-		@ApiResponse(code = 404, message = "complex id or complex empty or doesn't exist")
-	})
-	public Building update(@ApiParam(value = "building", required = true) Building building) {
-		if (building.getComplex() == null) {
-			if (building.getComplexId() != null) {
-				Complex complex = complexBean.find(building.getComplexId());
-				if (complex != null) {
-					building.setComplex(complex);
-					buildingBean.update(building);
-					return building;
-				} 
-			}
-		}
-		throw new EntityNotFoundException();
-	}
+    //TODO: refactor add @valid annotations and validate it in model.
+    @PUT
+    @ApiOperation(value = "update building", response = Building.class)
+    @ApiResponses({
+        @ApiResponse(code = 404, message = "complex id or complex empty or doesn't exist")
+    })
+    public Building update(@ApiParam(value = "building", required = true) Building building) {
+        if (building.getComplex() == null) {
+            if (building.getComplexId() != null) {
+                Complex complex = complexBean.find(building.getComplexId());
+                if (complex != null) {
+                    building.setComplex(complex);
+                    buildingBean.update(building);
+                    return building;
+                }
+            }
+        }
+        throw new EntityNotFoundException();
+    }
 
-	@DELETE
-	@Path("/{id: \\d+}")
-	@ApiOperation(value = "delete building", response = Response.class)
-	@ApiResponses({
-		@ApiResponse(code = 404, message = "building with given id doesn't exist")
-	})
-	public Response delete(@PathParam("id") @ApiParam(value = "id", required = true) Long id) {
-		Building building = buildingBean.find(id);
-		if (building == null) {
-			throw new EntityNotFoundException();
-		}
-		buildingBean.delete(building);
-		return Response.ok().build();
-	}
+    @DELETE
+    @Path("/{id: \\d+}")
+    @ApiOperation(value = "delete building", response = Response.class)
+    @ApiResponses({
+        @ApiResponse(code = 404, message = "building with given id doesn't exist")
+    })
+    public Response delete(@PathParam("id") @ApiParam(value = "id", required = true) Long id) {
+        Building building = buildingBean.find(id);
+        if (building == null) {
+            throw new EntityNotFoundException();
+        }
+        buildingBean.delete(building);
+        return Response.ok().build();
+    }
 
-	@GET
-	@ApiOperation(value = "find all buldings")
-	@ApiResponses({
-		@ApiResponse(code = 404, message = "complex doesn't exist")
-	})
-	public List<Building> findAll() {
-		Complex complex = authorizationBean.getCurrentUser().getComplexs().get(0);
-		if (complex == null) {
-			throw new EntityNotFoundException();
-		}
-		return buildingBean.findByComplex(authorizationBean.getCurrentUser().getComplexs().get(0));
-	}
+    @GET
+    @ApiOperation(value = "find all buldings")
+    @ApiResponses({
+        @ApiResponse(code = 404, message = "complex doesn't exist")
+    })
+    public List<Building> findAll() {
+        Complex complex = authorizationBean.getCurrentUser().getComplexs().get(0);
+        if (complex == null) {
+            throw new EntityNotFoundException();
+        }
+        return buildingBean.findByComplex(authorizationBean.getCurrentUser().getComplexs().get(0));
+    }
 
 }

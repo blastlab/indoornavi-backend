@@ -25,36 +25,36 @@ import javax.ws.rs.ext.Provider;
 @Priority(Priorities.AUTHENTICATION)
 public class AuthFilter implements ContainerRequestFilter {
 
-	private static final String AUTH_TOKEN = "auth_token";
+    private static final String AUTH_TOKEN = "auth_token";
 
-	@Inject
-	private AuthorizationBean authorizationBean;
+    @Inject
+    private AuthorizationBean authorizationBean;
 
-	@EJB
-	private PersonBean personBean;
+    @EJB
+    private PersonBean personBean;
 
-	@Override
-	public void filter(ContainerRequestContext requestCtx) throws IOException {
-		if (requestCtx.getRequest().getMethod().equals("OPTIONS")) {
-			requestCtx.abortWith(Response.status(Response.Status.OK).build());
-			return;
-		}
+    @Override
+    public void filter(ContainerRequestContext requestCtx) throws IOException {
+        if (requestCtx.getRequest().getMethod().equals("OPTIONS")) {
+            requestCtx.abortWith(Response.status(Response.Status.OK).build());
+            return;
+        }
 
-		String path = requestCtx.getUriInfo().getAbsolutePath().toString();
+        String path = requestCtx.getUriInfo().getAbsolutePath().toString();
 
-		if (!path.endsWith("/person") && !path.contains("/api") && !path.contains("swagger.json")) {
-                    System.out.println("authorization filtering");
-			String authToken = requestCtx.getHeaderString(AUTH_TOKEN);
-			if (authToken == null) {
-				throw new WebApplicationException(Response.Status.UNAUTHORIZED);
-			}
+        if (!path.endsWith("/person") && !path.contains("/api") && !path.contains("swagger.json")) {
+            System.out.println("authorization filtering");
+            String authToken = requestCtx.getHeaderString(AUTH_TOKEN);
+            if (authToken == null) {
+                throw new WebApplicationException(Response.Status.UNAUTHORIZED);
+            }
 
-			Person person = personBean.findByAuthToken(authToken);
-			if (person == null) {
-				throw new WebApplicationException(Response.Status.UNAUTHORIZED);
-			}
+            Person person = personBean.findByAuthToken(authToken);
+            if (person == null) {
+                throw new WebApplicationException(Response.Status.UNAUTHORIZED);
+            }
 
-			authorizationBean.setCurrentUser(person);
-		}
-	}
+            authorizationBean.setCurrentUser(person);
+        }
+    }
 }

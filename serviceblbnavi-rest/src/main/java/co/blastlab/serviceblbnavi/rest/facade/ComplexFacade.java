@@ -19,17 +19,17 @@ import javax.ws.rs.Path;
 @Api("/complex")
 public class ComplexFacade {
 
-	@EJB
-	private ComplexBean complexBean;
+    @EJB
+    private ComplexBean complexBean;
 
-	@Inject
-	private AuthorizationBean authorizationBean;
+    @Inject
+    private AuthorizationBean authorizationBean;
 
-	@POST
-	@ApiOperation(value = "create complex", response = Complex.class)
-	public Complex create(@ApiParam(value = "complex", required = true) Complex complex) {
-		complex.setPerson(authorizationBean.getCurrentUser());
-		complexBean.create(complex);
-		return complex;
-	}
+    @POST
+    @ApiOperation(value = "create complex", response = Complex.class)
+    public Complex create(@ApiParam(value = "complex", required = true) Complex complex) {
+        complex.setPerson(authorizationBean.getCurrentUser());
+        complexBean.create(complex);
+        return complex;
+    }
 }

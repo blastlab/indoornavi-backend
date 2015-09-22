@@ -21,99 +21,99 @@ import javax.xml.bind.annotation.XmlTransient;
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY, setterVisibility = JsonAutoDetect.Visibility.NONE, getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class Beacon implements Serializable {
 
-	@Id
-	@GeneratedValue
-	private Long id;
+    @Id
+    @GeneratedValue
+    private Long id;
 
-	private String mac;
+    private String mac;
 
-	private Double x;
+    private Double x;
 
-	private Double y;
+    private Double y;
 
-	private Double z;
+    private Double z;
 
-	private Integer minor;
+    private Integer minor;
 
-	private Integer major;
+    private Integer major;
 
-	@Transient
-	private Long floorId;
+    @Transient
+    private Long floorId;
 
-	@ManyToOne
-	@JsonIgnore
-	private Floor floor;
+    @ManyToOne
+    @JsonIgnore
+    private Floor floor;
 
-	public Long getFloorId() {
-		return floorId;
-	}
+    public Long getFloorId() {
+        return floorId;
+    }
 
-	public void setFloorId(Long floorId) {
-		this.floorId = floorId;
-	}
+    public void setFloorId(Long floorId) {
+        this.floorId = floorId;
+    }
 
-	public Integer getMinor() {
-		return minor;
-	}
+    public Integer getMinor() {
+        return minor;
+    }
 
-	public void setMinor(Integer minor) {
-		this.minor = minor;
-	}
+    public void setMinor(Integer minor) {
+        this.minor = minor;
+    }
 
-	public Integer getMajor() {
-		return major;
-	}
+    public Integer getMajor() {
+        return major;
+    }
 
-	public void setMajor(Integer major) {
-		this.major = major;
-	}
+    public void setMajor(Integer major) {
+        this.major = major;
+    }
 
-	public Long getId() {
-		return id;
-	}
+    public Long getId() {
+        return id;
+    }
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-	public String getMac() {
-		return mac;
-	}
+    public String getMac() {
+        return mac;
+    }
 
-	public void setMac(String mac) {
-		this.mac = mac;
-	}
+    public void setMac(String mac) {
+        this.mac = mac;
+    }
 
-	public Double getX() {
-		return x;
-	}
+    public Double getX() {
+        return x;
+    }
 
-	public void setX(Double x) {
-		this.x = x;
-	}
+    public void setX(Double x) {
+        this.x = x;
+    }
 
-	public Double getY() {
-		return y;
-	}
+    public Double getY() {
+        return y;
+    }
 
-	public void setY(Double y) {
-		this.y = y;
-	}
+    public void setY(Double y) {
+        this.y = y;
+    }
 
-	public Double getZ() {
-		return z;
-	}
+    public Double getZ() {
+        return z;
+    }
 
-	public void setZ(Double z) {
-		this.z = z;
-	}
+    public void setZ(Double z) {
+        this.z = z;
+    }
 
-	public Floor getFloor() {
-		return floor;
-	}
+    public Floor getFloor() {
+        return floor;
+    }
 
-	public void setFloor(Floor floor) {
-		this.floor = floor;
-	}
+    public void setFloor(Floor floor) {
+        this.floor = floor;
+    }
 
 }

@@ -1,0 +1,110 @@
+package co.blastlab.serviceblbnavi.rest.facade;
+
+import co.blastlab.serviceblbnavi.dao.FloorBean;
+import co.blastlab.serviceblbnavi.dao.VertexBean;
+import co.blastlab.serviceblbnavi.domain.Floor;
+import co.blastlab.serviceblbnavi.domain.Vertex;
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.ApiParam;
+import com.wordnik.swagger.annotations.ApiResponse;
+import com.wordnik.swagger.annotations.ApiResponses;
+import java.util.List;
+import javax.ejb.EJB;
+import javax.persistence.EntityNotFoundException;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.core.Response;
+
+/**
+ *
+ * @author mkoszalka
+ */
+@Path("/vertex")
+@Api("/vertex")
+public class VertexFacade {
+
+    @EJB
+    private VertexBean vertexBean;
+
+    @EJB
+    private FloorBean floorBean;
+
+    @POST
+    @ApiOperation(value = "create vertex", response = Vertex.class)
+    @ApiResponses({
+        @ApiResponse(code = 404, message = "floor id emtpy or floor doesn't exist")
+    })
+    public Vertex create(@ApiParam(value = "vertex", required = true) Vertex vertex) {
+        if (vertex.getFloorId() != null) {
+            Floor floor = floorBean.find(vertex.getFloorId());
+            if (floor != null) {
+                vertex.setFloor(floor);
+                vertexBean.create(vertex);
+                return vertex;
+            }
+        }
+        throw new EntityNotFoundException();
+    }
+
+    @DELETE
+    @Path("/{id: \\d+}")
+    @ApiOperation(value = "delete vertex", response = Response.class)
+    @ApiResponses({
+        @ApiResponse(code = 404, message = "vertex with given id doesn't exist")
+    })
+    public Response delete(@PathParam("id") @ApiParam(value = "id", required = true) Long id) {
+        Vertex vertex = vertexBean.find(id);
+        if (vertex == null) {
+            throw new EntityNotFoundException();
+        }
+        vertexBean.delete(vertex);
+        return Response.ok().build();
+    }
+
+    @PUT
+    @ApiOperation(value = "update vertex", response = Vertex.class)
+    @ApiResponses({
+        @ApiResponse(code = 404, message = "floor id or floor empty or doesn't exist")
+    })
+    public Vertex update(@ApiParam(value = "vertex", required = true) Vertex vertex) {
+        if (vertex.getId() != null) {
+            Vertex v = vertexBean.find(vertex.getId());
+            if (v != null) {
+                v.setX(vertex.getX());
+                v.setY(vertex.getY());
+                vertexBean.update(v);
+                return v;
+            }
+        }
+        throw new EntityNotFoundException();
+    }
+
+    @PUT
+    @ApiOperation(value = "update vertexes", response = Vertex.class)
+    public List<Vertex> update(@ApiParam(value = "vertex", required = true) List<Vertex> vertexes) {
+        vertexBean.update(vertexes);
+        return vertexes;
+    }
+
+    @GET
+    @Path("/{id: \\d+}")
+    @ApiOperation(value = "find vertexes for specified floor", response = Vertex.class, responseContainer = "List")
+    @ApiResponses({
+        @ApiResponse(code = 404, message = "floor with given id wasn't found")
+    })
+    public List<Vertex> findByFloor(@ApiParam(value = "id", required = true) @PathParam("id") Long floorId) {
+        if (floorId != null) {
+            Floor floor = floorBean.find(floorId);
+            if (floor != null) {
+                return vertexBean.findAll(floor);
+            }
+        }
+        throw new EntityNotFoundException();
+    }
+
+}

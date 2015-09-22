@@ -14,19 +14,19 @@ import javax.persistence.EntityManager;
 @Stateless
 public class ComplexBean {
 
-	@Inject
-	private EntityManager em;
+    @Inject
+    private EntityManager em;
 
-	public void create(Complex complex) {
-		em.persist(complex);
-	}
+    public void create(Complex complex) {
+        em.persist(complex);
+    }
 
-	public Complex find(Long id) {
-		return em.find(Complex.class, id);
-	}
+    public Complex find(Long id) {
+        return em.find(Complex.class, id);
+    }
 
-	public List<Complex> findAll(Person person) {
-		return em.createNamedQuery(Complex.FIND_BY_PERSON, Complex.class).getResultList();
-	}
+    public List<Complex> findAll(Person person) {
+        return em.createNamedQuery(Complex.FIND_BY_PERSON, Complex.class).getResultList();
+    }
 
 }

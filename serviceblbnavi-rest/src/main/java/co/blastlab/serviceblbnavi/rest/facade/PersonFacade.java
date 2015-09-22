@@ -23,31 +23,31 @@ import javax.ws.rs.Path;
 @Api("/person")
 public class PersonFacade {
 
-	@EJB
-	private PersonBean personBean;
+    @EJB
+    private PersonBean personBean;
 
-	@Inject
-	private AuthorizationBean authorizationBean;
+    @Inject
+    private AuthorizationBean authorizationBean;
 
-	@POST
-	@ApiOperation(value = "register", response = Person.class)
-	@ApiResponses({
-		@ApiResponse(code = 409, message = "person with given email exists")
-	})
-	public Person register(@ApiParam(value = "person", required = true) Person person) {
-		if (personBean.findByEmail(person.getEmail()) != null) {
-			throw new EntityExistsException();
-		}
-		person.generateAuthToken();
-		personBean.create(person);
-		return person;
-	}
+    @POST
+    @ApiOperation(value = "register", response = Person.class)
+    @ApiResponses({
+        @ApiResponse(code = 409, message = "person with given email exists")
+    })
+    public Person register(@ApiParam(value = "person", required = true) Person person) {
+        if (personBean.findByEmail(person.getEmail()) != null) {
+            throw new EntityExistsException();
+        }
+        person.generateAuthToken();
+        personBean.create(person);
+        return person;
+    }
 
-	@GET
-	@Path("/current")
-	@ApiOperation(value = "find current user")
-	public Person get() {
-		return authorizationBean.getCurrentUser();
-	}
+    @GET
+    @Path("/current")
+    @ApiOperation(value = "find current user")
+    public Person get() {
+        return authorizationBean.getCurrentUser();
+    }
 
 }

@@ -12,12 +12,12 @@ import javax.persistence.PersistenceContext;
 @Stateless
 public class EntityManagerProducer {
 
-	@PersistenceContext(unitName = "NaviPU")
-	private EntityManager naviEM;
+    @PersistenceContext(unitName = "NaviPU")
+    private EntityManager naviEM;
 
-	@Produces
-	public EntityManager produceNaviEM() {
-		return naviEM;
-	}
+    @Produces
+    public EntityManager produceNaviEM() {
+        return naviEM;
+    }
 
 }

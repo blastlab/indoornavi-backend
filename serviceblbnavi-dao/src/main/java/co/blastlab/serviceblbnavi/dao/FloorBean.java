@@ -13,31 +13,31 @@ import javax.persistence.EntityManager;
 @Stateless
 public class FloorBean {
 
-	@Inject
-	private EntityManager em;
+    @Inject
+    private EntityManager em;
 
-	public void create(Floor floor) {
-		em.persist(floor);
-	}
+    public void create(Floor floor) {
+        em.persist(floor);
+    }
 
-	public Floor find(Long id) {
-		return em.find(Floor.class, id);
-	}
+    public Floor find(Long id) {
+        return em.find(Floor.class, id);
+    }
 
-	public void update(Floor floor) {
-		em.merge(floor);
-	}
+    public void update(Floor floor) {
+        em.merge(floor);
+    }
 
-	public void delete(Floor floor) {
-		em.remove(em.contains(floor) ? floor : em.merge(floor));
-	}
-	
-	public void updateFloorLevels(List<Floor> floors) {
-		for(Floor f : floors) {
-			Floor floor = find(f.getId());
-			floor.setLevel(f.getLevel());
-			update(floor);
-		}
-	}
+    public void delete(Floor floor) {
+        em.remove(em.contains(floor) ? floor : em.merge(floor));
+    }
+
+    public void updateFloorLevels(List<Floor> floors) {
+        for (Floor f : floors) {
+            Floor floor = find(f.getId());
+            floor.setLevel(f.getLevel());
+            update(floor);
+        }
+    }
 
 }
