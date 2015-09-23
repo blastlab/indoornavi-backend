@@ -28,6 +28,10 @@ public class EdgeBean {
     public Edge findBySourceAndTarget(Vertex source, Vertex target) {
         return em.createNamedQuery(Edge.FIND_BY_TARGET_AND_SOURCE, Edge.class).setParameter("source", source).setParameter("target", target).getSingleResult();
     }
+    
+    public List<Edge> findByVertexFloorId(Long id) {
+        return em.createNamedQuery(Edge.FIND_VERTEX_FLOOR_ID, Edge.class).setParameter("floorId", id).getResultList();
+    }
 
     public void delete(Edge edge) {
         em.remove(em.contains(edge) ? edge : em.merge(edge));

@@ -60,16 +60,15 @@ public class EdgeFacade {
 
     @GET
     @Path("/{id: \\d+}")
-    @ApiOperation(value = "find edge", response = Edge.class)
+    @ApiOperation(value = "find edges by floor id", response = Edge.class)
     @ApiResponses({
-        @ApiResponse(code = 404, message = "edge with given id wasn't found")
+        @ApiResponse(code = 404, message = "floor with given id wasn't found")
     })
-    public Edge find(@PathParam("id") @ApiParam(value = "id", required = true) Long id) {
-        Edge edge = edgeBean.find(id);
-        if (edge == null) {
-            throw new EntityNotFoundException();
+    public List<Edge> findByVertexFloorId(@PathParam("id") @ApiParam(value = "id", required = true) Long id) {
+        if (id != null) {
+            return edgeBean.findByVertexFloorId(id);
         }
-        return edge;
+        throw new EntityNotFoundException();
     }
 
     @DELETE

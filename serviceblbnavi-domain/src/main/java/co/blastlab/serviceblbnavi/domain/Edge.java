@@ -17,12 +17,14 @@ import javax.persistence.Transient;
  */
 @Entity
 @NamedQueries({
-    @NamedQuery(name = Edge.FIND_BY_TARGET_AND_SOURCE, query = "SELECT e FROM Edge e WHERE e.source = :source AND e.target = :target")
+    @NamedQuery(name = Edge.FIND_BY_TARGET_AND_SOURCE, query = "SELECT e FROM Edge e WHERE e.source = :source AND e.target = :target"),
+    @NamedQuery(name = Edge.FIND_VERTEX_FLOOR_ID, query = "SELECT e FROM Edge e WHERE e.source.floor.id = :floorId")
 })
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.ANY, getterVisibility = JsonAutoDetect.Visibility.ANY)
 public class Edge implements Serializable {
 
     public static final String FIND_BY_TARGET_AND_SOURCE = "Edge.findByTargetAndSource";
+    public static final String FIND_VERTEX_FLOOR_ID = "Edge.findByVertexFloorId";
 
     @Id
     @GeneratedValue

@@ -41,14 +41,17 @@ public class Vertex implements Serializable {
     @Transient
     private Long floorId;
 
-//	@OneToMany(mappedBy = "vertex")
-//	private List<Exit> exits;
+    @JsonIgnore
+    @OneToMany(mappedBy = "vertex")
+    private List<Exit> exits;
+    
     @OneToMany(mappedBy = "target")
     private List<Edge> targetEdges;
 
     @OneToMany(mappedBy = "source")
     private List<Edge> sourceEdges;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "vertex")
     private List<Goal> goals;
 
@@ -64,13 +67,14 @@ public class Vertex implements Serializable {
         this.floorId = floorId;
     }
 
-//	public List<Exit> getExits() {
-//		return exits;
-//	}
-//
-//	public void setExits(List<Exit> exits) {
-//		this.exits = exits;
-//	}
+    public List<Exit> getExits() {
+        return exits;
+    }
+
+    public void setExits(List<Exit> exits) {
+        this.exits = exits;
+    }
+    
     public List<Edge> getTargetEdges() {
         return targetEdges;
     }
