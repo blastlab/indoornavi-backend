@@ -99,10 +99,8 @@ public class VertexFacade {
     })
     public List<Vertex> findByFloor(@ApiParam(value = "id", required = true) @PathParam("id") Long floorId) {
         if (floorId != null) {
-            Floor floor = floorBean.find(floorId);
-            if (floor != null) {
-                return vertexBean.findAll(floor);
-            }
+            System.out.println("getting vertexes");
+            return vertexBean.findAll(floorId);
         }
         throw new EntityNotFoundException();
     }

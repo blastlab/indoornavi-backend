@@ -25,8 +25,8 @@ public class VertexBean {
         return em.find(Vertex.class, id);
     }
 
-    public List<Vertex> findAll(Floor floor) {
-        return em.createNamedQuery(Vertex.FIND_BY_FLOOR, Vertex.class).setParameter("floor", floor).getResultList();
+    public List<Vertex> findAll(Long floorId) {
+        return em.createNamedQuery(Vertex.FIND_BY_FLOOR, Vertex.class).setParameter("floorId", floorId).getResultList();
     }
 
     public void delete(Vertex vertex) {
