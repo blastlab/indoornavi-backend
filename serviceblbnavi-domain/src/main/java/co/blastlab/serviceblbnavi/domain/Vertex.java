@@ -45,9 +45,11 @@ public class Vertex implements Serializable {
     @OneToMany(mappedBy = "vertex")
     private List<Exit> exits;
     
+    @JsonIgnore
     @OneToMany(mappedBy = "target")
     private List<Edge> targetEdges;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "source")
     private List<Edge> sourceEdges;
 
