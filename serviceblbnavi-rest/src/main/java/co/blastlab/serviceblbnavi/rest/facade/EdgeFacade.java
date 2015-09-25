@@ -10,6 +10,7 @@ import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
 import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
+import java.util.ArrayList;
 import java.util.List;
 import javax.ejb.EJB;
 import javax.persistence.EntityNotFoundException;
@@ -48,7 +49,7 @@ public class EdgeFacade {
         if (edge.getSourceId() != null && edge.getTargetId() != null) {
             Vertex source = vertexBean.find(edge.getSourceId());
             Vertex target = vertexBean.find(edge.getTargetId());
-            if (source != null && target != null) {
+            if (source != null && target != null && edgeBean.findBySourceAndTarget(source, target) == null) {
                 edge.setTarget(target);
                 edge.setSource(source);
                 edgeBean.create(edge);
@@ -66,7 +67,10 @@ public class EdgeFacade {
     })
     public List<Edge> findByVertexFloorId(@PathParam("id") @ApiParam(value = "id", required = true) Long id) {
         if (id != null) {
-            return edgeBean.findByVertexFloorId(id);
+            Long time = System.currentTimeMillis();
+            List<Edge> result = edgeBean.findByVertexFloorId(id);
+            System.out.println("query duration: " + (System.currentTimeMillis() - time));
+            return result;
         }
         throw new EntityNotFoundException();
     }
@@ -76,12 +80,18 @@ public class EdgeFacade {
     @ApiResponses({
         @ApiResponse(code = 404, message = "edge with given target and source id doesn't exist")
     })
-    public Response delete(@ApiParam(value = "ids", required = true) @HeaderParam("ids") Long[] ids) {
+    public Response delete(@ApiParam(value = "sourceId", required = true) @HeaderParam("sourceId") Long sourceId, @ApiParam(value = "targetId", required = true) @HeaderParam("targetId") Long targetId) {
         System.out.println("inside deleting method");
-        Vertex source = vertexBean.find(ids[0]);
-        Vertex target = vertexBean.find(ids[1]);
-        edgeBean.delete(edgeBean.findBySourceAndTarget(source, target));
-        edgeBean.delete(edgeBean.findBySourceAndTarget(target, source));
+        Vertex source = vertexBean.find(sourceId);
+        Vertex target = vertexBean.find(targetId);
+        Edge firstEdge = edgeBean.findBySourceAndTarget(source, target);
+        Edge secondEdge = edgeBean.findBySourceAndTarget(target, source);
+        if (firstEdge != null) {
+            edgeBean.delete(firstEdge);
+        }
+        if (secondEdge != null) {
+            edgeBean.delete(secondEdge);
+        }
         return Response.ok().build();
     }
 

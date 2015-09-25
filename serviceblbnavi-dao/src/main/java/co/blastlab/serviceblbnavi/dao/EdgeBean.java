@@ -6,6 +6,7 @@ import java.util.List;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 
 /**
  *
@@ -26,9 +27,16 @@ public class EdgeBean {
     }
 
     public Edge findBySourceAndTarget(Vertex source, Vertex target) {
-        return em.createNamedQuery(Edge.FIND_BY_TARGET_AND_SOURCE, Edge.class).setParameter("source", source).setParameter("target", target).getSingleResult();
+        Edge edge;
+        try {
+            edge = em.createNamedQuery(Edge.FIND_BY_TARGET_AND_SOURCE, Edge.class).setParameter("source", source).setParameter("target", target).getSingleResult();
+
+        } catch (NoResultException e) {
+            edge = null;
+        }
+        return edge;
     }
-    
+
     public List<Edge> findByVertexFloorId(Long id) {
         return em.createNamedQuery(Edge.FIND_VERTEX_FLOOR_ID, Edge.class).setParameter("floorId", id).getResultList();
     }
