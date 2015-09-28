@@ -5,6 +5,8 @@ import co.blastlab.serviceblbnavi.dao.ComplexBean;
 import co.blastlab.serviceblbnavi.domain.Building;
 import co.blastlab.serviceblbnavi.domain.Complex;
 import co.blastlab.serviceblbnavi.rest.bean.AuthorizationBean;
+import co.blastlab.serviceblbnavi.views.View;
+import com.fasterxml.jackson.annotation.JsonView;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
@@ -50,6 +52,7 @@ public class BuildingFacade {
 
     @GET
     @Path("/{id: \\d+}")
+    @JsonView(View.BuildingInternal.class)
     @ApiOperation(value = "find building")
     @ApiResponses({
         @ApiResponse(code = 404, message = "building with given id wasn't found")
@@ -62,7 +65,6 @@ public class BuildingFacade {
         return building;
     }
 
-    //TODO: refactor add @valid annotations and validate it in model.
     @PUT
     @ApiOperation(value = "update building", response = Building.class)
     @ApiResponses({
@@ -98,16 +100,20 @@ public class BuildingFacade {
     }
 
     @GET
-    @ApiOperation(value = "find all buldings")
+    @Path("/complex/{id: \\d+}")
+    @JsonView(View.ComplexInternal.class)
+    @ApiOperation(value = "find buildings by complex id")
     @ApiResponses({
         @ApiResponse(code = 404, message = "complex doesn't exist")
     })
-    public List<Building> findAll() {
-        Complex complex = authorizationBean.getCurrentUser().getComplexs().get(0);
-        if (complex == null) {
-            throw new EntityNotFoundException();
+    public List<Building> findAll(@PathParam("id") @ApiParam(value = "complexId", required = true) Long complexId) {
+        if (complexId != null) {
+            Complex complex = complexBean.find(complexId);
+            if (complex != null) {
+                return buildingBean.findByComplex(complex);
+            }
         }
-        return buildingBean.findByComplex(authorizationBean.getCurrentUser().getComplexs().get(0));
+        throw new EntityNotFoundException();
     }
 
 }

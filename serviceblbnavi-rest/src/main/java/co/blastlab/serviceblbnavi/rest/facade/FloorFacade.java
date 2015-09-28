@@ -4,6 +4,8 @@ import co.blastlab.serviceblbnavi.dao.BuildingBean;
 import co.blastlab.serviceblbnavi.dao.FloorBean;
 import co.blastlab.serviceblbnavi.domain.Building;
 import co.blastlab.serviceblbnavi.domain.Floor;
+import co.blastlab.serviceblbnavi.views.View;
+import com.fasterxml.jackson.annotation.JsonView;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
@@ -53,6 +55,7 @@ public class FloorFacade {
 
     @GET
     @Path("/{id: \\d+}")
+    @JsonView(View.FloorInternal.class)
     @ApiOperation(value = "find floor", response = Floor.class)
     @ApiResponses({
         @ApiResponse(code = 404, message = "floor with given id wasn't found")
@@ -81,6 +84,7 @@ public class FloorFacade {
     }
 
     @PUT
+    @JsonView(View.FloorInternal.class)
     @ApiOperation(value = "update floor", response = Floor.class)
     @ApiResponses({
         @ApiResponse(code = 404, message = "building id or building empty or doesn't exist")
@@ -100,6 +104,9 @@ public class FloorFacade {
     @PUT
     @Path("/{id: \\d+}")
     @ApiOperation(value = "update floors", response = Response.class)
+    @ApiResponses({
+        @ApiResponse(code = 404, message = "building id or building empty or doesn't exist")
+    })
     public Response updateFloors(@PathParam("id") Long buildingId, @ApiParam(value = "floors", required = true) List<Floor> floors) {
         Building building = buildingBean.find(buildingId);
         if (building != null) {

@@ -1,7 +1,9 @@
 package co.blastlab.serviceblbnavi.domain;
 
+import co.blastlab.serviceblbnavi.views.View;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonView;
 import java.io.Serializable;
 import java.util.List;
 import javax.persistence.Entity;
@@ -41,10 +43,12 @@ public class Building implements Serializable {
     @ManyToOne
     private Complex complex;
 
+    @JsonView({View.BuildingInternal.class, View.External.class})
     @OneToMany(mappedBy = "building")
     @OrderBy("level")
     private List<Floor> floors;
 
+    @JsonView({View.BuildingInternal.class, View.External.class})
     @OneToMany(mappedBy = "building")
     private List<Goal> goals;
 

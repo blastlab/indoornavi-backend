@@ -264,4 +264,7 @@
         <renameColumn tableName="Exit" oldColumnName="in" newColumnName="exitIn" columnDataType="TINYINT"/>
         <renameColumn tableName="Exit" oldColumnName="out" newColumnName="exitOut" columnDataType="TINYINT"/>
     </changeSet>
+    <changeSet id="16" author="mkoszalka">
+        <renameTable oldTableName="Exit" newTableName="BuildingExit"/>
+    </changeSet>
 </databaseChangeLog>

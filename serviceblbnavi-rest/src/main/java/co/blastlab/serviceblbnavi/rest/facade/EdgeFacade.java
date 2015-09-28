@@ -10,7 +10,6 @@ import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
 import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
-import java.util.ArrayList;
 import java.util.List;
 import javax.ejb.EJB;
 import javax.persistence.EntityNotFoundException;
@@ -25,7 +24,7 @@ import javax.ws.rs.core.Response;
 
 /**
  *
- * @author mkoszalka
+ * @author Michał Koszałka
  */
 @Path("/edge")
 @Api("/edge")

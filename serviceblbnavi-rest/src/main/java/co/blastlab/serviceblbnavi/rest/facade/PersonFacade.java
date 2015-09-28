@@ -3,6 +3,8 @@ package co.blastlab.serviceblbnavi.rest.facade;
 import co.blastlab.serviceblbnavi.dao.PersonBean;
 import co.blastlab.serviceblbnavi.domain.Person;
 import co.blastlab.serviceblbnavi.rest.bean.AuthorizationBean;
+import co.blastlab.serviceblbnavi.views.View;
+import com.fasterxml.jackson.annotation.JsonView;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
@@ -30,6 +32,7 @@ public class PersonFacade {
     private AuthorizationBean authorizationBean;
 
     @POST
+    @JsonView(View.PersonInternal.class)
     @ApiOperation(value = "register", response = Person.class)
     @ApiResponses({
         @ApiResponse(code = 409, message = "person with given email exists")
@@ -44,6 +47,7 @@ public class PersonFacade {
     }
 
     @GET
+    @JsonView(View.PersonInternal.class)
     @Path("/current")
     @ApiOperation(value = "find current user")
     public Person get() {

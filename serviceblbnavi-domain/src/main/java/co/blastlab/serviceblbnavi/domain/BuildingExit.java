@@ -17,7 +17,7 @@ import javax.persistence.Transient;
  */
 @Entity
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY, setterVisibility = JsonAutoDetect.Visibility.NONE, getterVisibility = JsonAutoDetect.Visibility.NONE)
-public class Exit implements Serializable {
+public class BuildingExit implements Serializable {
 
     @Id
     @GeneratedValue

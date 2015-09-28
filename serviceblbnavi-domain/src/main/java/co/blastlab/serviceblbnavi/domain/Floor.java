@@ -1,7 +1,9 @@
 package co.blastlab.serviceblbnavi.domain;
 
+import co.blastlab.serviceblbnavi.views.View;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonView;
 import java.io.Serializable;
 import java.util.List;
 import javax.persistence.Entity;
@@ -10,7 +12,6 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Transient;
-import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
@@ -37,13 +38,15 @@ public class Floor implements Serializable {
     @ManyToOne
     private Building building;
 
+    @JsonView(View.External.class)
     @OneToMany(mappedBy = "floor")
     private List<Waypoint> waypoints;
 
-    @JsonIgnore
+    @JsonView(View.External.class)
     @OneToMany(mappedBy = "floor")
     private List<Vertex> vertexs;
 
+    @JsonView(View.External.class)
     @OneToMany(mappedBy = "floor")
     private List<Beacon> beacons;
 

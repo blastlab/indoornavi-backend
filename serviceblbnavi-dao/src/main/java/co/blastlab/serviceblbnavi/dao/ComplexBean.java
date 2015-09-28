@@ -25,8 +25,13 @@ public class ComplexBean {
         return em.find(Complex.class, id);
     }
 
+    public void delete(Complex complex) {
+        em.remove(em.contains(complex) ? complex : em.merge(complex));
+
+    }
+
     public List<Complex> findAll(Person person) {
-        return em.createNamedQuery(Complex.FIND_BY_PERSON, Complex.class).getResultList();
+        return em.createNamedQuery(Complex.FIND_BY_PERSON, Complex.class).setParameter("person", person).getResultList();
     }
 
 }

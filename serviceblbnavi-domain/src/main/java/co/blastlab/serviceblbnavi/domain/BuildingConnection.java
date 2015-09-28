@@ -25,11 +25,11 @@ public class BuildingConnection implements Serializable {
 
     @JsonIgnore
     @ManyToOne
-    private Exit source;
+    private BuildingExit source;
 
     @JsonIgnore
     @ManyToOne
-    private Exit target;
+    private BuildingExit target;
 
     @Transient
     private Long sourceId;
@@ -69,19 +69,19 @@ public class BuildingConnection implements Serializable {
         this.distance = distance;
     }
 
-    public Exit getSource() {
+    public BuildingExit getSource() {
         return source;
     }
 
-    public void setSource(Exit source) {
+    public void setSource(BuildingExit source) {
         this.source = source;
     }
 
-    public Exit getTarget() {
+    public BuildingExit getTarget() {
         return target;
     }
 
-    public void setTarget(Exit target) {
+    public void setTarget(BuildingExit target) {
         this.target = target;
     }
 

@@ -22,7 +22,7 @@ import javax.ws.rs.core.Response;
 
 /**
  *
- * @author mkoszalka
+ * @author Michał Koszałka
  */
 @Path("/vertex")
 @Api("/vertex")

@@ -1,7 +1,9 @@
 package co.blastlab.serviceblbnavi.domain;
 
+import co.blastlab.serviceblbnavi.views.View;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonView;
 import java.io.Serializable;
 import java.util.List;
 import javax.persistence.Entity;
@@ -41,19 +43,17 @@ public class Vertex implements Serializable {
     @Transient
     private Long floorId;
 
-    @JsonIgnore
     @OneToMany(mappedBy = "vertex")
-    private List<Exit> exits;
-    
-    @JsonIgnore
+    private List<BuildingExit> buildingExits;
+
+    @JsonView(View.External.class)
     @OneToMany(mappedBy = "target")
     private List<Edge> targetEdges;
 
-    @JsonIgnore
+    @JsonView(View.External.class)
     @OneToMany(mappedBy = "source")
     private List<Edge> sourceEdges;
 
-    @JsonIgnore
     @OneToMany(mappedBy = "vertex")
     private List<Goal> goals;
 
@@ -69,14 +69,14 @@ public class Vertex implements Serializable {
         this.floorId = floorId;
     }
 
-    public List<Exit> getExits() {
-        return exits;
+    public List<BuildingExit> getBuildingExits() {
+        return buildingExits;
     }
 
-    public void setExits(List<Exit> exits) {
-        this.exits = exits;
+    public void setBuildingExits(List<BuildingExit> buildingExits) {
+        this.buildingExits = buildingExits;
     }
-    
+
     public List<Edge> getTargetEdges() {
         return targetEdges;
     }

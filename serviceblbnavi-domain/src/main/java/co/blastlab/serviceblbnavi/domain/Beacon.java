@@ -7,19 +7,22 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Transient;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
  * @author Michał Koszałka
  */
 @Entity
+@NamedQueries({
+    @NamedQuery(name = Beacon.FIND_BY_FLOOR, query = "SELECT b FROM Beacon b WHERE b.floor = :floor")
+})
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY, setterVisibility = JsonAutoDetect.Visibility.NONE, getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class Beacon implements Serializable {
+
+    public static final String FIND_BY_FLOOR = "Beacon.findByFloor";
 
     @Id
     @GeneratedValue
