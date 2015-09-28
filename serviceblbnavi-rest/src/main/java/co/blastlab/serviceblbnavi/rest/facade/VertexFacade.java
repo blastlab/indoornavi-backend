@@ -4,6 +4,8 @@ import co.blastlab.serviceblbnavi.dao.FloorBean;
 import co.blastlab.serviceblbnavi.dao.VertexBean;
 import co.blastlab.serviceblbnavi.domain.Floor;
 import co.blastlab.serviceblbnavi.domain.Vertex;
+import co.blastlab.serviceblbnavi.views.View;
+import com.fasterxml.jackson.annotation.JsonView;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
@@ -39,6 +41,7 @@ public class VertexFacade {
     @ApiResponses({
         @ApiResponse(code = 404, message = "floor id emtpy or floor doesn't exist")
     })
+    @JsonView(View.VertexInternal.class)
     public Vertex create(@ApiParam(value = "vertex", required = true) Vertex vertex) {
         if (vertex.getFloorId() != null) {
             Floor floor = floorBean.find(vertex.getFloorId());
@@ -68,6 +71,7 @@ public class VertexFacade {
 
     @PUT
     @ApiOperation(value = "update vertex", response = Vertex.class)
+    @JsonView(View.VertexInternal.class)
     @ApiResponses({
         @ApiResponse(code = 404, message = "floor id or floor empty or doesn't exist")
     })
@@ -86,6 +90,7 @@ public class VertexFacade {
 
     @PUT
     @ApiOperation(value = "update vertexes", response = Vertex.class)
+    @JsonView(View.VertexInternal.class)
     public List<Vertex> update(@ApiParam(value = "vertex", required = true) List<Vertex> vertexes) {
         vertexBean.update(vertexes);
         return vertexes;
@@ -93,6 +98,7 @@ public class VertexFacade {
 
     @GET
     @Path("/{id: \\d+}")
+    @JsonView(View.VertexInternal.class)
     @ApiOperation(value = "find vertexes for specified floor", response = Vertex.class, responseContainer = "List")
     @ApiResponses({
         @ApiResponse(code = 404, message = "floor with given id wasn't found")

@@ -9,6 +9,9 @@ public class View {
     public static class External {
     }
 
+    public static class VertexInternal{
+    }
+    
     public static class FloorInternal {
     }
 

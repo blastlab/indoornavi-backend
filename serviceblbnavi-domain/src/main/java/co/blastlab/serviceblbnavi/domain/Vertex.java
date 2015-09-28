@@ -43,6 +43,7 @@ public class Vertex implements Serializable {
     @Transient
     private Long floorId;
 
+    @JsonView(View.External.class)
     @OneToMany(mappedBy = "vertex")
     private List<BuildingExit> buildingExits;
 
@@ -54,6 +55,7 @@ public class Vertex implements Serializable {
     @OneToMany(mappedBy = "source")
     private List<Edge> sourceEdges;
 
+    @JsonView(View.External.class)
     @OneToMany(mappedBy = "vertex")
     private List<Goal> goals;
 
