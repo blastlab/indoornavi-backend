@@ -4,7 +4,6 @@ import co.blastlab.serviceblbnavi.dao.BuildingBean;
 import co.blastlab.serviceblbnavi.dao.ComplexBean;
 import co.blastlab.serviceblbnavi.domain.Building;
 import co.blastlab.serviceblbnavi.domain.Complex;
-import co.blastlab.serviceblbnavi.rest.bean.AuthorizationBean;
 import co.blastlab.serviceblbnavi.views.View;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.wordnik.swagger.annotations.Api;
@@ -14,7 +13,6 @@ import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
 import java.util.List;
 import javax.ejb.EJB;
-import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -38,16 +36,18 @@ public class BuildingFacade {
     @EJB
     private ComplexBean complexBean;
 
-    @Inject
-    private AuthorizationBean authorizationBean;
-
     @POST
     @ApiOperation(value = "create", response = Building.class)
     public Building create(@ApiParam(value = "building", required = true) Building building) {
-        Complex complex = authorizationBean.getCurrentUser().getComplexs().get(0);
-        building.setComplex(complex);
-        buildingBean.create(building);
-        return building;
+        if (building.getComplexId() != null) {
+            Complex complex = complexBean.find(building.getComplexId());
+            if (complex != null) {
+                building.setComplex(complex);
+                buildingBean.create(building);
+                return building;
+            }
+        }
+        throw new EntityNotFoundException();
     }
 
     @GET
