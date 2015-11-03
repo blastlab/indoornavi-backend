@@ -25,7 +25,7 @@ To connect to CLI in the same directory run jboss-cli.sh(.bat) --connect
 
 #### MySQL Connector class
 
-In $WILDFLY_HOME/modules/system/layers/com create /mysql/main (mkdir -p mysql/main), inside put your mysql-connector-java-[version]-bin.jar
+In $WILDFLY_HOME/modules/system/layers/base/com create /mysql/main (mkdir -p mysql/main), inside put your mysql-connector-java-[version]-bin.jar
 and create module.xml with following content(remember to change [version] to your connector version) :
 
 <?xml version="1.0" encoding="UTF-8"?>
@@ -39,7 +39,7 @@ and create module.xml with following content(remember to change [version] to you
             </dependencies>
         </module>
 ```bash
-echo "<?xml version="1.0" encoding="UTF-8"?><module xmlns="urn:jboss:module:1.1" name="com.mysql"><resources><resource-root path="mysql-connector-java-[version]-bin.jar"/></resources><dependencies><module name="javax.api"/><module name="javax.transaction.api"/></dependencies></module>" >> module.xml
+<?xml version="1.0" encoding="UTF-8"?><module xmlns="urn:jboss:module:1.1" name="com.mysql"><resources><resource-root path="mysql-connector-java-[version]-bin.jar"/></resources><dependencies><module name="javax.api"/><module name="javax.transaction.api"/></dependencies></module>
 ```
 In CLI run following command:
 
@@ -69,8 +69,8 @@ To let users send and receive bigger map files, in /etc/mysql/conf.d/mariadb.cnf
 ## Deploy
 
 ```bash
-$WILDFLY_HOME/bin/jboss-cli.sh --connect --command="deploy --force [PATH_TO_WAR]"
+$WILDFLY_HOME/bin/jboss-cli.sh --connect --command="deploy --force [PATH_TO_EAR]"
 ```
 After deploy the following paths will be available:
-- `/rest` with REST API,
+- `/rest/v1` with REST API,
 - `/api` with interactive API documentation (with the HTTP authorization with defined user and password).

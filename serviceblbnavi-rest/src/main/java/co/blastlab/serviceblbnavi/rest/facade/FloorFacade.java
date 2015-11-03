@@ -65,6 +65,7 @@ public class FloorFacade {
         if (floor == null) {
             throw new EntityNotFoundException();
         }
+        floor.setBuildingId(floor.getBuilding().getId());
         return floor;
     }
 
@@ -115,6 +116,22 @@ public class FloorFacade {
                 floorBean.updateFloorLevels(floors);
                 return Response.ok().build();
             }
+        }
+        throw new EntityNotFoundException();
+    }
+
+    @PUT
+    @Path("/mToPix")
+    @ApiOperation(value = "update mToPix", response = Response.class)
+    @ApiResponses({
+        @ApiResponse(code = 404, message = "floor with given id doesn't exist")
+    })
+    public Response updatemToPix(@ApiParam(value = "floor", required = true) Floor floor) {
+        Floor f = find(floor.getId());
+        if (f != null) {
+            f.setmToPix(floor.getmToPix());
+            floorBean.update(f);
+            return Response.ok().build();
         }
         throw new EntityNotFoundException();
     }
