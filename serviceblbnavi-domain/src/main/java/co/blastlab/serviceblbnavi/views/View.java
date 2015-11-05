@@ -23,4 +23,7 @@ public class View {
 
     public static class PersonInternal {
     }
+    
+    public static class GoalInternal {
+    }
 }

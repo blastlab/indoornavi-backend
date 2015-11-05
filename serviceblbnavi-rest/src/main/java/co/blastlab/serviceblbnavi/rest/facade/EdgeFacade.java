@@ -10,9 +10,11 @@ import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
 import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
+import java.util.ArrayList;
 import java.util.List;
 import javax.ejb.EJB;
 import javax.persistence.EntityNotFoundException;
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
@@ -94,17 +96,50 @@ public class EdgeFacade {
         return Response.ok().build();
     }
 
-    @PUT
-    @ApiOperation(value = "update edge", response = Edge.class)
-    public Edge update(@ApiParam(value = "edge", required = true) Edge edge) {
-        edgeBean.update(edge);
-        return edge;
+    @GET
+    @ApiOperation(value = "find edge", response = Edge.class)
+    @ApiResponses({
+        @ApiResponse(code = 404, message = "edge with given target and source id doesn't exist")
+    })
+    public Edge findBySourceIdAndTargetId(@ApiParam(value = "sourceId", required = true) @HeaderParam("sourceId") Long sourceId, @ApiParam(value = "targetId", required = true) @HeaderParam("targetId") Long targetId) {
+        System.out.println("finding by sourceId and taretId");
+        Vertex source = vertexBean.find(sourceId);
+        Vertex target = vertexBean.find(targetId);
+        Edge edge = edgeBean.findBySourceAndTarget(source, target);
+        if (edge != null) {
+            return edge;
+        }
+        throw new EntityNotFoundException();
     }
 
     @PUT
     @ApiOperation(value = "update edges", response = Edge.class, responseContainer = "List")
     public List<Edge> update(@ApiParam(value = "edges", required = true) List<Edge> edges) {
-        edgeBean.update(edges);
-        return edges;
+        List<Edge> newEdges = new ArrayList<>();
+        for (Edge edge : edges) {
+            if (edge.getSource() == null && edge.getSourceId() != null) {
+                Vertex source = vertexBean.find(edge.getSourceId());
+                if (source != null) {
+                    edge.setSource(source);
+                }
+            }
+            if (edge.getTarget()== null && edge.getTargetId() != null) {
+                Vertex target = vertexBean.find(edge.getTargetId());
+                if (target != null) {
+                    edge.setTarget(target);
+                }
+            }
+            if (edge.getSource() == null || edge.getTarget() == null) {
+                throw new BadRequestException();
+            }
+            Edge newEdge = edgeBean.findBySourceAndTarget(edge.getSource(), edge.getTarget());
+            if (newEdge == null) {
+                throw new BadRequestException();
+            }
+            newEdge.setWeight(edge.getWeight());
+            newEdges.add(newEdge);
+        }
+        edgeBean.update(newEdges);
+        return newEdges;
     }
 }

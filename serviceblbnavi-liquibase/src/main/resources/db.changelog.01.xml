@@ -267,4 +267,8 @@
     <changeSet id="16" author="mkoszalka">
         <renameTable oldTableName="Exit" newTableName="BuildingExit"/>
     </changeSet>
+    
+    <changeSet id="14" author="gkonupek">
+        <modifyDataType tableName="Beacon" columnName="mac" newDataType="VARCHAR(17)"/>
+    </changeSet>
 </databaseChangeLog>

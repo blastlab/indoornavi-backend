@@ -30,7 +30,6 @@ public class EdgeBean {
         Edge edge;
         try {
             edge = em.createNamedQuery(Edge.FIND_BY_TARGET_AND_SOURCE, Edge.class).setParameter("source", source).setParameter("target", target).getSingleResult();
-
         } catch (NoResultException e) {
             edge = null;
         }

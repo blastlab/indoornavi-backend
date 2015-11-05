@@ -7,6 +7,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Transient;
 
 /**
@@ -14,9 +16,14 @@ import javax.persistence.Transient;
  * @author Michał Koszałka
  */
 @Entity
+@NamedQueries({
+    @NamedQuery(name = Goal.FIND_BY_VERTEX, query = "SELECT g FROM Goal g WHERE g.vertex.id = :vertexId")
+})
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY, setterVisibility = JsonAutoDetect.Visibility.NONE, getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class Goal implements Serializable {
 
+    public static final String FIND_BY_VERTEX = "Goal.findByVertex";
+    
     @Id
     @GeneratedValue
     private Long id;
