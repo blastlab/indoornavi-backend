@@ -55,7 +55,6 @@ public class Vertex implements Serializable {
     @OneToMany(mappedBy = "source")
     private List<Edge> sourceEdges;
 
-    @JsonView(View.External.class)
     @OneToMany(mappedBy = "vertex")
     private List<Goal> goals;
 

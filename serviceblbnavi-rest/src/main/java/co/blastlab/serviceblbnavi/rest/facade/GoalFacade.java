@@ -116,5 +116,4 @@ public class GoalFacade {
         }
         throw new EntityNotFoundException();
     }
-    
 }
