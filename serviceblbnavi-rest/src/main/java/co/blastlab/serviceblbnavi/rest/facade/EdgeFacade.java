@@ -53,6 +53,13 @@ public class EdgeFacade {
             if (source != null && target != null && edgeBean.findBySourceAndTarget(source, target) == null) {
                 edge.setTarget(target);
                 edge.setSource(source);
+                if (source.getFloor().getLevel() > target.getFloor().getId()) {
+                    source.setIsFloorDownChangeable(true);
+                } else if (source.getFloor().getLevel() < target.getFloor().getId()) {
+                    source.setIsFloorUpChangeable(true);
+                }
+                vertexBean.update(source);
+                vertexBean.update(target);
                 edgeBean.create(edge);
                 return edge;
             }
@@ -62,15 +69,13 @@ public class EdgeFacade {
 
     @GET
     @Path("/{id: \\d+}")
-    @ApiOperation(value = "find edges by floor id", response = Edge.class)
+    @ApiOperation(value = "find edges by floor id", response = Edge.class, responseContainer = "List")
     @ApiResponses({
         @ApiResponse(code = 404, message = "floor with given id wasn't found")
     })
     public List<Edge> findByVertexFloorId(@PathParam("id") @ApiParam(value = "id", required = true) Long id) {
         if (id != null) {
-            Long time = System.currentTimeMillis();
             List<Edge> result = edgeBean.findByVertexFloorId(id);
-            System.out.println("query duration: " + (System.currentTimeMillis() - time));
             return result;
         }
         throw new EntityNotFoundException();
@@ -89,9 +94,13 @@ public class EdgeFacade {
         Edge secondEdge = edgeBean.findBySourceAndTarget(target, source);
         if (firstEdge != null) {
             edgeBean.delete(firstEdge);
+            vertexBean.updateFloorChangeability(source);
+            vertexBean.updateFloorChangeability(target);
         }
         if (secondEdge != null) {
             edgeBean.delete(secondEdge);
+            vertexBean.updateFloorChangeability(source);
+            vertexBean.updateFloorChangeability(target);
         }
         return Response.ok().build();
     }

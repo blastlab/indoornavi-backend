@@ -1,5 +1,6 @@
 package co.blastlab.serviceblbnavi.dao;
 
+import co.blastlab.serviceblbnavi.domain.Edge;
 import co.blastlab.serviceblbnavi.domain.Floor;
 import co.blastlab.serviceblbnavi.domain.Vertex;
 import java.util.List;
@@ -42,5 +43,15 @@ public class VertexBean {
             update(v);
         }
     }
-
+    
+    public void updateFloorChangeability(Vertex vertex) {
+        for (Edge edge : vertex.getSourceEdges()) {
+            if (edge.getTarget().getFloor().getLevel() < vertex.getFloor().getLevel()) {
+                vertex.setIsFloorDownChangeable(true);
+            } else if (edge.getTarget().getFloor().getLevel() > vertex.getFloor().getLevel()) {
+                vertex.setIsFloorUpChangeable(true);
+            }
+        }
+        update(vertex);
+    }
 }

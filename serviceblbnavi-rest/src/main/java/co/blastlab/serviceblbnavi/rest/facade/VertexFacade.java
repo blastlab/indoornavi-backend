@@ -97,7 +97,7 @@ public class VertexFacade {
     }
 
     @GET
-    @Path("/{id: \\d+}")
+    @Path("/floor/{id: \\d+}")
     @JsonView(View.VertexInternal.class)
     @ApiOperation(value = "find vertexes for specified floor", response = Vertex.class, responseContainer = "List")
     @ApiResponses({
@@ -107,6 +107,22 @@ public class VertexFacade {
         if (floorId != null) {
             System.out.println("getting vertexes");
             return vertexBean.findAll(floorId);
+        }
+        throw new EntityNotFoundException();
+    }
+    
+    @GET
+    @Path("/{id: \\d+}")
+    @JsonView(View.VertexInternal.class)
+    @ApiOperation(value = "find vertex by id", response = Vertex.class)
+    @ApiResponses({
+        @ApiResponse(code = 404, message = "vertex with given id wasn't found")
+    })
+    public Vertex findById(@ApiParam(value = "id", required = true) @PathParam("id") Long vertexId) {
+        if (vertexId != null) {
+            Vertex vertex = vertexBean.find(vertexId);
+            vertex.setFloorId(vertex.getFloor().getId());
+            return vertex;
         }
         throw new EntityNotFoundException();
     }

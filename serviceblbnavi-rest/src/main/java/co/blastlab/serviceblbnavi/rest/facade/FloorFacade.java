@@ -46,6 +46,7 @@ public class FloorFacade {
             Building building = buildingBean.find(floor.getBuildingId());
             if (building != null) {
                 floor.setBuilding(building);
+                floor.setBuildingId(building.getId());
                 floorBean.create(floor);
                 return floor;
             }
@@ -95,6 +96,7 @@ public class FloorFacade {
             Building building = buildingBean.find(floor.getBuildingId());
             if (building != null) {
                 floor.setBuilding(building);
+                floor.setBuildingId(building.getId());
                 floorBean.update(floor);
                 return floor;
             }
