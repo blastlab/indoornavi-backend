@@ -53,9 +53,9 @@ public class EdgeFacade {
             if (source != null && target != null && edgeBean.findBySourceAndTarget(source, target) == null) {
                 edge.setTarget(target);
                 edge.setSource(source);
-                if (source.getFloor().getLevel() > target.getFloor().getId()) {
+                if (source.getFloor().getLevel() > target.getFloor().getLevel()) {
                     source.setIsFloorDownChangeable(true);
-                } else if (source.getFloor().getLevel() < target.getFloor().getId()) {
+                } else if (source.getFloor().getLevel() < target.getFloor().getLevel()) {
                     source.setIsFloorUpChangeable(true);
                 }
                 vertexBean.update(source);
