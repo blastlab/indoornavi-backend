@@ -81,6 +81,8 @@ public class VertexFacade {
             if (v != null) {
                 v.setX(vertex.getX());
                 v.setY(vertex.getY());
+                v.setIsFloorDownChangeable(vertex.isIsFloorDownChangeable());
+                v.setIsFloorUpChangeable(vertex.isIsFloorUpChangeable());
                 vertexBean.update(v);
                 return v;
             }

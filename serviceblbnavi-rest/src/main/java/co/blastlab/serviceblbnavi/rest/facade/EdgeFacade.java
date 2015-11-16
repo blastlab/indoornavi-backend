@@ -1,7 +1,6 @@
 package co.blastlab.serviceblbnavi.rest.facade;
 
 import co.blastlab.serviceblbnavi.dao.EdgeBean;
-import co.blastlab.serviceblbnavi.dao.FloorBean;
 import co.blastlab.serviceblbnavi.dao.VertexBean;
 import co.blastlab.serviceblbnavi.domain.Edge;
 import co.blastlab.serviceblbnavi.domain.Vertex;
@@ -38,29 +37,20 @@ public class EdgeFacade {
     @EJB
     private VertexBean vertexBean;
 
-    @EJB
-    private FloorBean floorBean;
-
     @POST
     @ApiOperation(value = "create edge", response = Edge.class)
     @ApiResponses({
         @ApiResponse(code = 404, message = "target or source id emtpy or doesn't exist")
     })
     public Edge create(@ApiParam(value = "edge", required = true) Edge edge) {
-        if (edge.getSourceId() != null && edge.getTargetId() != null) {
+        if (edge.getSourceId() != null && edge.getTargetId() != null && edge.getWeight() != null) {
             Vertex source = vertexBean.find(edge.getSourceId());
             Vertex target = vertexBean.find(edge.getTargetId());
             if (source != null && target != null && edgeBean.findBySourceAndTarget(source, target) == null) {
                 edge.setTarget(target);
                 edge.setSource(source);
-                if (source.getFloor().getLevel() > target.getFloor().getLevel()) {
-                    source.setIsFloorDownChangeable(true);
-                } else if (source.getFloor().getLevel() < target.getFloor().getLevel()) {
-                    source.setIsFloorUpChangeable(true);
-                }
-                vertexBean.update(source);
-                vertexBean.update(target);
                 edgeBean.create(edge);
+                vertexBean.updateFloorChangeability(source);
                 return edge;
             }
         }

@@ -45,6 +45,8 @@ public class VertexBean {
     }
     
     public void updateFloorChangeability(Vertex vertex) {
+        vertex.setIsFloorDownChangeable(false);
+        vertex.setIsFloorUpChangeable(false);
         for (Edge edge : vertex.getSourceEdges()) {
             if (edge.getTarget().getFloor().getLevel() < vertex.getFloor().getLevel()) {
                 vertex.setIsFloorDownChangeable(true);
