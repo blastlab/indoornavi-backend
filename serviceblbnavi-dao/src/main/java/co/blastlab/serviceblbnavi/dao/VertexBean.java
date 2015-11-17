@@ -1,8 +1,8 @@
 package co.blastlab.serviceblbnavi.dao;
 
 import co.blastlab.serviceblbnavi.domain.Edge;
-import co.blastlab.serviceblbnavi.domain.Floor;
 import co.blastlab.serviceblbnavi.domain.Vertex;
+import java.util.ArrayList;
 import java.util.List;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
@@ -30,8 +30,23 @@ public class VertexBean {
         return em.createNamedQuery(Vertex.FIND_BY_FLOOR, Vertex.class).setParameter("floorId", floorId).getResultList();
     }
 
+    public void deleteWithEdgesCheck(Vertex vertex) {
+        System.out.println("deleteWithEdgesCheck");
+        List<Vertex> verticesToCheckFloorChangeability = new ArrayList<>();
+        for (Edge edge : vertex.getTargetEdges()) {
+            verticesToCheckFloorChangeability.add(edge.getSource());
+            System.out.println("added id: " + edge.getSource().getId());
+        }
+        delete(vertex);
+        for (Vertex vertexToCheckFloorChangeability : verticesToCheckFloorChangeability) {
+            System.out.println("updating floor changeability of: " + vertexToCheckFloorChangeability.getId());
+            updateFloorChangeability(vertexToCheckFloorChangeability);
+        }
+    }
+    
     public void delete(Vertex vertex) {
         em.remove(em.contains(vertex) ? vertex : em.merge(vertex));
+        em.flush();
     }
 
     public void update(Vertex vertex) {

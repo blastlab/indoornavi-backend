@@ -53,5 +53,8 @@ public class EdgeBean {
             update(e);
         }
     }
+    
+    public void clearEdges(Vertex vertex) {
+    }
 
 }

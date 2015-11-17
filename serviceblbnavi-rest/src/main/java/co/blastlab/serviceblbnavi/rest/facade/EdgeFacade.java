@@ -77,7 +77,6 @@ public class EdgeFacade {
         @ApiResponse(code = 404, message = "edge with given target and source id doesn't exist")
     })
     public Response delete(@ApiParam(value = "sourceId", required = true) @HeaderParam("sourceId") Long sourceId, @ApiParam(value = "targetId", required = true) @HeaderParam("targetId") Long targetId) {
-        System.out.println("inside deleting method");
         Vertex source = vertexBean.find(sourceId);
         Vertex target = vertexBean.find(targetId);
         Edge firstEdge = edgeBean.findBySourceAndTarget(source, target);
@@ -85,11 +84,9 @@ public class EdgeFacade {
         if (firstEdge != null) {
             edgeBean.delete(firstEdge);
             vertexBean.updateFloorChangeability(source);
-            vertexBean.updateFloorChangeability(target);
         }
         if (secondEdge != null) {
             edgeBean.delete(secondEdge);
-            vertexBean.updateFloorChangeability(source);
             vertexBean.updateFloorChangeability(target);
         }
         return Response.ok().build();
@@ -101,7 +98,6 @@ public class EdgeFacade {
         @ApiResponse(code = 404, message = "edge with given target and source id doesn't exist")
     })
     public Edge findBySourceIdAndTargetId(@ApiParam(value = "sourceId", required = true) @HeaderParam("sourceId") Long sourceId, @ApiParam(value = "targetId", required = true) @HeaderParam("targetId") Long targetId) {
-        System.out.println("finding by sourceId and taretId");
         Vertex source = vertexBean.find(sourceId);
         Vertex target = vertexBean.find(targetId);
         Edge edge = edgeBean.findBySourceAndTarget(source, target);

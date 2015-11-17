@@ -35,7 +35,7 @@ public class VertexFacade {
 
     @EJB
     private FloorBean floorBean;
-
+    
     @POST
     @ApiOperation(value = "create vertex", response = Vertex.class)
     @ApiResponses({
@@ -65,7 +65,7 @@ public class VertexFacade {
         if (vertex == null) {
             throw new EntityNotFoundException();
         }
-        vertexBean.delete(vertex);
+        vertexBean.deleteWithEdgesCheck(vertex);
         return Response.ok().build();
     }
 
@@ -81,8 +81,6 @@ public class VertexFacade {
             if (v != null) {
                 v.setX(vertex.getX());
                 v.setY(vertex.getY());
-                v.setIsFloorDownChangeable(vertex.isIsFloorDownChangeable());
-                v.setIsFloorUpChangeable(vertex.isIsFloorUpChangeable());
                 vertexBean.update(v);
                 return v;
             }
