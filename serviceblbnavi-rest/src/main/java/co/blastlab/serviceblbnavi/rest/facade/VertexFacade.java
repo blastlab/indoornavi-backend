@@ -65,7 +65,7 @@ public class VertexFacade {
         if (vertex == null) {
             throw new EntityNotFoundException();
         }
-        vertexBean.deleteWithEdgesCheck(vertex);
+        vertexBean.delete(vertex);
         return Response.ok().build();
     }
 
@@ -105,7 +105,6 @@ public class VertexFacade {
     })
     public List<Vertex> findByFloor(@ApiParam(value = "id", required = true) @PathParam("id") Long floorId) {
         if (floorId != null) {
-            System.out.println("getting vertexes");
             return vertexBean.findAll(floorId);
         }
         throw new EntityNotFoundException();

@@ -272,4 +272,29 @@
         <modifyDataType tableName="Beacon" columnName="mac" newDataType="VARCHAR(17)"/>
     </changeSet>
     
+    <changeSet id="18" author="gkonupek">
+        <dropColumn tableName="Vertex" columnName="isFloorUpChangeable"/>
+        <dropColumn tableName="Vertex" columnName="isFloorDownChangeable"/>
+    </changeSet>
+    
+    <changeSet id="19" author="gkonupek">
+        <createView viewName="VertexFloorChangeabilityView" replaceIfExists="true">
+            <![CDATA[
+            select v.*,
+            (select count(*) > 0 from Vertex v2
+            left join Edge e on (e.source_id = v2.id)
+            left join Vertex targetV on (targetV.id = e.target_id)
+            left join Floor targetFloor on (targetFloor.id = targetV.floor_id)
+            left join Floor sourceFloor on (sourceFloor.id = v2.floor_id)
+            where sourceFloor.level > targetFloor.level and v2.id = v.id) as isFloorUpChangeable,
+            (select count(*) > 0 from Vertex v3 left join Edge e on (e.source_id = v3.id)
+            left join Vertex targetV on (targetV.id = e.target_id)
+            left join Floor targetFloor on (targetFloor.id = targetV.floor_id)
+            left join Floor sourceFloor on (sourceFloor.id = v3.floor_id)
+            where sourceFloor.level < targetFloor.level and v3.id = v.id) as isFloorDownChangeable
+            from Vertex v
+            ]]>
+        </createView>
+    </changeSet>
+    
 </databaseChangeLog>

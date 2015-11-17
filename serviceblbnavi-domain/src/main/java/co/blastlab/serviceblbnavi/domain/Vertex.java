@@ -21,12 +21,16 @@ import javax.persistence.Transient;
  */
 @Entity
 @NamedQueries({
-    @NamedQuery(name = Vertex.FIND_BY_FLOOR, query = "SELECT v FROM Vertex v WHERE v.floor.id = :floorId")
+    @NamedQuery(name = Vertex.FIND_BY_FLOOR, query = "SELECT v FROM Vertex v WHERE v.floor.id = :floorId"),
+    @NamedQuery(name = Vertex.FIND_BY_FLOOR_WITH_FLOOR_CHANGEABILITY, query = "select new co.blastlab.serviceblbnavi.domain.Vertex(v.id, v.x, v.y, v.floor, (select count(*) > 0 from Vertex v2 left join v2.sourceEdges e left join e.target targetV left join targetV.floor targetFloor left join v2.floor sourceFloor where sourceFloor.level > targetFloor.level and v2.id = v.id), (select count(*) > 0 from Vertex v3 left join v3.sourceEdges e left join e.target targetV left join targetV.floor targetFloor left join v3.floor sourceFloor where sourceFloor.level < targetFloor.level and v3.id = v.id)) from Vertex v where v.floor.id = :floorId"),
+    @NamedQuery(name = Vertex.FIND_WITH_FLOOR_CHANGEABILITY, query = "select new co.blastlab.serviceblbnavi.domain.Vertex(v.id, v.x, v.y, v.floor, (select count(*) > 0 from Vertex v2 left join v2.sourceEdges e left join e.target targetV left join targetV.floor targetFloor left join v2.floor sourceFloor where sourceFloor.level > targetFloor.level and v2.id = v.id), (select count(*) > 0 from Vertex v3 left join v3.sourceEdges e left join e.target targetV left join targetV.floor targetFloor left join v3.floor sourceFloor where sourceFloor.level < targetFloor.level and v3.id = v.id)) from Vertex v where v.id = :id"),
 })
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY, setterVisibility = JsonAutoDetect.Visibility.NONE, getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class Vertex implements Serializable {
 
     public static final String FIND_BY_FLOOR = "Vertex.findByFloor";
+    public static final String FIND_BY_FLOOR_WITH_FLOOR_CHANGEABILITY = "Vertex.findByFloorWithFloorChangeability";
+    public static final String FIND_WITH_FLOOR_CHANGEABILITY = "Vertex.findWithFloorChangeAbility";
 
     @Id
     @GeneratedValue
@@ -36,8 +40,10 @@ public class Vertex implements Serializable {
 
     private Double y;
 
+    @Transient
     private boolean isFloorDownChangeable;
 
+    @Transient
     private boolean isFloorUpChangeable;
 
     @Transient
@@ -61,6 +67,21 @@ public class Vertex implements Serializable {
     @JsonIgnore
     @ManyToOne
     private Floor floor;
+
+    public Vertex() {
+    }
+    
+    public Vertex(Long id, Double x, Double y, Floor floor, boolean isFloorDownChangeable, boolean isFloorUpChangeable) {
+        this();
+        this.id = id;
+        this.x = x;
+        this.y = y;
+        this.isFloorDownChangeable = isFloorDownChangeable;
+        this.isFloorUpChangeable = isFloorUpChangeable;
+        this.floor = floor;
+    }
+    
+    
 
     public Long getFloorId() {
         return floorId;

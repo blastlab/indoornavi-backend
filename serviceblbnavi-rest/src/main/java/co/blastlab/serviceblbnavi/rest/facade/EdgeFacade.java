@@ -50,7 +50,6 @@ public class EdgeFacade {
                 edge.setTarget(target);
                 edge.setSource(source);
                 edgeBean.create(edge);
-                vertexBean.updateFloorChangeability(source);
                 return edge;
             }
         }
@@ -83,11 +82,9 @@ public class EdgeFacade {
         Edge secondEdge = edgeBean.findBySourceAndTarget(target, source);
         if (firstEdge != null) {
             edgeBean.delete(firstEdge);
-            vertexBean.updateFloorChangeability(source);
         }
         if (secondEdge != null) {
             edgeBean.delete(secondEdge);
-            vertexBean.updateFloorChangeability(target);
         }
         return Response.ok().build();
     }
