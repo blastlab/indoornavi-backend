@@ -69,6 +69,20 @@ public class EdgeFacade {
         }
         throw new EntityNotFoundException();
     }
+    
+    @GET
+    @Path("/vertex/{id: \\d+}")
+    @ApiOperation(value = "find edges by vertex id", response = Edge.class, responseContainer = "List")
+    @ApiResponses({
+        @ApiResponse(code = 404, message = "vertex with given id wasn't found")
+    })
+    public List<Edge> findByVertexId(@PathParam("id") @ApiParam(value = "id", required = true) Long vertexId) {
+        if (vertexId != null) {
+            List<Edge> result = edgeBean.findByVertexId(vertexId);
+            return result;
+        }
+        throw new EntityNotFoundException();
+    }
 
     @DELETE
     @ApiOperation(value = "delete edge", response = Response.class)

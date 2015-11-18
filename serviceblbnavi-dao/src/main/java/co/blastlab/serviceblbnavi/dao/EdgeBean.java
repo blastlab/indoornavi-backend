@@ -40,6 +40,10 @@ public class EdgeBean {
         return em.createNamedQuery(Edge.FIND_VERTEX_FLOOR_ID, Edge.class).setParameter("floorId", id).getResultList();
     }
 
+    public List<Edge> findByVertexId(Long vertexId) {
+        return em.createNamedQuery(Edge.FIND_VERTEX_ID, Edge.class).setParameter("vertexId", vertexId).getResultList();
+    }
+
     public void delete(Edge edge) {
         em.remove(em.contains(edge) ? edge : em.merge(edge));
     }
@@ -53,7 +57,7 @@ public class EdgeBean {
             update(e);
         }
     }
-    
+
     public void clearEdges(Vertex vertex) {
     }
 

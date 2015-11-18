@@ -24,7 +24,6 @@ public class VertexBean {
     public Vertex find(Long id) {
          Vertex result = em.createNamedQuery(Vertex.FIND_WITH_FLOOR_CHANGEABILITY, Vertex.class).setParameter("id", id).getSingleResult();
          result.setGoals(em.createNamedQuery(Goal.FIND_BY_VERTEX, Goal.class).setParameter("vertexId", result.getId()).getResultList());
-         
          return result;
     }
 
