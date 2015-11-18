@@ -9,6 +9,7 @@ import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
@@ -38,6 +39,11 @@ public class Building implements Serializable {
     private Integer minimumFloor;
 
     private Double degree;
+    
+    @Lob
+    private String configuration;
+    
+    private String configurationChecksum;
 
     @JsonIgnore
     @ManyToOne
@@ -119,4 +125,19 @@ public class Building implements Serializable {
         this.complexId = complexId;
     }
 
+    public String getConfiguration() {
+        return configuration;
+    }
+
+    public void setConfiguration(String configuration) {
+        this.configuration = configuration;
+    }
+
+    public String getConfigurationChecksum() {
+        return configurationChecksum;
+    }
+
+    public void setConfigurationChecksum(String configurationChecksum) {
+        this.configurationChecksum = configurationChecksum;
+    }
 }

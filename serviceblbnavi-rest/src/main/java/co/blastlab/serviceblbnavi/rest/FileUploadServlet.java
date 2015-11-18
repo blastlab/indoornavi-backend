@@ -15,7 +15,6 @@ import java.io.IOException;
 import java.util.Base64;
 import javax.ejb.EJB;
 import javax.inject.Inject;
-import javax.persistence.EntityNotFoundException;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;

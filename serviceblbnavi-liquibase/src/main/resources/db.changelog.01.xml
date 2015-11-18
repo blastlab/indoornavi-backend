@@ -297,4 +297,11 @@
         </createView>
     </changeSet>
     
+    <changeSet id="20" author="gkonupek">
+        <addColumn tableName="Building">
+            <column name="configuration" type="LONGTEXT"/>
+            <column name="configurationChecksum" type="VARCHAR(64)"/>
+        </addColumn>
+    </changeSet>
+    
 </databaseChangeLog>

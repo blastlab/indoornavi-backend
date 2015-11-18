@@ -2,7 +2,14 @@ package co.blastlab.serviceblbnavi.dao;
 
 import co.blastlab.serviceblbnavi.domain.Building;
 import co.blastlab.serviceblbnavi.domain.Complex;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.UnsupportedEncodingException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
@@ -35,6 +42,29 @@ public class BuildingBean {
 
     public void update(Building building) {
         em.merge(building);
+    }
+
+    public void saveConfiguration(Building building) {
+        String configuration = generateConfigurationFromBuilding(building);
+        System.out.println(configuration);
+        try {
+            building.setConfiguration(configuration);
+            building.setConfigurationChecksum(new String(MessageDigest.getInstance("MD5").digest(configuration.getBytes("UTF-8"))));
+            update(building);
+        } catch (NoSuchAlgorithmException | UnsupportedEncodingException ex) {
+            //TODO: better exception handling
+            Logger.getLogger(BuildingBean.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    private String generateConfigurationFromBuilding(Building building) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            return mapper.writeValueAsString(building);
+        } catch (JsonProcessingException ex) {
+            Logger.getLogger(BuildingBean.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return "";
     }
 
 }

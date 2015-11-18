@@ -115,5 +115,35 @@ public class BuildingFacade {
         }
         throw new EntityNotFoundException();
     }
+    
+    @PUT
+    @Path("/{id: \\d+}/config/")
+    @ApiOperation(value = "update building's configuration")
+    @ApiResponses({
+        @ApiResponse(code = 404, message = "building doesn't exist")
+    })
+    public String saveConfiguration(@PathParam("id") @ApiParam(value = "buildingId", required = true) Long buildingId) {
+        Building building = buildingBean.find(buildingId);
+        if (building != null) {
+            buildingBean.saveConfiguration(building);
+            return building.getConfiguration();
+        }
+        throw new EntityNotFoundException();
+    }
+    
+    @GET
+    @Path("/{id: \\d+}/config/")
+    @ApiOperation(value = "finds building's configuration by id")
+    @ApiResponses({
+        @ApiResponse(code = 404, message = "building doesn't exist")
+    })
+    public String getConfiguration(@PathParam("id") @ApiParam(value = "buildingIdId", required = true) Long buildingId) {
+        Building building = buildingBean.find(buildingId);
+        if (building != null) {
+            return building.getConfiguration();
+        }
+        throw new EntityNotFoundException();
+    }
+    
 
 }
