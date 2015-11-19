@@ -286,12 +286,12 @@
             left join Vertex targetV on (targetV.id = e.target_id)
             left join Floor targetFloor on (targetFloor.id = targetV.floor_id)
             left join Floor sourceFloor on (sourceFloor.id = v2.floor_id)
-            where sourceFloor.level > targetFloor.level and v2.id = v.id) as isFloorUpChangeable,
+            where sourceFloor.level > targetFloor.level and v2.id = v.id) as isFloorDownChangeable,
             (select count(*) > 0 from Vertex v3 left join Edge e on (e.source_id = v3.id)
             left join Vertex targetV on (targetV.id = e.target_id)
             left join Floor targetFloor on (targetFloor.id = targetV.floor_id)
             left join Floor sourceFloor on (sourceFloor.id = v3.floor_id)
-            where sourceFloor.level < targetFloor.level and v3.id = v.id) as isFloorDownChangeable
+            where sourceFloor.level < targetFloor.level and v3.id = v.id) as isFloorUpChangeable
             from Vertex v
             ]]>
         </createView>
