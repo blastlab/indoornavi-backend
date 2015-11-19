@@ -1,6 +1,6 @@
 package co.blastlab.serviceblbnavi.dao;
 
-import co.blastlab.serviceblbnavi.domain.Goal;
+import co.blastlab.serviceblbnavi.domain.Floor;
 import co.blastlab.serviceblbnavi.domain.Vertex;
 import java.util.List;
 import javax.ejb.Stateless;
@@ -22,18 +22,11 @@ public class VertexBean {
     }
 
     public Vertex find(Long id) {
-         Vertex result = em.createNamedQuery(Vertex.FIND_WITH_FLOOR_CHANGEABILITY, Vertex.class).setParameter("id", id).getSingleResult();
-         result.setGoals(em.createNamedQuery(Goal.FIND_BY_VERTEX, Goal.class).setParameter("vertexId", result.getId()).getResultList());
-         return result;
+         return em.find(Vertex.class, id);
     }
 
     public List<Vertex> findAll(Long floorId) {
-        List<Vertex> results = em.createNamedQuery(Vertex.FIND_BY_FLOOR_WITH_FLOOR_CHANGEABILITY, Vertex.class).setParameter("floorId", floorId).getResultList();
-        for (Vertex v : results) {
-            v.setGoals(em.createNamedQuery(Goal.FIND_BY_VERTEX, Goal.class).setParameter("vertexId", v.getId()).getResultList());
-        }
-        
-        return results;
+        return em.find(Floor.class, floorId).getVertexs();
     }
     
     public void delete(Vertex vertex) {

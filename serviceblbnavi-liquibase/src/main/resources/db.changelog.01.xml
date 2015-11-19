@@ -280,7 +280,7 @@
     <changeSet id="19" author="gkonupek">
         <createView viewName="VertexFloorChangeabilityView" replaceIfExists="true">
             <![CDATA[
-            select v.*,
+            select v.id as vertex_id,
             (select count(*) > 0 from Vertex v2
             left join Edge e on (e.source_id = v2.id)
             left join Vertex targetV on (targetV.id = e.target_id)

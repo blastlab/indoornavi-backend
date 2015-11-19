@@ -41,8 +41,10 @@ public class Building implements Serializable {
     private Double degree;
     
     @Lob
+    @JsonIgnore
     private String configuration;
     
+    @JsonIgnore
     private String configurationChecksum;
 
     @JsonIgnore

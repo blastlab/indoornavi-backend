@@ -7,12 +7,13 @@ import com.fasterxml.jackson.annotation.JsonView;
 import java.io.Serializable;
 import java.util.List;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.PostLoad;
 import javax.persistence.Transient;
 
 /**
@@ -20,17 +21,8 @@ import javax.persistence.Transient;
  * @author Michał Koszałka
  */
 @Entity
-@NamedQueries({
-    @NamedQuery(name = Vertex.FIND_BY_FLOOR, query = "SELECT v FROM Vertex v WHERE v.floor.id = :floorId"),
-    @NamedQuery(name = Vertex.FIND_BY_FLOOR_WITH_FLOOR_CHANGEABILITY, query = "select new co.blastlab.serviceblbnavi.domain.Vertex(v.id, v.x, v.y, v.floor, (select count(*) > 0 from Vertex v2 left join v2.sourceEdges e left join e.target targetV left join targetV.floor targetFloor left join v2.floor sourceFloor where sourceFloor.level > targetFloor.level and v2.id = v.id) as isFloorDownChangeable, (select count(*) > 0 from Vertex v3 left join v3.sourceEdges e left join e.target targetV left join targetV.floor targetFloor left join v3.floor sourceFloor where sourceFloor.level < targetFloor.level and v3.id = v.id) as isFloorUpChangeable) from Vertex v where v.floor.id = :floorId"),
-    @NamedQuery(name = Vertex.FIND_WITH_FLOOR_CHANGEABILITY, query = "select new co.blastlab.serviceblbnavi.domain.Vertex(v.id, v.x, v.y, v.floor, (select count(*) > 0 from Vertex v2 left join v2.sourceEdges e left join e.target targetV left join targetV.floor targetFloor left join v2.floor sourceFloor where sourceFloor.level > targetFloor.level and v2.id = v.id) as isFloorDownChangeable, (select count(*) > 0 from Vertex v3 left join v3.sourceEdges e left join e.target targetV left join targetV.floor targetFloor left join v3.floor sourceFloor where sourceFloor.level < targetFloor.level and v3.id = v.id) as isFloorUpChangeable) from Vertex v where v.id = :id")
-})
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY, setterVisibility = JsonAutoDetect.Visibility.NONE, getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class Vertex implements Serializable {
-
-    public static final String FIND_BY_FLOOR = "Vertex.findByFloor";
-    public static final String FIND_BY_FLOOR_WITH_FLOOR_CHANGEABILITY = "Vertex.findByFloorWithFloorChangeability";
-    public static final String FIND_WITH_FLOOR_CHANGEABILITY = "Vertex.findWithFloorChangeAbility";
 
     @Id
     @GeneratedValue
@@ -61,24 +53,21 @@ public class Vertex implements Serializable {
     @OneToMany(mappedBy = "source")
     private List<Edge> sourceEdges;
 
-    @OneToMany(mappedBy = "vertex")
+    @OneToMany(mappedBy = "vertex", fetch = FetchType.EAGER)
     private List<Goal> goals;
 
     @JsonIgnore
     @ManyToOne
     private Floor floor;
-
-    public Vertex() {
-    }
     
-    public Vertex(Long id, Double x, Double y, Floor floor, boolean isFloorDownChangeable, boolean isFloorUpChangeable) {
-        this();
-        this.id = id;
-        this.x = x;
-        this.y = y;
-        this.isFloorDownChangeable = isFloorDownChangeable;
-        this.isFloorUpChangeable = isFloorUpChangeable;
-        this.floor = floor;
+    @OneToOne(mappedBy = "vertex", fetch = FetchType.EAGER)
+    @JsonIgnore
+    private VertexFloorChangeabilityView vertexFloorChangeabilityView;
+
+    @PostLoad
+    public void onLoad() {
+        this.isFloorDownChangeable = this.vertexFloorChangeabilityView.getIsFloorDownChangeable();
+        this.isFloorUpChangeable = this.vertexFloorChangeabilityView.getIsFloorUpChangeable();
     }
 
     public Long getFloorId() {
@@ -169,4 +158,12 @@ public class Vertex implements Serializable {
         this.isFloorUpChangeable = isFloorUpChangeable;
     }
 
+    public VertexFloorChangeabilityView getVertexFloorChangeabilityView() {
+        return vertexFloorChangeabilityView;
+    }
+
+    public void setVertexFloorChangeabilityView(VertexFloorChangeabilityView vertexFloorChangeabilityView) {
+        this.vertexFloorChangeabilityView = vertexFloorChangeabilityView;
+    }
+    
 }
