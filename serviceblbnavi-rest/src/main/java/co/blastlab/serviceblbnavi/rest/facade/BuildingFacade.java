@@ -135,12 +135,50 @@ public class BuildingFacade {
     @Path("/{id: \\d+}/config/")
     @ApiOperation(value = "finds building's configuration by id")
     @ApiResponses({
-        @ApiResponse(code = 404, message = "building doesn't exist")
+        @ApiResponse(code = 404, message = "building doesn't exist or has no configuration set")
     })
-    public String getConfiguration(@PathParam("id") @ApiParam(value = "buildingIdId", required = true) Long buildingId) {
+    public String getConfiguration(@PathParam("id") @ApiParam(value = "buildingId", required = true) Long buildingId) {
         Building building = buildingBean.find(buildingId);
         if (building != null) {
-            return building.getConfiguration();
+            if (building.getConfiguration() != null) {
+                return building.getConfiguration();
+            }
+        }
+        throw new EntityNotFoundException();
+    }
+    
+    @GET
+    @Path("/{complexName}/{buildingName}/config/")
+    @ApiOperation(value = "finds building's configuration by complex name and building name")
+    @ApiResponses({
+        @ApiResponse(code = 404, message = "building doesn't exist or has no configuration set")
+    })
+    public String getConfigurationByComplexNameAndBuildingName(
+            @PathParam("complexName") @ApiParam(value = "complexName", required = true) String complexName,
+            @PathParam("buildingName") @ApiParam(value = "buildingName", required = true) String buildingName) {
+        Building building = buildingBean.findByComplexNameAndBuildingName(complexName, buildingName);
+        if (building != null) {
+            if (building.getConfiguration() != null) {
+                return building.getConfiguration();
+            }
+        }
+        throw new EntityNotFoundException();
+    }
+    
+    @GET
+    @Path("/{complexName}/{buildingName}/configChecksum/")
+    @ApiOperation(value = "finds building's configuration's checksum by complex name and building name")
+    @ApiResponses({
+        @ApiResponse(code = 404, message = "building doesn't exist or has no configuration checksum set")
+    })
+    public String getConfigurationChecksumByComplexNameAndBuildingName(
+            @PathParam("complexName") @ApiParam(value = "complexName", required = true) String complexName,
+            @PathParam("buildingName") @ApiParam(value = "buildingName", required = true) String buildingName) {
+        Building building = buildingBean.findByComplexNameAndBuildingName(complexName, buildingName);
+        if (building != null) {
+            if (building.getConfigurationChecksum() != null) {
+                return building.getConfigurationChecksum();
+            }
         }
         throw new EntityNotFoundException();
     }

@@ -22,13 +22,15 @@ import javax.persistence.Transient;
  * @author Michał Koszałka
  */
 @NamedQueries({
-    @NamedQuery(name = Building.FIND_BY_COMPLEX, query = "SELECT b FROM Building b WHERE b.complex = :complex ORDER BY b.name")
+    @NamedQuery(name = Building.FIND_BY_COMPLEX, query = "SELECT b FROM Building b WHERE b.complex = :complex ORDER BY b.name"),
+    @NamedQuery(name = Building.FIND_BY_COMPLEX_NAME_AND_BUILDING_NAME, query = "SELECT b FROM Building b WHERE b.complex.name = :complexName AND b.name = :buildingName")
 })
 @Entity
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY, setterVisibility = JsonAutoDetect.Visibility.NONE, getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class Building implements Serializable {
 
     public static final String FIND_BY_COMPLEX = "Building.findByComplex";
+    public static final String FIND_BY_COMPLEX_NAME_AND_BUILDING_NAME = "Building.findByComplexNameAndBuildingName";
 
     @Id
     @GeneratedValue
@@ -39,11 +41,11 @@ public class Building implements Serializable {
     private Integer minimumFloor;
 
     private Double degree;
-    
+
     @Lob
     @JsonIgnore
     private String configuration;
-    
+
     @JsonIgnore
     private String configurationChecksum;
 

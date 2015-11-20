@@ -44,7 +44,7 @@ public class Floor implements Serializable {
 
     @JsonView(View.External.class)
     @OneToMany(mappedBy = "floor")
-    private List<Vertex> vertexs;
+    private List<Vertex> vertices;
 
     @JsonView(View.External.class)
     @OneToMany(mappedBy = "floor")
@@ -109,12 +109,12 @@ public class Floor implements Serializable {
         this.waypoints = waypoints;
     }
 
-    public List<Vertex> getVertexs() {
-        return vertexs;
+    public List<Vertex> getVertices() {
+        return vertices;
     }
 
-    public void setVertexs(List<Vertex> vertexs) {
-        this.vertexs = vertexs;
+    public void setVertices(List<Vertex> vertices) {
+        this.vertices = vertices;
     }
 
     public List<Beacon> getBeacons() {

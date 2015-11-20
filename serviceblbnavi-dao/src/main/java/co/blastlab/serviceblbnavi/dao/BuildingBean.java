@@ -2,6 +2,7 @@ package co.blastlab.serviceblbnavi.dao;
 
 import co.blastlab.serviceblbnavi.domain.Building;
 import co.blastlab.serviceblbnavi.domain.Complex;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.UnsupportedEncodingException;
@@ -60,11 +61,19 @@ public class BuildingBean {
     private String generateConfigurationFromBuilding(Building building) {
         try {
             ObjectMapper mapper = new ObjectMapper();
+            mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
             return mapper.writeValueAsString(building);
         } catch (JsonProcessingException ex) {
             Logger.getLogger(BuildingBean.class.getName()).log(Level.SEVERE, null, ex);
         }
         return "";
+    }
+    
+    public Building findByComplexNameAndBuildingName(String complexName, String buildingName) {
+        return em.createNamedQuery(Building.FIND_BY_COMPLEX_NAME_AND_BUILDING_NAME, Building.class)
+                .setParameter("complexName", complexName)
+                .setParameter("buildingName", buildingName)
+                .getSingleResult();
     }
 
 }

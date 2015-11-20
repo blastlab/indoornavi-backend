@@ -1,12 +1,16 @@
 package co.blastlab.serviceblbnavi.domain;
 
+import co.blastlab.serviceblbnavi.views.View;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonView;
 import java.io.Serializable;
+import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Transient;
 
 /**
@@ -37,6 +41,10 @@ public class Waypoint implements Serializable {
     @JsonIgnore
     @ManyToOne
     private Floor floor;
+    
+    @JsonView(View.External.class)
+    @OneToMany
+    private List<WaypointVisit> waypointVisit;
 
     public Long getFloorId() {
         return floorId;
@@ -100,6 +108,14 @@ public class Waypoint implements Serializable {
 
     public void setFloor(Floor floor) {
         this.floor = floor;
+    }
+
+    public List<WaypointVisit> getWaypointVisit() {
+        return waypointVisit;
+    }
+
+    public void setWaypointVisit(List<WaypointVisit> waypointVisit) {
+        this.waypointVisit = waypointVisit;
     }
 
 }

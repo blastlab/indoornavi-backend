@@ -26,7 +26,7 @@ public class VertexBean {
     }
 
     public List<Vertex> findAll(Long floorId) {
-        return em.find(Floor.class, floorId).getVertexs();
+        return em.find(Floor.class, floorId).getVertices();
     }
     
     public void delete(Vertex vertex) {

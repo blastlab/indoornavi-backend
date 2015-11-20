@@ -304,4 +304,50 @@
         </addColumn>
     </changeSet>
     
+      <changeSet id="21" author="gkonupek">
+        <addColumn tableName="Person">
+            <column name="password" type="VARCHAR(128)"/>
+            <column name="salt" type="VARCHAR(16)"/>
+        </addColumn>
+    </changeSet>
+    
+    <changeSet id="22" author="gkonupek">
+        <createTable tableName="GoalSelection">
+            <column autoIncrement="true" type="INT" name="id">
+                <constraints primaryKey="true"/>
+            </column>
+            <column type="VARCHAR(255)" name="device">
+                <constraints nullable="false"/>
+            </column>
+            <column type="DOUBLE" name="x"/>
+            <column type="DOUBLE" name="y"/>
+            <column type="INT" name="floorLevel"/>
+            <column type="TIMESTAMP" name="creationDateTimestamp">
+                <constraints nullable="false"/>
+            </column>
+            <column type="INT" name="goal_id"/>
+        </createTable>
+        <addForeignKeyConstraint baseColumnNames="goal_id" baseTableName="GoalSelection"
+                                 referencedColumnNames="id" referencedTableName="Goal"
+                                 constraintName="FK_GoalSelection_Goal" onDelete="CASCADE" onUpdate="CASCADE"/>
+    </changeSet>
+    
+    <changeSet id="23" author="gkonupek">
+        <createTable tableName="WaypointVisit">
+            <column autoIncrement="true" type="INT" name = "id">
+                <constraints primaryKey="true"/>
+            </column>
+            <column type="VARCHAR(255)" name="device">
+                <constraints nullable="false"/>
+            </column>
+            <column type="TIMESTAMP" name="creationDateTimestamp">
+                <constraints nullable="false"/>
+            </column>
+            <column type="INT" name="waypoint_id"> 
+        </createTable>
+        <addForeignKeyConstraint baseColumnNames="waypoint_id" baseTableName="WaypointVisit"
+                                 referencedColumnNames="id" referencedTableName="Waypoint"
+                                 constraintName="FK_WaypointVisit_Waypoint" onDelete="CASCADE" onUpdate="CASCADE"/>
+    </changeSet>
+    
 </databaseChangeLog>

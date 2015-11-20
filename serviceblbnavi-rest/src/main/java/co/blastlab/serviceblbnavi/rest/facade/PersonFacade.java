@@ -13,8 +13,10 @@ import com.wordnik.swagger.annotations.ApiResponses;
 import javax.ejb.EJB;
 import javax.inject.Inject;
 import javax.persistence.EntityExistsException;
+import javax.persistence.EntityNotFoundException;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 
 /**
@@ -44,6 +46,23 @@ public class PersonFacade {
         person.generateAuthToken();
         personBean.create(person);
         return person;
+    }
+    
+    @PUT
+    @JsonView(View.PersonInternal.class)
+    @ApiOperation(value = "register", response = Person.class)
+    @ApiResponses({
+        @ApiResponse(code = 404, message = "invalid login data")
+    })
+    public String login(@ApiParam(value = "person", required = true) Person person) {
+        Person p = personBean.findByEmail(person.getEmail());
+        if (p == null) {
+            throw new EntityNotFoundException();
+        }
+        //todo: check password, generate authtoken?
+        throw new EntityNotFoundException();
+        
+//        return p.getAuthToken();
     }
 
     @GET
