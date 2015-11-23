@@ -35,7 +35,7 @@ public class VertexFacade {
 
     @EJB
     private FloorBean floorBean;
-    
+
     @POST
     @ApiOperation(value = "create vertex", response = Vertex.class)
     @ApiResponses({
@@ -109,7 +109,7 @@ public class VertexFacade {
         }
         throw new EntityNotFoundException();
     }
-    
+
     @GET
     @Path("/{id: \\d+}")
     @JsonView(View.VertexInternal.class)
@@ -121,6 +121,22 @@ public class VertexFacade {
         if (vertexId != null) {
             Vertex vertex = vertexBean.find(vertexId);
             vertex.setFloorId(vertex.getFloor().getId());
+            return vertex;
+        }
+        throw new EntityNotFoundException();
+    }
+
+    @PUT
+    @Path("/{id: \\d+}/deactivate")
+    @JsonView(View.GoalInternal.class)
+    @ApiOperation(value = "deactivates vertex of given id", response = Vertex.class)
+    @ApiResponses({
+        @ApiResponse(code = 404, message = "vertex with given id wasn't found")
+    })
+    public Vertex dectivate(@ApiParam(value = "id", required = true) @PathParam("id") Long vertexId) {
+        Vertex vertex = vertexBean.find(vertexId);
+        if (vertex != null) {
+            vertexBean.deactivate(vertex);
             return vertex;
         }
         throw new EntityNotFoundException();

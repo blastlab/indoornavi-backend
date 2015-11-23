@@ -343,11 +343,23 @@
             <column type="TIMESTAMP" name="creationDateTimestamp">
                 <constraints nullable="false"/>
             </column>
-            <column type="INT" name="waypoint_id"> 
+            <column type="INT" name="waypoint_id"/> 
         </createTable>
         <addForeignKeyConstraint baseColumnNames="waypoint_id" baseTableName="WaypointVisit"
                                  referencedColumnNames="id" referencedTableName="Waypoint"
                                  constraintName="FK_WaypointVisit_Waypoint" onDelete="CASCADE" onUpdate="CASCADE"/>
+    </changeSet>
+    
+    <changeSet id="24" author="gkonupek">
+        <addColumn tableName="Goal">
+            <column name="inactive" type="BOOL" defaultValue="0"/>
+        </addColumn>
+        <addColumn tableName="Vertex">
+            <column name="inactive" type="BOOL" defaultValue="0"/>
+        </addColumn>
+        <addColumn tableName="Waypoint">
+            <column name="inactive" type="BOOL" defaultValue="0"/>
+        </addColumn>
     </changeSet>
     
 </databaseChangeLog>

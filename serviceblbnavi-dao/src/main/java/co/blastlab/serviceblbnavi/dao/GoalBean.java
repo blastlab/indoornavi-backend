@@ -12,7 +12,7 @@ import javax.persistence.EntityManager;
  */
 @Stateless
 public class GoalBean {
-    
+
     @Inject
     private EntityManager em;
 
@@ -41,5 +41,10 @@ public class GoalBean {
         for (Goal v : goals) {
             update(v);
         }
+    }
+
+    public void deactivate(Goal goal) {
+        goal.setInactive(true);
+        update(goal);
     }
 }

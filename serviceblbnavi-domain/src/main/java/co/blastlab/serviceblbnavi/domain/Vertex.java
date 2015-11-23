@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
 import java.io.Serializable;
 import java.util.List;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -14,6 +15,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.PostLoad;
+import javax.persistence.PrePersist;
 import javax.persistence.Transient;
 
 /**
@@ -31,6 +33,9 @@ public class Vertex implements Serializable {
     private Double x;
 
     private Double y;
+    
+    @Column(nullable = false)
+    private Boolean inactive;
 
     @Transient
     private boolean isFloorDownChangeable;
@@ -59,15 +64,22 @@ public class Vertex implements Serializable {
     @JsonIgnore
     @ManyToOne
     private Floor floor;
-    
+
     @OneToOne(mappedBy = "vertex", fetch = FetchType.EAGER)
     @JsonIgnore
     private VertexFloorChangeabilityView vertexFloorChangeabilityView;
 
+    @PrePersist
+    void prePersist() {
+        if (inactive == null) {
+            inactive = false;
+        }
+    }
+
     @PostLoad
     public void onLoad() {
-        this.isFloorDownChangeable = this.vertexFloorChangeabilityView.getIsFloorDownChangeable();
-        this.isFloorUpChangeable = this.vertexFloorChangeabilityView.getIsFloorUpChangeable();
+        isFloorDownChangeable = vertexFloorChangeabilityView.getIsFloorDownChangeable();
+        isFloorUpChangeable = vertexFloorChangeabilityView.getIsFloorUpChangeable();
     }
 
     public Long getFloorId() {
@@ -165,5 +177,13 @@ public class Vertex implements Serializable {
     public void setVertexFloorChangeabilityView(VertexFloorChangeabilityView vertexFloorChangeabilityView) {
         this.vertexFloorChangeabilityView = vertexFloorChangeabilityView;
     }
-    
+
+    public Boolean getInactive() {
+        return inactive;
+    }
+
+    public void setInactive(Boolean inactive) {
+        this.inactive = inactive;
+    }
+
 }

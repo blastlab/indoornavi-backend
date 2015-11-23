@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
 import java.io.Serializable;
 import java.util.List;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -13,6 +14,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
+import javax.persistence.PrePersist;
 import javax.persistence.Transient;
 
 /**
@@ -33,6 +35,9 @@ public class Goal implements Serializable {
     private Long id;
 
     private String name;
+    
+    @Column(nullable = false)
+    private Boolean inactive;
 
     @JsonIgnore
     @ManyToOne
@@ -52,6 +57,13 @@ public class Goal implements Serializable {
     @Transient
     private Long vertexId;
 
+    @PrePersist
+    void prePersist() {
+        if (inactive == null) {
+            inactive = false;
+        }
+    }
+    
     public Long getBuildingId() {
         return buildingId;
     }
@@ -98,6 +110,22 @@ public class Goal implements Serializable {
 
     public void setVertex(Vertex vertex) {
         this.vertex = vertex;
+    }
+
+    public Boolean getInactive() {
+        return inactive;
+    }
+
+    public void setInactive(Boolean inactive) {
+        this.inactive = inactive;
+    }
+
+    public List<GoalSelection> getGoalSelections() {
+        return goalSelections;
+    }
+
+    public void setGoalSelections(List<GoalSelection> goalSelections) {
+        this.goalSelections = goalSelections;
     }
 
 }

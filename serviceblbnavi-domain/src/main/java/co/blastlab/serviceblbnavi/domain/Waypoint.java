@@ -35,13 +35,15 @@ public class Waypoint implements Serializable {
 
     private String details;
 
+    private Boolean inactive;
+
     @Transient
     private Long floorId;
 
     @JsonIgnore
     @ManyToOne
     private Floor floor;
-    
+
     @JsonView(View.External.class)
     @OneToMany
     private List<WaypointVisit> waypointVisit;
@@ -116,6 +118,14 @@ public class Waypoint implements Serializable {
 
     public void setWaypointVisit(List<WaypointVisit> waypointVisit) {
         this.waypointVisit = waypointVisit;
+    }
+
+    public Boolean getInactive() {
+        return inactive;
+    }
+
+    public void setInactive(Boolean inactive) {
+        this.inactive = inactive;
     }
 
 }

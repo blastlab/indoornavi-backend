@@ -34,10 +34,10 @@ public class GoalFacade {
 
     @EJB
     private GoalBean goalBean;
-    
+
     @EJB
     private VertexBean vertexBean;
-    
+
     @EJB
     private BuildingBean buildingBean;
 
@@ -48,7 +48,7 @@ public class GoalFacade {
     })
     @JsonView(View.GoalInternal.class)
     public Goal create(@ApiParam(value = "vertex", required = true) Goal goal) {
-        if (goal.getVertexId()!= null && goal.getBuildingId() != null) {
+        if (goal.getVertexId() != null && goal.getBuildingId() != null) {
             Vertex vertex = vertexBean.find(goal.getVertexId());
             Building building = buildingBean.find(goal.getBuildingId());
             if (vertex != null) {
@@ -113,6 +113,22 @@ public class GoalFacade {
         if (vertexId != null) {
             System.out.println("getting goals");
             return goalBean.findAll(vertexId);
+        }
+        throw new EntityNotFoundException();
+    }
+
+    @PUT
+    @Path("/{id: \\d+}/deactivate")
+    @JsonView(View.GoalInternal.class)
+    @ApiOperation(value = "deactivates goal of given id", response = Goal.class)
+    @ApiResponses({
+        @ApiResponse(code = 404, message = "vertex with given id wasn't found")
+    })
+    public Goal deactivate(@ApiParam(value = "id", required = true) @PathParam("id") Long goalId) {
+        Goal goal = goalBean.find(goalId);
+        if (goal != null) {
+            goalBean.deactivate(goal);
+            return goal;
         }
         throw new EntityNotFoundException();
     }
