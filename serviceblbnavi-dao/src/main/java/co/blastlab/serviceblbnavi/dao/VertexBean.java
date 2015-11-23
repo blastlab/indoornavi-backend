@@ -36,10 +36,7 @@ public class VertexBean {
     }
 
     public List<Vertex> findAllActive(Long floorId) {
-        List<Vertex> vertices = em.find(Floor.class, floorId).getVertices().stream().filter((vertex) -> {
-            return !vertex.getInactive();
-        }).collect(Collectors.toList());
-        
+        List<Vertex> vertices = em.createNamedQuery(Vertex.FIND_ACTIVE_BY_FLOOR, Vertex.class).setParameter("floorId", floorId).getResultList();
         vertices.stream().forEach((vertex) -> {
             vertex.setGoals(vertex.getGoals().stream().filter((goal) -> {
                 return !goal.getInactive();
