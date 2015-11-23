@@ -51,7 +51,7 @@ public class GoalFacade {
         if (goal.getVertexId() != null && goal.getBuildingId() != null) {
             Vertex vertex = vertexBean.find(goal.getVertexId());
             Building building = buildingBean.find(goal.getBuildingId());
-            if (vertex != null) {
+            if (vertex != null && building != null) {
                 goal.setVertex(vertex);
                 goal.setBuilding(building);
                 goalBean.create(goal);
@@ -86,9 +86,13 @@ public class GoalFacade {
         if (goal.getId() != null) {
             Goal g = goalBean.find(goal.getId());
             if (g != null) {
-                g.setName(goal.getName());
+                g.setInactive(true);
+                goal.setVertex(g.getVertex());
+                goal.setBuilding(g.getBuilding());
+                goal.setId(null);
                 goalBean.update(g);
-                return g;
+                goalBean.create(goal);
+                return goal;
             }
         }
         throw new EntityNotFoundException();

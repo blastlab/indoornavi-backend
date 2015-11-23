@@ -41,9 +41,9 @@ public class VertexBean {
 
     public void deactivate(Vertex vertex) {
         List<Goal> goals = vertex.getGoals();
-        for (Goal goal : goals) {
+        goals.stream().forEach((goal) -> {
             goal.setInactive(true);
-        }
+        });
         goalBean.update(goals);
         vertex.setInactive(true);
         update(vertex);
@@ -54,9 +54,9 @@ public class VertexBean {
     }
 
     public void update(List<Vertex> vertexes) {
-        for (Vertex v : vertexes) {
+        vertexes.stream().forEach((v) -> {
             update(v);
-        }
+        });
     }
 
     public EntityManager getEm() {

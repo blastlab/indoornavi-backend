@@ -33,10 +33,12 @@ public class FloorBean {
     }
 
     public void updateFloorLevels(List<Floor> floors) {
-        for (Floor f : floors) {
+        floors.stream().map((f) -> {
             Floor floor = find(f.getId());
             floor.setLevel(f.getLevel());
+            return floor;
+        }).forEach((floor) -> {
             update(floor);
-        }
+        });
     }
 }

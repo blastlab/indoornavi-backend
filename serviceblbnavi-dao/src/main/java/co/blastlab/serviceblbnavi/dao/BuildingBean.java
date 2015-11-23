@@ -11,6 +11,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
@@ -34,7 +35,8 @@ public class BuildingBean {
     }
 
     public List<Building> findByComplex(Complex complex) {
-        return em.createNamedQuery(Building.FIND_BY_COMPLEX, Building.class).setParameter("complex", complex).getResultList();
+        return em.createNamedQuery(Building.FIND_BY_COMPLEX, Building.class)
+                .setParameter("complex", complex).getResultList();
     }
 
     public void delete(Building building) {
@@ -45,30 +47,40 @@ public class BuildingBean {
         em.merge(building);
     }
 
-    public void saveConfiguration(Building building) {
-        String configuration = generateConfigurationFromBuilding(building);
-        System.out.println(configuration);
+    public boolean saveConfiguration(Building building) {
         try {
+            String configuration = generateConfigurationFromBuilding(building);
             building.setConfiguration(configuration);
-            building.setConfigurationChecksum(new String(MessageDigest.getInstance("MD5").digest(configuration.getBytes("UTF-8"))));
+            building.setConfigurationChecksum(
+                    new String(MessageDigest.getInstance("MD5")
+                            .digest(configuration.getBytes("UTF-8"))
+                    )
+            );
             update(building);
-        } catch (NoSuchAlgorithmException | UnsupportedEncodingException ex) {
-            //TODO: better exception handling
+            return true;
+        } catch (NoSuchAlgorithmException | UnsupportedEncodingException | JsonProcessingException ex) {
             Logger.getLogger(BuildingBean.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
         }
     }
 
-    private String generateConfigurationFromBuilding(Building building) {
-        try {
-            ObjectMapper mapper = new ObjectMapper();
-            mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-            return mapper.writeValueAsString(building);
-        } catch (JsonProcessingException ex) {
-            Logger.getLogger(BuildingBean.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return "";
+    private String generateConfigurationFromBuilding(Building building) throws JsonProcessingException {
+        building.getFloors().stream().forEach((floor) -> {
+            floor.getWaypoints().stream().forEach((waypoint) -> {
+                waypoint.setWaypointVisit(null);
+            });
+            floor.setVertices(floor.getVertices().stream().filter(
+                    vertex -> !vertex.getInactive()).collect(Collectors.toList()));
+        });
+        building.setGoals(building.getGoals().stream().filter(
+                goal -> !goal.getInactive()).collect(Collectors.toList()));
+        building.getGoals().stream().forEach((goal) -> {
+            goal.setGoalSelections(null);
+        });
+        return new ObjectMapper().setSerializationInclusion(JsonInclude.Include.NON_NULL)
+                .writeValueAsString(building);
     }
-    
+
     public Building findByComplexNameAndBuildingName(String complexName, String buildingName) {
         return em.createNamedQuery(Building.FIND_BY_COMPLEX_NAME_AND_BUILDING_NAME, Building.class)
                 .setParameter("complexName", complexName)

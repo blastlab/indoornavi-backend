@@ -38,9 +38,9 @@ public class GoalBean {
     }
 
     public void update(List<Goal> goals) {
-        for (Goal v : goals) {
+        goals.stream().forEach((v) -> {
             update(v);
-        }
+        });
     }
 
     public void deactivate(Goal goal) {
