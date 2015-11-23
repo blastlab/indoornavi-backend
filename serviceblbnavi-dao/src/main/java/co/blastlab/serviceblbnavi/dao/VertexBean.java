@@ -4,6 +4,7 @@ import co.blastlab.serviceblbnavi.domain.Floor;
 import co.blastlab.serviceblbnavi.domain.Goal;
 import co.blastlab.serviceblbnavi.domain.Vertex;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
@@ -32,6 +33,20 @@ public class VertexBean {
 
     public List<Vertex> findAll(Long floorId) {
         return em.find(Floor.class, floorId).getVertices();
+    }
+
+    public List<Vertex> findAllActive(Long floorId) {
+        List<Vertex> vertices = em.find(Floor.class, floorId).getVertices().stream().filter((vertex) -> {
+            return !vertex.getInactive();
+        }).collect(Collectors.toList());
+        
+        vertices.stream().forEach((vertex) -> {
+            vertex.setGoals(vertex.getGoals().stream().filter((goal) -> {
+                return !goal.getInactive();
+            }).collect(Collectors.toList()));
+        });
+        
+        return vertices;
     }
 
     public void delete(Vertex vertex) {

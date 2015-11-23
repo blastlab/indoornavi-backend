@@ -109,6 +109,20 @@ public class VertexFacade {
         }
         throw new EntityNotFoundException();
     }
+    
+    @GET
+    @Path("/floor/{id: \\d+}/active")
+    @JsonView(View.VertexInternal.class)
+    @ApiOperation(value = "find active vertices for specified floor", response = Vertex.class, responseContainer = "List")
+    @ApiResponses({
+        @ApiResponse(code = 404, message = "floor with given id wasn't found")
+    })
+    public List<Vertex> findAllActiveByFloor(@ApiParam(value = "id", required = true) @PathParam("id") Long floorId) {
+        if (floorId != null) {
+            return vertexBean.findAllActive(floorId);
+        }
+        throw new EntityNotFoundException();
+    }
 
     @GET
     @Path("/{id: \\d+}")
