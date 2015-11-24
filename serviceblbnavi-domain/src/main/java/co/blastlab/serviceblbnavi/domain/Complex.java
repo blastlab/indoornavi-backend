@@ -2,7 +2,6 @@ package co.blastlab.serviceblbnavi.domain;
 
 import co.blastlab.serviceblbnavi.views.View;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
 import java.io.Serializable;
 import java.util.List;
@@ -10,7 +9,6 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
@@ -21,7 +19,7 @@ import javax.persistence.OrderBy;
  * @author Michał Koszałka
  */
 @NamedQueries({
-    @NamedQuery(name = Complex.FIND_BY_PERSON, query = "SELECT c FROM Complex c WHERE c.person = :person ORDER BY c.name")
+    @NamedQuery(name = Complex.FIND_BY_PERSON, query = "SELECT c FROM Complex c JOIN c.ACL_complexes aclComplexes where aclComplexes.person.id = :personId ORDER BY c.name")
 })
 @Entity
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY, setterVisibility = JsonAutoDetect.Visibility.NONE, getterVisibility = JsonAutoDetect.Visibility.NONE)
@@ -36,9 +34,9 @@ public class Complex implements Serializable {
     @Column(unique = true)
     private String name;
 
-    @JsonIgnore
-    @ManyToOne
-    private Person person;
+    @JsonView({View.ComplexInternal.class, View.External.class})
+    @OneToMany(mappedBy = "complex")
+    List<ACL_Complex> ACL_complexes;
 
     @JsonView({View.ComplexInternal.class, View.External.class})
     @OneToMany(mappedBy = "complex")
@@ -61,12 +59,12 @@ public class Complex implements Serializable {
         this.name = name;
     }
 
-    public Person getPerson() {
-        return person;
+    public List<ACL_Complex> getACL_complexes() {
+        return ACL_complexes;
     }
 
-    public void setPerson(Person person) {
-        this.person = person;
+    public void setACL_complexes(List<ACL_Complex> ACL_complexes) {
+        this.ACL_complexes = ACL_complexes;
     }
 
     public List<Building> getBuildings() {

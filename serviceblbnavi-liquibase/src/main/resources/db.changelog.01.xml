@@ -304,7 +304,7 @@
         </addColumn>
     </changeSet>
     
-      <changeSet id="21" author="gkonupek">
+    <changeSet id="21" author="gkonupek">
         <addColumn tableName="Person">
             <column name="password" type="VARCHAR(128)"/>
             <column name="salt" type="VARCHAR(16)"/>
@@ -360,6 +360,35 @@
         <addColumn tableName="Waypoint">
             <column name="inactive" type="BOOL" defaultValue="0"/>
         </addColumn>
+    </changeSet>
+    
+    <changeSet id="25" author="gkonupek">
+        <addUniqueConstraint tableName="Complex" columnNames="name"/>
+    </changeSet>
+    
+    <changeSet id="27" author="gkonupek">
+        <createTable tableName="ACL_Complex">
+            <column autoIncrement="true" type="INT" name="id">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="person_id" type="INT"/>
+            <column name="complex_id" type="INT"/>
+            <column name="role" type="SET('READ', 'CREATE', 'UPDATE', 'DELETE')"/>
+        </createTable>
+        <addForeignKeyConstraint baseColumnNames="person_id" baseTableName="ACL_Complex"
+                                 referencedColumnNames="id" referencedTableName="Person"
+                                 constraintName="FK_ACL_Complex_Person" onDelete="CASCADE" onUpdate="CASCADE"/>
+        <addForeignKeyConstraint baseColumnNames="complex_id" baseTableName="ACL_Complex"
+                                 referencedColumnNames="id" referencedTableName="Complex"
+                                 constraintName="FK_ACL_Complex_Complex" onDelete="CASCADE" onUpdate="CASCADE"/>
+    </changeSet>
+    
+    <changeSet id="28" author="gkonupek">
+        <dropForeignKeyConstraint baseTableName="Complex" constraintName="FK_Complex_Person"/>
+    </changeSet>
+    
+    <changeSet id="29" author="gkonupek">
+        <dropColumn tableName="Complex" columnName="person_id"/>
     </changeSet>
     
 </databaseChangeLog>

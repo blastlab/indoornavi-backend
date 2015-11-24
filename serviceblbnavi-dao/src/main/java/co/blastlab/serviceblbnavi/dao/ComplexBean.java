@@ -19,6 +19,7 @@ public class ComplexBean {
 
     public void create(Complex complex) {
         em.persist(complex);
+        em.flush();
     }
 
     public Complex find(Long id) {
@@ -30,7 +31,7 @@ public class ComplexBean {
 
     }
 
-    public List<Complex> findAll(Person person) {
+    public List<Complex> findAllByPerson(Person person) {
         return em.createNamedQuery(Complex.FIND_BY_PERSON, Complex.class).setParameter("person", person).getResultList();
     }
 

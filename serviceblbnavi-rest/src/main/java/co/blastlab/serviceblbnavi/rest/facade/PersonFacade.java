@@ -60,9 +60,10 @@ public class PersonFacade {
             throw new EntityNotFoundException();
         }
         //todo: check password, generate authtoken?
-        throw new EntityNotFoundException();
+        return p.getAuthToken();
+//        throw new EntityNotFoundException();
         
-//        return p.getAuthToken();
+        
     }
 
     @GET

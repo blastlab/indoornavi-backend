@@ -4,13 +4,13 @@ import co.blastlab.serviceblbnavi.security.PasswordEncoder;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import java.io.Serializable;
 import java.util.List;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
-import javax.persistence.OrderBy;
 
 /**
  *
@@ -31,13 +31,17 @@ public class Person implements Serializable {
     @GeneratedValue
     private Long id;
 
+    @Column(unique = true)
     private String email;
+
+    private String password;
+
+    private String salt;
 
     private String authToken;
 
     @OneToMany(mappedBy = "person")
-    @OrderBy("name")
-    private List<Complex> complexs;
+    private List<ACL_Complex> ACL_Complexes;
 
     public String getAuthToken() {
         return authToken;
@@ -63,16 +67,32 @@ public class Person implements Serializable {
         this.email = email;
     }
 
-    public List<Complex> getComplexs() {
-        return complexs;
+    public List<ACL_Complex> getACL_Complexes() {
+        return ACL_Complexes;
     }
 
-    public void setComplexs(List<Complex> complexs) {
-        this.complexs = complexs;
+    public void setACL_Complexes(List<ACL_Complex> ACL_Complexes) {
+        this.ACL_Complexes = ACL_Complexes;
     }
 
     public void generateAuthToken() {
         this.authToken = PasswordEncoder.getAuthToken();
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getSalt() {
+        return salt;
+    }
+
+    public void setSalt(String salt) {
+        this.salt = salt;
     }
 
 }
