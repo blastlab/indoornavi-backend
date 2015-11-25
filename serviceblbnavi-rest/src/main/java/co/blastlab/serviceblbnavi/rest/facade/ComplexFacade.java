@@ -4,8 +4,10 @@ import co.blastlab.serviceblbnavi.dao.ACL_ComplexBean;
 import co.blastlab.serviceblbnavi.dao.ComplexBean;
 import co.blastlab.serviceblbnavi.dao.PermissionBean;
 import co.blastlab.serviceblbnavi.dao.PersonBean;
+import co.blastlab.serviceblbnavi.dao.exception.PermissionException;
 import co.blastlab.serviceblbnavi.domain.ACL_Complex;
 import co.blastlab.serviceblbnavi.domain.Complex;
+import co.blastlab.serviceblbnavi.domain.Permission;
 import co.blastlab.serviceblbnavi.domain.Person;
 import co.blastlab.serviceblbnavi.views.View;
 import co.blastlab.serviceblbnavi.rest.bean.AuthorizationBean;
@@ -17,7 +19,6 @@ import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import javax.ejb.EJB;
 import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
@@ -26,7 +27,6 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
 /**
@@ -57,10 +57,10 @@ public class ComplexFacade {
     public Complex create(@ApiParam(value = "complex", required = true) Complex complex) {
         complexBean.create(complex);
         List<ACL_Complex> aclComplexes = new ArrayList<>();
-        aclComplexes.add(new ACL_Complex(authorizationBean.getCurrentUser(), complex, permissionBean.findByName("READ")));
-        aclComplexes.add(new ACL_Complex(authorizationBean.getCurrentUser(), complex, permissionBean.findByName("CREATE")));
-        aclComplexes.add(new ACL_Complex(authorizationBean.getCurrentUser(), complex, permissionBean.findByName("UPDATE")));
-        aclComplexes.add(new ACL_Complex(authorizationBean.getCurrentUser(), complex, permissionBean.findByName("DELETE")));
+        aclComplexes.add(new ACL_Complex(authorizationBean.getCurrentUser(), complex, permissionBean.findByName(Permission.READ)));
+        aclComplexes.add(new ACL_Complex(authorizationBean.getCurrentUser(), complex, permissionBean.findByName(Permission.CREATE)));
+        aclComplexes.add(new ACL_Complex(authorizationBean.getCurrentUser(), complex, permissionBean.findByName(Permission.UPDATE)));
+        aclComplexes.add(new ACL_Complex(authorizationBean.getCurrentUser(), complex, permissionBean.findByName(Permission.DELETE)));
         aclComplexBean.create(aclComplexes);
         return complex;
     }
@@ -74,15 +74,14 @@ public class ComplexFacade {
     })
     public Complex find(@ApiParam(value = "id", required = true) @PathParam("id") Long id) {
         if (id != null) {
+            List<String> permissions = permissionBean.getPermissions(authorizationBean.getCurrentUser().getId(), id);
+            if (!permissions.contains(Permission.READ)) {
+                throw new PermissionException();
+            }
             Complex complex = complexBean.find(id);
             if (complex != null) {
-                for (ACL_Complex aclComplex : complex.getACL_complexes()) {
-                    if (Objects.equals(aclComplex.getPerson().getId(), authorizationBean.getCurrentUser().getId()) 
-                            && aclComplex.getPermission().getName().equals("READ")) {
-                        return complex;
-                    }
-                }
-                throw new WebApplicationException(Response.Status.UNAUTHORIZED);
+                complex.setPermissions(permissions);
+                return complex;
             }
         }
         throw new EntityNotFoundException();
@@ -97,8 +96,13 @@ public class ComplexFacade {
     })
     public Complex findComplete(@ApiParam(value = "id", required = true) @PathParam("id") Long id) {
         if (id != null) {
+            List<String> permissions = permissionBean.getPermissions(authorizationBean.getCurrentUser().getId(), id);
+            if (!permissions.contains(Permission.READ)) {
+                throw new PermissionException();
+            }
             Complex complex = complexBean.find(id);
             if (complex != null) {
+                complex.setPermissions(permissions);
                 return complex;
             }
         }
@@ -113,15 +117,11 @@ public class ComplexFacade {
     })
     public Response delete(@ApiParam(value = "id", required = true) @PathParam("id") Long id) {
         if (id != null) {
+            permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(), id, Permission.DELETE);
             Complex complex = complexBean.find(id);
             if (complex != null) {
-                for (ACL_Complex aclComplex : complex.getACL_complexes()) {
-                    if (aclComplex.getPermission().getName().equals("DELETE")) {
-                        complexBean.delete(complex);
-                        return Response.ok().build();
-                    }
-                }
-                throw new WebApplicationException(Response.Status.UNAUTHORIZED);
+                complexBean.delete(complex);
+                return Response.ok().build();
             }
         }
         throw new EntityNotFoundException();
@@ -138,7 +138,7 @@ public class ComplexFacade {
         if (personId != null) {
             Person person = personBean.find(personId);
             if (person != null) {
-                return complexBean.findAllByPerson(person);
+                return complexBean.findAllByPerson(personId);
             }
         }
         throw new EntityNotFoundException();

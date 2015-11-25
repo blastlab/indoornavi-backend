@@ -26,7 +26,7 @@ import javax.persistence.Transient;
  */
 @Entity
 @NamedQueries({
-    @NamedQuery(name = Vertex.FIND_ACTIVE_BY_FLOOR, query = "SELECT v FROM Vertex v WHERE v.floor.id = :floorId AND v.inactive = 0")
+    @NamedQuery(name = Vertex.FIND_ACTIVE_BY_FLOOR, query = "SELECT v FROM Vertex v WHERE v.floor.id = :floorId AND v.inactive = false")
 })
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY, setterVisibility = JsonAutoDetect.Visibility.NONE, getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class Vertex implements Serializable {

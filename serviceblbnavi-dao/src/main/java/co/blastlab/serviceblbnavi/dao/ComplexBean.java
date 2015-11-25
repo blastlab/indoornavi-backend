@@ -1,7 +1,6 @@
 package co.blastlab.serviceblbnavi.dao;
 
 import co.blastlab.serviceblbnavi.domain.Complex;
-import co.blastlab.serviceblbnavi.domain.Person;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -34,8 +33,8 @@ public class ComplexBean {
 
     }
 
-    public List<Complex> findAllByPerson(Person person) {
-        List<Complex> complexes = em.createNamedQuery(Complex.FIND_BY_PERSON, Complex.class).setParameter("personId", person.getId()).getResultList();
+    public List<Complex> findAllByPerson(Long personId) {
+        List<Complex> complexes = em.createNamedQuery(Complex.FIND_BY_PERSON, Complex.class).setParameter("personId", personId).getResultList();
         Set<Complex> complexSet = new HashSet<>(complexes);
         complexes = new ArrayList<>(complexSet);
         
@@ -50,8 +49,8 @@ public class ComplexBean {
         return complexes;
     }
 
-    public Complex findByPersonAndId(Person person, Long id) {
-        return em.createNamedQuery(Complex.FIND_BY_PERSON_AND_ID, Complex.class).setParameter("personId", person.getId()).setParameter("id", id).getSingleResult();
+    public Complex findByPersonAndId(Long personId, Long id) {
+        return em.createNamedQuery(Complex.FIND_BY_PERSON_AND_ID, Complex.class).setParameter("personId", personId).setParameter("id", id).getSingleResult();
     }
 
 }

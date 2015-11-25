@@ -2,10 +2,13 @@ package co.blastlab.serviceblbnavi.rest.facade;
 
 import co.blastlab.serviceblbnavi.dao.BuildingBean;
 import co.blastlab.serviceblbnavi.dao.GoalBean;
+import co.blastlab.serviceblbnavi.dao.PermissionBean;
 import co.blastlab.serviceblbnavi.dao.VertexBean;
 import co.blastlab.serviceblbnavi.domain.Building;
 import co.blastlab.serviceblbnavi.domain.Goal;
+import co.blastlab.serviceblbnavi.domain.Permission;
 import co.blastlab.serviceblbnavi.domain.Vertex;
+import co.blastlab.serviceblbnavi.rest.bean.AuthorizationBean;
 import co.blastlab.serviceblbnavi.views.View;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.wordnik.swagger.annotations.Api;
@@ -15,6 +18,7 @@ import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
 import java.util.List;
 import javax.ejb.EJB;
+import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -41,6 +45,12 @@ public class GoalFacade {
     @EJB
     private BuildingBean buildingBean;
 
+    @EJB
+    private PermissionBean permissionBean;
+
+    @Inject
+    private AuthorizationBean authorizationBean;
+
     @POST
     @ApiOperation(value = "create goal", response = Goal.class)
     @ApiResponses({
@@ -52,6 +62,8 @@ public class GoalFacade {
             Vertex vertex = vertexBean.find(goal.getVertexId());
             Building building = buildingBean.find(goal.getBuildingId());
             if (vertex != null && building != null) {
+                permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
+                        building.getComplex().getId(), Permission.UPDATE);
                 goal.setVertex(vertex);
                 goal.setBuilding(building);
                 goalBean.create(goal);
@@ -69,11 +81,13 @@ public class GoalFacade {
     })
     public Response delete(@PathParam("id") @ApiParam(value = "id", required = true) Long id) {
         Goal goal = goalBean.find(id);
-        if (goal == null) {
-            throw new EntityNotFoundException();
+        if (goal != null) {
+            permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
+                    goal.getBuilding().getComplex().getId(), Permission.UPDATE);
+            goalBean.delete(goal);
+            return Response.ok().build();
         }
-        goalBean.delete(goal);
-        return Response.ok().build();
+        throw new EntityNotFoundException();
     }
 
     @PUT
@@ -86,6 +100,8 @@ public class GoalFacade {
         if (goal.getId() != null) {
             Goal g = goalBean.find(goal.getId());
             if (g != null) {
+                permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
+                        g.getBuilding().getComplex().getId(), Permission.UPDATE);
                 g.setInactive(true);
                 goal.setVertex(g.getVertex());
                 goal.setBuilding(g.getBuilding());
@@ -102,6 +118,7 @@ public class GoalFacade {
     @ApiOperation(value = "update goals", response = Goal.class)
     @JsonView(View.GoalInternal.class)
     public List<Goal> update(@ApiParam(value = "goal", required = true) List<Goal> goals) {
+        permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(), 0L, Permission.UPDATE);
         goalBean.update(goals);
         return goals;
     }
@@ -115,8 +132,12 @@ public class GoalFacade {
     })
     public List<Goal> findByFloor(@ApiParam(value = "id", required = true) @PathParam("id") Long vertexId) {
         if (vertexId != null) {
-            System.out.println("getting goals");
-            return goalBean.findAll(vertexId);
+            List<Goal> goals = goalBean.findAll(vertexId);
+            if (goals.size() > 0) {
+                permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
+                        goals.get(0).getBuilding().getComplex().getId(), Permission.READ);
+            }
+            return goals;
         }
         throw new EntityNotFoundException();
     }
@@ -131,6 +152,8 @@ public class GoalFacade {
     public Goal deactivate(@ApiParam(value = "id", required = true) @PathParam("id") Long goalId) {
         Goal goal = goalBean.find(goalId);
         if (goal != null) {
+            permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
+                    goal.getBuilding().getComplex().getId(), Permission.UPDATE);
             goalBean.deactivate(goal);
             return goal;
         }

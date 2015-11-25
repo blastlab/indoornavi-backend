@@ -1,9 +1,12 @@
 package co.blastlab.serviceblbnavi.rest.facade;
 
 import co.blastlab.serviceblbnavi.dao.EdgeBean;
+import co.blastlab.serviceblbnavi.dao.PermissionBean;
 import co.blastlab.serviceblbnavi.dao.VertexBean;
 import co.blastlab.serviceblbnavi.domain.Edge;
+import co.blastlab.serviceblbnavi.domain.Permission;
 import co.blastlab.serviceblbnavi.domain.Vertex;
+import co.blastlab.serviceblbnavi.rest.bean.AuthorizationBean;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
@@ -12,6 +15,7 @@ import com.wordnik.swagger.annotations.ApiResponses;
 import java.util.ArrayList;
 import java.util.List;
 import javax.ejb.EJB;
+import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.DELETE;
@@ -37,6 +41,12 @@ public class EdgeFacade {
     @EJB
     private VertexBean vertexBean;
 
+    @EJB
+    private PermissionBean permissionBean;
+
+    @Inject
+    private AuthorizationBean authorizationBean;
+
     @POST
     @ApiOperation(value = "create edge", response = Edge.class)
     @ApiResponses({
@@ -47,6 +57,8 @@ public class EdgeFacade {
             Vertex source = vertexBean.find(edge.getSourceId());
             Vertex target = vertexBean.find(edge.getTargetId());
             if (source != null && target != null && edgeBean.findBySourceAndTarget(source, target) == null) {
+                permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
+                        source.getFloor().getBuilding().getComplex().getId(), Permission.UPDATE);
                 edge.setTarget(target);
                 edge.setSource(source);
                 edgeBean.create(edge);
@@ -65,11 +77,16 @@ public class EdgeFacade {
     public List<Edge> findByVertexFloorId(@PathParam("id") @ApiParam(value = "id", required = true) Long id) {
         if (id != null) {
             List<Edge> result = edgeBean.findByVertexFloorId(id);
+            if (result.size() > 0) {
+                permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
+                        result.get(0).getSource().getFloor().getBuilding().getComplex().getId(),
+                        Permission.READ);
+            }
             return result;
         }
         throw new EntityNotFoundException();
     }
-    
+
     @GET
     @Path("/vertex/{id: \\d+}")
     @ApiOperation(value = "find edges by vertex id", response = Edge.class, responseContainer = "List")
@@ -79,6 +96,11 @@ public class EdgeFacade {
     public List<Edge> findByVertexId(@PathParam("id") @ApiParam(value = "id", required = true) Long vertexId) {
         if (vertexId != null) {
             List<Edge> result = edgeBean.findByVertexId(vertexId);
+            if (result.size() > 0) {
+                permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
+                        result.get(0).getSource().getFloor().getBuilding().getComplex().getId(),
+                        Permission.READ);
+            }
             return result;
         }
         throw new EntityNotFoundException();
@@ -95,9 +117,15 @@ public class EdgeFacade {
         Edge firstEdge = edgeBean.findBySourceAndTarget(source, target);
         Edge secondEdge = edgeBean.findBySourceAndTarget(target, source);
         if (firstEdge != null) {
+            permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
+                    firstEdge.getSource().getFloor().getBuilding().getComplex().getId(),
+                    Permission.UPDATE);
             edgeBean.delete(firstEdge);
         }
         if (secondEdge != null) {
+            permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
+                    secondEdge.getSource().getFloor().getBuilding().getComplex().getId(),
+                    Permission.UPDATE);
             edgeBean.delete(secondEdge);
         }
         return Response.ok().build();
@@ -113,6 +141,9 @@ public class EdgeFacade {
         Vertex target = vertexBean.find(targetId);
         Edge edge = edgeBean.findBySourceAndTarget(source, target);
         if (edge != null) {
+            permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
+                    edge.getSource().getFloor().getBuilding().getComplex().getId(),
+                    Permission.UPDATE);
             return edge;
         }
         throw new EntityNotFoundException();
@@ -129,7 +160,7 @@ public class EdgeFacade {
                     edge.setSource(source);
                 }
             }
-            if (edge.getTarget()== null && edge.getTargetId() != null) {
+            if (edge.getTarget() == null && edge.getTargetId() != null) {
                 Vertex target = vertexBean.find(edge.getTargetId());
                 if (target != null) {
                     edge.setTarget(target);
@@ -142,6 +173,9 @@ public class EdgeFacade {
             if (newEdge == null) {
                 throw new BadRequestException();
             }
+            permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
+                    newEdge.getSource().getFloor().getBuilding().getComplex().getId(),
+                    Permission.UPDATE);
             newEdge.setWeight(edge.getWeight());
             newEdges.add(newEdge);
         }

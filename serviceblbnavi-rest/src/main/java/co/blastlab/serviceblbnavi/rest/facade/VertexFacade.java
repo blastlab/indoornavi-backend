@@ -1,9 +1,12 @@
 package co.blastlab.serviceblbnavi.rest.facade;
 
 import co.blastlab.serviceblbnavi.dao.FloorBean;
+import co.blastlab.serviceblbnavi.dao.PermissionBean;
 import co.blastlab.serviceblbnavi.dao.VertexBean;
 import co.blastlab.serviceblbnavi.domain.Floor;
+import co.blastlab.serviceblbnavi.domain.Permission;
 import co.blastlab.serviceblbnavi.domain.Vertex;
+import co.blastlab.serviceblbnavi.rest.bean.AuthorizationBean;
 import co.blastlab.serviceblbnavi.views.View;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.wordnik.swagger.annotations.Api;
@@ -13,6 +16,7 @@ import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
 import java.util.List;
 import javax.ejb.EJB;
+import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -36,6 +40,12 @@ public class VertexFacade {
     @EJB
     private FloorBean floorBean;
 
+    @EJB
+    private PermissionBean permissionBean;
+
+    @Inject
+    private AuthorizationBean authorizationBean;
+
     @POST
     @ApiOperation(value = "create vertex", response = Vertex.class)
     @ApiResponses({
@@ -46,6 +56,8 @@ public class VertexFacade {
         if (vertex.getFloorId() != null) {
             Floor floor = floorBean.find(vertex.getFloorId());
             if (floor != null) {
+                permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
+                        floor.getBuilding().getComplex().getId(), Permission.UPDATE);
                 vertex.setFloor(floor);
                 vertexBean.create(vertex);
                 return vertex;
@@ -62,23 +74,29 @@ public class VertexFacade {
     })
     public Response delete(@PathParam("id") @ApiParam(value = "id", required = true) Long id) {
         Vertex vertex = vertexBean.find(id);
-        if (vertex == null) {
-            throw new EntityNotFoundException();
+        if (vertex != null) {
+            permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
+                    vertex.getFloor().getBuilding().getComplex().getId(), Permission.UPDATE);
+            vertexBean.delete(vertex);
+            return Response.ok().build();
         }
-        vertexBean.delete(vertex);
-        return Response.ok().build();
+        throw new EntityNotFoundException();
+
     }
 
     @PUT
     @ApiOperation(value = "update vertex", response = Vertex.class)
     @JsonView(View.VertexInternal.class)
     @ApiResponses({
-        @ApiResponse(code = 404, message = "floor id or floor empty or doesn't exist")
+        @ApiResponse(code = 404, message = "vertex id empty or doesn't exist")
     })
     public Vertex update(@ApiParam(value = "vertex", required = true) Vertex vertex) {
+        System.out.println(vertex.getId() + " " + vertex.getX() + " " + vertex.getY());
         if (vertex.getId() != null) {
             Vertex v = vertexBean.find(vertex.getId());
             if (v != null) {
+                permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
+                        v.getFloor().getBuilding().getComplex().getId(), Permission.UPDATE);
                 v.setX(vertex.getX());
                 v.setY(vertex.getY());
                 vertexBean.update(v);
@@ -86,14 +104,6 @@ public class VertexFacade {
             }
         }
         throw new EntityNotFoundException();
-    }
-
-    @PUT
-    @ApiOperation(value = "update vertexes", response = Vertex.class)
-    @JsonView(View.VertexInternal.class)
-    public List<Vertex> update(@ApiParam(value = "vertex", required = true) List<Vertex> vertexes) {
-        vertexBean.update(vertexes);
-        return vertexes;
     }
 
     @GET
@@ -105,11 +115,16 @@ public class VertexFacade {
     })
     public List<Vertex> findByFloor(@ApiParam(value = "id", required = true) @PathParam("id") Long floorId) {
         if (floorId != null) {
-            return vertexBean.findAll(floorId);
+            List<Vertex> vertices = vertexBean.findAll(floorId);
+            if (vertices.size() > 0) {
+                permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
+                        vertices.get(0).getFloor().getBuilding().getComplex().getId(), Permission.READ);
+            }
+            return vertices;
         }
         throw new EntityNotFoundException();
     }
-    
+
     @GET
     @Path("/floor/{id: \\d+}/active")
     @JsonView(View.VertexInternal.class)
@@ -119,7 +134,12 @@ public class VertexFacade {
     })
     public List<Vertex> findAllActiveByFloor(@ApiParam(value = "id", required = true) @PathParam("id") Long floorId) {
         if (floorId != null) {
-            return vertexBean.findAllActive(floorId);
+            List<Vertex> vertices = vertexBean.findAllActive(floorId);
+            if (vertices.size() > 0) {
+                permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
+                        vertices.get(0).getFloor().getBuilding().getComplex().getId(), Permission.READ);
+            }
+            return vertices;
         }
         throw new EntityNotFoundException();
     }
@@ -134,8 +154,12 @@ public class VertexFacade {
     public Vertex findById(@ApiParam(value = "id", required = true) @PathParam("id") Long vertexId) {
         if (vertexId != null) {
             Vertex vertex = vertexBean.find(vertexId);
-            vertex.setFloorId(vertex.getFloor().getId());
-            return vertex;
+            if (vertex != null) {
+                permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(), 
+                        vertex.getFloor().getBuilding().getComplex().getId(), Permission.READ);
+                vertex.setFloorId(vertex.getFloor().getId());
+                return vertex;
+            }
         }
         throw new EntityNotFoundException();
     }
@@ -150,6 +174,8 @@ public class VertexFacade {
     public Vertex dectivate(@ApiParam(value = "id", required = true) @PathParam("id") Long vertexId) {
         Vertex vertex = vertexBean.find(vertexId);
         if (vertex != null) {
+            permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(), 
+                    vertex.getFloor().getBuilding().getComplex().getId(), Permission.UPDATE);
             vertexBean.deactivate(vertex);
             return vertex;
         }
