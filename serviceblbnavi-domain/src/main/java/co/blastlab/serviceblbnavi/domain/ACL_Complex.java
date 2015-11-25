@@ -2,11 +2,7 @@ package co.blastlab.serviceblbnavi.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
-import java.util.List;
-import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
@@ -17,8 +13,6 @@ import javax.persistence.ManyToOne;
  */
 @Entity
 public class ACL_Complex implements Serializable {
-
-    public enum Role { CREATE, READ, UPDATE, DELETE }
     
     @Id
     @GeneratedValue
@@ -32,9 +26,17 @@ public class ACL_Complex implements Serializable {
     @ManyToOne
     private Complex complex;
 
-    @ElementCollection(targetClass = Role.class)
-    @Enumerated(EnumType.STRING)
-    private List<Role> role;
+    @ManyToOne
+    private Permission permission;
+
+    public ACL_Complex() {
+    }
+
+    public ACL_Complex(Person person, Complex complex, Permission permission) {
+        this.person = person;
+        this.complex = complex;
+        this.permission = permission;
+    }
 
     public Long getId() {
         return id;
@@ -44,12 +46,12 @@ public class ACL_Complex implements Serializable {
         this.id = id;
     }
 
-    public List<Role> getRole() {
-        return role;
+    public Permission getPermission() {
+        return permission;
     }
 
-    public void setRole(List<Role> role) {
-        this.role = role;
+    public void setPermission(Permission permission) {
+        this.permission = permission;
     }
 
     public Person getPerson() {

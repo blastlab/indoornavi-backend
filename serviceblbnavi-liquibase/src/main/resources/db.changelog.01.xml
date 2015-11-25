@@ -391,4 +391,36 @@
         <dropColumn tableName="Complex" columnName="person_id"/>
     </changeSet>
     
+    <changeSet id="30" author="gkonupek">
+        <createTable tableName="Role">
+            <column autoIncrement="true" type="INT" name="id">
+                <constraints primaryKey="true"/>
+            </column>
+            <column type="VARCHAR(255)" name="name"/>
+        </createTable>
+        <addColumn tableName="ACL_Complex">
+            <column name="role_id" type="INT"/>
+        </addColumn>
+        <dropColumn tableName="ACL_Complex" columnName="role"/>
+        <addForeignKeyConstraint baseColumnNames="role_id" baseTableName="ACL_Complex"
+                                 referencedColumnNames="id" referencedTableName="Role"
+                                 constraintName="FK_ACL_Complex_Role" onDelete="CASCADE" onUpdate="CASCADE"/>
+    </changeSet>
+    
+    <changeSet id="31" author="gkonupek">
+        <renameTable oldTableName="Role" newTableName="Permission"/>
+    </changeSet>
+    
+    <changeSet id="32" author="gkonupek">
+        <renameColumn tableName="ACL_Complex" oldColumnName="role_id" newColumnName="permission_id" columnDataType="INT"/>
+        <dropForeignKeyConstraint baseTableName="ACL_Complex" constraintName="FK_ACL_Complex_Role"/>
+        <addForeignKeyConstraint baseColumnNames="permission_id" baseTableName="ACL_Complex"
+                                 referencedColumnNames="id" referencedTableName="Permission"
+                                 constraintName="FK_ACL_Complex_Permission" onDelete="CASCADE" onUpdate="CASCADE"/>
+    </changeSet>
+    
+    <changeSet id="33" author="gkonupek">
+        <addUniqueConstraint tableName="Permission" columnNames="name"/>
+    </changeSet>
+    
 </databaseChangeLog>

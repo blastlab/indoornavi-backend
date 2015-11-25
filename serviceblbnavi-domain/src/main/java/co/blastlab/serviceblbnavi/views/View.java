@@ -26,4 +26,7 @@ public class View {
     
     public static class GoalInternal {
     }
+    
+    public static class PermissionInternal {
+    }
 }

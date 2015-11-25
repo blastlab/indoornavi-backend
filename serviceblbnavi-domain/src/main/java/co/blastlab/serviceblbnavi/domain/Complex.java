@@ -2,6 +2,7 @@ package co.blastlab.serviceblbnavi.domain;
 
 import co.blastlab.serviceblbnavi.views.View;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
 import java.io.Serializable;
 import java.util.List;
@@ -13,19 +14,22 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
+import javax.persistence.Transient;
 
 /**
  *
  * @author Michał Koszałka
  */
 @NamedQueries({
-    @NamedQuery(name = Complex.FIND_BY_PERSON, query = "SELECT c FROM Complex c JOIN c.ACL_complexes aclComplexes where aclComplexes.person.id = :personId ORDER BY c.name")
+    @NamedQuery(name = Complex.FIND_BY_PERSON, query = "SELECT c FROM Complex c JOIN c.ACL_complexes aclComplexes where aclComplexes.person.id = :personId ORDER BY c.name"),
+    @NamedQuery(name = Complex.FIND_BY_PERSON_AND_ID, query = "SELECT c FROM Complex c JOIN c.ACL_complexes aclComplexes where aclComplexes.person.id = :personId AND c.id = :id ORDER BY c.name")
 })
 @Entity
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY, setterVisibility = JsonAutoDetect.Visibility.NONE, getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class Complex implements Serializable {
 
     public static final String FIND_BY_PERSON = "Complex.findByPerson";
+    public static final String FIND_BY_PERSON_AND_ID = "Complex.findByPersonAndId";
 
     @Id
     @GeneratedValue
@@ -34,7 +38,7 @@ public class Complex implements Serializable {
     @Column(unique = true)
     private String name;
 
-    @JsonView({View.ComplexInternal.class, View.External.class})
+    @JsonIgnore
     @OneToMany(mappedBy = "complex")
     List<ACL_Complex> ACL_complexes;
 
@@ -42,6 +46,9 @@ public class Complex implements Serializable {
     @OneToMany(mappedBy = "complex")
     @OrderBy("name")
     private List<Building> buildings;
+
+    @Transient
+    private List<String> permissions;
 
     public Long getId() {
         return id;
@@ -73,6 +80,14 @@ public class Complex implements Serializable {
 
     public void setBuildings(List<Building> buildings) {
         this.buildings = buildings;
+    }
+
+    public List<String> getPermissions() {
+        return permissions;
+    }
+
+    public void setPermissions(List<String> permissions) {
+        this.permissions = permissions;
     }
 
 }
