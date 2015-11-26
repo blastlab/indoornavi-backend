@@ -37,7 +37,7 @@ public class ComplexBean {
         List<Complex> complexes = em.createNamedQuery(Complex.FIND_BY_PERSON, Complex.class).setParameter("personId", personId).getResultList();
         Set<Complex> complexSet = new HashSet<>(complexes);
         complexes = new ArrayList<>(complexSet);
-        
+
         complexes.stream().forEach((complex) -> {
             List<String> permissions = new ArrayList<>();
             complex.getACL_complexes().stream().forEach((aclComplex) -> {
@@ -45,12 +45,20 @@ public class ComplexBean {
             });
             complex.setPermissions(permissions);
         });
-        
+
         return complexes;
     }
 
     public Complex findByPersonAndId(Long personId, Long id) {
         return em.createNamedQuery(Complex.FIND_BY_PERSON_AND_ID, Complex.class).setParameter("personId", personId).setParameter("id", id).getSingleResult();
+    }
+
+    public Complex findByBuildingId(Long id) {
+        return em.createNamedQuery(Complex.FIND_BY_BUILDING, Complex.class).setParameter("buildingId", id).getSingleResult();
+    }
+
+    public Complex findByFloorId(Long id) {
+        return em.createNamedQuery(Complex.FIND_BY_FLOOR, Complex.class).setParameter("floorId", id).getSingleResult();
     }
 
 }

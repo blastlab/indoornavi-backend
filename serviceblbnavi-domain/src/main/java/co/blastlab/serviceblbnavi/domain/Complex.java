@@ -21,8 +21,10 @@ import javax.persistence.Transient;
  * @author Michał Koszałka
  */
 @NamedQueries({
-    @NamedQuery(name = Complex.FIND_BY_PERSON, query = "SELECT c FROM Complex c JOIN c.ACL_complexes aclComplexes where aclComplexes.person.id = :personId ORDER BY c.name"),
-    @NamedQuery(name = Complex.FIND_BY_PERSON_AND_ID, query = "SELECT c FROM Complex c JOIN c.ACL_complexes aclComplexes where aclComplexes.person.id = :personId AND c.id = :id ORDER BY c.name")
+    @NamedQuery(name = Complex.FIND_BY_PERSON, query = "SELECT c FROM Complex c JOIN c.ACL_complexes aclComplexes where aclComplexes.person.id = :personId"),
+    @NamedQuery(name = Complex.FIND_BY_PERSON_AND_ID, query = "SELECT c FROM Complex c JOIN c.ACL_complexes aclComplexes where aclComplexes.person.id = :personId AND c.id = :id"),
+    @NamedQuery(name = Complex.FIND_BY_BUILDING, query = "SELECT c FROM Complex c JOIN c.buildings buildings where buildings.id = :buildingId"),
+    @NamedQuery(name = Complex.FIND_BY_FLOOR, query = "SELECT c FROM Complex c JOIN c.buildings buildings JOIN buildings.floors floors where floors.id = :floorId")
 })
 @Entity
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY, setterVisibility = JsonAutoDetect.Visibility.NONE, getterVisibility = JsonAutoDetect.Visibility.NONE)
@@ -30,6 +32,8 @@ public class Complex implements Serializable {
 
     public static final String FIND_BY_PERSON = "Complex.findByPerson";
     public static final String FIND_BY_PERSON_AND_ID = "Complex.findByPersonAndId";
+    public static final String FIND_BY_BUILDING = "Complex.findByBuilding";
+    public static final String FIND_BY_FLOOR = "Complex.findByFloor";
 
     @Id
     @GeneratedValue

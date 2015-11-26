@@ -1,8 +1,11 @@
 package co.blastlab.serviceblbnavi.rest;
 
 import co.blastlab.serviceblbnavi.dao.FloorBean;
+import co.blastlab.serviceblbnavi.dao.PermissionBean;
 import co.blastlab.serviceblbnavi.dao.PersonBean;
+import co.blastlab.serviceblbnavi.dao.exception.PermissionException;
 import co.blastlab.serviceblbnavi.domain.Floor;
+import co.blastlab.serviceblbnavi.domain.Permission;
 import co.blastlab.serviceblbnavi.domain.Person;
 import co.blastlab.serviceblbnavi.rest.bean.AuthorizationBean;
 import co.blastlab.serviceblbnavi.rest.facade.ext.filter.CORSFilter;
@@ -42,6 +45,9 @@ public class FileUploadServlet extends HttpServlet {
     @EJB
     private PersonBean personBean;
 
+    @EJB
+    private PermissionBean permissionBean;
+
     @Inject
     private AuthorizationBean authorizationBean;
 
@@ -53,55 +59,63 @@ public class FileUploadServlet extends HttpServlet {
         @ApiImplicitParam(name = "floor", value = "floor number", required = true, dataType = "Long", paramType = "form"),
         @ApiImplicitParam(name = "image", value = "map image", required = true, dataType = "Part", paramType = "form")
     })
-    protected void doPost(HttpServletRequest request,
-            HttpServletResponse response)
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        if (authorize(request, response)) {
+        try {
+            authorize(request);
             response.setContentType("text/html;charset=UTF-8");
 
-            final Long floorId = Long.parseLong(request.getParameter("floor"));
+            Floor floor = floorBean.find(Long.parseLong(request.getParameter("floor")));
+            permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
+                    floor.getBuilding().getComplex().getId(), Permission.UPDATE);
             final Part filePart = request.getPart("image");
 
             byte[] bytes = IOUtils.toByteArray(filePart.getInputStream());
-
-            Floor floor = floorBean.find(floorId);
             floor.setBitmap(bytes);
             floorBean.update(floor);
+        } catch (PermissionException e) {
+            response.setStatus(CORSFilter.UNAUTHORIZED);
+        } catch (NumberFormatException e) {
+            response.setStatus(Response.Status.BAD_REQUEST.getStatusCode());
         }
-
     }
 
     @Override
     @ApiOperation(httpMethod = "GET", value = "download map")
     @ApiImplicitParam(value = "floor number", required = true, dataType = "Long", paramType = "path")
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        if (authorize(req, resp)) {
-            Long floorId;
-            String path = req.getPathInfo();
-            try {
-                floorId = Long.parseLong(path.substring(SEPARATOR_INDEX));
-            } catch (NumberFormatException e) {
-                throw new BadRequestException();
-            }
-            Floor floor = floorBean.find(floorId);
+    protected void doGet(HttpServletRequest req, HttpServletResponse response)
+            throws ServletException, IOException {
+        try {
+            authorize(req);
+            Floor floor = floorBean.find(Long.parseLong(
+                    req.getPathInfo().substring(SEPARATOR_INDEX))
+            );
             if (floor == null || floor.getBitmap() == null) {
                 throw new WebApplicationException(Response.Status.NOT_FOUND);
             }
-            IOUtils.copy(new ByteArrayInputStream(Base64.getEncoder().encode(floor.getBitmap())), resp.getOutputStream());
+            permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
+                    floor.getBuilding().getComplex().getId(), Permission.READ);
+            IOUtils.copy(new ByteArrayInputStream(Base64.getEncoder().encode(floor.getBitmap())),
+                    response.getOutputStream());
+        } catch (PermissionException e) {
+            response.setStatus(Response.Status.UNAUTHORIZED.getStatusCode());
+        } catch (NumberFormatException e) {
+            response.setStatus(Response.Status.BAD_REQUEST.getStatusCode());
+        } catch (WebApplicationException e) {
+            response.setStatus(Response.Status.NOT_FOUND.getStatusCode());
         }
     }
 
-    private boolean authorize(HttpServletRequest request, HttpServletResponse response) {
+    private void authorize(HttpServletRequest request) {
         String authToken = request.getHeader("auth_token");
         if (authToken != null) {
             Person person = personBean.findByAuthToken(authToken);
             if (person != null) {
                 authorizationBean.setCurrentUser(person);
-                return true;
+                return;
             }
         }
-        response.setStatus(CORSFilter.UNAUTHORIZED);
-        return false;
+        throw new PermissionException();
     }
 
 }

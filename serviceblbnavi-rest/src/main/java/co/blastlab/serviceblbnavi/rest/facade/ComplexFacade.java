@@ -88,6 +88,50 @@ public class ComplexFacade {
     }
 
     @GET
+    @Path("/building/{id: \\d+}")
+    @JsonView(View.ComplexInternal.class)
+    @ApiOperation(value = "find complex by building id", response = Complex.class)
+    @ApiResponses({
+        @ApiResponse(code = 404, message = "building id empty or building doesn't exist")
+    })
+    public Complex findByBuilding(@ApiParam(value = "id", required = true) @PathParam("id") Long id) {
+        if (id != null) {
+            Complex complex = complexBean.findByBuildingId(id);
+            if (complex != null) {
+                List<String> permissions = permissionBean.getPermissions(authorizationBean.getCurrentUser().getId(), complex.getId());
+                if (!permissions.contains(Permission.READ)) {
+                    throw new PermissionException();
+                }
+                complex.setPermissions(permissions);
+                return complex;
+            }
+        }
+        throw new EntityNotFoundException();
+    }
+
+    @GET
+    @Path("/floor/{id: \\d+}")
+    @JsonView(View.ComplexInternal.class)
+    @ApiOperation(value = "find complex by floor id", response = Complex.class)
+    @ApiResponses({
+        @ApiResponse(code = 404, message = "floor id empty or floor doesn't exist")
+    })
+    public Complex findByFloor(@ApiParam(value = "id", required = true) @PathParam("id") Long id) {
+        if (id != null) {
+            Complex complex = complexBean.findByFloorId(id);
+            if (complex != null) {
+                List<String> permissions = permissionBean.getPermissions(authorizationBean.getCurrentUser().getId(), complex.getId());
+                if (!permissions.contains(Permission.READ)) {
+                    throw new PermissionException();
+                }
+                complex.setPermissions(permissions);
+                return complex;
+            }
+        }
+        throw new EntityNotFoundException();
+    }
+
+    @GET
     @Path("/complete/{id: \\d+}")
     @JsonView(View.External.class)
     @ApiOperation(value = "find complete complex by id", response = Complex.class)
