@@ -40,30 +40,31 @@ public class PersonFacade {
         @ApiResponse(code = 409, message = "person with given email exists")
     })
     public Person register(@ApiParam(value = "person", required = true) Person person) {
-        if (personBean.findByEmail(person.getEmail()) != null) {
+        Person p = personBean.findByEmail(person.getEmail());
+        if (p != null) {
             throw new EntityExistsException();
         }
-        person.generateAuthToken();
-        personBean.create(person);
-        return person;
+        p = new Person(person.getEmail(), person.getPlainPassword());
+        p.generateAuthToken();
+        personBean.create(p);
+        return p;
+
     }
-    
+
     @PUT
     @JsonView(View.PersonInternal.class)
     @ApiOperation(value = "register", response = Person.class)
     @ApiResponses({
         @ApiResponse(code = 404, message = "invalid login data")
     })
-    public String login(@ApiParam(value = "person", required = true) Person person) {
+    public Person login(@ApiParam(value = "person", required = true) Person person) {
         Person p = personBean.findByEmail(person.getEmail());
         if (p == null) {
             throw new EntityNotFoundException();
         }
-        //todo: check password, generate authtoken?
-        return p.getAuthToken();
-//        throw new EntityNotFoundException();
-        
-        
+        personBean.checkPassword(p, person.getPlainPassword());
+        personBean.generateAuthToken(p);
+        return p;
     }
 
     @GET

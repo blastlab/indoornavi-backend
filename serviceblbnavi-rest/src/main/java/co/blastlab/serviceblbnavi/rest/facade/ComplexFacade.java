@@ -136,6 +136,9 @@ public class ComplexFacade {
     })
     public List<Complex> findByPerson(@ApiParam(value = "personId", required = true) @PathParam("id") Long personId) {
         if (personId != null) {
+            if (!personId.equals(authorizationBean.getCurrentUser().getId())) {
+                throw new PermissionException();
+            }
             Person person = personBean.find(personId);
             if (person != null) {
                 return complexBean.findAllByPerson(personId);

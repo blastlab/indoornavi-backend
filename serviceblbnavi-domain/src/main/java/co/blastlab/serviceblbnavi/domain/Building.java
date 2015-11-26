@@ -22,7 +22,7 @@ import javax.persistence.Transient;
  * @author Michał Koszałka
  */
 @NamedQueries({
-    @NamedQuery(name = Building.FIND_BY_COMPLEX, query = "SELECT b FROM Building b WHERE b.complex = :complex ORDER BY b.name"),
+    @NamedQuery(name = Building.FIND_BY_COMPLEX, query = "SELECT b FROM Building b WHERE b.complex = :complex"),
     @NamedQuery(name = Building.FIND_BY_COMPLEX_NAME_AND_BUILDING_NAME, query = "SELECT b FROM Building b WHERE b.complex.name = :complexName AND b.name = :buildingName")
 })
 @Entity

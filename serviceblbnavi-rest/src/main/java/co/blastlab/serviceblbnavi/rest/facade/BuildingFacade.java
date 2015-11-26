@@ -109,7 +109,7 @@ public class BuildingFacade {
         Building building = buildingBean.find(id);
         if (building != null) {
             permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
-                    building.getComplexId(), Permission.UPDATE);
+                    building.getComplex().getId(), Permission.UPDATE);
             buildingBean.delete(building);
             return Response.ok().build();
         }
@@ -145,7 +145,7 @@ public class BuildingFacade {
         Building building = buildingBean.find(buildingId);
         if (building != null) {
             permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
-                    building.getComplexId(), Permission.UPDATE);
+                    building.getComplex().getId(), Permission.UPDATE);
             if (buildingBean.saveConfiguration(building)) {
                 return Response.noContent().build();
             } else {

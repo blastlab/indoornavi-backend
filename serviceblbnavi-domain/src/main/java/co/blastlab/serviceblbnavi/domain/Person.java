@@ -2,6 +2,7 @@ package co.blastlab.serviceblbnavi.domain;
 
 import co.blastlab.serviceblbnavi.security.PasswordEncoder;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
 import java.util.List;
 import javax.persistence.Column;
@@ -11,6 +12,9 @@ import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
+import javax.persistence.Transient;
 
 /**
  *
@@ -27,6 +31,8 @@ public class Person implements Serializable {
     public static final String FIND_BY_EMAIL = "Person.findByEmail";
     public static final String FIND_BY_AUTH_TOKEN = "Person.findByAuthToken";
 
+    public static final String PASSWORD_DIGEST_ALG = "SHA-512";
+
     @Id
     @GeneratedValue
     private Long id;
@@ -34,14 +40,37 @@ public class Person implements Serializable {
     @Column(unique = true)
     private String email;
 
+    @JsonIgnore
     private String password;
 
+    @JsonIgnore
     private String salt;
 
     private String authToken;
 
+    @Transient
+    private String plainPassword;
+
     @OneToMany(mappedBy = "person")
     private List<ACL_Complex> ACL_Complexes;
+
+    public Person() {
+    }
+
+    public Person(String email, String plainPassword) {
+        this.email = email;
+        this.plainPassword = plainPassword;
+    }
+
+    @PrePersist
+    @PreUpdate
+    public void hashPassword() {
+        if (plainPassword != null) {
+            salt = PasswordEncoder.getSalt();
+            password = PasswordEncoder.getShaPassword(PASSWORD_DIGEST_ALG, plainPassword, salt);
+            plainPassword = null;
+        }
+    }
 
     public String getAuthToken() {
         return authToken;
@@ -93,6 +122,14 @@ public class Person implements Serializable {
 
     public void setSalt(String salt) {
         this.salt = salt;
+    }
+
+    public String getPlainPassword() {
+        return plainPassword;
+    }
+
+    public void setPlainPassword(String plainPassword) {
+        this.plainPassword = plainPassword;
     }
 
 }

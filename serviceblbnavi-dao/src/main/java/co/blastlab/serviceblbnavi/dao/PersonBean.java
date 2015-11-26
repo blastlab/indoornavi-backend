@@ -1,6 +1,8 @@
 package co.blastlab.serviceblbnavi.dao;
 
+import co.blastlab.serviceblbnavi.dao.exception.PermissionException;
 import co.blastlab.serviceblbnavi.domain.Person;
+import co.blastlab.serviceblbnavi.security.PasswordEncoder;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
@@ -18,11 +20,17 @@ public class PersonBean {
 
     public void create(Person person) {
         em.persist(person);
+        em.refresh(person);
     }
 
     public Person find(Long id) {
         return em.find(Person.class, id);
     }
+    
+    public void update(Person person) {
+        em.merge(person);
+    }
+    
 
     public Person findByEmail(String email) {
         try {
@@ -40,6 +48,19 @@ public class PersonBean {
             System.out.println("NoResultException in findByAuthToken");
         }
         return null;
+    }
+
+    public void checkPassword(Person person, String plainPassword) {
+        if (!PasswordEncoder.getShaPassword(Person.PASSWORD_DIGEST_ALG, plainPassword, person.getSalt()).equalsIgnoreCase(person.getPassword())) {
+            throw new PermissionException();
+        }
+    }
+
+    public String generateAuthToken(Person person) {
+        String token = PasswordEncoder.getAuthToken();
+        person.setAuthToken(token);
+        update(person);
+        return token;
     }
 
 }
