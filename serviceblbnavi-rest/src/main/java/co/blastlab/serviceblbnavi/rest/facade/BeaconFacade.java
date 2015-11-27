@@ -2,8 +2,11 @@ package co.blastlab.serviceblbnavi.rest.facade;
 
 import co.blastlab.serviceblbnavi.dao.BeaconBean;
 import co.blastlab.serviceblbnavi.dao.FloorBean;
+import co.blastlab.serviceblbnavi.dao.PermissionBean;
 import co.blastlab.serviceblbnavi.domain.Beacon;
 import co.blastlab.serviceblbnavi.domain.Floor;
+import co.blastlab.serviceblbnavi.domain.Permission;
+import co.blastlab.serviceblbnavi.rest.bean.AuthorizationBean;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
@@ -11,6 +14,7 @@ import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
 import java.util.List;
 import javax.ejb.EJB;
+import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -34,6 +38,12 @@ public class BeaconFacade {
     @EJB
     private FloorBean floorBean;
 
+    @EJB
+    private PermissionBean permissionBean;
+
+    @Inject
+    private AuthorizationBean authorizationBean;
+
     @POST
     @ApiOperation(value = "create beacon", response = Beacon.class)
     @ApiResponses({
@@ -43,6 +53,8 @@ public class BeaconFacade {
         if (beacon.getFloorId() != null) {
             Floor floor = floorBean.find(beacon.getFloorId());
             if (floor != null) {
+                permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
+                        floor.getBuilding().getComplex().getId(), Permission.UPDATE);
                 beacon.setFloor(floor);
                 beaconBean.create(beacon);
                 return beacon;
@@ -59,10 +71,12 @@ public class BeaconFacade {
     })
     public Beacon find(@PathParam("id") @ApiParam(value = "id", required = true) Long id) {
         Beacon beacon = beaconBean.find(id);
-        if (beacon == null) {
-            throw new EntityNotFoundException();
+        if (beacon != null) {
+            permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
+                    beacon.getFloor().getBuilding().getComplex().getId(), Permission.READ);
+            return beacon;
         }
-        return beacon;
+        throw new EntityNotFoundException();
     }
 
     @DELETE
@@ -73,11 +87,13 @@ public class BeaconFacade {
     })
     public Response delete(@PathParam("id") @ApiParam(value = "id", required = true) Long id) {
         Beacon beacon = beaconBean.find(id);
-        if (beacon == null) {
-            throw new EntityNotFoundException();
+        if (beacon != null) {
+            permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
+                    beacon.getFloor().getBuilding().getComplex().getId(), Permission.UPDATE);
+            beaconBean.delete(beacon);
+            return Response.ok().build();
         }
-        beaconBean.delete(beacon);
-        return Response.ok().build();
+        throw new EntityNotFoundException();
     }
 
     @PUT
@@ -89,6 +105,8 @@ public class BeaconFacade {
         if (beacon.getFloorId() != null) {
             Floor floor = floorBean.find(beacon.getFloorId());
             if (floor != null) {
+                permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
+                        floor.getBuilding().getComplex().getId(), Permission.UPDATE);
                 beacon.setFloor(floor);
                 beaconBean.update(beacon);
                 return beacon;
@@ -107,6 +125,8 @@ public class BeaconFacade {
         if (floorId != null) {
             Floor floor = floorBean.find(floorId);
             if (floor != null) {
+                permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
+                        floor.getBuilding().getComplex().getId(), Permission.READ);
                 return beaconBean.findAll(floor);
             }
         }

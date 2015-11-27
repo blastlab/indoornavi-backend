@@ -423,4 +423,19 @@
         <addUniqueConstraint tableName="Permission" columnNames="name"/>
     </changeSet>
     
+    <changeSet id="34" author="gkonupek">
+        <insert tableName="Permission">
+            <column name="name">READ</column>
+        </insert>
+        <insert tableName="Permission">
+            <column name="name">UPDATE</column>
+        </insert>
+        <insert tableName="Permission">
+            <column name="name">CREATE</column>
+        </insert>
+        <insert tableName="Permission">
+            <column name="name">DELETE</column>
+        </insert>
+    </changeSet>
+    
 </databaseChangeLog>
