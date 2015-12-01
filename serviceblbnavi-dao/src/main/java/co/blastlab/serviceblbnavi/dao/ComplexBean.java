@@ -8,6 +8,7 @@ import java.util.Set;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 
 /**
  *
@@ -62,7 +63,11 @@ public class ComplexBean {
     }
 
     public Complex findByName(String name) {
-        return em.createNamedQuery(Complex.FIND_BY_NAME, Complex.class).setParameter("name", name).getSingleResult();
+        try {
+            return em.createNamedQuery(Complex.FIND_BY_NAME, Complex.class).setParameter("name", name).getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
     }
 
 }
