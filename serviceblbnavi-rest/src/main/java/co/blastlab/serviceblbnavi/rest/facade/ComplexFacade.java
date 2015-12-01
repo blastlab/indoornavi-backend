@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.ejb.EJB;
 import javax.inject.Inject;
+import javax.persistence.EntityExistsException;
 import javax.persistence.EntityNotFoundException;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -55,6 +56,10 @@ public class ComplexFacade {
     @POST
     @ApiOperation(value = "create complex", response = Complex.class)
     public Complex create(@ApiParam(value = "complex", required = true) Complex complex) {
+        Complex c = complexBean.findByName(complex.getName());
+        if (c != null) {
+            throw new EntityExistsException();
+        }
         complexBean.create(complex);
         List<ACL_Complex> aclComplexes = new ArrayList<>();
         aclComplexes.add(new ACL_Complex(authorizationBean.getCurrentUser(), complex, permissionBean.findByName(Permission.READ)));

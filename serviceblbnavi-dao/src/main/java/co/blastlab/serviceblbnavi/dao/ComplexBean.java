@@ -61,4 +61,8 @@ public class ComplexBean {
         return em.createNamedQuery(Complex.FIND_BY_FLOOR, Complex.class).setParameter("floorId", id).getSingleResult();
     }
 
+    public Complex findByName(String name) {
+        return em.createNamedQuery(Complex.FIND_BY_NAME, Complex.class).setParameter("name", name).getSingleResult();
+    }
+
 }
