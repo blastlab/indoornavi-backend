@@ -86,19 +86,14 @@ public class FileUploadServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse response)
             throws ServletException, IOException {
         try {
-            authorize(req);
             Floor floor = floorBean.find(Long.parseLong(
                     req.getPathInfo().substring(SEPARATOR_INDEX))
             );
             if (floor == null || floor.getBitmap() == null) {
                 throw new WebApplicationException(Response.Status.NOT_FOUND);
             }
-            permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
-                    floor.getBuilding().getComplex().getId(), Permission.READ);
             IOUtils.copy(new ByteArrayInputStream(Base64.getEncoder().encode(floor.getBitmap())),
                     response.getOutputStream());
-        } catch (PermissionException e) {
-            response.setStatus(Response.Status.UNAUTHORIZED.getStatusCode());
         } catch (NumberFormatException e) {
             response.setStatus(Response.Status.BAD_REQUEST.getStatusCode());
         } catch (WebApplicationException e) {
