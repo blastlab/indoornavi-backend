@@ -21,6 +21,12 @@ public class EdgeBean {
     public void create(Edge edge) {
         em.persist(edge);
     }
+    
+    public void create(List<Edge> edges) {
+        edges.stream().forEach((edge) -> {
+            this.create(edge);
+        });
+    }
 
     public Edge find(Long id) {
         return em.find(Edge.class, id);
@@ -53,9 +59,9 @@ public class EdgeBean {
     }
 
     public void update(List<Edge> edges) {
-        for (Edge e : edges) {
+        edges.stream().forEach((e) -> {
             update(e);
-        }
+        });
     }
 
     public void clearEdges(Vertex vertex) {

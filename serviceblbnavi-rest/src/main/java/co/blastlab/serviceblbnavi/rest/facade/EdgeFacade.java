@@ -48,24 +48,27 @@ public class EdgeFacade {
     private AuthorizationBean authorizationBean;
 
     @POST
-    @ApiOperation(value = "create edge", response = Edge.class)
+    @ApiOperation(value = "create edges", response = Edge.class, responseContainer = "List")
     @ApiResponses({
         @ApiResponse(code = 404, message = "target or source id emtpy or doesn't exist")
     })
-    public Edge create(@ApiParam(value = "edge", required = true) Edge edge) {
-        if (edge.getSourceId() != null && edge.getTargetId() != null && edge.getWeight() != null) {
-            Vertex source = vertexBean.find(edge.getSourceId());
-            Vertex target = vertexBean.find(edge.getTargetId());
-            if (source != null && target != null && edgeBean.findBySourceAndTarget(source, target) == null) {
-                permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
-                        source.getFloor().getBuilding().getComplex().getId(), Permission.UPDATE);
-                edge.setTarget(target);
-                edge.setSource(source);
-                edgeBean.create(edge);
-                return edge;
+    public List<Edge> create(@ApiParam(value = "edges", required = true) List<Edge> edges) {
+        for (Edge edge : edges) {
+            if (edge.getSourceId() != null && edge.getTargetId() != null && edge.getWeight() != null) {
+                Vertex source = vertexBean.find(edge.getSourceId());
+                Vertex target = vertexBean.find(edge.getTargetId());
+                if (source != null && target != null && edgeBean.findBySourceAndTarget(source, target) == null) {
+                    permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
+                            source.getFloor().getBuilding().getComplex().getId(), Permission.UPDATE);
+                    edge.setTarget(target);
+                    edge.setSource(source);
+                    continue;
+                }
             }
+            throw new EntityNotFoundException();
         }
-        throw new EntityNotFoundException();
+        edgeBean.create(edges);
+        return edges;
     }
 
     @GET
