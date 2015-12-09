@@ -57,7 +57,7 @@ public class EdgeFacade {
             if (edge.getSourceId() != null && edge.getTargetId() != null && edge.getWeight() != null) {
                 Vertex source = vertexBean.find(edge.getSourceId());
                 Vertex target = vertexBean.find(edge.getTargetId());
-                if (source != null && target != null && edgeBean.findBySourceAndTarget(source, target) == null) {
+                if (source != null && target != null && edgeBean.findBySourceAndTarget(edge.getSourceId(), edge.getTargetId()) == null) {
                     permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
                             source.getFloor().getBuilding().getComplex().getId(), Permission.UPDATE);
                     edge.setTarget(target);
@@ -114,11 +114,11 @@ public class EdgeFacade {
     @ApiResponses({
         @ApiResponse(code = 404, message = "edge with given target and source id doesn't exist")
     })
-    public Response delete(@ApiParam(value = "sourceId", required = true) @HeaderParam("sourceId") Long sourceId, @ApiParam(value = "targetId", required = true) @HeaderParam("targetId") Long targetId) {
-        Vertex source = vertexBean.find(sourceId);
-        Vertex target = vertexBean.find(targetId);
-        Edge firstEdge = edgeBean.findBySourceAndTarget(source, target);
-        Edge secondEdge = edgeBean.findBySourceAndTarget(target, source);
+    public Response delete(
+            @ApiParam(value = "sourceId", required = true) @HeaderParam("sourceId") Long sourceId,
+            @ApiParam(value = "targetId", required = true) @HeaderParam("targetId") Long targetId) {
+        Edge firstEdge = edgeBean.findBySourceAndTarget(sourceId, targetId);
+        Edge secondEdge = edgeBean.findBySourceAndTarget(targetId, sourceId);
         if (firstEdge != null) {
             permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
                     firstEdge.getSource().getFloor().getBuilding().getComplex().getId(),
@@ -139,10 +139,10 @@ public class EdgeFacade {
     @ApiResponses({
         @ApiResponse(code = 404, message = "edge with given target and source id doesn't exist")
     })
-    public Edge findBySourceIdAndTargetId(@ApiParam(value = "sourceId", required = true) @HeaderParam("sourceId") Long sourceId, @ApiParam(value = "targetId", required = true) @HeaderParam("targetId") Long targetId) {
-        Vertex source = vertexBean.find(sourceId);
-        Vertex target = vertexBean.find(targetId);
-        Edge edge = edgeBean.findBySourceAndTarget(source, target);
+    public Edge findBySourceIdAndTargetId(
+            @ApiParam(value = "sourceId", required = true) @HeaderParam("sourceId") Long sourceId,
+            @ApiParam(value = "targetId", required = true) @HeaderParam("targetId") Long targetId) {
+        Edge edge = edgeBean.findBySourceAndTarget(sourceId, targetId);
         if (edge != null) {
             permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
                     edge.getSource().getFloor().getBuilding().getComplex().getId(),
@@ -172,7 +172,7 @@ public class EdgeFacade {
             if (edge.getSource() == null || edge.getTarget() == null) {
                 throw new BadRequestException();
             }
-            Edge newEdge = edgeBean.findBySourceAndTarget(edge.getSource(), edge.getTarget());
+            Edge newEdge = edgeBean.findBySourceAndTarget(edge.getSourceId(), edge.getTargetId());
             if (newEdge == null) {
                 throw new BadRequestException();
             }

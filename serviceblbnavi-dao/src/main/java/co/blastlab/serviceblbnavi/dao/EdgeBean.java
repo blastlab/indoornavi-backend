@@ -32,10 +32,13 @@ public class EdgeBean {
         return em.find(Edge.class, id);
     }
 
-    public Edge findBySourceAndTarget(Vertex source, Vertex target) {
+    public Edge findBySourceAndTarget(Long sourceId, Long targetId) {
         Edge edge;
         try {
-            edge = em.createNamedQuery(Edge.FIND_BY_TARGET_AND_SOURCE, Edge.class).setParameter("source", source).setParameter("target", target).getSingleResult();
+            edge = em.createNamedQuery(Edge.FIND_BY_TARGET_AND_SOURCE, Edge.class)
+                    .setParameter("sourceId", sourceId)
+                    .setParameter("targetId", targetId)
+                    .getSingleResult();
         } catch (NoResultException e) {
             edge = null;
         }
