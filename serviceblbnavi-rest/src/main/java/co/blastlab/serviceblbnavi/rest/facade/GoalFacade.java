@@ -130,7 +130,7 @@ public class GoalFacade {
     @ApiResponses({
         @ApiResponse(code = 404, message = "vertex with given id wasn't found")
     })
-    public List<Goal> findByFloor(@ApiParam(value = "id", required = true) @PathParam("id") Long vertexId) {
+    public List<Goal> findByVertex(@ApiParam(value = "id", required = true) @PathParam("id") Long vertexId) {
         if (vertexId != null) {
             List<Goal> goals = goalBean.findAll(vertexId);
             if (goals.size() > 0) {
@@ -156,6 +156,25 @@ public class GoalFacade {
                     goal.getBuilding().getComplex().getId(), Permission.UPDATE);
             goalBean.deactivate(goal);
             return goal;
+        }
+        throw new EntityNotFoundException();
+    }
+    
+    @GET
+    @Path("/building/{id: \\d+}")
+    @JsonView(View.GoalInternal.class)
+    @ApiOperation(value = "find goals for specified building", response = Goal.class, responseContainer = "List")
+    @ApiResponses({
+        @ApiResponse(code = 404, message = "building with given id wasn't found")
+    })
+    public List<Goal> findByBuilding(@ApiParam(value = "id", required = true) @PathParam("id") Long buildingId) {
+        if (buildingId != null) {
+            List<Goal> goals = goalBean.findAllByBuildingId(buildingId);
+            if (goals.size() > 0) {
+                permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
+                        goals.get(0).getBuilding().getComplex().getId(), Permission.READ);
+            }
+            return goals;
         }
         throw new EntityNotFoundException();
     }

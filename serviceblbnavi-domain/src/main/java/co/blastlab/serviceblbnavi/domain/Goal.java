@@ -15,9 +15,7 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.PrePersist;
-import javax.persistence.Table;
 import javax.persistence.Transient;
-import javax.persistence.UniqueConstraint;
 
 /**
  *
@@ -25,12 +23,14 @@ import javax.persistence.UniqueConstraint;
  */
 @Entity
 @NamedQueries({
-    @NamedQuery(name = Goal.FIND_BY_VERTEX, query = "SELECT g FROM Goal g WHERE g.vertex.id = :vertexId")
+    @NamedQuery(name = Goal.FIND_BY_VERTEX, query = "SELECT g FROM Goal g WHERE g.vertex.id = :vertexId"),
+    @NamedQuery(name = Goal.FIND_BY_BUILDING, query = "SELECT g FROM Goal g WHERE g.building.id = :buildingId")
 })
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY, setterVisibility = JsonAutoDetect.Visibility.NONE, getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class Goal implements Serializable {
 
     public static final String FIND_BY_VERTEX = "Goal.findByVertex";
+    public static final String FIND_BY_BUILDING = "Goal.findByBuilding";
     
     @Id
     @GeneratedValue
@@ -49,7 +49,7 @@ public class Goal implements Serializable {
     @ManyToOne
     private Vertex vertex;
     
-    @JsonView(View.External.class)
+    @JsonView({View.External.class, View.GoalInternal.class})
     @OneToMany(mappedBy = "goal")
     private List<GoalSelection> goalSelections;
 

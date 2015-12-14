@@ -47,4 +47,9 @@ public class GoalBean {
         goal.setInactive(true);
         update(goal);
     }
+
+    public List<Goal> findAllByBuildingId(Long buildingId) {
+        return em.createNamedQuery(Goal.FIND_BY_BUILDING, Goal.class)
+                .setParameter("buildingId", buildingId).getResultList();
+    }
 }
