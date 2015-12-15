@@ -29,4 +29,7 @@ public class View {
     
     public static class PermissionInternal {
     }
+    
+    public static class WaypointInternal {
+    }
 }

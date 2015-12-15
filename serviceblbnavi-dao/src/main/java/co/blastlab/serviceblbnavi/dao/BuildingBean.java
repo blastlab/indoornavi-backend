@@ -67,7 +67,7 @@ public class BuildingBean {
     private String generateConfigurationFromBuilding(Building building) throws JsonProcessingException {
         building.getFloors().stream().forEach((floor) -> {
             floor.getWaypoints().stream().forEach((waypoint) -> {
-                waypoint.setWaypointVisit(null);
+                waypoint.setWaypointVisits(null);
             });
             floor.setVertices(floor.getVertices().stream().filter(
                     vertex -> !vertex.getInactive()).collect(Collectors.toList()));

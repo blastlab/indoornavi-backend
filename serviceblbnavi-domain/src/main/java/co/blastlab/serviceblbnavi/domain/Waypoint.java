@@ -10,6 +10,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Transient;
 
@@ -18,8 +20,13 @@ import javax.persistence.Transient;
  * @author Michał Koszałka
  */
 @Entity
+@NamedQueries({
+    @NamedQuery(name = Waypoint.FIND_BY_BUILDING_ID, query = "SELECT w FROM Waypoint w WHERE w.floor.building.id = :buildingId")
+})
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY, setterVisibility = JsonAutoDetect.Visibility.NONE, getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class Waypoint implements Serializable {
+
+    public static final String FIND_BY_BUILDING_ID = "Waypoint.findByBuildingId";
 
     @Id
     @GeneratedValue
@@ -37,6 +44,8 @@ public class Waypoint implements Serializable {
 
     private Boolean inactive;
 
+    private String name;
+
     @Transient
     private Long floorId;
 
@@ -44,9 +53,9 @@ public class Waypoint implements Serializable {
     @ManyToOne
     private Floor floor;
 
-    @JsonView(View.External.class)
-    @OneToMany
-    private List<WaypointVisit> waypointVisit;
+    @JsonView({View.External.class, View.WaypointInternal.class})
+    @OneToMany(mappedBy = "waypoint")
+    private List<WaypointVisit> waypointVisits;
 
     public Long getFloorId() {
         return floorId;
@@ -112,12 +121,12 @@ public class Waypoint implements Serializable {
         this.floor = floor;
     }
 
-    public List<WaypointVisit> getWaypointVisit() {
-        return waypointVisit;
+    public List<WaypointVisit> getWaypointVisits() {
+        return waypointVisits;
     }
 
-    public void setWaypointVisit(List<WaypointVisit> waypointVisit) {
-        this.waypointVisit = waypointVisit;
+    public void setWaypointVisits(List<WaypointVisit> waypointVisits) {
+        this.waypointVisits = waypointVisits;
     }
 
     public Boolean getInactive() {
@@ -126,6 +135,14 @@ public class Waypoint implements Serializable {
 
     public void setInactive(Boolean inactive) {
         this.inactive = inactive;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
 }
