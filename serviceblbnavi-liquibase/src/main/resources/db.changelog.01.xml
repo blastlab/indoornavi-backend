@@ -446,4 +446,11 @@
         </addColumn>
     </changeSet>
     
+    <changeSet id="36" author="gkonupek">
+        <addColumn tableName="Floor">
+            <column name="bitmapWidth" type="INT"/>
+            <column name="bitmapHeight" type="INT"/>
+        </addColumn>
+    </changeSet>
+    
 </databaseChangeLog>

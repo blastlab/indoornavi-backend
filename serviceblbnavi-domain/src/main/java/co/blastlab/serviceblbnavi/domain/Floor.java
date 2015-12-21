@@ -30,6 +30,10 @@ public class Floor implements Serializable {
     @JsonIgnore
     private byte[] bitmap;
 
+    private Integer bitmapWidth;
+
+    private Integer bitmapHeight;
+
     private Double mToPix;
 
     private Double startZoom;
@@ -131,6 +135,22 @@ public class Floor implements Serializable {
 
     public void setBuildingId(Long buildingId) {
         this.buildingId = buildingId;
+    }
+
+    public Integer getBitmapWidth() {
+        return bitmapWidth;
+    }
+
+    public void setBitmapWidth(Integer bitmapWidth) {
+        this.bitmapWidth = bitmapWidth;
+    }
+
+    public Integer getBitmapHeight() {
+        return bitmapHeight;
+    }
+
+    public void setBitmapHeight(Integer bitmapHeight) {
+        this.bitmapHeight = bitmapHeight;
     }
 
 }

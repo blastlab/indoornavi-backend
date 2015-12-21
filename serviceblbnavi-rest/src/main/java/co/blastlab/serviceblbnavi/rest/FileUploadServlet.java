@@ -13,10 +13,12 @@ import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiImplicitParam;
 import com.wordnik.swagger.annotations.ApiImplicitParams;
 import com.wordnik.swagger.annotations.ApiOperation;
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Base64;
 import javax.ejb.EJB;
+import javax.imageio.ImageIO;
 import javax.inject.Inject;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
@@ -69,8 +71,12 @@ public class FileUploadServlet extends HttpServlet {
             permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
                     floor.getBuilding().getComplex().getId(), Permission.UPDATE);
             final Part filePart = request.getPart("image");
-
+            
             byte[] bytes = IOUtils.toByteArray(filePart.getInputStream());
+            BufferedImage bi = ImageIO.read(new ByteArrayInputStream(bytes));
+            
+            floor.setBitmapHeight(bi.getHeight());
+            floor.setBitmapWidth(bi.getWidth());
             floor.setBitmap(bytes);
             floorBean.update(floor);
         } catch (PermissionException e) {
