@@ -52,4 +52,9 @@ public class GoalBean {
         return em.createNamedQuery(Goal.FIND_BY_BUILDING, Goal.class)
                 .setParameter("buildingId", buildingId).getResultList();
     }
+
+    public List<Goal> findAllByFloorId(Long floorId) {
+        return em.createNamedQuery(Goal.FIND_BY_FLOOR, Goal.class)
+                .setParameter("floorId", floorId).getResultList();
+    }
 }
