@@ -42,6 +42,7 @@ public class AuthFilter implements ContainerRequestFilter {
         String path = requestCtx.getUriInfo().getAbsolutePath().toString();
         
         if (!path.endsWith("/person") && !path.contains("/api") && !path.contains("swagger.json")
+                && (!path.endsWith("/goalSelection") && !path.endsWith("/waypointVisit") || !requestCtx.getMethod().equals("POST"))
                 && !(path.contains("building") && path.contains("config") && requestCtx.getMethod().equals("GET"))) {
             System.out.println("authorization filtering");
             String authToken = requestCtx.getHeaderString(AUTH_TOKEN);

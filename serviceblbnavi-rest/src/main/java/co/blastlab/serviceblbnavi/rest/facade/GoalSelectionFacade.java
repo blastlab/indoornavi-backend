@@ -6,6 +6,7 @@ import co.blastlab.serviceblbnavi.domain.Goal;
 import co.blastlab.serviceblbnavi.domain.GoalSelection;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.ApiParam;
 import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
 import javax.ejb.EJB;
@@ -32,13 +33,14 @@ public class GoalSelectionFacade {
     @ApiResponses({
         @ApiResponse(code = 404, message = "invalid goal selection\'s data")
     })
-    public GoalSelection create(GoalSelection goalSelection) {
+    public GoalSelection create(@ApiParam(value = "goalSelection", required = true) GoalSelection goalSelection) {
         if (goalSelection.getGoalId() != null && goalSelection.getDevice() != null
                 && goalSelection.getCreationDateTimestamp() != null) {
             Goal goal = goalBean.find(goalSelection.getGoalId());
             if (goal != null) {
                 goalSelection.setGoal(goal);
                 goalSelectionBean.create(goalSelection);
+                return goalSelection;
             }
         }
         throw new EntityNotFoundException();

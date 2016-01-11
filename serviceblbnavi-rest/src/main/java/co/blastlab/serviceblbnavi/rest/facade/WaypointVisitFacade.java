@@ -6,6 +6,7 @@ import co.blastlab.serviceblbnavi.domain.Waypoint;
 import co.blastlab.serviceblbnavi.domain.WaypointVisit;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.ApiParam;
 import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
 import javax.ejb.EJB;
@@ -32,13 +33,14 @@ public class WaypointVisitFacade {
     @ApiResponses({
         @ApiResponse(code = 404, message = "invalid waypoint visit\'s data")
     })
-    public WaypointVisit create(WaypointVisit waypointVisit) {
+    public WaypointVisit create(@ApiParam(value = "waypoint visit", required = true) WaypointVisit waypointVisit) {
         if (waypointVisit.getWaypointId() != null && waypointVisit.getDevice() != null
                 && waypointVisit.getCreationDateTimestamp() != null) {
             Waypoint waypoint = waypointBean.findById(waypointVisit.getWaypointId());
             if (waypoint != null) {
                 waypointVisit.setWaypoint(waypoint);
                 waypointVisitBean.create(waypointVisit);
+                return waypointVisit;
             }
         }
         throw new EntityNotFoundException();
