@@ -4,6 +4,7 @@ import co.blastlab.serviceblbnavi.domain.Complex;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
@@ -42,7 +43,9 @@ public class ComplexBean {
         complexes.stream().forEach((complex) -> {
             List<String> permissions = new ArrayList<>();
             complex.getACL_complexes().stream().forEach((aclComplex) -> {
-                permissions.add(aclComplex.getPermission().getName());
+                if (Objects.equals(aclComplex.getPerson().getId(), personId)) {
+                    permissions.add(aclComplex.getPermission().getName());
+                }
             });
             complex.setPermissions(permissions);
         });
