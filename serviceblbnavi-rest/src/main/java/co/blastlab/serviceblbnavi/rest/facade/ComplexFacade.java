@@ -19,6 +19,7 @@ import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import javax.ejb.EJB;
 import javax.inject.Inject;
 import javax.persistence.EntityExistsException;
@@ -26,6 +27,7 @@ import javax.persistence.EntityNotFoundException;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
@@ -194,6 +196,20 @@ public class ComplexFacade {
             }
         }
         throw new EntityNotFoundException();
+    }
+    
+    @PUT
+    @ApiOperation(value = "delete complex by id", response = Response.class)
+    @ApiResponses({
+        @ApiResponse(code = 404, message = "complex id empty or complex doesn't exist")
+    })
+    public Complex update(@ApiParam(value = "complex", required = true) Complex complex) {
+         Complex c = complexBean.findByName(complex.getName());
+        if (c != null && !Objects.equals(c.getId(), complex.getId())) {
+            throw new EntityExistsException();
+        }
+        complexBean.update(complex);
+        return complex;
     }
 
 }

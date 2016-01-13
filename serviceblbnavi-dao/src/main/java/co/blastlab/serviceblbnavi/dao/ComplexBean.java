@@ -73,4 +73,8 @@ public class ComplexBean {
         }
     }
 
+    public void update(Complex complex) {
+        em.merge(complex);
+    }
+
 }
