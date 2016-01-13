@@ -114,15 +114,6 @@ public class GoalFacade {
         throw new EntityNotFoundException();
     }
 
-    @PUT
-    @ApiOperation(value = "update goals", response = Goal.class)
-    @JsonView(View.GoalInternal.class)
-    public List<Goal> update(@ApiParam(value = "goal", required = true) List<Goal> goals) {
-        permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(), 0L, Permission.UPDATE);
-        goalBean.update(goals);
-        return goals;
-    }
-
     @GET
     @Path("/{id: \\d+}")
     @JsonView(View.GoalInternal.class)
