@@ -86,11 +86,11 @@ public class BuildingFacade {
         @ApiResponse(code = 404, message = "complex id or complex empty or doesn't exist")
     })
     public Building update(@ApiParam(value = "building", required = true) Building building) {
-        if (building.getComplex() == null && building.getComplexId() != null) {
-            permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
-                    building.getComplexId(), Permission.UPDATE);
-            Complex complex = complexBean.find(building.getComplexId());
+        if (building.getId() != null) {
+            Complex complex = complexBean.findByBuildingId(building.getId());
             if (complex != null) {
+                permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
+                        complex.getId(), Permission.UPDATE);
                 building.setComplex(complex);
                 buildingBean.update(building);
                 return building;
