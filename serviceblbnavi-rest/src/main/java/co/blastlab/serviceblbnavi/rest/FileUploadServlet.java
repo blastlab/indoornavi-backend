@@ -27,7 +27,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
-import javax.ws.rs.BadRequestException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import org.apache.commons.io.IOUtils;
@@ -96,14 +95,13 @@ public class FileUploadServlet extends HttpServlet {
                     req.getPathInfo().substring(SEPARATOR_INDEX))
             );
             if (floor == null || floor.getBitmap() == null) {
-                throw new WebApplicationException(Response.Status.NOT_FOUND);
+                response.setStatus(Response.Status.NOT_FOUND.getStatusCode());
+                return;
             }
             IOUtils.copy(new ByteArrayInputStream(Base64.getEncoder().encode(floor.getBitmap())),
                     response.getOutputStream());
         } catch (NumberFormatException e) {
             response.setStatus(Response.Status.BAD_REQUEST.getStatusCode());
-        } catch (WebApplicationException e) {
-            response.setStatus(Response.Status.NOT_FOUND.getStatusCode());
         }
     }
 
