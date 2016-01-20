@@ -1,6 +1,5 @@
 package co.blastlab.serviceblbnavi.domain;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
 import java.util.Date;
@@ -17,7 +16,6 @@ import javax.persistence.Transient;
  * @author Grzegorz Konupek
  */
 @Entity
-@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY, setterVisibility = JsonAutoDetect.Visibility.NONE, getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class GoalSelection implements Serializable{
     
     @Id
