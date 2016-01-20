@@ -15,7 +15,6 @@ import javax.ejb.EJB;
 import javax.persistence.EntityNotFoundException;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
 
 /**
  *
@@ -23,7 +22,6 @@ import javax.ws.rs.Produces;
  */
 @Path("/waypointVisit")
 @Api("/waypointVisit")
-@Produces("application/json")
 public class WaypointVisitFacade {
 
     @EJB
