@@ -33,9 +33,6 @@ public class GoalSelection implements Serializable{
     @Temporal(TemporalType.TIMESTAMP)
     private Date creationDateTimestamp;
     
-    @Transient
-    private Date timestamp;
-    
     @JsonIgnore
     @ManyToOne
     private Goal goal; 
@@ -105,14 +102,6 @@ public class GoalSelection implements Serializable{
 
     public void setGoalId(Long goalId) {
         this.goalId = goalId;
-    }
-
-    public Date getTimestamp() {
-        return timestamp;
-    }
-
-    public void setTimestamp(Date timestamp) {
-        this.timestamp = timestamp;
     }
     
 }
