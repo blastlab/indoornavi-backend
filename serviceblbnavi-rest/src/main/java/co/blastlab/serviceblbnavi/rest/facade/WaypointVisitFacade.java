@@ -40,7 +40,10 @@ public class WaypointVisitFacade {
     @JsonView(View.WaypointVisitInternal.class)
     public WaypointVisit create(@ApiParam(value = "waypoint visit", required = true) WaypointVisit waypointVisit) {
         if (waypointVisit.getWaypointId() != null && waypointVisit.getDevice() != null
-                && waypointVisit.getCreationDateTimestamp() != null) {
+                && (waypointVisit.getCreationDateTimestamp() != null || waypointVisit.getTimestamp() != null)) {
+            if (waypointVisit.getTimestamp() != null) {
+                waypointVisit.setCreationDateTimestamp(waypointVisit.getTimestamp());
+            }
             Waypoint waypoint = waypointBean.findById(waypointVisit.getWaypointId());
             if (waypoint != null) {
                 waypointVisit.setWaypoint(waypoint);
