@@ -35,7 +35,10 @@ public class GoalSelectionFacade {
     })
     public GoalSelection create(@ApiParam(value = "goalSelection", required = true) GoalSelection goalSelection) {
         if (goalSelection.getGoalId() != null && goalSelection.getDevice() != null
-                && goalSelection.getCreationDateTimestamp() != null) {
+                && (goalSelection.getCreationDateTimestamp() != null || goalSelection.getTimestamp() != null)) {
+            if (goalSelection.getTimestamp() != null) {
+                goalSelection.setCreationDateTimestamp(goalSelection.getTimestamp());
+            }
             Goal goal = goalBean.find(goalSelection.getGoalId());
             if (goal != null) {
                 goalSelection.setGoal(goal);
