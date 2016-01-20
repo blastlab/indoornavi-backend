@@ -19,23 +19,20 @@ import javax.persistence.Transient;
 @Entity
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY, setterVisibility = JsonAutoDetect.Visibility.NONE, getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class WaypointVisit implements Serializable {
-
+    
     @Id
     @GeneratedValue
     private Long id;
-
+    
     private String device;
-
+    
     @Temporal(TemporalType.TIMESTAMP)
     private Date creationDateTimestamp;
-
-    @Transient
-    private Date timestamp;
-
+    
     @JsonIgnore
     @ManyToOne
     private Waypoint waypoint;
-
+    
     @Transient
     private Long waypointId;
 
@@ -78,13 +75,5 @@ public class WaypointVisit implements Serializable {
     public void setWaypointId(Long waypointId) {
         this.waypointId = waypointId;
     }
-
-    public Date getTimestamp() {
-        return timestamp;
-    }
-
-    public void setTimestamp(Date timestamp) {
-        this.timestamp = timestamp;
-    }
-
+    
 }
