@@ -4,8 +4,6 @@ import co.blastlab.serviceblbnavi.dao.GoalBean;
 import co.blastlab.serviceblbnavi.dao.GoalSelectionBean;
 import co.blastlab.serviceblbnavi.domain.Goal;
 import co.blastlab.serviceblbnavi.domain.GoalSelection;
-import co.blastlab.serviceblbnavi.views.View;
-import com.fasterxml.jackson.annotation.JsonView;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
@@ -35,7 +33,6 @@ public class GoalSelectionFacade {
     @ApiResponses({
         @ApiResponse(code = 404, message = "invalid goal selection\'s data")
     })
-    @JsonView(View.GoalSelectionInternal.class)
     public GoalSelection create(@ApiParam(value = "goalSelection", required = true) GoalSelection goalSelection) {
         if (goalSelection.getGoalId() != null && goalSelection.getDevice() != null
                 && (goalSelection.getCreationDateTimestamp() != null || goalSelection.getTimestamp() != null)) {

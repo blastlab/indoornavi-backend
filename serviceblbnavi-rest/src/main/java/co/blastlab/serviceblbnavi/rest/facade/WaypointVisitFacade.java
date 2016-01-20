@@ -4,8 +4,6 @@ import co.blastlab.serviceblbnavi.dao.WaypointBean;
 import co.blastlab.serviceblbnavi.dao.WaypointVisitBean;
 import co.blastlab.serviceblbnavi.domain.Waypoint;
 import co.blastlab.serviceblbnavi.domain.WaypointVisit;
-import co.blastlab.serviceblbnavi.views.View;
-import com.fasterxml.jackson.annotation.JsonView;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
@@ -35,7 +33,6 @@ public class WaypointVisitFacade {
     @ApiResponses({
         @ApiResponse(code = 404, message = "invalid waypoint visit\'s data")
     })
-    @JsonView(View.WaypointVisitInternal.class)
     public WaypointVisit create(@ApiParam(value = "waypoint visit", required = true) WaypointVisit waypointVisit) {
         if (waypointVisit.getWaypointId() != null && waypointVisit.getDevice() != null
                 && waypointVisit.getCreationDateTimestamp() != null) {
