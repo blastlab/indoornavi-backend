@@ -43,6 +43,7 @@ public class GoalSelectionFacade {
                 && (goalSelection.getCreationDateTimestamp() != null || goalSelection.getTimestamp() != null)) {
             if (goalSelection.getTimestamp() != null) {
                 goalSelection.setCreationDateTimestamp(goalSelection.getTimestamp());
+                goalSelection.setTimestamp(null);
             }
             Goal goal = goalBean.find(goalSelection.getGoalId());
             if (goal != null) {
