@@ -43,6 +43,7 @@ public class WaypointVisitFacade {
                 && (waypointVisit.getCreationDateTimestamp() != null || waypointVisit.getTimestamp() != null)) {
             if (waypointVisit.getTimestamp() != null) {
                 waypointVisit.setCreationDateTimestamp(waypointVisit.getTimestamp());
+                waypointVisit.setTimestamp(null);
             }
             Waypoint waypoint = waypointBean.findById(waypointVisit.getWaypointId());
             if (waypoint != null) {
