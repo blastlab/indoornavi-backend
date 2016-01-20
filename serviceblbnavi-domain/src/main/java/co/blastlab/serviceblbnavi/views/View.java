@@ -32,4 +32,10 @@ public class View {
     
     public static class WaypointInternal {
     }
+    
+    public static class WaypointVisitInternal {
+    }
+    
+    public static class GoalSelectionInternal {
+    }
 }
