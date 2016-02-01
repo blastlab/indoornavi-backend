@@ -3,6 +3,7 @@ package co.blastlab.serviceblbnavi.dao;
 import co.blastlab.serviceblbnavi.domain.Building;
 import co.blastlab.serviceblbnavi.domain.BuildingConfiguration;
 import co.blastlab.serviceblbnavi.domain.Complex;
+import co.blastlab.serviceblbnavi.domain.Edge;
 import co.blastlab.serviceblbnavi.domain.Floor;
 import co.blastlab.serviceblbnavi.domain.Vertex;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -126,10 +127,21 @@ public class BuildingConfigurationBean {
                 floor.getVertices().forEach((vertex) -> {
                     vertex.getSourceEdges().forEach((sourceEdge) -> {
                         sourceEdge.setSource(vertex);
+                        if (em.find(Edge.class, sourceEdge.getId()) == null) {
+                            em.persist(sourceEdge);
+                        } else {
+                            em.merge(sourceEdge);
+                        }
+                    });
+                });
+                floor.getVertices().forEach((vertex) -> {
+                    vertex.getSourceEdges().forEach((sourceEdge) -> {
                         sourceEdge.setTarget(em.find(Vertex.class, sourceEdge.getTargetId()));
                         em.merge(sourceEdge);
                     });
                 });
+                
+                
                 floor.setBuilding(building);
                 Floor otherFloor = em.find(Floor.class, floor.getId());
                 floor.setBitmap(otherFloor.getBitmap());
