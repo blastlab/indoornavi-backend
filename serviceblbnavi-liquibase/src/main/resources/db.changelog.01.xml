@@ -453,4 +453,41 @@
         </addColumn>
     </changeSet>
     
+    <changeSet id ="37" author="gkonupek">
+        <createTable tableName="BuildingConfiguration">
+            <column autoIncrement="true" type="INT" name="id">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="building_id" type="INT"/>
+            <column name="version" type="INT"/>
+            <column name="configuration" type="LONGTEXT"/>
+            <column name="configurationChecksum" type="VARCHAR(64)"/>
+        </createTable>
+    </changeSet>
+    
+    <changeSet id="38" author="gkonupek">
+        <addForeignKeyConstraint baseColumnNames="building_id" baseTableName="BuildingConfiguration"
+                                 referencedColumnNames="id" referencedTableName="Building"
+                                 constraintName="FK_BuildingConfiguration_Building" onDelete="CASCADE" onUpdate="CASCADE"/>
+    </changeSet>
+    
+    <changeSet id="39" author="gkonupek">
+        <addUniqueConstraint tableName="BuildingConfiguration" columnNames="version,building_id"/>
+    </changeSet>
+    
+    <changeSet id="40" author="gkonupek">
+        <sql>
+            INSERT INTO BuildingConfiguration(version, building_id, configuration, configurationChecksum)
+            SELECT 1, id, configuration, configurationChecksum
+            FROM Building;
+        </sql>
+    </changeSet>
+    
+    <changeSet id="41" author="gkonupek">
+        <dropColumn tableName="Building">
+            <column name="configuration"/>
+            <column name="configurationChecksum"/>
+        </dropColumn>
+    </changeSet>
+    
 </databaseChangeLog>
