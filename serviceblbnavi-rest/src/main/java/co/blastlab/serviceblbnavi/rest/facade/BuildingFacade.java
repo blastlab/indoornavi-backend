@@ -200,10 +200,26 @@ public class BuildingFacade {
             @PathParam("complexName") @ApiParam(value = "complexName", required = true) String complexName,
             @PathParam("buildingName") @ApiParam(value = "buildingName", required = true) String buildingName) {
         BuildingConfiguration buildingConfiguration = buildingConfigurationBean.findByComplexNameAndBuildingNameAndVersion(complexName, buildingName, 1);
-        if (buildingConfiguration != null && buildingConfiguration.getConfigurationChecksum()!= null) {
+        if (buildingConfiguration != null && buildingConfiguration.getConfigurationChecksum() != null) {
             return buildingConfiguration.getConfigurationChecksum();
         }
         throw new EntityNotFoundException();
+    }
+
+    @PUT
+    @Path("/{id: \\d+}/restoreConfiguration")
+    @ApiOperation(value = "restores saved building's configuration")
+    @ApiResponses({
+        @ApiResponse(code = 404, message = "building doesn't exist or has no configuration saved")
+    })
+    public Building restoreConfiguration(
+            @PathParam("id") @ApiParam(value = "id", required = true) Long id) {
+        BuildingConfiguration buildingConfiguration = buildingConfigurationBean.findLatestVersionByBuildingId(id);
+        if (buildingConfiguration != null && buildingConfiguration.getConfiguration() != null) {
+            return buildingConfigurationBean.restoreConfiguration(buildingConfiguration, id);
+        }
+        throw new EntityNotFoundException();
+
     }
 
 }

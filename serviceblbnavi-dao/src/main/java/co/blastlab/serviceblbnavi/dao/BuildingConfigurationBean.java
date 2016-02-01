@@ -2,9 +2,13 @@ package co.blastlab.serviceblbnavi.dao;
 
 import co.blastlab.serviceblbnavi.domain.Building;
 import co.blastlab.serviceblbnavi.domain.BuildingConfiguration;
+import co.blastlab.serviceblbnavi.domain.Complex;
+import co.blastlab.serviceblbnavi.domain.Floor;
+import co.blastlab.serviceblbnavi.domain.Vertex;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -14,6 +18,7 @@ import java.util.stream.Collectors;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
+import javax.ws.rs.InternalServerErrorException;
 
 /**
  *
@@ -89,5 +94,52 @@ public class BuildingConfigurationBean {
         building.setBuildingConfigurations(null);
         return new ObjectMapper().setSerializationInclusion(JsonInclude.Include.NON_NULL)
                 .writeValueAsString(building);
+    }
+
+    public BuildingConfiguration findLatestVersionByBuildingId(Long id) {
+        return em.createNamedQuery(BuildingConfiguration.FIND_BY_BUILDING_ID_SORT_VERSION_FROM_NEWEST, BuildingConfiguration.class)
+                .setParameter("buildingId", id)
+                .getSingleResult();
+    }
+
+    public Building restoreConfiguration(BuildingConfiguration buildingConfiguration, Long id) {
+        try {
+            Building building = new ObjectMapper().readValue(buildingConfiguration.getConfiguration(), Building.class);
+            building.getFloors().stream().forEach((floor) -> {
+                floor.getWaypoints().forEach((waypoint) -> {
+                    waypoint.setFloor(floor);
+                    em.merge(waypoint);
+                });
+                floor.getBeacons().forEach((beacon) -> {
+                    beacon.setFloor(floor);
+                    em.merge(beacon);
+                });
+                floor.getVertices().forEach((vertex) -> {
+                    vertex.getGoals().forEach((goal) -> {
+                        goal.setVertex(vertex);
+                        goal.setBuilding(building);
+                        em.merge(goal);
+                    });
+                    vertex.setFloor(floor);
+                    em.merge(vertex);
+                });
+                floor.getVertices().forEach((vertex) -> {
+                    vertex.getSourceEdges().forEach((sourceEdge) -> {
+                        sourceEdge.setSource(vertex);
+                        sourceEdge.setTarget(em.find(Vertex.class, sourceEdge.getTargetId()));
+                        em.merge(sourceEdge);
+                    });
+                });
+                floor.setBuilding(building);
+                Floor otherFloor = em.find(Floor.class, floor.getId());
+                floor.setBitmap(otherFloor.getBitmap());
+                em.merge(floor);
+            });
+            building.setComplex(em.createNamedQuery(Complex.FIND_BY_BUILDING, Complex.class).setParameter("buildingId", id).getSingleResult());
+            em.merge(building);
+            return building;
+        } catch (IOException ex) {
+            throw new InternalServerErrorException(ex);
+        }
     }
 }
