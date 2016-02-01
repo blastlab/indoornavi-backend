@@ -1,9 +1,11 @@
 package co.blastlab.serviceblbnavi.rest.facade;
 
 import co.blastlab.serviceblbnavi.dao.BuildingBean;
+import co.blastlab.serviceblbnavi.dao.BuildingConfigurationBean;
 import co.blastlab.serviceblbnavi.dao.ComplexBean;
 import co.blastlab.serviceblbnavi.dao.PermissionBean;
 import co.blastlab.serviceblbnavi.domain.Building;
+import co.blastlab.serviceblbnavi.domain.BuildingConfiguration;
 import co.blastlab.serviceblbnavi.domain.Complex;
 import co.blastlab.serviceblbnavi.domain.Permission;
 import co.blastlab.serviceblbnavi.rest.bean.AuthorizationBean;
@@ -43,6 +45,9 @@ public class BuildingFacade {
 
     @EJB
     private PermissionBean permissionBean;
+
+    @EJB
+    private BuildingConfigurationBean buildingConfigurationBean;
 
     @Inject
     private AuthorizationBean authorizationBean;
@@ -137,7 +142,7 @@ public class BuildingFacade {
 
     @PUT
     @Path("/{id: \\d+}/config/")
-    @ApiOperation(value = "update building's configuration")
+    @ApiOperation(value = "create building's configuration")
     @ApiResponses({
         @ApiResponse(code = 404, message = "building doesn't exist")
     })
@@ -146,7 +151,7 @@ public class BuildingFacade {
         if (building != null) {
             permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
                     building.getComplex().getId(), Permission.UPDATE);
-            if (buildingBean.saveConfiguration(building)) {
+            if (buildingConfigurationBean.saveConfiguration(building, 1)) {
                 return Response.noContent().build();
             } else {
                 throw new InternalServerErrorException();
@@ -162,9 +167,9 @@ public class BuildingFacade {
         @ApiResponse(code = 404, message = "building doesn't exist or has no configuration set")
     })
     public String getConfiguration(@PathParam("id") @ApiParam(value = "buildingId", required = true) Long buildingId) {
-        Building building = buildingBean.find(buildingId);
-        if (building != null && building.getConfiguration() != null) {
-            return building.getConfiguration();
+        BuildingConfiguration buildingConfiguration = buildingConfigurationBean.findByBuildingAndVersion(buildingId, 1);
+        if (buildingConfiguration != null && buildingConfiguration.getConfiguration() != null) {
+            return buildingConfiguration.getConfiguration();
         }
         throw new EntityNotFoundException();
     }
@@ -178,9 +183,9 @@ public class BuildingFacade {
     public String getConfigurationByComplexNameAndBuildingName(
             @PathParam("complexName") @ApiParam(value = "complexName", required = true) String complexName,
             @PathParam("buildingName") @ApiParam(value = "buildingName", required = true) String buildingName) {
-        Building building = buildingBean.findByComplexNameAndBuildingName(complexName, buildingName);
-        if (building != null && building.getConfiguration() != null) {
-            return building.getConfiguration();
+        BuildingConfiguration buildingConfiguration = buildingConfigurationBean.findByComplexNameAndBuildingNameAndVersion(complexName, buildingName, 1);
+        if (buildingConfiguration != null && buildingConfiguration.getConfiguration() != null) {
+            return buildingConfiguration.getConfiguration();
         }
         throw new EntityNotFoundException();
     }
@@ -194,9 +199,9 @@ public class BuildingFacade {
     public String getConfigurationChecksumByComplexNameAndBuildingName(
             @PathParam("complexName") @ApiParam(value = "complexName", required = true) String complexName,
             @PathParam("buildingName") @ApiParam(value = "buildingName", required = true) String buildingName) {
-        Building building = buildingBean.findByComplexNameAndBuildingName(complexName, buildingName);
-        if (building != null && building.getConfigurationChecksum() != null) {
-            return building.getConfigurationChecksum();
+        BuildingConfiguration buildingConfiguration = buildingConfigurationBean.findByComplexNameAndBuildingNameAndVersion(complexName, buildingName, 1);
+        if (buildingConfiguration != null && buildingConfiguration.getConfigurationChecksum()!= null) {
+            return buildingConfiguration.getConfigurationChecksum();
         }
         throw new EntityNotFoundException();
     }

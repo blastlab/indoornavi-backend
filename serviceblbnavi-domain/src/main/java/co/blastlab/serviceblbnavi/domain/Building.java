@@ -9,7 +9,6 @@ import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
@@ -42,13 +41,6 @@ public class Building implements Serializable {
 
     private Double degree;
 
-    @Lob
-    @JsonIgnore
-    private String configuration;
-
-    @JsonIgnore
-    private String configurationChecksum;
-
     @JsonIgnore
     @ManyToOne
     private Complex complex;
@@ -61,6 +53,10 @@ public class Building implements Serializable {
     @JsonView({View.BuildingInternal.class, View.External.class})
     @OneToMany(mappedBy = "building")
     private List<Goal> goals;
+
+    @JsonView({View.BuildingInternal.class, View.External.class})
+    @OneToMany(mappedBy = "building")
+    private List<BuildingConfiguration> buildingConfigurations;
 
     @Transient
     private Long complexId;
@@ -129,19 +125,12 @@ public class Building implements Serializable {
         this.complexId = complexId;
     }
 
-    public String getConfiguration() {
-        return configuration;
+    public List<BuildingConfiguration> getBuildingConfigurations() {
+        return buildingConfigurations;
     }
 
-    public void setConfiguration(String configuration) {
-        this.configuration = configuration;
+    public void setBuildingConfigurations(List<BuildingConfiguration> buildingConfigurations) {
+        this.buildingConfigurations = buildingConfigurations;
     }
 
-    public String getConfigurationChecksum() {
-        return configurationChecksum;
-    }
-
-    public void setConfigurationChecksum(String configurationChecksum) {
-        this.configurationChecksum = configurationChecksum;
-    }
 }

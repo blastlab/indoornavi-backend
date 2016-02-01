@@ -47,40 +47,6 @@ public class BuildingBean {
         em.merge(building);
     }
 
-    public boolean saveConfiguration(Building building) {
-        try {
-            String configuration = generateConfigurationFromBuilding(building);
-            building.setConfiguration(configuration);
-            building.setConfigurationChecksum(
-                    new String(MessageDigest.getInstance("MD5")
-                            .digest(configuration.getBytes("UTF-8"))
-                    )
-            );
-            update(building);
-            return true;
-        } catch (NoSuchAlgorithmException | UnsupportedEncodingException | JsonProcessingException ex) {
-            Logger.getLogger(BuildingBean.class.getName()).log(Level.SEVERE, null, ex);
-            return false;
-        }
-    }
-
-    private String generateConfigurationFromBuilding(Building building) throws JsonProcessingException {
-        building.getFloors().stream().forEach((floor) -> {
-            floor.getWaypoints().stream().forEach((waypoint) -> {
-                waypoint.setWaypointVisits(null);
-            });
-            floor.setVertices(floor.getVertices().stream().filter(
-                    vertex -> !vertex.getInactive()).collect(Collectors.toList()));
-        });
-        building.setGoals(building.getGoals().stream().filter(
-                goal -> !goal.getInactive()).collect(Collectors.toList()));
-        building.getGoals().stream().forEach((goal) -> {
-            goal.setGoalSelections(null);
-        });
-        return new ObjectMapper().setSerializationInclusion(JsonInclude.Include.NON_NULL)
-                .writeValueAsString(building);
-    }
-
     public Building findByComplexNameAndBuildingName(String complexName, String buildingName) {
         return em.createNamedQuery(Building.FIND_BY_COMPLEX_NAME_AND_BUILDING_NAME, Building.class)
                 .setParameter("complexName", complexName)
