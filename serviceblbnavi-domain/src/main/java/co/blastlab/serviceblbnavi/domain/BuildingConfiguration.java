@@ -27,15 +27,11 @@ import javax.persistence.UniqueConstraint;
 @Table(uniqueConstraints=
         @UniqueConstraint(columnNames = {"version","building_id"})
 )
-public class BuildingConfiguration implements Serializable {
+public class BuildingConfiguration extends CustomIdGenerationEntity implements Serializable {
 
     public static final String FIND_BY_COMPLEX_NAME_AND_BUILDING_NAME_AND_VERSION = "BuildingConfiguration.findByComplexNameAndBuildingNameAndVersion";
     public static final String FIND_BY_BUILDING_ID_AND_VERSION = "BuildingConfiguration.findByBuildingAndVersion";
     public static final String FIND_BY_BUILDING_ID_SORT_VERSION_FROM_NEWEST = "BuildingConfiguration.findByBuildingIdSortVersionFromNewest";
-    
-    @Id
-    @GeneratedValue
-    private Long id;
 
     private Integer version;
 
@@ -49,14 +45,6 @@ public class BuildingConfiguration implements Serializable {
     @JsonIgnore
     @ManyToOne
     private Building building;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public Integer getVersion() {
         return version;

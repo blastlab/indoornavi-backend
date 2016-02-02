@@ -3,8 +3,6 @@ package co.blastlab.serviceblbnavi.domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
 /**
@@ -12,12 +10,8 @@ import javax.persistence.ManyToOne;
  * @author Grzegorz Konupek
  */
 @Entity
-public class ACL_Complex implements Serializable {
-    
-    @Id
-    @GeneratedValue
-    private Long id;
-
+public class ACL_Complex extends CustomIdGenerationEntity implements Serializable {
+ 
     @JsonIgnore
     @ManyToOne
     private Person person;
@@ -36,14 +30,6 @@ public class ACL_Complex implements Serializable {
         this.person = person;
         this.complex = complex;
         this.permission = permission;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public Permission getPermission() {

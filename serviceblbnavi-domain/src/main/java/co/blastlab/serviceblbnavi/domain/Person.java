@@ -7,8 +7,6 @@ import java.io.Serializable;
 import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
@@ -26,16 +24,12 @@ import javax.persistence.Transient;
 })
 @Entity
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY, setterVisibility = JsonAutoDetect.Visibility.NONE, getterVisibility = JsonAutoDetect.Visibility.NONE)
-public class Person implements Serializable {
+public class Person extends CustomIdGenerationEntity implements Serializable {
 
     public static final String FIND_BY_EMAIL = "Person.findByEmail";
     public static final String FIND_BY_AUTH_TOKEN = "Person.findByAuthToken";
 
     public static final String PASSWORD_DIGEST_ALG = "SHA-512";
-
-    @Id
-    @GeneratedValue
-    private Long id;
 
     @Column(unique = true)
     private String email;
@@ -78,14 +72,6 @@ public class Person implements Serializable {
 
     public void setAuthToken(String authToken) {
         this.authToken = authToken;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getEmail() {

@@ -20,11 +20,7 @@ import javax.persistence.Transient;
  */
 @Entity
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY, setterVisibility = JsonAutoDetect.Visibility.NONE, getterVisibility = JsonAutoDetect.Visibility.NONE)
-public class GoalSelection implements Serializable {
-
-    @Id
-    @GeneratedValue
-    private Long id;
+public class GoalSelection extends CustomIdGenerationEntity implements Serializable {
 
     private String device;
 
@@ -46,14 +42,6 @@ public class GoalSelection implements Serializable {
 
     @Transient
     private Long goalId;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public String getDevice() {
         return device;

@@ -23,15 +23,11 @@ import javax.persistence.Transient;
         
 })
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.ANY, getterVisibility = JsonAutoDetect.Visibility.ANY)
-public class Edge implements Serializable {
+public class Edge extends CustomIdGenerationEntity implements Serializable {
 
     public static final String FIND_BY_TARGET_AND_SOURCE = "Edge.findByTargetAndSource";
     public static final String FIND_VERTEX_FLOOR_ID = "Edge.findByVertexFloorId";
     public static final String FIND_VERTEX_ID = "Edge.findByVertexId";
-
-    @Id
-    @GeneratedValue
-    private Long id;
 
     private Double weight;
 
@@ -71,14 +67,6 @@ public class Edge implements Serializable {
 
     public void setTargetId(Long targetId) {
         this.targetId = targetId;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public Double getWeight() {

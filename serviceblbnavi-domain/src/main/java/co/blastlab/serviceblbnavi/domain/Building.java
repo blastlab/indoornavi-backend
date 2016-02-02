@@ -6,9 +6,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
 import java.io.Serializable;
 import java.util.List;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
@@ -26,14 +25,10 @@ import javax.persistence.Transient;
 })
 @Entity
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY, setterVisibility = JsonAutoDetect.Visibility.NONE, getterVisibility = JsonAutoDetect.Visibility.NONE)
-public class Building implements Serializable {
+public class Building extends CustomIdGenerationEntity implements Serializable {
 
     public static final String FIND_BY_COMPLEX = "Building.findByComplex";
     public static final String FIND_BY_COMPLEX_NAME_AND_BUILDING_NAME = "Building.findByComplexNameAndBuildingName";
-
-    @Id
-    @GeneratedValue
-    private Long id;
 
     private String name;
 
@@ -46,12 +41,12 @@ public class Building implements Serializable {
     private Complex complex;
 
     @JsonView({View.BuildingInternal.class, View.External.class})
-    @OneToMany(mappedBy = "building")
+    @OneToMany(mappedBy = "building", cascade = CascadeType.MERGE)
     @OrderBy("level")
     private List<Floor> floors;
 
     @JsonView({View.BuildingInternal.class, View.External.class})
-    @OneToMany(mappedBy = "building")
+    @OneToMany(mappedBy = "building", cascade = CascadeType.MERGE)
     private List<Goal> goals;
 
     @JsonView({View.BuildingInternal.class, View.External.class})
@@ -75,14 +70,6 @@ public class Building implements Serializable {
 
     public void setFloors(List<Floor> floors) {
         this.floors = floors;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getName() {

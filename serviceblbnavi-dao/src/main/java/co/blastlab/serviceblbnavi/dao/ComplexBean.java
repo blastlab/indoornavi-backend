@@ -54,15 +54,27 @@ public class ComplexBean {
     }
 
     public Complex findByPersonAndId(Long personId, Long id) {
-        return em.createNamedQuery(Complex.FIND_BY_PERSON_AND_ID, Complex.class).setParameter("personId", personId).setParameter("id", id).getSingleResult();
+        try {
+            return em.createNamedQuery(Complex.FIND_BY_PERSON_AND_ID, Complex.class).setParameter("personId", personId).setParameter("id", id).getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
     }
 
     public Complex findByBuildingId(Long id) {
-        return em.createNamedQuery(Complex.FIND_BY_BUILDING, Complex.class).setParameter("buildingId", id).getSingleResult();
+        try {
+            return em.createNamedQuery(Complex.FIND_BY_BUILDING, Complex.class).setParameter("buildingId", id).getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
     }
 
     public Complex findByFloorId(Long id) {
-        return em.createNamedQuery(Complex.FIND_BY_FLOOR, Complex.class).setParameter("floorId", id).getSingleResult();
+        try {
+            return em.createNamedQuery(Complex.FIND_BY_FLOOR, Complex.class).setParameter("floorId", id).getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
     }
 
     public Complex findByName(String name) {

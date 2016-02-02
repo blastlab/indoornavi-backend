@@ -8,8 +8,6 @@ import java.io.Serializable;
 import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
@@ -29,17 +27,13 @@ import javax.persistence.Transient;
 })
 @Entity
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY, setterVisibility = JsonAutoDetect.Visibility.NONE, getterVisibility = JsonAutoDetect.Visibility.NONE)
-public class Complex implements Serializable {
+public class Complex extends CustomIdGenerationEntity implements Serializable {
 
     public static final String FIND_BY_PERSON = "Complex.findByPerson";
     public static final String FIND_BY_PERSON_AND_ID = "Complex.findByPersonAndId";
     public static final String FIND_BY_BUILDING = "Complex.findByBuilding";
     public static final String FIND_BY_FLOOR = "Complex.findByFloor";
     public static final String FIND_BY_NAME = "Complex.findByName";
-
-    @Id
-    @GeneratedValue
-    private Long id;
 
     @Column(unique = true)
     private String name;
@@ -55,14 +49,6 @@ public class Complex implements Serializable {
 
     @Transient
     private List<String> permissions;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public String getName() {
         return name;

@@ -4,8 +4,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
@@ -20,13 +19,9 @@ import javax.persistence.Transient;
     @NamedQuery(name = Beacon.FIND_BY_FLOOR, query = "SELECT b FROM Beacon b WHERE b.floor = :floor")
 })
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY, setterVisibility = JsonAutoDetect.Visibility.NONE, getterVisibility = JsonAutoDetect.Visibility.NONE)
-public class Beacon implements Serializable {
+public class Beacon extends CustomIdGenerationEntity implements Serializable {
 
     public static final String FIND_BY_FLOOR = "Beacon.findByFloor";
-
-    @Id
-    @GeneratedValue
-    private Long id;
 
     private String mac;
 
@@ -45,6 +40,7 @@ public class Beacon implements Serializable {
 
     @ManyToOne
     @JsonIgnore
+    @JoinColumn(updatable = false)
     private Floor floor;
 
     public Long getFloorId() {
@@ -69,14 +65,6 @@ public class Beacon implements Serializable {
 
     public void setMajor(Integer major) {
         this.major = major;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getMac() {

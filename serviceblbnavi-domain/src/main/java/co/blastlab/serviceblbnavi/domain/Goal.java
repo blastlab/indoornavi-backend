@@ -28,18 +28,14 @@ import javax.persistence.Transient;
     @NamedQuery(name = Goal.FIND_BY_FLOOR, query = "SELECT g FROM Goal g WHERE g.vertex.floor.id = :floorId")
 })
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY, setterVisibility = JsonAutoDetect.Visibility.NONE, getterVisibility = JsonAutoDetect.Visibility.NONE)
-public class Goal implements Serializable {
+public class Goal extends CustomIdGenerationEntity implements Serializable {
 
     public static final String FIND_BY_VERTEX = "Goal.findByVertex";
     public static final String FIND_BY_BUILDING = "Goal.findByBuilding";
     public static final String FIND_BY_FLOOR = "Goal.findByFloor";
-    
-    @Id
-    @GeneratedValue
-    private Long id;
 
     private String name;
-    
+
     @Column(nullable = false)
     private Boolean inactive;
 
@@ -50,7 +46,7 @@ public class Goal implements Serializable {
     @JsonIgnore
     @ManyToOne
     private Vertex vertex;
-    
+
     @JsonView({View.External.class, View.GoalInternal.class})
     @OneToMany(mappedBy = "goal")
     private List<GoalSelection> goalSelections;
@@ -67,7 +63,7 @@ public class Goal implements Serializable {
             inactive = false;
         }
     }
-    
+
     public Long getBuildingId() {
         return buildingId;
     }
@@ -82,14 +78,6 @@ public class Goal implements Serializable {
 
     public void setVertexId(Long vertexId) {
         this.vertexId = vertexId;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getName() {

@@ -4,8 +4,6 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Transient;
 
@@ -15,11 +13,7 @@ import javax.persistence.Transient;
  */
 @Entity
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY, setterVisibility = JsonAutoDetect.Visibility.NONE, getterVisibility = JsonAutoDetect.Visibility.NONE)
-public class BuildingConnection implements Serializable {
-
-    @Id
-    @GeneratedValue
-    private Long id;
+public class BuildingConnection extends CustomIdGenerationEntity implements Serializable {
 
     private Double distance;
 
@@ -51,14 +45,6 @@ public class BuildingConnection implements Serializable {
 
     public void setTargetId(Long targetId) {
         this.targetId = targetId;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public Double getDistance() {

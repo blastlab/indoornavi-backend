@@ -6,11 +6,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
 import java.io.Serializable;
 import java.util.List;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
@@ -29,18 +28,14 @@ import javax.persistence.Transient;
     @NamedQuery(name = Vertex.FIND_ACTIVE_BY_FLOOR, query = "SELECT v FROM Vertex v WHERE v.floor.id = :floorId AND v.inactive = false")
 })
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY, setterVisibility = JsonAutoDetect.Visibility.NONE, getterVisibility = JsonAutoDetect.Visibility.NONE)
-public class Vertex implements Serializable {
+public class Vertex extends CustomIdGenerationEntity implements Serializable {
 
     public static final String FIND_ACTIVE_BY_FLOOR = "Vertex.findActiveByFloor";
-    
-    @Id
-    @GeneratedValue
-    private Long id;
 
     private Double x;
 
     private Double y;
-    
+
     @Column(nullable = false)
     private Boolean inactive;
 
@@ -54,18 +49,18 @@ public class Vertex implements Serializable {
     private Long floorId;
 
     @JsonView(View.External.class)
-    @OneToMany(mappedBy = "vertex")
+    @OneToMany(mappedBy = "vertex", cascade = CascadeType.MERGE)
     private List<BuildingExit> buildingExits;
 
     @JsonView(View.External.class)
-    @OneToMany(mappedBy = "target")
+    @OneToMany(mappedBy = "target", cascade = CascadeType.MERGE)
     private List<Edge> targetEdges;
 
     @JsonView(View.External.class)
-    @OneToMany(mappedBy = "source")
+    @OneToMany(mappedBy = "source", cascade = CascadeType.MERGE)
     private List<Edge> sourceEdges;
 
-    @OneToMany(mappedBy = "vertex", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "vertex", fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
     private List<Goal> goals;
 
     @JsonIgnore
@@ -87,6 +82,22 @@ public class Vertex implements Serializable {
     public void onLoad() {
         isFloorDownChangeable = vertexFloorChangeabilityView.getIsFloorDownChangeable();
         isFloorUpChangeable = vertexFloorChangeabilityView.getIsFloorUpChangeable();
+    }
+
+    @Override
+    public String toString() {
+        return "Vertex{" + "id=" + getId() + ", x=" + x + ", y=" + y
+                + ", inactive=" + inactive
+                + ", isFloorDownChangeable=" + isFloorDownChangeable
+                + ", isFloorUpChangeable=" + isFloorUpChangeable
+                + ", floorId=" + floorId
+                + ", buildingExits=" + buildingExits
+                + ", targetEdges=" + targetEdges
+                + ", sourceEdges=" + sourceEdges
+                + ", goals=" + goals
+                + ", floor=" + floor
+                + ", vertexFloorChangeabilityView=" + vertexFloorChangeabilityView
+                + '}';
     }
 
     public Long getFloorId() {
@@ -127,14 +138,6 @@ public class Vertex implements Serializable {
 
     public void setGoals(List<Goal> goals) {
         this.goals = goals;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public Double getX() {

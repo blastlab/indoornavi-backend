@@ -5,7 +5,9 @@ import co.blastlab.serviceblbnavi.domain.BuildingConfiguration;
 import co.blastlab.serviceblbnavi.domain.Complex;
 import co.blastlab.serviceblbnavi.domain.Edge;
 import co.blastlab.serviceblbnavi.domain.Floor;
+import co.blastlab.serviceblbnavi.domain.GoalSelection;
 import co.blastlab.serviceblbnavi.domain.Vertex;
+import co.blastlab.serviceblbnavi.domain.WaypointVisit;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,12 +15,15 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.ws.rs.InternalServerErrorException;
 
 /**
@@ -42,15 +47,15 @@ public class BuildingConfigurationBean {
                 .setParameter("version", version)
                 .getSingleResult();
     }
-    
+
     public BuildingConfiguration findByBuildingAndVersion(Long buildingId, Integer version) {
         return em.createNamedQuery(BuildingConfiguration.FIND_BY_BUILDING_ID_AND_VERSION, BuildingConfiguration.class)
                 .setParameter("buildingId", buildingId)
                 .setParameter("version", version)
                 .getSingleResult();
     }
-    
-     public boolean saveConfiguration(Building building, Integer version) {
+
+    public boolean saveConfiguration(Building building, Integer version) {
         try {
             String configuration = generateConfigurationFromBuilding(building);
             BuildingConfiguration buildingConfiguration = new BuildingConfiguration();
@@ -62,10 +67,15 @@ public class BuildingConfigurationBean {
             );
             buildingConfiguration.setVersion(version);
             buildingConfiguration.setBuilding(building);
-            BuildingConfiguration bc = em.createNamedQuery(BuildingConfiguration.FIND_BY_BUILDING_ID_AND_VERSION, BuildingConfiguration.class)
-                .setParameter("buildingId", building.getId())
-                .setParameter("version", version)
-                .getSingleResult();
+            BuildingConfiguration bc;
+            try {
+                bc = em.createNamedQuery(BuildingConfiguration.FIND_BY_BUILDING_ID_AND_VERSION, BuildingConfiguration.class)
+                        .setParameter("buildingId", building.getId())
+                        .setParameter("version", version)
+                        .getSingleResult();
+            } catch (NoResultException e) {
+                bc = null;
+            }
             if (bc != null) {
                 buildingConfiguration.setId(bc.getId());
                 em.merge(buildingConfiguration);
@@ -98,57 +108,88 @@ public class BuildingConfigurationBean {
     }
 
     public BuildingConfiguration findLatestVersionByBuildingId(Long id) {
-        return em.createNamedQuery(BuildingConfiguration.FIND_BY_BUILDING_ID_SORT_VERSION_FROM_NEWEST, BuildingConfiguration.class)
-                .setParameter("buildingId", id)
-                .getSingleResult();
+        try {
+            return em.createNamedQuery(BuildingConfiguration.FIND_BY_BUILDING_ID_SORT_VERSION_FROM_NEWEST, BuildingConfiguration.class)
+                    .setParameter("buildingId", id)
+                    .getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
     }
 
     public Building restoreConfiguration(BuildingConfiguration buildingConfiguration, Long id) {
         try {
             Building building = new ObjectMapper().readValue(buildingConfiguration.getConfiguration(), Building.class);
-            building.getFloors().stream().forEach((floor) -> {
+            Building buildingInDB = em.find(Building.class, building.getId());
+            Complex complex = buildingInDB.getComplex();
+            List<BuildingConfiguration> buildingConfigurations = new ArrayList<>();
+            buildingConfigurations.addAll(buildingInDB.getBuildingConfigurations());
+            List<WaypointVisit> waypointVisits = new ArrayList<>();
+            List<GoalSelection> goalSelections = new ArrayList<>();
+            buildingInDB.getFloors().forEach((floor) -> {
                 floor.getWaypoints().forEach((waypoint) -> {
-                    waypoint.setFloor(floor);
-                    em.merge(waypoint);
-                });
-                floor.getBeacons().forEach((beacon) -> {
-                    beacon.setFloor(floor);
-                    em.merge(beacon);
+                    waypointVisits.addAll(waypoint.getWaypointVisits());
                 });
                 floor.getVertices().forEach((vertex) -> {
                     vertex.getGoals().forEach((goal) -> {
+                        goalSelections.addAll(goal.getGoalSelections());
+                    });
+                });
+            });
+            building.getFloors().forEach((floor) -> {
+                Floor otherFloor = em.find(Floor.class, floor.getId());
+                if (otherFloor != null) {
+                    /* floor was not deleted, copy bitmap */
+                    floor.setBitmap(otherFloor.getBitmap());
+                }
+            });
+//            buildingInDB.getFloors().forEach((floor) -> {
+//                em.remove(floor);
+//            });
+            em.remove(buildingInDB);
+
+            List<Edge> edges = new ArrayList<>();
+            List<Vertex> vertices = new ArrayList<>();
+            building.getFloors().forEach((floor) -> {
+                floor.setBuilding(building);
+                floor.getVertices().forEach((vertex) -> {
+                    vertex.setFloor(floor);
+                    edges.addAll(vertex.getSourceEdges());
+                    vertex.setSourceEdges(new ArrayList<>());
+                    vertex.setTargetEdges(new ArrayList<>());
+                    vertex.getGoals().forEach((goal) -> {
                         goal.setVertex(vertex);
                         goal.setBuilding(building);
-                        em.merge(goal);
-                    });
-                    vertex.setFloor(floor);
-                    em.merge(vertex);
-                });
-                floor.getVertices().forEach((vertex) -> {
-                    vertex.getSourceEdges().forEach((sourceEdge) -> {
-                        sourceEdge.setSource(vertex);
-                        if (em.find(Edge.class, sourceEdge.getId()) == null) {
-                            em.persist(sourceEdge);
-                        } else {
-                            em.merge(sourceEdge);
-                        }
                     });
                 });
-                floor.getVertices().forEach((vertex) -> {
-                    vertex.getSourceEdges().forEach((sourceEdge) -> {
-                        sourceEdge.setTarget(em.find(Vertex.class, sourceEdge.getTargetId()));
-                        em.merge(sourceEdge);
-                    });
+                vertices.addAll(floor.getVertices());
+                floor.getBeacons().forEach((beacon) -> {
+                    beacon.setFloor(floor);
                 });
-                
-                
-                floor.setBuilding(building);
-                Floor otherFloor = em.find(Floor.class, floor.getId());
-                floor.setBitmap(otherFloor.getBitmap());
-                em.merge(floor);
+                floor.getWaypoints().forEach((waypoint) -> {
+                    waypoint.setFloor(floor);
+                });
             });
-            building.setComplex(em.createNamedQuery(Complex.FIND_BY_BUILDING, Complex.class).setParameter("buildingId", id).getSingleResult());
+            building.setComplex(complex);
+            building.setBuildingConfigurations(buildingConfigurations);
+            System.out.println("Building id: " + building.getId());
+            edges.forEach((edge) -> {
+                edge.setSource(vertices.stream().filter((vertex) -> {
+                    return vertex.getId().equals(edge.getSourceId());
+                }).collect(Collectors.toList()).get(0));
+                edge.setTarget(vertices.stream().filter((vertex) -> {
+                    return vertex.getId().equals(edge.getTargetId());
+                }).collect(Collectors.toList()).get(0));
+//                em.merge(edge);
+            });
+            System.out.println("Building id: " + building.getId());
             em.merge(building);
+            goalSelections.forEach((goalSelection) -> {
+                em.merge(goalSelection);
+            });
+            waypointVisits.forEach((waypointVisit) -> {
+                em.merge(waypointVisit);
+            });
             return building;
         } catch (IOException ex) {
             throw new InternalServerErrorException(ex);

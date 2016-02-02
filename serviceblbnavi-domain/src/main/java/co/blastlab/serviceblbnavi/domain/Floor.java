@@ -6,9 +6,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
 import java.io.Serializable;
 import java.util.List;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Transient;
@@ -19,11 +18,7 @@ import javax.persistence.Transient;
  */
 @Entity
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY, setterVisibility = JsonAutoDetect.Visibility.NONE, getterVisibility = JsonAutoDetect.Visibility.NONE)
-public class Floor implements Serializable {
-
-    @Id
-    @GeneratedValue
-    private Long id;
+public class Floor extends CustomIdGenerationEntity implements Serializable {
 
     private Integer level;
 
@@ -43,27 +38,19 @@ public class Floor implements Serializable {
     private Building building;
 
     @JsonView(View.External.class)
-    @OneToMany(mappedBy = "floor")
+    @OneToMany(mappedBy = "floor", cascade = CascadeType.MERGE)
     private List<Waypoint> waypoints;
 
     @JsonView(View.External.class)
-    @OneToMany(mappedBy = "floor")
+    @OneToMany(mappedBy = "floor", cascade = CascadeType.MERGE)
     private List<Vertex> vertices;
 
     @JsonView(View.External.class)
-    @OneToMany(mappedBy = "floor")
+    @OneToMany(mappedBy = "floor", cascade = CascadeType.MERGE)
     private List<Beacon> beacons;
 
     @Transient
     private Long buildingId;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public Integer getLevel() {
         return level;

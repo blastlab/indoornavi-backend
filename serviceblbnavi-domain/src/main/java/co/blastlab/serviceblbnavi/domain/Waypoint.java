@@ -7,8 +7,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 import java.io.Serializable;
 import java.util.List;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
@@ -24,13 +23,9 @@ import javax.persistence.Transient;
     @NamedQuery(name = Waypoint.FIND_BY_BUILDING_ID, query = "SELECT w FROM Waypoint w WHERE w.floor.building.id = :buildingId")
 })
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY, setterVisibility = JsonAutoDetect.Visibility.NONE, getterVisibility = JsonAutoDetect.Visibility.NONE)
-public class Waypoint implements Serializable {
+public class Waypoint extends CustomIdGenerationEntity implements Serializable {
 
     public static final String FIND_BY_BUILDING_ID = "Waypoint.findByBuildingId";
-
-    @Id
-    @GeneratedValue
-    private Long id;
 
     private Double x;
 
@@ -51,6 +46,7 @@ public class Waypoint implements Serializable {
 
     @JsonIgnore
     @ManyToOne
+    @JoinColumn(updatable = false)
     private Floor floor;
 
     @JsonView({View.External.class, View.WaypointInternal.class})
@@ -63,14 +59,6 @@ public class Waypoint implements Serializable {
 
     public void setFloorId(Long floorId) {
         this.floorId = floorId;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public Double getX() {

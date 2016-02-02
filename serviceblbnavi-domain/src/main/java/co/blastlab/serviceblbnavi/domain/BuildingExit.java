@@ -5,8 +5,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
 import java.util.List;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Transient;
@@ -17,11 +15,7 @@ import javax.persistence.Transient;
  */
 @Entity
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY, setterVisibility = JsonAutoDetect.Visibility.NONE, getterVisibility = JsonAutoDetect.Visibility.NONE)
-public class BuildingExit implements Serializable {
-
-    @Id
-    @GeneratedValue
-    private Long id;
+public class BuildingExit extends CustomIdGenerationEntity implements Serializable {
 
     private Double latitude;
 
@@ -66,14 +60,6 @@ public class BuildingExit implements Serializable {
 
     public void setSourceConnections(List<BuildingConnection> sourceConnections) {
         this.sourceConnections = sourceConnections;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public Double getLatitude() {
