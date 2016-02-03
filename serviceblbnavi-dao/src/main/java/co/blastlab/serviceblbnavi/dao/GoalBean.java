@@ -57,4 +57,14 @@ public class GoalBean {
         return em.createNamedQuery(Goal.FIND_BY_FLOOR, Goal.class)
                 .setParameter("floorId", floorId).getResultList();
     }
+
+    public void insertSQL(Goal goal) {
+        em.createNativeQuery("INSERT INTO Goal (id, name, building_id, vertex_id, inactive) VALUES (:id, :name, :building_id, :vertex_id, :inactive)")
+                .setParameter("id", goal.getId())
+                .setParameter("name", goal.getName())
+                .setParameter("building_id", goal.getVertex().getFloor().getBuilding().getId())
+                .setParameter("vertex_id", goal.getVertex().getId())
+                .setParameter("inactive", goal.getInactive())
+                .executeUpdate();
+    }
 }

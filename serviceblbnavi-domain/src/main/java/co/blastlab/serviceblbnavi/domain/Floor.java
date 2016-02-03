@@ -38,15 +38,15 @@ public class Floor extends CustomIdGenerationEntity implements Serializable {
     private Building building;
 
     @JsonView(View.External.class)
-    @OneToMany(mappedBy = "floor", cascade = CascadeType.MERGE)
+    @OneToMany(mappedBy = "floor", cascade = CascadeType.REMOVE)
     private List<Waypoint> waypoints;
 
     @JsonView(View.External.class)
-    @OneToMany(mappedBy = "floor", cascade = CascadeType.MERGE)
+    @OneToMany(mappedBy = "floor", cascade = CascadeType.REMOVE)
     private List<Vertex> vertices;
 
     @JsonView(View.External.class)
-    @OneToMany(mappedBy = "floor", cascade = CascadeType.MERGE)
+    @OneToMany(mappedBy = "floor", cascade = CascadeType.REMOVE)
     private List<Beacon> beacons;
 
     @Transient

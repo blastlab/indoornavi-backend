@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
 import java.io.Serializable;
 import java.util.List;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -48,7 +49,7 @@ public class Goal extends CustomIdGenerationEntity implements Serializable {
     private Vertex vertex;
 
     @JsonView({View.External.class, View.GoalInternal.class})
-    @OneToMany(mappedBy = "goal")
+    @OneToMany(mappedBy = "goal", cascade = CascadeType.REMOVE)
     private List<GoalSelection> goalSelections;
 
     @Transient

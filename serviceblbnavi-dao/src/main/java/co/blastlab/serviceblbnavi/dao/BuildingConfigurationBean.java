@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
@@ -35,6 +36,33 @@ public class BuildingConfigurationBean {
 
     @Inject
     private EntityManager em;
+
+    @EJB
+    private BuildingBean buildingBean;
+
+    @EJB
+    private FloorBean floorBean;
+
+    @EJB
+    private BeaconBean beaconBean;
+
+    @EJB
+    private WaypointBean waypointBean;
+    
+    @EJB
+    private VertexBean vertexBean;
+    
+    @EJB
+    private GoalBean goalBean;
+    
+    @EJB
+    private EdgeBean edgeBean;
+    
+    @EJB
+    private GoalSelectionBean goalSelectionBean;
+    
+    @EJB
+    private WaypointVisitBean waypointVisitBean;
 
     public void create(BuildingConfiguration buildingConfiguration) {
         em.persist(buildingConfiguration);
@@ -143,10 +171,7 @@ public class BuildingConfigurationBean {
                     floor.setBitmap(otherFloor.getBitmap());
                 }
             });
-//            buildingInDB.getFloors().forEach((floor) -> {
-//                em.remove(floor);
-//            });
-            em.remove(buildingInDB);
+            buildingBean.removeSQL(buildingInDB);
 
             List<Edge> edges = new ArrayList<>();
             List<Vertex> vertices = new ArrayList<>();
@@ -180,19 +205,49 @@ public class BuildingConfigurationBean {
                 edge.setTarget(vertices.stream().filter((vertex) -> {
                     return vertex.getId().equals(edge.getTargetId());
                 }).collect(Collectors.toList()).get(0));
-//                em.merge(edge);
             });
             System.out.println("Building id: " + building.getId());
-            em.merge(building);
+            buildingBean.insertSQL(building);
+            building.getFloors().forEach((floor) -> {
+                floorBean.insertSQL(floor);
+                floor.getBeacons().forEach((beacon) -> {
+                    beaconBean.insertSQL(beacon);
+                });
+                floor.getWaypoints().forEach((waypoint) -> {
+                    waypointBean.insertSQL(waypoint);
+                });
+                floor.getVertices().forEach((vertex) -> {
+                    vertexBean.insertSQL(vertex);
+                    vertex.getGoals().forEach((goal) -> {
+                        goalBean.insertSQL(goal);
+                    });
+                });
+            });
+            building.getBuildingConfigurations().forEach((bc) -> {
+                insertSQL(bc);
+            });
+            edges.forEach((edge) -> {
+                edgeBean.insertSQL(edge);
+            });
             goalSelections.forEach((goalSelection) -> {
-                em.merge(goalSelection);
+                goalSelectionBean.insetSQL(goalSelection);
             });
             waypointVisits.forEach((waypointVisit) -> {
-                em.merge(waypointVisit);
+                waypointVisitBean.insertSQL(waypointVisit);
             });
             return building;
         } catch (IOException ex) {
             throw new InternalServerErrorException(ex);
         }
+    }
+
+    private void insertSQL(BuildingConfiguration bc) {
+        em.createNativeQuery("INSERT INTO BuildingConfiguration (id, building_id, version, configuration, configurationChecksum) VALUES (:id, :building_id, :version, :configuration, :configurationChecksum)")
+                .setParameter("id", bc.getId())
+                .setParameter("building_id", bc.getBuilding().getId())
+                .setParameter("version", bc.getVersion())
+                .setParameter("configuration", bc.getConfiguration())
+                .setParameter("configurationChecksum", bc.getConfigurationChecksum())
+                .executeUpdate();
     }
 }

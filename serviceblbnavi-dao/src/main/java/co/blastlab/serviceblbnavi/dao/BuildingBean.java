@@ -2,16 +2,7 @@ package co.blastlab.serviceblbnavi.dao;
 
 import co.blastlab.serviceblbnavi.domain.Building;
 import co.blastlab.serviceblbnavi.domain.Complex;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.UnsupportedEncodingException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
@@ -52,6 +43,22 @@ public class BuildingBean {
                 .setParameter("complexName", complexName)
                 .setParameter("buildingName", buildingName)
                 .getSingleResult();
+    }
+
+    public void insertSQL(Building building) {
+        em.createNativeQuery("INSERT INTO Building (id, name, minimumFloor, degree, complex_id) VALUES (:id, :name, :minimumFloor, :degree, :complex_id)")
+                .setParameter("id", building.getId())
+                .setParameter("name", building.getName())
+                .setParameter("minimumFloor", building.getMinimumFloor())
+                .setParameter("degree", building.getDegree())
+                .setParameter("complex_id", building.getComplex().getId())
+                .executeUpdate();
+    }
+
+    public void removeSQL(Building building) {
+        em.createNativeQuery("DELETE FROM Building WHERE id = :id")
+                .setParameter("id", building.getId())
+                .executeUpdate();
     }
 
 }

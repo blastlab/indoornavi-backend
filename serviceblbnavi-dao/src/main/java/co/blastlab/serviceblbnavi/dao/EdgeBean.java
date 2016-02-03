@@ -70,4 +70,13 @@ public class EdgeBean {
     public void clearEdges(Vertex vertex) {
     }
 
+    public void insertSQL(Edge edge) {
+        em.createNativeQuery("INSERT INTO Edge (id, weight, source_id, target_id) VALUES (:id, :weight, :source_id, :target_id)")
+                .setParameter("id", edge.getId())
+                .setParameter("weight", edge.getWeight())
+                .setParameter("source_id", edge.getSourceId())
+                .setParameter("target_id", edge.getTargetId())
+                .executeUpdate();
+    }
+
 }

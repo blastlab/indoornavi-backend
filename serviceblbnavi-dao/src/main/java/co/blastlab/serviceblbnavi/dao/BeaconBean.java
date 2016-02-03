@@ -36,4 +36,17 @@ public class BeaconBean {
     public List<Beacon> findAll(Floor floor) {
         return em.createNamedQuery(Beacon.FIND_BY_FLOOR).setParameter("floor", floor).getResultList();
     }
+
+    public void insertSQL(Beacon beacon) {
+        em.createNativeQuery("INSERT INTO Beacon (id, mac, x, y, z, floor_id, minor, major) VALUES (:id, :mac, :x, :y, :z, :floor_id, :minor, :major)")
+                .setParameter("id", beacon.getId())
+                .setParameter("mac", beacon.getMac())
+                .setParameter("x", beacon.getX())
+                .setParameter("y", beacon.getY())
+                .setParameter("z", beacon.getZ())
+                .setParameter("floor_id", beacon.getFloor().getId())
+                .setParameter("minor", beacon.getMinor())
+                .setParameter("major", beacon.getMajor())
+                .executeUpdate();
+    }
 }

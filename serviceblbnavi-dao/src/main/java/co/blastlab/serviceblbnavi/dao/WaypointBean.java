@@ -23,5 +23,19 @@ public class WaypointBean {
     public List<Waypoint> findByBuildingId(Long buildingId) {
         return em.createNamedQuery(Waypoint.FIND_BY_BUILDING_ID, Waypoint.class).setParameter("buildingId", buildingId).getResultList();
     }
+
+    public void insertSQL(Waypoint waypoint) {
+        em.createNativeQuery("INSERT INTO Waypoint (id, x, y, timeToCheckout, distance, details, floor_id, inactive, name) VALUES (:id, :x, :y, :timeToCheckout, :distance, :details, :floor_id, :inactive, :name)")
+                .setParameter("id", waypoint.getId())
+                .setParameter("x", waypoint.getX())
+                .setParameter("y", waypoint.getY())
+                .setParameter("timeToCheckout", waypoint.getTimeToCheckout())
+                .setParameter("distance", waypoint.getDistance())
+                .setParameter("details", waypoint.getDetails())
+                .setParameter("floor_id", waypoint.getFloor().getId())
+                .setParameter("inactive", waypoint.getInactive())
+                .setParameter("name", waypoint.getName())
+                .executeUpdate();
+    }
     
 }

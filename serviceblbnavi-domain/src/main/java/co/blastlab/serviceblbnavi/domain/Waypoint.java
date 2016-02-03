@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
 import java.io.Serializable;
 import java.util.List;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -50,7 +51,7 @@ public class Waypoint extends CustomIdGenerationEntity implements Serializable {
     private Floor floor;
 
     @JsonView({View.External.class, View.WaypointInternal.class})
-    @OneToMany(mappedBy = "waypoint")
+    @OneToMany(mappedBy = "waypoint", cascade = CascadeType.REMOVE)
     private List<WaypointVisit> waypointVisits;
 
     public Long getFloorId() {
