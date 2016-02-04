@@ -48,19 +48,19 @@ public class BuildingConfigurationBean {
 
     @EJB
     private WaypointBean waypointBean;
-    
+
     @EJB
     private VertexBean vertexBean;
-    
+
     @EJB
     private GoalBean goalBean;
-    
+
     @EJB
     private EdgeBean edgeBean;
-    
+
     @EJB
     private GoalSelectionBean goalSelectionBean;
-    
+
     @EJB
     private WaypointVisitBean waypointVisitBean;
 
@@ -69,18 +69,26 @@ public class BuildingConfigurationBean {
     }
 
     public BuildingConfiguration findByComplexNameAndBuildingNameAndVersion(String complexName, String buildingName, Integer version) {
-        return em.createNamedQuery(BuildingConfiguration.FIND_BY_COMPLEX_NAME_AND_BUILDING_NAME_AND_VERSION, BuildingConfiguration.class)
-                .setParameter("complexName", complexName)
-                .setParameter("buildingName", buildingName)
-                .setParameter("version", version)
-                .getSingleResult();
+        try {
+            return em.createNamedQuery(BuildingConfiguration.FIND_BY_COMPLEX_NAME_AND_BUILDING_NAME_AND_VERSION, BuildingConfiguration.class)
+                    .setParameter("complexName", complexName)
+                    .setParameter("buildingName", buildingName)
+                    .setParameter("version", version)
+                    .getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
     }
 
     public BuildingConfiguration findByBuildingAndVersion(Long buildingId, Integer version) {
-        return em.createNamedQuery(BuildingConfiguration.FIND_BY_BUILDING_ID_AND_VERSION, BuildingConfiguration.class)
-                .setParameter("buildingId", buildingId)
-                .setParameter("version", version)
-                .getSingleResult();
+        try {
+            return em.createNamedQuery(BuildingConfiguration.FIND_BY_BUILDING_ID_AND_VERSION, BuildingConfiguration.class)
+                    .setParameter("buildingId", buildingId)
+                    .setParameter("version", version)
+                    .getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
     }
 
     public boolean saveConfiguration(Building building, Integer version) {
@@ -145,7 +153,23 @@ public class BuildingConfigurationBean {
         }
     }
 
-    public Building restoreConfiguration(BuildingConfiguration buildingConfiguration, Long id) {
+    public Building restoreConfiguration(BuildingConfiguration buildingConfiguration, Integer dbVersion, EntityManager em) {
+        switch (dbVersion) {
+            case 1:
+            default:
+                return restoreConfiguration(buildingConfiguration, em);
+        }
+    }
+
+    public Building restoreConfiguration(BuildingConfiguration buildingConfiguration, Integer dbVersion) {
+        return restoreConfiguration(buildingConfiguration, dbVersion, em);
+    }
+
+    public Building restoreConfiguration(BuildingConfiguration buildingConfiguration) {
+        return restoreConfiguration(buildingConfiguration, em);
+    }
+
+    public Building restoreConfiguration(BuildingConfiguration buildingConfiguration, EntityManager em) {
         try {
             Building building = new ObjectMapper().readValue(buildingConfiguration.getConfiguration(), Building.class);
             Building buildingInDB = em.find(Building.class, building.getId());
@@ -197,7 +221,6 @@ public class BuildingConfigurationBean {
             });
             building.setComplex(complex);
             building.setBuildingConfigurations(buildingConfigurations);
-            System.out.println("Building id: " + building.getId());
             edges.forEach((edge) -> {
                 edge.setSource(vertices.stream().filter((vertex) -> {
                     return vertex.getId().equals(edge.getSourceId());
@@ -206,7 +229,6 @@ public class BuildingConfigurationBean {
                     return vertex.getId().equals(edge.getTargetId());
                 }).collect(Collectors.toList()).get(0));
             });
-            System.out.println("Building id: " + building.getId());
             buildingBean.insertSQL(building);
             building.getFloors().forEach((floor) -> {
                 floorBean.insertSQL(floor);
@@ -249,5 +271,11 @@ public class BuildingConfigurationBean {
                 .setParameter("configuration", bc.getConfiguration())
                 .setParameter("configurationChecksum", bc.getConfigurationChecksum())
                 .executeUpdate();
+    }
+
+    public List<BuildingConfiguration> findAllByVersion(Integer version) {
+        return em.createNamedQuery(BuildingConfiguration.FIND_BY_VERSION)
+                .setParameter("version", version)
+                .getResultList();
     }
 }

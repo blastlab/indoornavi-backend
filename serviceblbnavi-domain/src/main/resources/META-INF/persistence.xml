@@ -16,4 +16,21 @@
             <!--<property name="hibernate.transaction.jta.platform" value="org.hibernate.service.jta.platform.internal.SunOneJtaPlatform"/>-->
         </properties>
     </persistence-unit>
+    
+    <persistence-unit name="NaviUpgradePU" transaction-type="JTA">
+        <!--<provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>-->
+        <jta-data-source>jdbc/NaviUpgrade</jta-data-source>
+        <exclude-unlisted-classes>false</exclude-unlisted-classes> <!-- Import all entity classes -->
+        <properties>
+            <property name="hibernate.enable_lazy_load_no_trans" value="true"/>
+            <property name="hibernate.show_sql" value="true"/>
+            <property name="hibernate.use_sql_comments" value="true"/>
+            <!--jta platform for wildfly-->
+            <property name="hibernate.transaction.jta.platform" value="org.hibernate.service.jta.platform.internal.JBossAppServerJtaPlatform" />
+            <!--for properly id generation-->
+            <property name="hibernate.id.new_generator_mappings" value="false"/>
+            <!--jta platform for glassfish-->
+            <!--<property name="hibernate.transaction.jta.platform" value="org.hibernate.service.jta.platform.internal.SunOneJtaPlatform"/>-->
+        </properties>
+    </persistence-unit>
 </persistence>

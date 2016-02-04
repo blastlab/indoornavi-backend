@@ -18,7 +18,8 @@ import javax.persistence.UniqueConstraint;
 @NamedQueries({
     @NamedQuery(name = BuildingConfiguration.FIND_BY_COMPLEX_NAME_AND_BUILDING_NAME_AND_VERSION, query = "SELECT bc FROM BuildingConfiguration bc WHERE bc.building.name = :buildingName AND bc.building.complex.name = :complexName AND bc.version = :version"),
     @NamedQuery(name = BuildingConfiguration.FIND_BY_BUILDING_ID_AND_VERSION, query = "SELECT bc FROM BuildingConfiguration bc WHERE bc.building.id = :buildingId AND bc.version = :version"),
-    @NamedQuery(name = BuildingConfiguration.FIND_BY_BUILDING_ID_SORT_VERSION_FROM_NEWEST, query = "SELECT bc FROM BuildingConfiguration bc WHERE bc.building.id = :buildingId ORDER BY bc.version DESC")
+    @NamedQuery(name = BuildingConfiguration.FIND_BY_BUILDING_ID_SORT_VERSION_FROM_NEWEST, query = "SELECT bc FROM BuildingConfiguration bc WHERE bc.building.id = :buildingId ORDER BY bc.version DESC"),
+    @NamedQuery(name = BuildingConfiguration.FIND_BY_VERSION, query = "SELECT bc FROM BuildingConfiguration bc WHERE bc.version = :version"),
 })
 @Entity
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY, setterVisibility = JsonAutoDetect.Visibility.NONE, getterVisibility = JsonAutoDetect.Visibility.NONE)
@@ -30,6 +31,7 @@ public class BuildingConfiguration extends CustomIdGenerationEntity implements S
     public static final String FIND_BY_COMPLEX_NAME_AND_BUILDING_NAME_AND_VERSION = "BuildingConfiguration.findByComplexNameAndBuildingNameAndVersion";
     public static final String FIND_BY_BUILDING_ID_AND_VERSION = "BuildingConfiguration.findByBuildingAndVersion";
     public static final String FIND_BY_BUILDING_ID_SORT_VERSION_FROM_NEWEST = "BuildingConfiguration.findByBuildingIdSortVersionFromNewest";
+    public static final String FIND_BY_VERSION = "BuildingConfiguration.findByVersion";
 
     private Integer version;
 

@@ -216,7 +216,7 @@ public class BuildingFacade {
             @PathParam("id") @ApiParam(value = "id", required = true) Long id) {
         BuildingConfiguration buildingConfiguration = buildingConfigurationBean.findLatestVersionByBuildingId(id);
         if (buildingConfiguration != null && buildingConfiguration.getConfiguration() != null) {
-            return buildingConfigurationBean.restoreConfiguration(buildingConfiguration, id);
+            return buildingConfigurationBean.restoreConfiguration(buildingConfiguration);
         }
         throw new EntityNotFoundException();
 
