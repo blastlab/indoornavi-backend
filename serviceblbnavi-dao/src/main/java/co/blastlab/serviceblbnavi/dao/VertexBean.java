@@ -79,7 +79,7 @@ public class VertexBean {
         this.em = em;
     }
 
-    public void insertSQL(Vertex vertex) {
+    public void insertSQL(Vertex vertex, EntityManager em) {
         em.createNativeQuery("INSERT INTO Vertex (id, x, y, floor_id, inactive) VALUES (:id, :x, :y, :floor_id, :inactive)")
                 .setParameter("id", vertex.getId())
                 .setParameter("x", vertex.getX())

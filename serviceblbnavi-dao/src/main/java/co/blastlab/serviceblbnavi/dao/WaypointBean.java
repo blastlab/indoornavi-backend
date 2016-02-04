@@ -24,7 +24,7 @@ public class WaypointBean {
         return em.createNamedQuery(Waypoint.FIND_BY_BUILDING_ID, Waypoint.class).setParameter("buildingId", buildingId).getResultList();
     }
 
-    public void insertSQL(Waypoint waypoint) {
+    public void insertSQL(Waypoint waypoint, EntityManager em) {
         em.createNativeQuery("INSERT INTO Waypoint (id, x, y, timeToCheckout, distance, details, floor_id, inactive, name) VALUES (:id, :x, :y, :timeToCheckout, :distance, :details, :floor_id, :inactive, :name)")
                 .setParameter("id", waypoint.getId())
                 .setParameter("x", waypoint.getX())

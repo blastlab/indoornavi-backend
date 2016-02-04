@@ -58,7 +58,7 @@ public class GoalBean {
                 .setParameter("floorId", floorId).getResultList();
     }
 
-    public void insertSQL(Goal goal) {
+    public void insertSQL(Goal goal, EntityManager em) {
         em.createNativeQuery("INSERT INTO Goal (id, name, building_id, vertex_id, inactive) VALUES (:id, :name, :building_id, :vertex_id, :inactive)")
                 .setParameter("id", goal.getId())
                 .setParameter("name", goal.getName())

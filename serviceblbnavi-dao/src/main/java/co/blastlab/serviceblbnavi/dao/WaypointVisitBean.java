@@ -19,7 +19,7 @@ public class WaypointVisitBean {
         em.persist(waypointVisit);
     }
 
-    public void insertSQL(WaypointVisit waypointVisit) {
+    public void insertSQL(WaypointVisit waypointVisit, EntityManager em) {
         em.createNativeQuery("INSERT INTO WaypointVisit (id, device, creationDateTimestamp, waypoin_id) VALUES (:id, :device, :creationDateTimestamp, :waypoint_id)")
                 .setParameter("id", waypointVisit.getId())
                 .setParameter("device", waypointVisit.getDevice())

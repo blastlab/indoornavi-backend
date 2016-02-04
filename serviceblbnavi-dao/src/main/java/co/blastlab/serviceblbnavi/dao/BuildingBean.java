@@ -45,7 +45,7 @@ public class BuildingBean {
                 .getSingleResult();
     }
 
-    public void insertSQL(Building building) {
+    public void insertSQL(Building building, EntityManager em) {
         em.createNativeQuery("INSERT INTO Building (id, name, minimumFloor, degree, complex_id) VALUES (:id, :name, :minimumFloor, :degree, :complex_id)")
                 .setParameter("id", building.getId())
                 .setParameter("name", building.getName())
@@ -55,7 +55,7 @@ public class BuildingBean {
                 .executeUpdate();
     }
 
-    public void removeSQL(Building building) {
+    public void removeSQL(Building building, EntityManager em) {
         em.createNativeQuery("DELETE FROM Building WHERE id = :id")
                 .setParameter("id", building.getId())
                 .executeUpdate();

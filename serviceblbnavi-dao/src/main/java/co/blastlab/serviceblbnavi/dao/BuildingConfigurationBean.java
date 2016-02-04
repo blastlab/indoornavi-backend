@@ -91,7 +91,7 @@ public class BuildingConfigurationBean {
         }
     }
 
-    public boolean saveConfiguration(Building building, Integer version) {
+    public boolean saveConfiguration(Building building, int version, EntityManager em) {
         try {
             String configuration = generateConfigurationFromBuilding(building);
             BuildingConfiguration buildingConfiguration = new BuildingConfiguration();
@@ -123,6 +123,10 @@ public class BuildingConfigurationBean {
             Logger.getLogger(BuildingBean.class.getName()).log(Level.SEVERE, null, ex);
             return false;
         }
+    }
+
+    public boolean saveConfiguration(Building building, Integer version) {
+        return saveConfiguration(building, version, em);
     }
 
     private String generateConfigurationFromBuilding(Building building) throws JsonProcessingException {
@@ -195,7 +199,7 @@ public class BuildingConfigurationBean {
                     floor.setBitmap(otherFloor.getBitmap());
                 }
             });
-            buildingBean.removeSQL(buildingInDB);
+            buildingBean.removeSQL(buildingInDB, em);
 
             List<Edge> edges = new ArrayList<>();
             List<Vertex> vertices = new ArrayList<>();
@@ -229,33 +233,33 @@ public class BuildingConfigurationBean {
                     return vertex.getId().equals(edge.getTargetId());
                 }).collect(Collectors.toList()).get(0));
             });
-            buildingBean.insertSQL(building);
+            buildingBean.insertSQL(building, em);
             building.getFloors().forEach((floor) -> {
-                floorBean.insertSQL(floor);
+                floorBean.insertSQL(floor, em);
                 floor.getBeacons().forEach((beacon) -> {
-                    beaconBean.insertSQL(beacon);
+                    beaconBean.insertSQL(beacon, em);
                 });
                 floor.getWaypoints().forEach((waypoint) -> {
-                    waypointBean.insertSQL(waypoint);
+                    waypointBean.insertSQL(waypoint, em);
                 });
                 floor.getVertices().forEach((vertex) -> {
-                    vertexBean.insertSQL(vertex);
+                    vertexBean.insertSQL(vertex, em);
                     vertex.getGoals().forEach((goal) -> {
-                        goalBean.insertSQL(goal);
+                        goalBean.insertSQL(goal, em);
                     });
                 });
             });
             building.getBuildingConfigurations().forEach((bc) -> {
-                insertSQL(bc);
+                insertSQL(bc, em);
             });
             edges.forEach((edge) -> {
-                edgeBean.insertSQL(edge);
+                edgeBean.insertSQL(edge, em);
             });
             goalSelections.forEach((goalSelection) -> {
-                goalSelectionBean.insetSQL(goalSelection);
+                goalSelectionBean.insetSQL(goalSelection, em);
             });
             waypointVisits.forEach((waypointVisit) -> {
-                waypointVisitBean.insertSQL(waypointVisit);
+                waypointVisitBean.insertSQL(waypointVisit, em);
             });
             return building;
         } catch (IOException ex) {
@@ -263,7 +267,7 @@ public class BuildingConfigurationBean {
         }
     }
 
-    private void insertSQL(BuildingConfiguration bc) {
+    private void insertSQL(BuildingConfiguration bc, EntityManager em) {
         em.createNativeQuery("INSERT INTO BuildingConfiguration (id, building_id, version, configuration, configurationChecksum) VALUES (:id, :building_id, :version, :configuration, :configurationChecksum)")
                 .setParameter("id", bc.getId())
                 .setParameter("building_id", bc.getBuilding().getId())

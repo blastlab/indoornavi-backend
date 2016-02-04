@@ -19,7 +19,7 @@ public class GoalSelectionBean {
         em.persist(goalSelection);
     }
 
-    public void insetSQL(GoalSelection goalSelection) {
+    public void insetSQL(GoalSelection goalSelection, EntityManager em) {
         em.createNativeQuery("INSERT INTO GoalSelection (id, device, x, y, floor_level, creationDateTimestamp, goal_id) VALUES (:id, :device, :x, :y, :floor_level, :creationDateTimestamp, :goal_id)")
                 .setParameter("id", goalSelection.getId())
                 .setParameter("device", goalSelection.getDevice())

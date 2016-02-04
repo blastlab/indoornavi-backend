@@ -37,7 +37,7 @@ public class BeaconBean {
         return em.createNamedQuery(Beacon.FIND_BY_FLOOR).setParameter("floor", floor).getResultList();
     }
 
-    public void insertSQL(Beacon beacon) {
+    public void insertSQL(Beacon beacon, EntityManager em) {
         em.createNativeQuery("INSERT INTO Beacon (id, mac, x, y, z, floor_id, minor, major) VALUES (:id, :mac, :x, :y, :z, :floor_id, :minor, :major)")
                 .setParameter("id", beacon.getId())
                 .setParameter("mac", beacon.getMac())
