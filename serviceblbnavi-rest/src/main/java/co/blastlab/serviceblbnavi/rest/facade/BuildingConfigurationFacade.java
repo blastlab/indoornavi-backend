@@ -60,7 +60,7 @@ public class BuildingConfigurationFacade {
                     complex.getId(), Permission.UPDATE);
             Building building = buildingBean.findByComplexNameAndBuildingName(complexName, buildingName);
             if (building != null) {
-                if (buildingConfigurationBean.saveConfiguration(building, version)) {
+                if (buildingConfigurationBean.saveConfiguration(building)) {
                     return Response.noContent().build();
                 } else {
                     throw new InternalServerErrorException();

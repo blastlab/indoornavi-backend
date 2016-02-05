@@ -17,9 +17,9 @@
         </properties>
     </persistence-unit>
     
-    <persistence-unit name="NaviUpgradePU" transaction-type="JTA">
+    <persistence-unit name="NaviProductionPU" transaction-type="JTA">
         <!--<provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>-->
-        <jta-data-source>jdbc/NaviUpgrade</jta-data-source>
+        <jta-data-source>jdbc/NaviProduction</jta-data-source>
         <exclude-unlisted-classes>false</exclude-unlisted-classes> <!-- Import all entity classes -->
         <properties>
             <property name="hibernate.enable_lazy_load_no_trans" value="true"/>

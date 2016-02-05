@@ -1,10 +1,10 @@
 package co.blastlab.serviceblbnavi;
 
-import co.blastlab.serviceblbnavi.dao.qualifier.NaviUpgrade;
 import javax.ejb.Stateless;
 import javax.enterprise.inject.Produces;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import co.blastlab.serviceblbnavi.dao.qualifier.NaviProduction;
 
 /**
  *
@@ -17,17 +17,17 @@ public class EntityManagerProducer {
     private EntityManager naviEM;
 
     
-    @PersistenceContext(unitName = "NaviUpgradePU")
-    private EntityManager naviUpgradeEM;
+    @PersistenceContext(unitName = "NaviProductionPU")
+    private EntityManager naviProductionEM;
 
     @Produces
     public EntityManager produceNaviEM() {
         return naviEM;
     }
     @Produces
-    @NaviUpgrade
-    public EntityManager produceNaviUpgradeEM() {
-        return naviUpgradeEM;
+    @NaviProduction
+    public EntityManager produceNaviProductionEM() {
+        return naviProductionEM;
     }
 
 }

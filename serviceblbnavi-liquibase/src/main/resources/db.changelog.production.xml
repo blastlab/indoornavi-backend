@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.3.xsd">
+	
+    <preConditions>
+        <!-- Check if DB type is MariaDB. -->
+        <sqlCheck expectedResult="1">SELECT CASE LOCATE('MariaDB', @@version) WHEN 0 THEN 0 ELSE 1 END</sqlCheck>
+		
+        <!-- Check if DB version is 10.x. -->
+        <sqlCheck expectedResult="1">SELECT LOCATE('10.', @@version)</sqlCheck>
+    </preConditions>
+	
+    <changeSet id="set-charset-and-collation" author="mradzikowski">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <and>
+                    <sqlCheck expectedResult="utf8">SELECT @@character_set_database</sqlCheck>
+                    <sqlCheck expectedResult="utf8_unicode_ci">SELECT @@collation_database</sqlCheck>
+                </and>
+            </not>
+        </preConditions>
+        <comment>
+            Useful when database is created with default collocation,
+            by user or createDatabaseIfNotExist flag in JDBC connection url.
+        </comment>
+        <sql>ALTER DATABASE DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci</sql>
+    </changeSet>
+	
+    <include file="db.changelog.01.xml"/>
+    <include file="db.changelog.01-02.xml"/>
+	
+</databaseChangeLog>

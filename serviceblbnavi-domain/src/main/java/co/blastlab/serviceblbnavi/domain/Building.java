@@ -41,12 +41,12 @@ public class Building extends CustomIdGenerationEntity implements Serializable {
     private Complex complex;
 
     @JsonView({View.BuildingInternal.class, View.External.class})
-    @OneToMany(mappedBy = "building", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "building", cascade = {CascadeType.REMOVE, CascadeType.MERGE})
     @OrderBy("level")
     private List<Floor> floors;
 
     @JsonView({View.BuildingInternal.class, View.External.class})
-    @OneToMany(mappedBy = "building", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "building", cascade = {CascadeType.REMOVE, CascadeType.MERGE})
     private List<Goal> goals;
 
     @JsonView({View.BuildingInternal.class, View.External.class})

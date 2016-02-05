@@ -49,18 +49,18 @@ public class Vertex extends CustomIdGenerationEntity implements Serializable {
     private Long floorId;
 
     @JsonView(View.External.class)
-    @OneToMany(mappedBy = "vertex", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "vertex", cascade = {CascadeType.REMOVE, CascadeType.MERGE})
     private List<BuildingExit> buildingExits;
 
     @JsonView(View.External.class)
-    @OneToMany(mappedBy = "target", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "target", cascade = {CascadeType.REMOVE, CascadeType.MERGE})
     private List<Edge> targetEdges;
 
     @JsonView(View.External.class)
-    @OneToMany(mappedBy = "source", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "source", cascade = {CascadeType.REMOVE, CascadeType.MERGE})
     private List<Edge> sourceEdges;
 
-    @OneToMany(mappedBy = "vertex", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "vertex", fetch = FetchType.EAGER, cascade = {CascadeType.REMOVE, CascadeType.MERGE})
     private List<Goal> goals;
 
     @JsonIgnore

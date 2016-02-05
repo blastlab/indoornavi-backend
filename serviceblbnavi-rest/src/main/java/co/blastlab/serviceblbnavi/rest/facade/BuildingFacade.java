@@ -151,7 +151,7 @@ public class BuildingFacade {
         if (building != null) {
             permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
                     building.getComplex().getId(), Permission.UPDATE);
-            if (buildingConfigurationBean.saveConfiguration(building, 1)) {
+            if (buildingConfigurationBean.saveConfiguration(building)) {
                 return Response.noContent().build();
             } else {
                 throw new InternalServerErrorException();
@@ -214,12 +214,7 @@ public class BuildingFacade {
     })
     public Building restoreConfiguration(
             @PathParam("id") @ApiParam(value = "id", required = true) Long id) {
-        BuildingConfiguration buildingConfiguration = buildingConfigurationBean.findLatestVersionByBuildingId(id);
-        if (buildingConfiguration != null && buildingConfiguration.getConfiguration() != null) {
-            return buildingConfigurationBean.restoreConfiguration(buildingConfiguration);
-        }
-        throw new EntityNotFoundException();
-
+        return buildingConfigurationBean.restoreConfiguration(id);
     }
 
 }
