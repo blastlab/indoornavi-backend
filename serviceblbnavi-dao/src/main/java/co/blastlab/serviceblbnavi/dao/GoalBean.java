@@ -24,11 +24,6 @@ public class GoalBean {
         return em.find(Goal.class, id);
     }
 
-    public List<Goal> findAll(Long vertexId) {
-        return em.createNamedQuery(Goal.FIND_BY_VERTEX, Goal.class)
-                .setParameter("vertexId", vertexId).getResultList();
-    }
-
     public void delete(Goal goal) {
         em.remove(em.contains(goal) ? goal : em.merge(goal));
     }
@@ -59,11 +54,10 @@ public class GoalBean {
     }
 
     public void insertSQL(Goal goal, EntityManager em) {
-        em.createNativeQuery("INSERT INTO Goal (id, name, building_id, vertex_id, inactive) VALUES (:id, :name, :building_id, :vertex_id, :inactive)")
+        em.createNativeQuery("INSERT INTO Goal (id, name, floor_id, inactive) VALUES (:id, :name, :building_id, :vertex_id, :inactive)")
                 .setParameter("id", goal.getId())
                 .setParameter("name", goal.getName())
-                .setParameter("building_id", goal.getVertex().getFloor().getBuilding().getId())
-                .setParameter("vertex_id", goal.getVertex().getId())
+                .setParameter("building_id", goal.getFloor().getId())
                 .setParameter("inactive", goal.getInactive())
                 .executeUpdate();
     }

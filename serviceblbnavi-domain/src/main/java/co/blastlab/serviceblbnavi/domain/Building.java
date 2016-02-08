@@ -46,23 +46,11 @@ public class Building extends CustomIdGenerationEntity implements Serializable {
     private List<Floor> floors;
 
     @JsonView({View.BuildingInternal.class, View.External.class})
-    @OneToMany(mappedBy = "building", cascade = {CascadeType.REMOVE, CascadeType.MERGE})
-    private List<Goal> goals;
-
-    @JsonView({View.BuildingInternal.class, View.External.class})
     @OneToMany(mappedBy = "building", cascade = CascadeType.REMOVE)
     private List<BuildingConfiguration> buildingConfigurations;
 
     @Transient
     private Long complexId;
-
-    public List<Goal> getGoals() {
-        return goals;
-    }
-
-    public void setGoals(List<Goal> goals) {
-        this.goals = goals;
-    }
 
     public List<Floor> getFloors() {
         return floors;

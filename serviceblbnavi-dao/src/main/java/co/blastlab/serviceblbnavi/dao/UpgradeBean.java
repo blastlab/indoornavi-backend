@@ -9,16 +9,7 @@ import javax.ejb.Startup;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import co.blastlab.serviceblbnavi.dao.qualifier.NaviProduction;
-import java.sql.Connection;
-import liquibase.Contexts;
-import liquibase.Liquibase;
-import liquibase.database.Database;
-import liquibase.database.DatabaseFactory;
-import liquibase.database.jvm.JdbcConnection;
-import liquibase.exception.DatabaseException;
-import liquibase.exception.LiquibaseException;
-import liquibase.resource.FileSystemResourceAccessor;
-import org.hibernate.Session;
+import co.blastlab.serviceblbnavi.domain.Complex;
 
 /**
  *
@@ -29,7 +20,6 @@ import org.hibernate.Session;
 public class UpgradeBean {
 
     public final static Integer DB_VERSION = 2;
-    private final static String CHANGELOG_FILE = "db.changelog.xml";
 
     @Inject
     @NaviProduction
@@ -41,10 +31,13 @@ public class UpgradeBean {
     @EJB
     private BuildingConfigurationBean buildingConfigurationBean;
 
+    @EJB
+    private LiquibaseBean liquibaseBean;
+
     @PostConstruct
     public void runLiquibaseAndUpgradeDatabase() {
-        runLiquibaseChangelog(em);
-        runLiquibaseChangelog(emProduction);
+        liquibaseBean.runLiquibaseChangelog(em);
+        liquibaseBean.runLiquibaseChangelog(emProduction);
         performDatabaseUpgrade();
     }
 
@@ -59,28 +52,17 @@ public class UpgradeBean {
     }
 
     private void upgradeDatabaseToVersion2() {
-        List<BuildingConfiguration> bcs = buildingConfigurationBean.findAllByVersion(DB_VERSION - 1);
+        List<BuildingConfiguration> bcs = buildingConfigurationBean.findAllByVersion(DB_VERSION - 1, em);
         bcs.forEach((bc) -> {
-            if (buildingConfigurationBean.findByBuildingAndVersion(bc.getBuilding().getId(), DB_VERSION) == null) {
+            if (bc.getConfiguration() != null 
+                    && buildingConfigurationBean.findByBuildingAndVersion(bc.getBuilding().getId(), DB_VERSION, emProduction) == null) {
+                /* Persist complex if it does not exist (at the beginning Complex table in Production Database is empty */
+                if (emProduction.find(Complex.class, bc.getBuilding().getComplex().getId()) == null) {
+                    emProduction.merge(bc.getBuilding().getComplex());
+                }
                 buildingConfigurationBean.saveConfiguration(bc.getBuilding());
             }
         });
     }
 
-    private void runLiquibaseChangelog(EntityManager em) {
-        em.unwrap(Session.class).doWork((Connection cnctn) -> {
-            Database db = null;
-            try {
-                db = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(new JdbcConnection(cnctn));
-                Liquibase liquibase = new Liquibase(CHANGELOG_FILE, new FileSystemResourceAccessor(), db);
-                liquibase.update(new Contexts());
-            } catch (DatabaseException ex) {
-                throw new RuntimeException(ex);
-            } catch (LiquibaseException ex) {
-                throw new RuntimeException(ex);
-            } finally {
-                
-            }
-        });
-    }
 }

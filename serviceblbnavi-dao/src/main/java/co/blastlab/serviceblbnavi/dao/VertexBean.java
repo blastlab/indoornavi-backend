@@ -1,11 +1,8 @@
 package co.blastlab.serviceblbnavi.dao;
 
 import co.blastlab.serviceblbnavi.domain.Floor;
-import co.blastlab.serviceblbnavi.domain.Goal;
 import co.blastlab.serviceblbnavi.domain.Vertex;
 import java.util.List;
-import java.util.stream.Collectors;
-import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
@@ -16,9 +13,6 @@ import javax.persistence.EntityManager;
  */
 @Stateless
 public class VertexBean {
-
-    @EJB
-    private GoalBean goalBean;
 
     @Inject
     private EntityManager em;
@@ -37,12 +31,6 @@ public class VertexBean {
 
     public List<Vertex> findAllActive(Long floorId) {
         List<Vertex> vertices = em.createNamedQuery(Vertex.FIND_ACTIVE_BY_FLOOR, Vertex.class).setParameter("floorId", floorId).getResultList();
-        vertices.stream().forEach((vertex) -> {
-            vertex.setGoals(vertex.getGoals().stream().filter((goal) -> {
-                return !goal.getInactive();
-            }).collect(Collectors.toList()));
-        });
-        
         return vertices;
     }
 
@@ -52,11 +40,6 @@ public class VertexBean {
     }
 
     public void deactivate(Vertex vertex) {
-        List<Goal> goals = vertex.getGoals();
-        goals.stream().forEach((goal) -> {
-            goal.setInactive(true);
-        });
-        goalBean.update(goals);
         vertex.setInactive(true);
         update(vertex);
     }

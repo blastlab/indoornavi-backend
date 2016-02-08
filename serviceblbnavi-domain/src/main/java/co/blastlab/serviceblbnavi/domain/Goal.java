@@ -22,39 +22,34 @@ import javax.persistence.Transient;
  */
 @Entity
 @NamedQueries({
-    @NamedQuery(name = Goal.FIND_BY_VERTEX, query = "SELECT g FROM Goal g WHERE g.vertex.id = :vertexId"),
-    @NamedQuery(name = Goal.FIND_BY_BUILDING, query = "SELECT g FROM Goal g WHERE g.building.id = :buildingId"),
-    @NamedQuery(name = Goal.FIND_BY_FLOOR, query = "SELECT g FROM Goal g WHERE g.vertex.floor.id = :floorId")
+    @NamedQuery(name = Goal.FIND_BY_BUILDING, query = "SELECT g FROM Goal g WHERE g.floor.building.id = :buildingId"),
+    @NamedQuery(name = Goal.FIND_BY_FLOOR, query = "SELECT g FROM Goal g WHERE g.floor.id = :floorId")
 })
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY, setterVisibility = JsonAutoDetect.Visibility.NONE, getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class Goal extends CustomIdGenerationEntity implements Serializable {
 
-    public static final String FIND_BY_VERTEX = "Goal.findByVertex";
     public static final String FIND_BY_BUILDING = "Goal.findByBuilding";
     public static final String FIND_BY_FLOOR = "Goal.findByFloor";
 
     private String name;
+
+    private Double x;
+
+    private Double y;
 
     @Column(nullable = false)
     private Boolean inactive;
 
     @JsonIgnore
     @ManyToOne
-    private Building building;
-
-    @JsonIgnore
-    @ManyToOne
-    private Vertex vertex;
+    private Floor floor;
 
     @JsonView({View.External.class, View.GoalInternal.class})
     @OneToMany(mappedBy = "goal", cascade = CascadeType.REMOVE)
     private List<GoalSelection> goalSelections;
 
     @Transient
-    private Long buildingId;
-
-    @Transient
-    private Long vertexId;
+    private Long floorId;
 
     @PrePersist
     void prePersist() {
@@ -63,20 +58,12 @@ public class Goal extends CustomIdGenerationEntity implements Serializable {
         }
     }
 
-    public Long getBuildingId() {
-        return buildingId;
+    public Long getFloorId() {
+        return floorId;
     }
 
-    public void setBuildingId(Long buildingId) {
-        this.buildingId = buildingId;
-    }
-
-    public Long getVertexId() {
-        return vertexId;
-    }
-
-    public void setVertexId(Long vertexId) {
-        this.vertexId = vertexId;
+    public void setFloorId(Long floorId) {
+        this.floorId = floorId;
     }
 
     public String getName() {
@@ -85,22 +72,6 @@ public class Goal extends CustomIdGenerationEntity implements Serializable {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public Building getBuilding() {
-        return building;
-    }
-
-    public void setBuilding(Building building) {
-        this.building = building;
-    }
-
-    public Vertex getVertex() {
-        return vertex;
-    }
-
-    public void setVertex(Vertex vertex) {
-        this.vertex = vertex;
     }
 
     public Boolean getInactive() {
@@ -117,6 +88,30 @@ public class Goal extends CustomIdGenerationEntity implements Serializable {
 
     public void setGoalSelections(List<GoalSelection> goalSelections) {
         this.goalSelections = goalSelections;
+    }
+
+    public Double getX() {
+        return x;
+    }
+
+    public void setX(Double x) {
+        this.x = x;
+    }
+
+    public Double getY() {
+        return y;
+    }
+
+    public void setY(Double y) {
+        this.y = y;
+    }
+
+    public Floor getFloor() {
+        return floor;
+    }
+
+    public void setFloor(Floor floor) {
+        this.floor = floor;
     }
 
 }

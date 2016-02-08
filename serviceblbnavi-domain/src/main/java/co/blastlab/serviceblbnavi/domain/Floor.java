@@ -47,6 +47,10 @@ public class Floor extends CustomIdGenerationEntity implements Serializable {
 
     @JsonView(View.External.class)
     @OneToMany(mappedBy = "floor", cascade = {CascadeType.REMOVE, CascadeType.MERGE})
+    private List<Goal> goals;
+
+    @JsonView(View.External.class)
+    @OneToMany(mappedBy = "floor", cascade = {CascadeType.REMOVE, CascadeType.MERGE})
     private List<Beacon> beacons;
 
     @Transient
@@ -138,6 +142,14 @@ public class Floor extends CustomIdGenerationEntity implements Serializable {
 
     public void setBitmapHeight(Integer bitmapHeight) {
         this.bitmapHeight = bitmapHeight;
+    }
+
+    public List<Goal> getGoals() {
+        return goals;
+    }
+
+    public void setGoals(List<Goal> goals) {
+        this.goals = goals;
     }
 
 }

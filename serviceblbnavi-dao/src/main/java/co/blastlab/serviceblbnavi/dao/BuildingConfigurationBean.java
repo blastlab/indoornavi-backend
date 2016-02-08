@@ -76,6 +76,10 @@ public class BuildingConfigurationBean {
     }
 
     public BuildingConfiguration findByBuildingAndVersion(Long buildingId, Integer version) {
+        return findByBuildingAndVersion(buildingId, version, em);
+    }
+
+    public BuildingConfiguration findByBuildingAndVersion(Long buildingId, Integer version, EntityManager em) {
         try {
             return em.createNamedQuery(BuildingConfiguration.FIND_BY_BUILDING_ID_AND_VERSION, BuildingConfiguration.class)
                     .setParameter("buildingId", buildingId)
@@ -88,6 +92,7 @@ public class BuildingConfigurationBean {
 
     public boolean saveConfiguration(Building building) {
         //merge developer building to production
+        emProduction.merge(building.getComplex());
         emProduction.merge(building);
         try {
             String configuration = generateConfigurationFromBuilding(building);
@@ -129,11 +134,11 @@ public class BuildingConfigurationBean {
             });
             floor.setVertices(floor.getVertices().stream().filter(
                     vertex -> !vertex.getInactive()).collect(Collectors.toList()));
-        });
-        building.setGoals(building.getGoals().stream().filter(
-                goal -> !goal.getInactive()).collect(Collectors.toList()));
-        building.getGoals().stream().forEach((goal) -> {
-            goal.setGoalSelections(null);
+            floor.setGoals(floor.getGoals().stream().filter(
+                    goal -> !goal.getInactive()).collect(Collectors.toList()));
+            floor.getGoals().forEach((goal) -> {
+                goal.setGoalSelections(null);
+            });
         });
         building.setBuildingConfigurations(null);
         return new ObjectMapper().setSerializationInclusion(JsonInclude.Include.NON_NULL)
@@ -159,7 +164,7 @@ public class BuildingConfigurationBean {
         Complex complex = buildingInDB.getComplex();
         List<BuildingConfiguration> buildingConfigurations = new ArrayList<>();
         buildingConfigurations.addAll(buildingInDB.getBuildingConfigurations());
-     
+
         buildingBean.removeSQL(buildingInDB, em);
 
         List<Edge> edges = new ArrayList<>();
@@ -171,10 +176,6 @@ public class BuildingConfigurationBean {
                 edges.addAll(vertex.getSourceEdges());
                 vertex.setSourceEdges(new ArrayList<>());
                 vertex.setTargetEdges(new ArrayList<>());
-                vertex.getGoals().forEach((goal) -> {
-                    goal.setVertex(vertex);
-                    goal.setBuilding(building);
-                });
             });
             vertices.addAll(floor.getVertices());
             floor.getBeacons().forEach((beacon) -> {
@@ -182,6 +183,9 @@ public class BuildingConfigurationBean {
             });
             floor.getWaypoints().forEach((waypoint) -> {
                 waypoint.setFloor(floor);
+            });
+            floor.getGoals().forEach((goal) -> {
+                goal.setFloor(floor);
             });
         });
         building.setComplex(complex);
@@ -205,9 +209,9 @@ public class BuildingConfigurationBean {
             });
             floor.getVertices().forEach((vertex) -> {
                 vertexBean.insertSQL(vertex, em);
-                vertex.getGoals().forEach((goal) -> {
-                    goalBean.insertSQL(goal, em);
-                });
+            });
+            floor.getGoals().forEach((goal) -> {
+                goalBean.insertSQL(goal, em);
             });
         });
         building.getBuildingConfigurations().forEach((bc) -> {
@@ -229,7 +233,7 @@ public class BuildingConfigurationBean {
                 .executeUpdate();
     }
 
-    public List<BuildingConfiguration> findAllByVersion(Integer version) {
+    public List<BuildingConfiguration> findAllByVersion(Integer version, EntityManager em) {
         return em.createNamedQuery(BuildingConfiguration.FIND_BY_VERSION)
                 .setParameter("version", version)
                 .getResultList();

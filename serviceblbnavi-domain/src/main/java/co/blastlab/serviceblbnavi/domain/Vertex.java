@@ -60,9 +60,6 @@ public class Vertex extends CustomIdGenerationEntity implements Serializable {
     @OneToMany(mappedBy = "source", cascade = {CascadeType.REMOVE, CascadeType.MERGE})
     private List<Edge> sourceEdges;
 
-    @OneToMany(mappedBy = "vertex", fetch = FetchType.EAGER, cascade = {CascadeType.REMOVE, CascadeType.MERGE})
-    private List<Goal> goals;
-
     @JsonIgnore
     @ManyToOne
     private Floor floor;
@@ -94,7 +91,6 @@ public class Vertex extends CustomIdGenerationEntity implements Serializable {
                 + ", buildingExits=" + buildingExits
                 + ", targetEdges=" + targetEdges
                 + ", sourceEdges=" + sourceEdges
-                + ", goals=" + goals
                 + ", floor=" + floor
                 + ", vertexFloorChangeabilityView=" + vertexFloorChangeabilityView
                 + '}';
@@ -130,14 +126,6 @@ public class Vertex extends CustomIdGenerationEntity implements Serializable {
 
     public void setSourceEdges(List<Edge> sourceEdges) {
         this.sourceEdges = sourceEdges;
-    }
-
-    public List<Goal> getGoals() {
-        return goals;
-    }
-
-    public void setGoals(List<Goal> goals) {
-        this.goals = goals;
     }
 
     public Double getX() {
