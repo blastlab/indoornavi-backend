@@ -163,7 +163,7 @@ public class BuildingConfigurationBean {
         Building buildingInDB = em.find(Building.class, id);
         Complex complex = buildingInDB.getComplex();
         List<BuildingConfiguration> buildingConfigurations = new ArrayList<>();
-        buildingConfigurations.addAll(buildingInDB.getBuildingConfigurations());
+        buildingConfigurations.addAll(building.getBuildingConfigurations());
 
         buildingBean.removeSQL(buildingInDB, em);
 

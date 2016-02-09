@@ -56,7 +56,7 @@ public class UpgradeBean {
         bcs.forEach((bc) -> {
             if (bc.getConfiguration() != null 
                     && buildingConfigurationBean.findByBuildingAndVersion(bc.getBuilding().getId(), DB_VERSION, emProduction) == null) {
-                /* Persist complex if it does not exist (at the beginning Complex table in Production Database is empty */
+                /* Create a Complex if it does not exist - at the upgrade's beginning, the Complex table in Production Database is empty */
                 if (emProduction.find(Complex.class, bc.getBuilding().getComplex().getId()) == null) {
                     emProduction.merge(bc.getBuilding().getComplex());
                 }

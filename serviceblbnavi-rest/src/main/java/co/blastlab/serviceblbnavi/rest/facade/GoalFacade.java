@@ -49,10 +49,10 @@ public class GoalFacade {
     @POST
     @ApiOperation(value = "create goal", response = Goal.class)
     @ApiResponses({
-        @ApiResponse(code = 404, message = "vertex id or building id emtpy or vertex or building doesn't exist")
+        @ApiResponse(code = 404, message = "floor id emtpy or floor doesn't exist")
     })
     @JsonView(View.GoalInternal.class)
-    public Goal create(@ApiParam(value = "vertex", required = true) Goal goal) {
+    public Goal create(@ApiParam(value = "goal", required = true) Goal goal) {
         if (goal.getFloorId() != null) {
             Floor floor = floorBean.find(goal.getFloorId());
             if (floor != null) {
@@ -84,12 +84,13 @@ public class GoalFacade {
     }
 
     @PUT
-    @ApiOperation(value = "update goal", response = Goal.class)
+    @Path("/name")
+    @ApiOperation(value = "update goal name", response = Goal.class)
     @JsonView(View.GoalInternal.class)
     @ApiResponses({
         @ApiResponse(code = 404, message = "goal id or goal empty or doesn't exist")
     })
-    public Goal update(@ApiParam(value = "goal", required = true) Goal goal) {
+    public Goal updateName(@ApiParam(value = "goal", required = true) Goal goal) {
         if (goal.getId() != null) {
             Goal g = goalBean.find(goal.getId());
             if (g != null) {
@@ -100,6 +101,28 @@ public class GoalFacade {
                 goal.setId(null);
                 goalBean.update(g);
                 goalBean.create(goal);
+                return goal;
+            }
+        }
+        throw new EntityNotFoundException();
+    }
+    
+    @PUT
+    @Path("/coordinates")
+    @ApiOperation(value = "update goal coordinates", response = Goal.class)
+    @JsonView(View.GoalInternal.class)
+    @ApiResponses({
+        @ApiResponse(code = 404, message = "goal id or goal empty or doesn't exist")
+    })
+    public Goal updateCoordinates(@ApiParam(value = "goal", required = true) Goal goal) {
+        if (goal.getId() != null) {
+            Goal g = goalBean.find(goal.getId());
+            if (g != null) {
+                permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
+                        g.getFloor().getBuilding().getComplex().getId(), Permission.UPDATE);
+                g.setX(goal.getX());
+                g.setY(goal.getY());
+                goalBean.update(g);
                 return goal;
             }
         }
