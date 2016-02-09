@@ -61,4 +61,9 @@ public class GoalBean {
                 .setParameter("inactive", goal.getInactive())
                 .executeUpdate();
     }
+
+    public List<Goal> findActiveByFloorId(Long floorId) {
+        return em.createNamedQuery(Goal.FIND_ACTIVE_BY_FLOOR, Goal.class)
+                .setParameter("floorId", floorId).getResultList();
+    }
 }

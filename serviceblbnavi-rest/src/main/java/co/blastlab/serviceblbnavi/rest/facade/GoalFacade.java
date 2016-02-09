@@ -184,4 +184,23 @@ public class GoalFacade {
         }
         throw new EntityNotFoundException();
     }
+    
+    @GET
+    @Path("/floor/{id: \\d+}/active")
+    @JsonView(View.GoalInternal.class)
+    @ApiOperation(value = "find goals for specified floor", response = Goal.class, responseContainer = "List")
+    @ApiResponses({
+        @ApiResponse(code = 404, message = "floor with given id wasn't found")
+    })
+    public List<Goal> findActiveByFloor(@ApiParam(value = "id", required = true) @PathParam("id") Long floorId) {
+        if (floorId != null) {
+            List<Goal> goals = goalBean.findActiveByFloorId(floorId);
+            if (goals.size() > 0) {
+                permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
+                        goals.get(0).getFloor().getBuilding().getComplex().getId(), Permission.READ);
+            }
+            return goals;
+        }
+        throw new EntityNotFoundException();
+    }
 }

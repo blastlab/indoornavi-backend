@@ -23,14 +23,15 @@ import javax.persistence.Transient;
 @Entity
 @NamedQueries({
     @NamedQuery(name = Goal.FIND_BY_BUILDING, query = "SELECT g FROM Goal g WHERE g.floor.building.id = :buildingId"),
-    @NamedQuery(name = Goal.FIND_BY_FLOOR, query = "SELECT g FROM Goal g WHERE g.floor.id = :floorId")
+    @NamedQuery(name = Goal.FIND_BY_FLOOR, query = "SELECT g FROM Goal g WHERE g.floor.id = :floorId"),
+    @NamedQuery(name = Goal.FIND_ACTIVE_BY_FLOOR, query = "SELECT g FROM Goal g WHERE g.floor.id = :floorId AND g.inactive = false")
 })
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY, setterVisibility = JsonAutoDetect.Visibility.NONE, getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class Goal extends CustomIdGenerationEntity implements Serializable {
 
     public static final String FIND_BY_BUILDING = "Goal.findByBuilding";
     public static final String FIND_BY_FLOOR = "Goal.findByFloor";
-
+    public static final String FIND_ACTIVE_BY_FLOOR = "Goal.findActiveByFloor";
     private String name;
 
     private Double x;
