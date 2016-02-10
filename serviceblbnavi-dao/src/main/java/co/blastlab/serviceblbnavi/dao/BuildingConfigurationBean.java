@@ -2,16 +2,12 @@ package co.blastlab.serviceblbnavi.dao;
 
 import co.blastlab.serviceblbnavi.domain.Building;
 import co.blastlab.serviceblbnavi.domain.BuildingConfiguration;
-import co.blastlab.serviceblbnavi.domain.Complex;
-import co.blastlab.serviceblbnavi.domain.Edge;
-import co.blastlab.serviceblbnavi.domain.Vertex;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -40,24 +36,6 @@ public class BuildingConfigurationBean {
 
     @EJB
     private BuildingBean buildingBean;
-
-    @EJB
-    private FloorBean floorBean;
-
-    @EJB
-    private BeaconBean beaconBean;
-
-    @EJB
-    private WaypointBean waypointBean;
-
-    @EJB
-    private VertexBean vertexBean;
-
-    @EJB
-    private GoalBean goalBean;
-
-    @EJB
-    private EdgeBean edgeBean;
 
     public void create(BuildingConfiguration buildingConfiguration) {
         em.persist(buildingConfiguration);
@@ -93,6 +71,7 @@ public class BuildingConfigurationBean {
     public boolean saveConfiguration(Building building) {
         //merge developer building to production
         emProduction.merge(building.getComplex());
+        buildingBean.removeSQL(building, emProduction);
         emProduction.merge(building);
         building.getFloors().forEach((floor) -> {
             emProduction.merge(floor);
@@ -192,77 +171,31 @@ public class BuildingConfigurationBean {
         if (building == null) {
             throw new EntityNotFoundException();
         }
-        Building buildingInDB = em.find(Building.class, id);
-        Complex complex = buildingInDB.getComplex();
-        List<BuildingConfiguration> buildingConfigurations = new ArrayList<>();
-        buildingConfigurations.addAll(building.getBuildingConfigurations());
-
-        buildingBean.removeSQL(buildingInDB, em);
-
-        List<Edge> edges = new ArrayList<>();
-        List<Vertex> vertices = new ArrayList<>();
+        buildingBean.removeSQL(building, em);
+        em.merge(building);
         building.getFloors().forEach((floor) -> {
-            floor.setBuilding(building);
-            floor.getVertices().forEach((vertex) -> {
-                vertex.setFloor(floor);
-                edges.addAll(vertex.getSourceEdges());
-                vertex.setSourceEdges(new ArrayList<>());
-                vertex.setTargetEdges(new ArrayList<>());
-            });
-            vertices.addAll(floor.getVertices());
+            em.merge(floor);
             floor.getBeacons().forEach((beacon) -> {
-                beacon.setFloor(floor);
+                em.merge(beacon);
             });
             floor.getWaypoints().forEach((waypoint) -> {
-                waypoint.setFloor(floor);
-            });
-            floor.getGoals().forEach((goal) -> {
-                goal.setFloor(floor);
-            });
-        });
-        building.setComplex(complex);
-        building.setBuildingConfigurations(buildingConfigurations);
-        edges.forEach((edge) -> {
-            edge.setSource(vertices.stream().filter((vertex) -> {
-                return vertex.getId().equals(edge.getSourceId());
-            }).collect(Collectors.toList()).get(0));
-            edge.setTarget(vertices.stream().filter((vertex) -> {
-                return vertex.getId().equals(edge.getTargetId());
-            }).collect(Collectors.toList()).get(0));
-        });
-        buildingBean.insertSQL(building, em);
-        building.getFloors().forEach((floor) -> {
-            floorBean.insertSQL(floor, em);
-            floor.getBeacons().forEach((beacon) -> {
-                beaconBean.insertSQL(beacon, em);
-            });
-            floor.getWaypoints().forEach((waypoint) -> {
-                waypointBean.insertSQL(waypoint, em);
+                em.merge(waypoint);
             });
             floor.getVertices().forEach((vertex) -> {
-                vertexBean.insertSQL(vertex, em);
+                em.merge(vertex);
             });
             floor.getGoals().forEach((goal) -> {
-                goalBean.insertSQL(goal, em);
+                em.merge(goal);
             });
         });
-        building.getBuildingConfigurations().forEach((bc) -> {
-            insertSQL(bc, em);
-        });
-        edges.forEach((edge) -> {
-            edgeBean.insertSQL(edge, em);
+        building.getFloors().forEach((floor) -> {
+             floor.getVertices().forEach((vertex) -> {
+                vertex.getSourceEdges().forEach((edge) -> {
+                    em.merge(edge);
+                });
+            });
         });
         return building;
-    }
-
-    private void insertSQL(BuildingConfiguration bc, EntityManager em) {
-        em.createNativeQuery("INSERT INTO BuildingConfiguration (id, building_id, version, configuration, configurationChecksum) VALUES (:id, :building_id, :version, :configuration, :configurationChecksum)")
-                .setParameter("id", bc.getId())
-                .setParameter("building_id", bc.getBuilding().getId())
-                .setParameter("version", bc.getVersion())
-                .setParameter("configuration", bc.getConfiguration())
-                .setParameter("configurationChecksum", bc.getConfigurationChecksum())
-                .executeUpdate();
     }
 
     public List<BuildingConfiguration> findAllByVersion(Integer version, EntityManager em) {

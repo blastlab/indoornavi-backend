@@ -41,17 +41,4 @@ public class FloorBean {
             update(floor);
         });
     }
-
-    public void insertSQL(Floor floor, EntityManager em) {
-        em.createNativeQuery("INSERT INTO Floor (id, level, bitmap, mToPix, startZoom, building_id, bitmapWidth, bitmapHeight) VALUES (:id, :level, :bitmap, :mToPix, :startZoom, :building_id, :bitmapWidth, :bitmapHeight)")
-                .setParameter("id", floor.getId())
-                .setParameter("level", floor.getLevel())
-                .setParameter("bitmap", floor.getBitmap())
-                .setParameter("mToPix", floor.getmToPix())
-                .setParameter("startZoom", floor.getStartZoom())
-                .setParameter("building_id", floor.getBuilding().getId())
-                .setParameter("bitmapWidth", floor.getBitmapWidth())
-                .setParameter("bitmapHeight", floor.getBitmapHeight())
-                .executeUpdate();
-    }
 }
