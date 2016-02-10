@@ -149,12 +149,12 @@ public class FloorFacade {
         @ApiResponse(code = 404, message = "floor with given id doesn't exist")
     })
     public Response updatemToPix(@ApiParam(value = "floor", required = true) Floor floor) {
-        Floor f = find(floor.getId());
-        if (f != null) {
+        Floor floorInDB = find(floor.getId());
+        if (floorInDB != null) {
             permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
-                    f.getBuilding().getComplex().getId(), Permission.UPDATE);
-            f.setmToPix(floor.getmToPix());
-            floorBean.update(f);
+                    floorInDB.getBuilding().getComplex().getId(), Permission.UPDATE);
+            floorInDB.setmToPix(floor.getmToPix());
+            floorBean.update(floorInDB);
             return Response.ok().build();
         }
         throw new EntityNotFoundException();

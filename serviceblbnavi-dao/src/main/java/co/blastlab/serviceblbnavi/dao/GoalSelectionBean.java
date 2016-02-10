@@ -1,5 +1,6 @@
 package co.blastlab.serviceblbnavi.dao;
 
+import co.blastlab.serviceblbnavi.dao.qualifier.NaviProduction;
 import co.blastlab.serviceblbnavi.domain.GoalSelection;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
@@ -13,9 +14,10 @@ import javax.persistence.EntityManager;
 public class GoalSelectionBean {
 
     @Inject
-    private EntityManager em;
+    @NaviProduction
+    private EntityManager emProduction;
 
     public void create(GoalSelection goalSelection) {
-        em.persist(goalSelection);
+        emProduction.persist(goalSelection);
     }
 }

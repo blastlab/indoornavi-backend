@@ -1,5 +1,6 @@
 package co.blastlab.serviceblbnavi.dao;
 
+import co.blastlab.serviceblbnavi.dao.qualifier.NaviProduction;
 import co.blastlab.serviceblbnavi.domain.WaypointVisit;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
@@ -13,9 +14,10 @@ import javax.persistence.EntityManager;
 public class WaypointVisitBean {
 
     @Inject
-    private EntityManager em;
+    @NaviProduction
+    private EntityManager emProduction;
 
     public void create(WaypointVisit waypointVisit) {
-        em.persist(waypointVisit);
+        emProduction.persist(waypointVisit);
     }
 }

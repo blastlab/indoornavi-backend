@@ -1,7 +1,6 @@
 package co.blastlab.serviceblbnavi.dao;
 
 import co.blastlab.serviceblbnavi.domain.Edge;
-import co.blastlab.serviceblbnavi.domain.Vertex;
 import java.util.List;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
@@ -65,8 +64,5 @@ public class EdgeBean {
         edges.stream().forEach((e) -> {
             update(e);
         });
-    }
-
-    public void clearEdges(Vertex vertex) {
     }
 }
