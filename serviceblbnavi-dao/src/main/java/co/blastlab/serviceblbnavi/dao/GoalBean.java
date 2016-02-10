@@ -54,10 +54,12 @@ public class GoalBean {
     }
 
     public void insertSQL(Goal goal, EntityManager em) {
-        em.createNativeQuery("INSERT INTO Goal (id, name, floor_id, inactive) VALUES (:id, :name, :building_id, :vertex_id, :inactive)")
+        em.createNativeQuery("INSERT INTO Goal (id, x, y, name, floor_id, inactive) VALUES (:id, :x, :y, :name, :floor_id, :inactive)")
                 .setParameter("id", goal.getId())
+                .setParameter("x", goal.getX())
+                .setParameter("y", goal.getY())
                 .setParameter("name", goal.getName())
-                .setParameter("building_id", goal.getFloor().getId())
+                .setParameter("floor_id", goal.getFloor().getId())
                 .setParameter("inactive", goal.getInactive())
                 .executeUpdate();
     }

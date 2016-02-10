@@ -94,6 +94,38 @@ public class BuildingConfigurationBean {
         //merge developer building to production
         emProduction.merge(building.getComplex());
         emProduction.merge(building);
+        building.getFloors().forEach((floor) -> {
+            emProduction.merge(floor);
+            floor.getBeacons().forEach((beacon) -> {
+                emProduction.merge(beacon);
+            });
+            floor.getVertices().forEach((vertex) -> {
+                emProduction.merge(vertex);
+                vertex.getBuildingExits().forEach((buildingExit) -> {
+                    em.merge(buildingExit);
+                });
+            });
+            floor.getGoals().forEach((goal) -> {
+                emProduction.merge(goal);
+            });
+            floor.getWaypoints().forEach((waypoint) -> {
+                emProduction.merge(waypoint);
+            });
+        });
+        building.getFloors().forEach((floor) -> {
+            floor.getVertices().forEach((vertex) -> {
+                vertex.getSourceEdges().forEach((edge) -> {
+                    emProduction.merge(edge);
+                });
+                vertex.getBuildingExits().forEach((buildingExit) -> {
+                    buildingExit.getSourceConnections().forEach((connection) -> {
+                        emProduction.merge(connection);
+                    });
+                });
+                
+            });
+        });
+        
         try {
             String configuration = generateConfigurationFromBuilding(building);
             BuildingConfiguration buildingConfiguration = new BuildingConfiguration();
