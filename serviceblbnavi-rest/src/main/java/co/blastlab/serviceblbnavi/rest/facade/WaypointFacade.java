@@ -69,6 +69,31 @@ public class WaypointFacade {
     }
     
     @PUT
+    @ApiOperation(value = "update waypoint's data", response = Waypoint.class)
+    @ApiResponses({
+        @ApiResponse(code = 400, message = "invalid waypoint's data")
+    })
+    public Waypoint updateWaypoint(@ApiParam(value = "waypoint", required = true) Waypoint waypoint) {
+        if (waypoint.getId() != null) {
+            Waypoint waypointInDB = waypointBean.findById(waypoint.getId());
+            if (waypointInDB != null) {
+                permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
+                        waypointInDB.getFloor().getBuilding().getComplex().getId(), Permission.UPDATE);
+                waypointInDB.setName(waypoint.getName());
+                waypointInDB.setDetails(waypoint.getDetails());
+                waypointInDB.setDistance(waypoint.getDistance());
+                waypointInDB.setTimeToCheckout(waypoint.getTimeToCheckout());
+                waypointInDB.setX(waypoint.getX());
+                waypointInDB.setY(waypoint.getY());
+                waypointBean.update(waypointInDB);
+                return waypointInDB;
+            }
+            throw new EntityNotFoundException();
+        }
+        throw new BadRequestException();
+    }
+    
+    @PUT
     @Path("/coordinates")
     @ApiOperation(value = "update waypoint's coordinates", response = Waypoint.class)
     @ApiResponses({
@@ -101,7 +126,7 @@ public class WaypointFacade {
             Floor floor = floorBean.find(floorId);
             if (floor != null) {
                 permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
-                        floor.getBuilding().getComplex().getId(), Permission.UPDATE);
+                        floor.getBuilding().getComplex().getId(), Permission.READ);
                 List<Waypoint> waypoints = waypointBean.findActiveByFloorId(floorId);
                 return waypoints;
             }
@@ -120,7 +145,7 @@ public class WaypointFacade {
             Building building = buildingBean.find(buildingId);
             if (building != null) {
                 permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
-                        building.getComplex().getId(), Permission.UPDATE);
+                        building.getComplex().getId(), Permission.READ);
                 List<Waypoint> waypoints = waypointBean.findByBuildingId(buildingId);
                 return waypoints;
             }
