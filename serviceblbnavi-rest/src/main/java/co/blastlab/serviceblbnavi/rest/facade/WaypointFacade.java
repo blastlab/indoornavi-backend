@@ -1,12 +1,14 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package co.blastlab.serviceblbnavi.rest.facade;
 
+import co.blastlab.serviceblbnavi.dao.BuildingBean;
+import co.blastlab.serviceblbnavi.dao.FloorBean;
+import co.blastlab.serviceblbnavi.dao.PermissionBean;
 import co.blastlab.serviceblbnavi.dao.WaypointBean;
+import co.blastlab.serviceblbnavi.domain.Building;
+import co.blastlab.serviceblbnavi.domain.Floor;
+import co.blastlab.serviceblbnavi.domain.Permission;
 import co.blastlab.serviceblbnavi.domain.Waypoint;
+import co.blastlab.serviceblbnavi.rest.bean.AuthorizationBean;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
@@ -14,8 +16,12 @@ import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
 import java.util.List;
 import javax.ejb.EJB;
+import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 
@@ -26,20 +32,99 @@ import javax.ws.rs.PathParam;
 @Path("/waypoint")
 @Api("/waypoint")
 public class WaypointFacade {
-    
+
     @EJB
     private WaypointBean waypointBean;
 
+    @EJB
+    private FloorBean floorBean;
+
+    @EJB
+    private PermissionBean permissionBean;
+
+    @Inject
+    private AuthorizationBean authorizationBean;
+
+    @EJB
+    private BuildingBean buildingBean;
+
+    @POST
+    @ApiOperation(value = "create waypoint", response = Waypoint.class)
+    @ApiResponses({
+        @ApiResponse(code = 400, message = "invalid waypoint's data")
+    })
+    public Waypoint createWaypoint(@ApiParam(value = "waypoint", required = true) Waypoint waypoint) {
+        if (waypoint.getFloorId() != null) {
+            Floor floor = floorBean.find(waypoint.getFloorId());
+            if (floor != null) {
+                permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
+                        floor.getBuilding().getComplex().getId(), Permission.UPDATE);
+                waypoint.setFloor(floor);
+                waypointBean.create(waypoint);
+                return waypoint;
+            }
+            throw new EntityNotFoundException();
+        }
+        throw new BadRequestException();
+    }
+    
+    @PUT
+    @Path("/coordinates")
+    @ApiOperation(value = "update waypoint's coordinates", response = Waypoint.class)
+    @ApiResponses({
+        @ApiResponse(code = 400, message = "invalid waypoint's data")
+    })
+    public Waypoint updateWaypointsCoordinates(@ApiParam(value = "waypoint", required = true) Waypoint waypoint) {
+        if (waypoint.getId() != null) {
+            Waypoint waypointInDB = waypointBean.findById(waypoint.getId());
+            if (waypointInDB != null) {
+                permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
+                        waypointInDB.getFloor().getBuilding().getComplex().getId(), Permission.UPDATE);
+                waypointInDB.setX(waypoint.getX());
+                waypointInDB.setY(waypoint.getY());
+                waypointBean.update(waypointInDB);
+                return waypointInDB;
+            }
+            throw new EntityNotFoundException();
+        }
+        throw new BadRequestException();
+    }
+
+    @GET
+    @Path("/floor/{id: \\d+}/active")
+    @ApiOperation(value = "gets active waypoints by floor id", response = Waypoint.class, responseContainer = "List")
+    @ApiResponses({
+        @ApiResponse(code = 404, message = "building id was not found")
+    })
+    public List<Waypoint> getActiveWaypointsByFloorId(@ApiParam(value = "id", required = true) @PathParam("id") Long floorId) {
+        if (floorId != null) {
+            Floor floor = floorBean.find(floorId);
+            if (floor != null) {
+                permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
+                        floor.getBuilding().getComplex().getId(), Permission.UPDATE);
+                List<Waypoint> waypoints = waypointBean.findActiveByFloorId(floorId);
+                return waypoints;
+            }
+        }
+        throw new EntityNotFoundException();
+    }
+
     @GET
     @Path("/building/{id: \\d+}")
-    @ApiOperation(value = "create waypoint visit", response = Waypoint.class, responseContainer = "List")
+    @ApiOperation(value = "gets waypoints by building id", response = Waypoint.class, responseContainer = "List")
     @ApiResponses({
-        @ApiResponse(code = 404, message = "invalid waypoint visit\'s data")
+        @ApiResponse(code = 404, message = "building id was not found")
     })
     public List<Waypoint> getWaypointsByBuildingId(@ApiParam(value = "id", required = true) @PathParam("id") Long buildingId) {
         if (buildingId != null) {
-            List<Waypoint> waypoints = waypointBean.findByBuildingId(buildingId);
-            return waypoints;
+            Building building = buildingBean.find(buildingId);
+            if (building != null) {
+                permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
+                        building.getComplex().getId(), Permission.UPDATE);
+                List<Waypoint> waypoints = waypointBean.findByBuildingId(buildingId);
+                return waypoints;
+            }
+            throw new EntityNotFoundException();
         }
         throw new EntityNotFoundException();
     }

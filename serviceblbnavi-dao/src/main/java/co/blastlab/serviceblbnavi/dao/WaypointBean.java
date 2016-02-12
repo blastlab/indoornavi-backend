@@ -23,4 +23,16 @@ public class WaypointBean {
     public List<Waypoint> findByBuildingId(Long buildingId) {
         return em.createNamedQuery(Waypoint.FIND_BY_BUILDING_ID, Waypoint.class).setParameter("buildingId", buildingId).getResultList();
     }
+
+    public void create(Waypoint waypoint) {
+        em.persist(waypoint);
+    }
+
+    public List<Waypoint> findActiveByFloorId(Long floorId) {
+        return em.createNamedQuery(Waypoint.FIND_ACTIVE_BY_FLOOR_ID, Waypoint.class).setParameter("floorId", floorId).getResultList();
+    }
+
+    public void update(Waypoint waypointInDB) {
+        em.merge(waypointInDB);
+    }
 }
