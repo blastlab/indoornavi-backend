@@ -32,7 +32,12 @@ public class WaypointBean {
         return em.createNamedQuery(Waypoint.FIND_ACTIVE_BY_FLOOR_ID, Waypoint.class).setParameter("floorId", floorId).getResultList();
     }
 
-    public void update(Waypoint waypointInDB) {
-        em.merge(waypointInDB);
+    public void update(Waypoint waypoint) {
+        em.merge(waypoint);
+    }
+
+    public void deactivate(Waypoint waypoint) {
+        waypoint.setInactive(true);
+        update(waypoint);
     }
 }

@@ -9,6 +9,8 @@ import co.blastlab.serviceblbnavi.domain.Floor;
 import co.blastlab.serviceblbnavi.domain.Permission;
 import co.blastlab.serviceblbnavi.domain.Waypoint;
 import co.blastlab.serviceblbnavi.rest.bean.AuthorizationBean;
+import co.blastlab.serviceblbnavi.views.View;
+import com.fasterxml.jackson.annotation.JsonView;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
@@ -150,6 +152,24 @@ public class WaypointFacade {
                 return waypoints;
             }
             throw new EntityNotFoundException();
+        }
+        throw new EntityNotFoundException();
+    }
+    
+    @PUT
+    @Path("/{id: \\d+}/deactivate")
+    @JsonView(View.WaypointInternal.class)
+    @ApiOperation(value = "deactivates waypoint of given id", response = Waypoint.class)
+    @ApiResponses({
+        @ApiResponse(code = 404, message = "waypoint with given id wasn't found")
+    })
+    public Waypoint deactivate(@ApiParam(value = "id", required = true) @PathParam("id") Long waypointId) {
+        Waypoint waypoint = waypointBean.findById(waypointId);
+        if (waypoint != null) {
+            permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
+                    waypoint.getFloor().getBuilding().getComplex().getId(), Permission.UPDATE);
+            waypointBean.deactivate(waypoint);
+            return waypoint;
         }
         throw new EntityNotFoundException();
     }
