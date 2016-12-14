@@ -35,7 +35,7 @@ public class BeaconFacade {
     @EJB
     private BeaconBean beaconBean;
 
-    @EJB
+    @Inject
     private FloorBean floorBean;
 
     @EJB
