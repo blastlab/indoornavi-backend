@@ -1,0 +1,37 @@
+version: '2'
+services:
+  core:
+    build: .
+    ports:
+      - '8080:8080'
+      - '8787:8787'
+      - '9990:9990'
+    volumes:
+      - ./serviceblbnavi-ear/deployments:/opt/jboss/wildfly/standalone/deployments
+    depends_on:
+      - db
+      - db_prod
+    environment:
+      TZ: Europe/Warsaw
+      APP_ENVIRONMENT: development
+      APP_DB_HOST: db
+      APP_DB_HOST_PROD: db_prod
+    entrypoint: ["wait-for-it", "db:3306", "-t", "0", "--", "/start-server.sh"]
+
+  db:
+    build: database
+    ports:
+      - '3306:3306'
+    environment:
+      MYSQL_DATABASE: navi
+      MYSQL_ALLOW_EMPTY_PASSWORD: "true"
+      TZ: Europe/Warsaw
+
+  db_prod:
+    build: database_prod
+    ports:
+      - '3307:3306'
+    environment:
+      MYSQL_DATABASE: naviProduction
+      MYSQL_ALLOW_EMPTY_PASSWORD: "true"
+      TZ: Europe/Warsaw
