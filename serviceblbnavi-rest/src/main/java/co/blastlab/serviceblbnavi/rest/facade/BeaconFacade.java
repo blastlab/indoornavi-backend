@@ -49,7 +49,7 @@ public class BeaconFacade {
     @ApiResponses({
         @ApiResponse(code = 404, message = "floor id empty or floor doesn't exist")
     })
-    public Beacon create(@ApiParam(value = "beacon", required = true) Beacon beacon) {
+    public Beacon create(@ApiParam(value = "beacon", required = true)  Beacon beacon) {
         if (beacon.getFloorId() != null) {
             Floor floor = floorBean.find(beacon.getFloorId());
             if (floor != null) {
