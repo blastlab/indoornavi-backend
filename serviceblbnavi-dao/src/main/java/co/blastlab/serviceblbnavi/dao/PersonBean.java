@@ -20,7 +20,6 @@ public class PersonBean {
 
     public void create(Person person) {
         em.persist(person);
-        em.refresh(person);
     }
 
     public Person find(Long id) {

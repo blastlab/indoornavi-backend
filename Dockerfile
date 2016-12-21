@@ -17,6 +17,7 @@ RUN $JBOSS_HOME/bin/add-user.sh admin admin --silent
 
 RUN $JBOSS_HOME/bin/add-user.sh -a api api --group Manager --silent
 
+COPY docker/wait-for-container-end /usr/local/bin/
 COPY docker/standalone.xml $JBOSS_HOME/standalone/configuration/
 COPY docker/mariadb-module.xml $JBOSS_HOME/modules/system/layers/base/org/mariadb/jdbc/main/module.xml
 RUN cd $JBOSS_HOME/modules/system/layers/base/org/mariadb/jdbc/main/ \

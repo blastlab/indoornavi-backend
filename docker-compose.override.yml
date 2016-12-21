@@ -16,22 +16,28 @@ services:
       APP_ENVIRONMENT: development
       APP_DB_HOST: db
       APP_DB_HOST_PROD: db_prod
-    entrypoint: ["wait-for-it", "db:3306", "-t", "0", "--", "/start-server.sh"]
+    entrypoint: ["wait-for-container-end", "-c", "liquibase", "-c", "liquibase_prod", "--", "/start-server.sh"]
 
   db:
-    build: database
-    ports:
-      - '3306:3306'
-    environment:
-      MYSQL_DATABASE: navi
-      MYSQL_ALLOW_EMPTY_PASSWORD: "true"
-      TZ: Europe/Warsaw
+    extends:
+      file: database/docker-compose.yml
+      service: db
 
   db_prod:
-    build: database_prod
-    ports:
-      - '3307:3306'
-    environment:
-      MYSQL_DATABASE: naviProduction
-      MYSQL_ALLOW_EMPTY_PASSWORD: "true"
-      TZ: Europe/Warsaw
+    extends:
+      file: database/docker-compose.yml
+      service: db_prod
+
+  liquibase:
+    extends:
+      file: database/docker-compose.yml
+      service: liquibase
+
+  liquibase_prod:
+    extends:
+      file: database/docker-compose.yml
+      service: liquibase_prod
+
+volumes:
+  # For Liquibase container.
+  maven_liquibase: {}

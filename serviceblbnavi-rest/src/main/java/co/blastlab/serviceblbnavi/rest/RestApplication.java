@@ -14,6 +14,8 @@ import javax.ws.rs.core.Application;
 @ApplicationPath("/rest/v1")
 public class RestApplication extends Application {
 
+    public static final String BASE_PATH = "/rest/v1";
+
     public RestApplication() {
         // ObjectMapper needed to correct handling of @JsonIgnore annotations in models by Swagger.
         // see: https://github.com/swagger-api/swagger-core/issues/960

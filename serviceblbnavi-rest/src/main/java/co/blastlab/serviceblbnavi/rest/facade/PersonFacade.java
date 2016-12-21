@@ -48,7 +48,6 @@ public class PersonFacade {
         p.generateAuthToken();
         personBean.create(p);
         return p;
-
     }
 
     @PUT

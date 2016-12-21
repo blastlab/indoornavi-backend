@@ -23,7 +23,7 @@
     <orderEntry type="library" name="Maven: javax.ejb:ejb-api:3.0" level="project" />
     <orderEntry type="module" module-name="serviceblbnavi-rest" />
     <orderEntry type="module" module-name="serviceblbnavi-domain" />
-    <orderEntry type="module" module-name="serviceblbnavi-liquibase" />
+    <orderEntry type="library" name="Maven: co.blastlab.serviceblbnavi:serviceblbnavi-liquibase:1.0" level="project" />
     <orderEntry type="library" name="Maven: us.fatehi:schemacrawler:12.06.03" level="project" />
     <orderEntry type="library" name="Maven: us.fatehi:schemacrawler-mysql:12.06.03" level="project" />
     <orderEntry type="library" name="Maven: mysql:mysql-connector-java:5.1.35" level="project" />
