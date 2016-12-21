@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.3.xsd">
+
+	<changeSet id="Person" author="mcichosz" context="test" runAlways="true" runOnChange="true">
+		<delete tableName="person"/>
+		<insert tableName="person">
+			<column name="email" value="abcd@efg.hij"/>
+			<column name="password" value="start123"/>
+			<column name="authToken" value="TestToken"/>
+		</insert>
+	</changeSet>
+
+</databaseChangeLog>
