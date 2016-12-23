@@ -6,11 +6,7 @@
 
 	<changeSet id="Person" author="mcichosz" context="test" runAlways="true" runOnChange="true">
 		<delete tableName="person"/>
-		<insert tableName="person">
-			<column name="email" value="abcd@efg.hij"/>
-			<column name="password" value="start123"/>
-			<column name="authToken" value="TestToken"/>
-		</insert>
+		<loadUpdateData tableName="person" file="test/Person.csv" primaryKey="id" />
 	</changeSet>
 
 </databaseChangeLog>
