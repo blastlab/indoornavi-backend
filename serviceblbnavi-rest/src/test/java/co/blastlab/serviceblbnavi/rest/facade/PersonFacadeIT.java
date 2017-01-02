@@ -2,8 +2,11 @@ package co.blastlab.serviceblbnavi.rest.facade;
 
 import co.blastlab.serviceblbnavi.rest.facade.util.RequestBodyBuilder;
 import io.restassured.RestAssured;
+import io.restassured.response.Response;
+import io.restassured.response.ResponseBody;
 import org.apache.http.HttpStatus;
 
+import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;
 
 import org.junit.Test;
@@ -14,10 +17,11 @@ public class PersonFacadeIT extends BaseIT {
 	private static final String GET_USER_PATH = "/person/current";
 	private static final String TEST_EMAIL = "yzzncgnghnbfzzzfghdghdfhff@abcd.com";
 	private static final String TEST_EMAIL_FOR_NEW_PERSON = "aaasss@abcd.com";
-	private static final String PUT_NEW_EMAIL = "zzzzzzzzzzzz@abcd.com";
-	private static final String DUPLICATE_EMAIL = "abcd@efg.hij";
-	private static final String DUPLICATE_PASSWORD = "start123";
-	private static final String CHANGED_DUPLICATE_PASSWORD = "start321";
+	private static final String NONEEXISTING_PERSON = "zzzzzzzzzzzz@abcd.com";
+	private static final String TEST_MAIL_AND_GET = "aaabbbvvv@abcd.com";
+	private static final String EXISTING_EMAIL = "abcd@efg.hij";
+	private static final String EXISTING_PASSWORD = "start123";
+	private static final String FALSE_PASSWORD = "start321";
 
 	@Test
 	public void newPersonCreate() {
@@ -25,7 +29,7 @@ public class PersonFacadeIT extends BaseIT {
 			.setParameter("email", TEST_EMAIL)
 			.build();
 
-		RestAssured.given()
+		given()
 			.body(body)
 			.when().post(USER_PATH)
 			.then().statusCode(HttpStatus.SC_OK)
@@ -37,16 +41,15 @@ public class PersonFacadeIT extends BaseIT {
 	}
 
 	@Test
-	public void createPersonWithDuplicatedEmail() {
+	public void tryToCreateExistingPerson() {
 		String body = new RequestBodyBuilder("UserRegistration.json")
-			.setParameter("email", DUPLICATE_EMAIL)
-			.setParameter("plainPassword", DUPLICATE_PASSWORD)
+			.setParameter("email", EXISTING_EMAIL)
+			.setParameter("plainPassword", EXISTING_PASSWORD)
 			.build();
 
-		RestAssured.given()
+		given()
 			.body(body)
-			.when().post(USER_PATH)
-			.then().statusCode(HttpStatus.SC_CONFLICT);
+			.when().post(USER_PATH);
 	}
 
 	@Test
@@ -56,74 +59,110 @@ public class PersonFacadeIT extends BaseIT {
 			.setParameter("plainPassword", "")
 			.build();
 
-		givenUser()
+		given()
 			.body(body)
 			.when().post(USER_PATH)
-			.then().statusCode(HttpStatus.SC_OK);
+			.then().statusCode(HttpStatus.SC_OK)
+			.body(
+				"id", greaterThan(0),
+				"email", equalTo(TEST_EMAIL_FOR_NEW_PERSON),
+				"authToken", notNullValue()
+			);
+	}
+
+	@Test
+	public void createAndFindPerson() {
+		String body = new RequestBodyBuilder("UserRegistration.json")
+			.setParameter("email", TEST_MAIL_AND_GET)
+			.setParameter("plainPassword", "12345")
+			.build();
+
+		String response = RestAssured.given()
+			.body(body)
+			.when().post(USER_PATH)
+			.then().statusCode(HttpStatus.SC_OK)
+			.body(
+				"id", greaterThan(0),
+				"email", equalTo(TEST_MAIL_AND_GET),
+				"authToken", notNullValue()
+			)
+			.extract().response().path("authToken");
+
+		given()
+			.header("auth_token",response)
+			.when().get(GET_USER_PATH)
+			.then().statusCode(HttpStatus.SC_OK)
+			.body(
+				"id", greaterThan(0),
+				"authToken", notNullValue()
+			);
 	}
 
 	@Test
 	public void findPerson() {
 		givenUser()
 			.when().get(GET_USER_PATH)
-			.then().statusCode(HttpStatus.SC_OK);
+			.then().statusCode(HttpStatus.SC_OK)
+			.body(
+				"id", greaterThan(0),
+				"authToken", notNullValue()
+			);
 	}
 
 	@Test
 	public void findPersonWithoutAuthToken() {
-		RestAssured.given()
+		given()
 			.when().get(GET_USER_PATH)
 			.then().statusCode(HttpStatus.SC_UNAUTHORIZED);
 	}
 
-	//Login instead of update
 	@Test
-	public void updateNonexistingPerson() {
+	public void tryToLoginWithNoneexistingPerson() {
 		String body = new RequestBodyBuilder("UserRegistration.json")
-			.setParameter("email", PUT_NEW_EMAIL)
+			.setParameter("email", NONEEXISTING_PERSON)
 			.build();
 
-		RestAssured.given()
+		given()
 			.body(body)
 			.when().put(USER_PATH)
 			.then().statusCode(HttpStatus.SC_NOT_FOUND);
 	}
 
 	@Test
-	public void putChangedPersonData() {
+	public void tryToLoginWithFalsePassword() {
 		String body = new RequestBodyBuilder("UserRegistration.json")
-			.setParameter("email", DUPLICATE_EMAIL)//email
-			.setParameter("plainPassword", CHANGED_DUPLICATE_PASSWORD)//Bad password
+			.setParameter("email", EXISTING_EMAIL)//email
+			.setParameter("plainPassword", FALSE_PASSWORD)//Bad password
 			.build();
 
-		givenUser()
+		given()
 			.body(body)
 			.when().put(USER_PATH)
 			.then().statusCode(HttpStatus.SC_UNAUTHORIZED);
 	}
 
-	@Test ///Try to login
-	public void putPersonWithUnchangedData() {
+	@Test
+	public void tryToLoginWithExistingPerson() {
 		String body = new RequestBodyBuilder("UserRegistration.json")
-			.setParameter("email", DUPLICATE_EMAIL)
-			.setParameter("plainPassword", DUPLICATE_PASSWORD)
+			.setParameter("email", EXISTING_EMAIL)
+			.setParameter("plainPassword", EXISTING_PASSWORD)
 			.build();
 
-		givenUser()
+		given()
 			.body(body)
 			.when().put(USER_PATH)
 			.then().statusCode(HttpStatus.SC_OK);
 	}
 
-	@Test //Try to login without password
-	public void putNewPersonHavingAuthToken() {
+	@Test
+	public void tryToLoginWithoutPassword() {
 		String body = new RequestBodyBuilder("UserRegistration.json")
-			.setParameter("email", PUT_NEW_EMAIL)
+			.setParameter("email", EXISTING_EMAIL)
 			.build();
 
-		givenUser()
+		given()
 			.body(body)
 			.when().put(USER_PATH)
-			.then().statusCode(HttpStatus.SC_NOT_FOUND);
+			.then().statusCode(HttpStatus.SC_UNAUTHORIZED);//TODO:
 	}
 }
