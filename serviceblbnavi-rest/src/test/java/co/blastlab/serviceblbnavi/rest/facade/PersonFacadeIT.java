@@ -49,7 +49,8 @@ public class PersonFacadeIT extends BaseIT {
 
 		given()
 			.body(body)
-			.when().post(USER_PATH);
+			.when().post(USER_PATH)
+			.then().statusCode(HttpStatus.SC_CONFLICT);
 	}
 
 	@Test
@@ -89,11 +90,12 @@ public class PersonFacadeIT extends BaseIT {
 			.extract().response().path("authToken");
 
 		given()
-			.header("auth_token",response)
+			.header("auth_token", response)
 			.when().get(GET_USER_PATH)
 			.then().statusCode(HttpStatus.SC_OK)
 			.body(
 				"id", greaterThan(0),
+				"email", equalTo(TEST_MAIL_AND_GET),
 				"authToken", notNullValue()
 			);
 	}
@@ -151,7 +153,12 @@ public class PersonFacadeIT extends BaseIT {
 		given()
 			.body(body)
 			.when().put(USER_PATH)
-			.then().statusCode(HttpStatus.SC_OK);
+			.then().statusCode(HttpStatus.SC_OK)
+			.body(
+				"id", greaterThan(0),
+				"email", equalTo(EXISTING_EMAIL),
+				"authToken", notNullValue()
+			);
 	}
 
 	@Test
