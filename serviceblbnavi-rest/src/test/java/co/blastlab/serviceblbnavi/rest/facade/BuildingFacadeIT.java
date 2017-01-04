@@ -11,6 +11,7 @@ public class BuildingFacadeIT extends BaseIT {
 
 	private static final String BUILDING_PATH = "/building";
 	private static final String TEST_NAME = "AAAAAdfA";
+	private static final String EXISTING_NAME = "AABBCCDD";
 
 	@Test
 	public void createNewBuilding() {
@@ -27,4 +28,20 @@ public class BuildingFacadeIT extends BaseIT {
 				"name", equalTo(TEST_NAME)
 			);
 	}
+
+/*	@Test
+	public void updateBuilding() {
+		String body = new RequestBodyBuilder("BuildingCreating.json")
+			.setParameter("name", EXISTING_NAME)
+			.setParameter("complexId",2)
+			.build();
+
+		givenUser()
+			.body(body)
+			.when().put(BUILDING_PATH)
+			.then().statusCode(HttpStatus.SC_OK)
+			.body(
+				"name", equalTo(TEST_NAME)
+			);
+	}*/
 }

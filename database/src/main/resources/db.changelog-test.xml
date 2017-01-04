@@ -14,4 +14,14 @@
 		<loadUpdateData tableName="complex" file="test/Complex.csv" primaryKey="id" />
 	</changeSet>
 
+	<changeSet id="acl_complex" author="mcichosz" context="test" runAlways="true" runOnChange="true">
+		<delete tableName="acl_complex"/>
+		<loadUpdateData tableName="acl_complex" file="test/acl_complex.csv" primaryKey="id" />
+	</changeSet>
+
+	<changeSet id="Building" author="mcichosz" context="test" runAlways="true" runOnChange="true">
+		<delete tableName="building"/>
+		<loadUpdateData tableName="building" file="test/Building.csv" primaryKey="id" />
+	</changeSet>
+
 </databaseChangeLog>
