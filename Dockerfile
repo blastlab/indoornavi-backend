@@ -20,8 +20,11 @@ RUN $JBOSS_HOME/bin/add-user.sh -a api api --group Manager --silent
 COPY docker/wait-for-container-end /usr/local/bin/
 COPY docker/standalone.xml $JBOSS_HOME/standalone/configuration/
 COPY docker/mariadb-module.xml $JBOSS_HOME/modules/system/layers/base/org/mariadb/jdbc/main/module.xml
+COPY docker/mariadb-xa-module.xml $JBOSS_HOME/modules/system/layers/base/org/mariadb/jdbc/xaMaria/module.xml
 RUN cd $JBOSS_HOME/modules/system/layers/base/org/mariadb/jdbc/main/ \
 	&& curl -o mariadb-java-client.jar http://central.maven.org/maven2/org/mariadb/jdbc/mariadb-java-client/$MARIADB_CONNECTOR_VERSION/mariadb-java-client-$MARIADB_CONNECTOR_VERSION.jar
+RUN cp $JBOSS_HOME/modules/system/layers/base/org/mariadb/jdbc/main/mariadb-java-client.jar $JBOSS_HOME/modules/system/layers/base/org/mariadb/jdbc/xaMaria/
+
 
 COPY docker/start-server.sh /
 

@@ -10,7 +10,7 @@ services:
       TZ: Europe/Warsaw
 
   db_prod:
-    build: mariadb
+    build: mariadbProd
     ports:
       - '3307:3306'
     environment:
