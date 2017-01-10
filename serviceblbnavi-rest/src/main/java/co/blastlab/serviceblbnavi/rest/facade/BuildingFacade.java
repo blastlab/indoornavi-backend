@@ -56,6 +56,7 @@ public class BuildingFacade {
     @ApiOperation(value = "create", response = Building.class)
     public Building create(@ApiParam(value = "building", required = true) Building building) {
         if (building.getComplexId() != null) {
+
             permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
                     building.getComplexId(), Permission.UPDATE);
             Complex complex = complexBean.find(building.getComplexId());
