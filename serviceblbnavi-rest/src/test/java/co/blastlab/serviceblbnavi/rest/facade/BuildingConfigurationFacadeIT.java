@@ -1,35 +1,33 @@
 package co.blastlab.serviceblbnavi.rest.facade;
 
-import co.blastlab.serviceblbnavi.rest.facade.util.RequestBodyBuilder;
 import org.apache.http.HttpStatus;
 import org.junit.Test;
 
-import static org.hamcrest.Matchers.equalTo;
-
+import static io.restassured.RestAssured.given;
 public class BuildingConfigurationFacadeIT extends BaseIT {
 
-	private static final String BUILDING_PATH = "/building";
-	private static final String CONFIG_PATH = "/config";
-	private static final String TEST_NAME = "AAAAAdfA";
-	private static final String TEST_NAME_2 = "AAAAAdfabcdabcA";
-	private static final String TEST_NAME_3 = "AGKDADKASDK";
-	private static final String EXISTING_NAME = "AABBCC";
-	private static final String UPDATED_NAME = "AABBCCQQQQQQQ";
-	private static final Integer ID_FOR_BUILDING_CONFIGURATION = 1;
+	private static final String BUILDING_CONFIGURATION_PATH = "/buildingConfiguration/{complexName}/{buildingName}/{version}";
+	private static final String COMPLEX_TEST_NAME = "QWERTY";
+	private static final String BUILDING_TEST_NAME = "GPP";
+	private static final String AUTH_TOKEN = "TokenTEST";
+	private static final Integer VERSION = 2;
 
 	@Test
-	public void createNewBuilding() {
-		String body = new RequestBodyBuilder("BuildingCreating.json")
-			.setParameter("name", TEST_NAME)
-			.setParameter("complexId",2)
-			.build();
+	public void createAndGetBuildingConfiguration() {
+		given()
+			.header("auth_token", AUTH_TOKEN)
+			.pathParam("complexName",COMPLEX_TEST_NAME)
+			.pathParam("buildingName",BUILDING_TEST_NAME)
+			.pathParam("version",VERSION)
+			.when().post(BUILDING_CONFIGURATION_PATH)
+			.then().statusCode(HttpStatus.SC_NO_CONTENT);
 
-		givenUser()
-			.body(body)
-			.when().post(BUILDING_PATH)
-			.then().statusCode(HttpStatus.SC_OK)
-			.body(
-				"name", equalTo(TEST_NAME)
-			);
+		given()
+			.header("auth_token", AUTH_TOKEN)
+			.pathParam("complexName",COMPLEX_TEST_NAME)
+			.pathParam("buildingName",BUILDING_TEST_NAME)
+			.pathParam("version",VERSION)
+			.when().get(BUILDING_CONFIGURATION_PATH)
+			.then().statusCode(HttpStatus.SC_NOT_FOUND);
 	}
 }

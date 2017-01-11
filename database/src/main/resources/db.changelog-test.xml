@@ -24,4 +24,8 @@
 		<loadUpdateData tableName="building" file="test/Building.csv" primaryKey="id" />
 	</changeSet>
 
+	<changeSet id="Buildingconfiguration" author="mcichosz" context="test" runAlways="true" runOnChange="true">
+		<delete tableName="buildingconfiguration"/>
+	</changeSet>
+
 </databaseChangeLog>
