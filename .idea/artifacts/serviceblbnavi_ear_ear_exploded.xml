@@ -1,0 +1,26 @@
+<component name="ArtifactManager">
+  <artifact type="exploded-ear" name="serviceblbnavi-ear:ear exploded">
+    <output-path>$PROJECT_DIR$/serviceblbnavi-ear/target/serviceblbnavi-ear-1.0</output-path>
+    <root id="root">
+      <element id="javaee-facet-resources" facet="serviceblbnavi-ear/javaeeApplication/JavaEE" />
+      <element id="directory" name="META-INF">
+        <element id="file-copy" path="$PROJECT_DIR$/serviceblbnavi-ear/target/serviceblbnavi-ear-1.0/META-INF/MANIFEST.MF" />
+      </element>
+      <element id="dir-copy" path="$PROJECT_DIR$/serviceblbnavi-ear/src/main/application" />
+      <element id="archive" name="serviceblbnavi-dao-1.0.jar">
+        <element id="artifact" artifact-name="serviceblbnavi-dao:ejb exploded" />
+      </element>
+      <element id="directory" name="lib">
+        <element id="library" level="project" name="Maven: commons-lang:commons-lang:2.6" />
+        <element id="library" level="project" name="Maven: org.liquibase:liquibase-core:3.4.0" />
+        <element id="library" level="project" name="Maven: javax.ejb:ejb-api:3.0" />
+        <element id="archive" name="serviceblbnavi-domain-1.0.jar">
+          <element id="module-output" name="serviceblbnavi-domain" />
+        </element>
+      </element>
+      <element id="archive" name="serviceblbnavi-rest-1.0.war">
+        <element id="artifact" artifact-name="serviceblbnavi-rest:war exploded" />
+      </element>
+    </root>
+  </artifact>
+</component>

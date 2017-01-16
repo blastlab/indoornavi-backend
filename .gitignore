@@ -2,8 +2,15 @@
 *.classpath_nb
 
 *nb-configuration.xml
-*jboss.xml
-*jboss-app.xml
-*jboss-web.xml
+
+# IntelliJ
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/issues.xml
+.idea/dataSources/
+.idea/dataSources.local.xml
+.idea/sqlDataSources.xml
+.idea/dynamic.xml
+.idea/uiDesigner.xml
 
 /serviceblbnavi-dao/nbproject/
