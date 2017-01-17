@@ -20,6 +20,9 @@
     <patterns>
       <pattern testClass=".*IT" />
     </patterns>
-    <method />
+    <method>
+      <option name="RunConfigurationTask" enabled="true" run_configuration_name="[Docker] Run liquibase" run_configuration_type="MavenRunConfiguration" />
+      <option name="Make" enabled="true" />
+    </method>
   </configuration>
 </component>
