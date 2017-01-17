@@ -14,6 +14,16 @@
         <element id="library" level="project" name="Maven: commons-lang:commons-lang:2.6" />
         <element id="library" level="project" name="Maven: org.liquibase:liquibase-core:3.4.0" />
         <element id="library" level="project" name="Maven: javax.ejb:ejb-api:3.0" />
+        <element id="library" level="project" name="Maven: org.apache.deltaspike.core:deltaspike-core-api:1.7.1" />
+        <element id="library" level="project" name="Maven: org.apache.deltaspike.core:deltaspike-core-impl:1.7.1" />
+        <element id="library" level="project" name="Maven: org.apache.deltaspike.modules:deltaspike-data-module-api:1.7.1" />
+        <element id="library" level="project" name="Maven: org.apache.deltaspike.modules:deltaspike-partial-bean-module-api:1.7.1" />
+        <element id="library" level="project" name="Maven: org.apache.deltaspike.modules:deltaspike-data-module-impl:1.7.1" />
+        <element id="library" level="project" name="Maven: org.apache.deltaspike.modules:deltaspike-partial-bean-module-impl:1.7.1" />
+        <element id="library" level="project" name="Maven: org.apache.deltaspike.modules:deltaspike-proxy-module-api:1.7.1" />
+        <element id="library" level="project" name="Maven: org.apache.deltaspike.modules:deltaspike-proxy-module-impl-asm5:1.7.1" />
+        <element id="library" level="project" name="Maven: org.apache.deltaspike.modules:deltaspike-jpa-module-impl:1.7.1" />
+        <element id="library" level="project" name="Maven: org.apache.deltaspike.modules:deltaspike-jpa-module-api:1.7.1" />
         <element id="archive" name="serviceblbnavi-domain-1.0.jar">
           <element id="module-output" name="serviceblbnavi-domain" />
         </element>
