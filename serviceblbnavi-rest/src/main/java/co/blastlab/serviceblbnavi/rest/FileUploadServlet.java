@@ -13,10 +13,8 @@ import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiImplicitParam;
 import com.wordnik.swagger.annotations.ApiImplicitParams;
 import com.wordnik.swagger.annotations.ApiOperation;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.util.Base64;
+import org.apache.commons.io.IOUtils;
+
 import javax.ejb.EJB;
 import javax.imageio.ImageIO;
 import javax.inject.Inject;
@@ -27,9 +25,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
-import org.apache.commons.io.IOUtils;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.util.Base64;
 
 /**
  *
