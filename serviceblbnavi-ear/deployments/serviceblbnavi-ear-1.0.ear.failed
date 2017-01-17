@@ -1,9 +1,9 @@
-"{
-    \"WFLYCTL0080: Failed services\" => {\"jboss.deployment.subunit.\\\"serviceblbnavi-ear-1.0.ear\\\".\\\"serviceblbnavi-dao-1.0.jar\\\".component.UpgradeBean.START\" => \"org.jboss.msc.service.StartException in service jboss.deployment.subunit.\\\"serviceblbnavi-ear-1.0.ear\\\".\\\"serviceblbnavi-dao-1.0.jar\\\".component.UpgradeBean.START: java.lang.IllegalStateException: WFLYEE0042: Failed to construct component instance
+{
+    "WFLYCTL0080: Failed services" => {"jboss.deployment.subunit.\"serviceblbnavi-ear-1.0.ear\".\"serviceblbnavi-dao-1.0.jar\".component.UpgradeBean.START" => "org.jboss.msc.service.StartException in service jboss.deployment.subunit.\"serviceblbnavi-ear-1.0.ear\".\"serviceblbnavi-dao-1.0.jar\".component.UpgradeBean.START: java.lang.IllegalStateException: WFLYEE0042: Failed to construct component instance
     Caused by: java.lang.IllegalStateException: WFLYEE0042: Failed to construct component instance
     Caused by: javax.ejb.EJBException: java.lang.RuntimeException: liquibase.exception.ChangeLogParseException: db.changelog.xml does not exist
     Caused by: java.lang.RuntimeException: liquibase.exception.ChangeLogParseException: db.changelog.xml does not exist
-    Caused by: liquibase.exception.ChangeLogParseException: db.changelog.xml does not exist\"},
-    \"WFLYCTL0412: Required services that are not installed:\" => [\"jboss.deployment.subunit.\\\"serviceblbnavi-ear-1.0.ear\\\".\\\"serviceblbnavi-dao-1.0.jar\\\".component.UpgradeBean.START\"],
-    \"WFLYCTL0180: Services with missing/unavailable dependencies\" => undefined
-}"
+    Caused by: liquibase.exception.ChangeLogParseException: db.changelog.xml does not exist"},
+    "WFLYCTL0412: Required services that are not installed:" => ["jboss.deployment.subunit.\"serviceblbnavi-ear-1.0.ear\".\"serviceblbnavi-dao-1.0.jar\".component.UpgradeBean.START"],
+    "WFLYCTL0180: Services with missing/unavailable dependencies" => undefined
+}
