@@ -1,11 +1,5 @@
 package co.blastlab.serviceblbnavi.rest.facade;
 
-import co.blastlab.serviceblbnavi.rest.facade.util.RequestBodyBuilder;
-import org.apache.http.HttpStatus;
-import org.junit.Test;
-
-import static org.hamcrest.Matchers.equalTo;
-
 public class FloorFacadeIT extends BaseIT {
 
 	private static final String BUILDING_PATH = "/floor";
@@ -13,7 +7,7 @@ public class FloorFacadeIT extends BaseIT {
 	private static final String TEST_NAME_2 = "AAAAAdfabcdabcA";
 
 
-	@Test
+	/*@Test
 	public void createNewFloor() {
 		String body = new RequestBodyBuilder("BuildingCreating.json")
 			.setParameter("name", TEST_NAME)
@@ -52,5 +46,5 @@ public class FloorFacadeIT extends BaseIT {
 			.body(
 				"name", equalTo(TEST_NAME_2)
 			);
-	}
+	}*/
 }
