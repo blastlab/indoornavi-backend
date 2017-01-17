@@ -3,6 +3,7 @@ package co.blastlab.serviceblbnavi.rest;
 import co.blastlab.serviceblbnavi.dao.FloorBean;
 import co.blastlab.serviceblbnavi.dao.PermissionBean;
 import co.blastlab.serviceblbnavi.dao.PersonBean;
+import co.blastlab.serviceblbnavi.dao.PersonRepository;
 import co.blastlab.serviceblbnavi.dao.exception.PermissionException;
 import co.blastlab.serviceblbnavi.domain.Floor;
 import co.blastlab.serviceblbnavi.domain.Permission;
@@ -45,6 +46,9 @@ public class FileUploadServlet extends HttpServlet {
 
     @EJB
     private PersonBean personBean;
+
+    @Inject
+    private PersonRepository personRepository;
 
     @EJB
     private PermissionBean permissionBean;
@@ -108,7 +112,7 @@ public class FileUploadServlet extends HttpServlet {
     private void authorize(HttpServletRequest request) {
         String authToken = request.getHeader("auth_token");
         if (authToken != null) {
-            Person person = personBean.findByAuthToken(authToken);
+            Person person = personRepository.findByAuthToken(authToken);
             if (person != null) {
                 authorizationBean.setCurrentUser(person);
                 return;
