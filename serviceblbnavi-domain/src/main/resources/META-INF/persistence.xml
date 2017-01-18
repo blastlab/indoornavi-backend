@@ -3,7 +3,9 @@
     <persistence-unit name="NaviPU" transaction-type="JTA">
         <!--<provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>-->
         <jta-data-source>java:/jdbc/Navi</jta-data-source>
-        <exclude-unlisted-classes>false</exclude-unlisted-classes> <!-- Import all entity classes -->
+
+        <!--<exclude-unlisted-classes>false</exclude-unlisted-classes>--> <!-- Import all entity classes -->
+        <class>co.blastlab.serviceblbnavi.domain.Person</class>
         <properties>
             <property name="hibernate.enable_lazy_load_no_trans" value="true"/>
             <property name="hibernate.show_sql" value="true"/>

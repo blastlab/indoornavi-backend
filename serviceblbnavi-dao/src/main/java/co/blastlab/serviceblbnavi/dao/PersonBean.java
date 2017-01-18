@@ -20,7 +20,6 @@ public class PersonBean {
 
     public void create(Person person) {
         em.persist(person);
-        System.out.print("sth");
     }
 
     public Person find(Long id) {
@@ -52,7 +51,6 @@ public class PersonBean {
 
     public void checkPassword(Person person, String plainPassword) {
         if (!PasswordEncoder.getShaPassword(Person.PASSWORD_DIGEST_ALG, plainPassword, person.getSalt()).equalsIgnoreCase(person.getPassword())) {
-            System.out.print("sdfas");
             throw new PermissionException();
         }
     }
