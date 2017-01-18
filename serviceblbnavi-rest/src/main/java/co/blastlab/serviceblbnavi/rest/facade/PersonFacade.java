@@ -1,16 +1,15 @@
 package co.blastlab.serviceblbnavi.rest.facade;
 
 import co.blastlab.serviceblbnavi.dao.PersonBean;
+import co.blastlab.serviceblbnavi.dao.repository.PersonRepository;
 import co.blastlab.serviceblbnavi.domain.Person;
 import co.blastlab.serviceblbnavi.rest.bean.AuthorizationBean;
 import co.blastlab.serviceblbnavi.views.View;
 import com.fasterxml.jackson.annotation.JsonView;
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
-import com.wordnik.swagger.annotations.ApiParam;
-import com.wordnik.swagger.annotations.ApiResponse;
-import com.wordnik.swagger.annotations.ApiResponses;
+import com.wordnik.swagger.annotations.*;
+
 import javax.ejb.EJB;
+import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityExistsException;
 import javax.persistence.EntityNotFoundException;
@@ -25,10 +24,14 @@ import javax.ws.rs.Path;
  */
 @Path("/person")
 @Api("/person")
+@Stateless
 public class PersonFacade {
 
     @EJB
     private PersonBean personBean;
+
+    @Inject
+    private PersonRepository personRepository;
 
     @Inject
     private AuthorizationBean authorizationBean;
@@ -40,13 +43,14 @@ public class PersonFacade {
         @ApiResponse(code = 409, message = "person with given email exists")
     })
     public Person register(@ApiParam(value = "person", required = true) Person person) {
-        Person p = personBean.findByEmail(person.getEmail());
+        Person p = personRepository.findOptionalByEmail(person.getEmail());
         if (p != null) {
             throw new EntityExistsException();
         }
         p = new Person(person.getEmail(), person.getPlainPassword());
         p.generateAuthToken();
         personBean.create(p);
+        //personRepository.save(p);
         return p;
     }
 
@@ -57,7 +61,7 @@ public class PersonFacade {
         @ApiResponse(code = 404, message = "invalid login data")
     })
     public Person login(@ApiParam(value = "person", required = true) Person person) {
-        Person p = personBean.findByEmail(person.getEmail());
+        Person p = personRepository.findOptionalByEmail(person.getEmail());
         if (p == null) {
             throw new EntityNotFoundException();
         }
