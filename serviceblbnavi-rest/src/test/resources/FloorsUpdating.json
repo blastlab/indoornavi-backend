@@ -1,0 +1,13 @@
+[
+  {
+  "id": "{id_1:3}",
+  "level": "{level_1:5}",
+  "bitmapWidth": "{bitmapWidth_1:60}",
+  "bitmapHeight": "{bitmapHeight_1:70}"
+  },
+  {
+    "id": "{id_2:4}",
+    "level": "{level_2:9}",
+    "bitmapWidth": "{bitmapWidth_2:60}",
+    "bitmapHeight": "{bitmapHeight_2:80}"
+  }]

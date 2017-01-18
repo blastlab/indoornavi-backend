@@ -10,7 +10,7 @@ import static org.hamcrest.Matchers.*;
 public class ComplexFacadeIT extends BaseIT {
 
 	private static final String COMPLEX_PATH = "/complex";
-	private static final String COMPLEX_PATH_WITH_ID = "/complex/%d";
+	private static final String COMPLEX_PATH_WITH_ID = "/complex/{id}";
 	private static final String TEST_NAME = "GPNT";
 	private static final String EXISTING_NAME = "AABBCC";
 	private static final String TEST_NAME_TO_DELETE = "GPNTDDDDDD";
@@ -70,18 +70,18 @@ public class ComplexFacadeIT extends BaseIT {
 			)
 			.extract().response().path("id");
 
-		String pathForDelete = String.format(COMPLEX_PATH_WITH_ID, response);
 		givenUser()
-			.when().delete(pathForDelete)
+			.pathParam("id",response)
+			.when().delete(COMPLEX_PATH_WITH_ID)
 			.then().statusCode(HttpStatus.SC_OK);
 	}
 
 	@Test
-	public void tryToDeleteNoneexistingComplex() {
+	public void failInDeletingNoneexistingComplex() {
 		Integer nonexistingId = 999;
-		String pathForDelete = String.format(COMPLEX_PATH_WITH_ID, nonexistingId);
 		givenUser()
-			.when().delete(pathForDelete)
+			.pathParam("id",nonexistingId)
+			.when().delete(COMPLEX_PATH_WITH_ID)
 			.then().statusCode(HttpStatus.SC_UNAUTHORIZED);
 	}
 
@@ -100,9 +100,9 @@ public class ComplexFacadeIT extends BaseIT {
 			)
 			.extract().response().path("id");
 
-		String pathForGet = COMPLEX_PATH + "/" + response;
 		givenUser()
-			.when().get(pathForGet)
+			.pathParam("id",response)
+			.when().get(COMPLEX_PATH_WITH_ID)
 			.then().statusCode(HttpStatus.SC_OK)
 			.body(
 				"name", equalTo(TEST_NAME_TO_FIND)
@@ -112,9 +112,9 @@ public class ComplexFacadeIT extends BaseIT {
 	@Test
 	public void findComplexWithoutAuthToken() {
 		Integer id = 2;
-		String pathForGet = COMPLEX_PATH + "/" + id;
 		given()
-			.when().get(pathForGet)
+			.pathParam("id",id)
+			.when().get(COMPLEX_PATH_WITH_ID)
 			.then().statusCode(HttpStatus.SC_UNAUTHORIZED);
 	}
 }
