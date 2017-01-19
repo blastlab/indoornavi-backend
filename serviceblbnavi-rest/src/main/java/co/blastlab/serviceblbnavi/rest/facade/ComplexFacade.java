@@ -5,39 +5,32 @@ import co.blastlab.serviceblbnavi.dao.ComplexBean;
 import co.blastlab.serviceblbnavi.dao.PermissionBean;
 import co.blastlab.serviceblbnavi.dao.PersonBean;
 import co.blastlab.serviceblbnavi.dao.exception.PermissionException;
+import co.blastlab.serviceblbnavi.dao.repository.PersonRepository;
 import co.blastlab.serviceblbnavi.domain.ACL_Complex;
 import co.blastlab.serviceblbnavi.domain.Complex;
 import co.blastlab.serviceblbnavi.domain.Permission;
 import co.blastlab.serviceblbnavi.domain.Person;
-import co.blastlab.serviceblbnavi.views.View;
 import co.blastlab.serviceblbnavi.rest.bean.AuthorizationBean;
+import co.blastlab.serviceblbnavi.views.View;
 import com.fasterxml.jackson.annotation.JsonView;
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
-import com.wordnik.swagger.annotations.ApiParam;
-import com.wordnik.swagger.annotations.ApiResponse;
-import com.wordnik.swagger.annotations.ApiResponses;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import com.wordnik.swagger.annotations.*;
+
 import javax.ejb.EJB;
 import javax.inject.Inject;
 import javax.persistence.EntityExistsException;
 import javax.persistence.EntityNotFoundException;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 /**
- *
  * @author Michał Koszałka
  */
 @Path("/complex")
 @Api("/complex")
+//@Stateless
 public class ComplexFacade {
 
     @EJB
@@ -45,6 +38,9 @@ public class ComplexFacade {
 
     @EJB
     private PersonBean personBean;
+
+    @Inject
+    private PersonRepository personRepository;
 
     @EJB
     private ACL_ComplexBean aclComplexBean;
@@ -78,7 +74,7 @@ public class ComplexFacade {
     @JsonView(View.ComplexInternal.class)
     @ApiOperation(value = "find complex by id", response = Complex.class)
     @ApiResponses({
-        @ApiResponse(code = 404, message = "complex id empty or complex doesn't exist")
+            @ApiResponse(code = 404, message = "complex id empty or complex doesn't exist")
     })
     public Complex find(@ApiParam(value = "id", required = true) @PathParam("id") Long id) {
         if (id != null) {
@@ -100,7 +96,7 @@ public class ComplexFacade {
     @JsonView(View.ComplexInternal.class)
     @ApiOperation(value = "find complex by building id", response = Complex.class)
     @ApiResponses({
-        @ApiResponse(code = 404, message = "building id empty or building doesn't exist")
+            @ApiResponse(code = 404, message = "building id empty or building doesn't exist")
     })
     public Complex findByBuilding(@ApiParam(value = "id", required = true) @PathParam("id") Long id) {
         if (id != null) {
@@ -122,7 +118,7 @@ public class ComplexFacade {
     @JsonView(View.ComplexInternal.class)
     @ApiOperation(value = "find complex by floor id", response = Complex.class)
     @ApiResponses({
-        @ApiResponse(code = 404, message = "floor id empty or floor doesn't exist")
+            @ApiResponse(code = 404, message = "floor id empty or floor doesn't exist")
     })
     public Complex findByFloor(@ApiParam(value = "id", required = true) @PathParam("id") Long id) {
         if (id != null) {
@@ -144,7 +140,7 @@ public class ComplexFacade {
     @JsonView(View.External.class)
     @ApiOperation(value = "find complete complex by id", response = Complex.class)
     @ApiResponses({
-        @ApiResponse(code = 404, message = "complex id empty or complex doesn't exist")
+            @ApiResponse(code = 404, message = "complex id empty or complex doesn't exist")
     })
     public Complex findComplete(@ApiParam(value = "id", required = true) @PathParam("id") Long id) {
         if (id != null) {
@@ -169,7 +165,12 @@ public class ComplexFacade {
     })
     public Response delete(@ApiParam(value = "id", required = true) @PathParam("id") Long id) {
         if (id != null) {
-            permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(), id, Permission.DELETE);
+            try {
+                permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(), id, Permission.DELETE);
+            } catch (PermissionException e) {
+                e.printStackTrace();
+                return Response.status(401).build();
+            }
             Complex complex = complexBean.find(id);
             if (complex != null) {
                 complexBean.delete(complex);
@@ -184,28 +185,29 @@ public class ComplexFacade {
     @JsonView(View.PersonInternal.class)
     @ApiOperation(value = "find complexes by person id", response = Complex.class)
     @ApiResponses({
-        @ApiResponse(code = 404, message = "person id empty, person or complex doesn't exist")
+            @ApiResponse(code = 404, message = "person id empty, person or complex doesn't exist")
     })
     public List<Complex> findByPerson(@ApiParam(value = "personId", required = true) @PathParam("id") Long personId) {
         if (personId != null) {
             if (!personId.equals(authorizationBean.getCurrentUser().getId())) {
                 throw new PermissionException();
             }
-            Person person = personBean.find(personId);
+            //Person person = personBean.find(personId);
+            Person person = personRepository.findBy(personId);
             if (person != null) {
                 return complexBean.findAllByPerson(personId);
             }
         }
         throw new EntityNotFoundException();
     }
-    
+
     @PUT
     @ApiOperation(value = "delete complex by id", response = Response.class)
     @ApiResponses({
-        @ApiResponse(code = 404, message = "complex id empty or complex doesn't exist")
+            @ApiResponse(code = 404, message = "complex id empty or complex doesn't exist")
     })
     public Complex update(@ApiParam(value = "complex", required = true) Complex complex) {
-         Complex c = complexBean.findByName(complex.getName());
+        Complex c = complexBean.findByName(complex.getName());
         if (c != null && !Objects.equals(c.getId(), complex.getId())) {
             throw new EntityExistsException();
         }
