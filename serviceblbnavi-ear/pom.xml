@@ -60,12 +60,12 @@
         </plugins>
     </build>
     <dependencies>
-        <dependency>
+        <!--<dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>serviceblbnavi-dao</artifactId>
             <version>${project.version}</version>
             <type>ejb</type>
-        </dependency>
+        </dependency>-->
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>serviceblbnavi-rest</artifactId>
