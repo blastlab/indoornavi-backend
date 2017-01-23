@@ -17,21 +17,8 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module" module-name="serviceblbnavi-dao" />
-    <orderEntry type="library" name="Maven: commons-lang:commons-lang:2.6" level="project" />
-    <orderEntry type="library" name="Maven: org.liquibase:liquibase-core:3.4.0" level="project" />
-    <orderEntry type="library" name="Maven: javax.ejb:ejb-api:3.0" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.deltaspike.core:deltaspike-core-api:1.7.1" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: org.apache.deltaspike.core:deltaspike-core-impl:1.7.1" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.deltaspike.modules:deltaspike-data-module-api:1.7.1" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.deltaspike.modules:deltaspike-partial-bean-module-api:1.7.1" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: org.apache.deltaspike.modules:deltaspike-data-module-impl:1.7.1" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: org.apache.deltaspike.modules:deltaspike-partial-bean-module-impl:1.7.1" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: org.apache.deltaspike.modules:deltaspike-proxy-module-api:1.7.1" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: org.apache.deltaspike.modules:deltaspike-proxy-module-impl-asm5:1.7.1" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: org.apache.deltaspike.modules:deltaspike-jpa-module-impl:1.7.1" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: org.apache.deltaspike.modules:deltaspike-jpa-module-api:1.7.1" level="project" />
     <orderEntry type="module" module-name="serviceblbnavi-rest" />
     <orderEntry type="module" module-name="serviceblbnavi-domain" />
+    <orderEntry type="library" name="Maven: commons-lang:commons-lang:2.6" level="project" />
   </component>
 </module>

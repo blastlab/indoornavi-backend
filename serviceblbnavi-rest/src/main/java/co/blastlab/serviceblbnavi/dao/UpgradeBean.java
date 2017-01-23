@@ -1,15 +1,16 @@
 package co.blastlab.serviceblbnavi.dao;
 
+import co.blastlab.serviceblbnavi.dao.qualifier.NaviProduction;
 import co.blastlab.serviceblbnavi.domain.BuildingConfiguration;
-import java.util.List;
+import co.blastlab.serviceblbnavi.domain.Complex;
+
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
-import co.blastlab.serviceblbnavi.dao.qualifier.NaviProduction;
-import co.blastlab.serviceblbnavi.domain.Complex;
+import java.util.List;
 
 /**
  *
