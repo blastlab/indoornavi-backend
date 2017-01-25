@@ -41,7 +41,7 @@ public class PersonFacade {
     @ApiResponses({
             @ApiResponse(code = 409, message = "person with given email exists")
     })
-    public Person register(@ApiParam(value = "person", required = true) Person person){
+    public Person register(@ApiParam(value = "person", required = true) Person person) {
         Person p = personRepository.findOptionalByEmail(person.getEmail());
         if (p != null) {
             throw new EntityExistsException();
@@ -58,7 +58,7 @@ public class PersonFacade {
     @ApiResponses({
             @ApiResponse(code = 404, message = "invalid login data")
     })
-    public Person login(@ApiParam(value = "person", required = true) Person person){
+    public Person login(@ApiParam(value = "person", required = true) Person person) {
         Person p = personRepository.findOptionalByEmail(person.getEmail());
 
         if (p == null) {
@@ -74,7 +74,7 @@ public class PersonFacade {
     @JsonView(View.PersonInternal.class)
     @Path("/current")
     @ApiOperation(value = "find current user")
-    public Person get(){
+    public Person get() {
         return authorizationBean.getCurrentUser();
     }
 

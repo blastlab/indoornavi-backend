@@ -1,10 +1,18 @@
 package co.blastlab.serviceblbnavi.dao;
 
+import co.blastlab.serviceblbnavi.dao.qualifier.NaviProduction;
 import co.blastlab.serviceblbnavi.domain.Building;
 import co.blastlab.serviceblbnavi.domain.BuildingConfiguration;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import javax.ejb.EJB;
+import javax.ejb.Stateless;
+import javax.inject.Inject;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityNotFoundException;
+import javax.persistence.NoResultException;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -12,13 +20,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-import javax.ejb.EJB;
-import javax.ejb.Stateless;
-import javax.inject.Inject;
-import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
-import co.blastlab.serviceblbnavi.dao.qualifier.NaviProduction;
-import javax.persistence.EntityNotFoundException;
 
 /**
  *
@@ -26,6 +27,8 @@ import javax.persistence.EntityNotFoundException;
  */
 @Stateless
 public class BuildingConfigurationBean {
+
+    public final static Integer DB_VERSION = 2;
 
     @Inject
     private EntityManager em;
@@ -114,13 +117,13 @@ public class BuildingConfigurationBean {
                             .digest(configuration.getBytes("UTF-8"))
                     )
             );
-            buildingConfiguration.setVersion(UpgradeBean.DB_VERSION);
+            buildingConfiguration.setVersion(DB_VERSION);
             buildingConfiguration.setBuilding(building);
             BuildingConfiguration bc;
             try {
                 bc = emProduction.createNamedQuery(BuildingConfiguration.FIND_BY_BUILDING_ID_AND_VERSION, BuildingConfiguration.class)
                         .setParameter("buildingId", building.getId())
-                        .setParameter("version", UpgradeBean.DB_VERSION)
+                        .setParameter("version", DB_VERSION)
                         .getSingleResult();
             } catch (NoResultException e) {
                 bc = null;
