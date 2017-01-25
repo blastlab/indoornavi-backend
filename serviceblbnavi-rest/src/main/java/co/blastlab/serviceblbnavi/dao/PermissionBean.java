@@ -2,11 +2,12 @@ package co.blastlab.serviceblbnavi.dao;
 
 import co.blastlab.serviceblbnavi.dao.exception.PermissionException;
 import co.blastlab.serviceblbnavi.domain.Permission;
-import java.util.ArrayList;
-import java.util.List;
+
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *

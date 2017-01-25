@@ -4,6 +4,7 @@ import co.blastlab.serviceblbnavi.dao.BuildingBean;
 import co.blastlab.serviceblbnavi.dao.BuildingConfigurationBean;
 import co.blastlab.serviceblbnavi.dao.ComplexBean;
 import co.blastlab.serviceblbnavi.dao.PermissionBean;
+import co.blastlab.serviceblbnavi.dao.repository.BuildingRepository;
 import co.blastlab.serviceblbnavi.domain.Building;
 import co.blastlab.serviceblbnavi.domain.BuildingConfiguration;
 import co.blastlab.serviceblbnavi.domain.Complex;
@@ -11,23 +12,15 @@ import co.blastlab.serviceblbnavi.domain.Permission;
 import co.blastlab.serviceblbnavi.rest.bean.AuthorizationBean;
 import co.blastlab.serviceblbnavi.views.View;
 import com.fasterxml.jackson.annotation.JsonView;
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
-import com.wordnik.swagger.annotations.ApiParam;
-import com.wordnik.swagger.annotations.ApiResponse;
-import com.wordnik.swagger.annotations.ApiResponses;
-import java.util.List;
+import com.wordnik.swagger.annotations.*;
+
 import javax.ejb.EJB;
+import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.InternalServerErrorException;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
+import java.util.List;
 
 /**
  *
@@ -35,10 +28,14 @@ import javax.ws.rs.core.Response;
  */
 @Path("/building")
 @Api("/building")
+@Stateless
 public class BuildingFacade {
 
     @EJB
     private BuildingBean buildingBean;
+
+    @Inject
+    private BuildingRepository buildingRepository;
 
     @EJB
     private ComplexBean complexBean;
@@ -62,7 +59,7 @@ public class BuildingFacade {
             Complex complex = complexBean.find(building.getComplexId());
             if (complex != null) {
                 building.setComplex(complex);
-                buildingBean.create(building);
+                buildingRepository.save(building);
                 return building;
             }
         }
@@ -77,7 +74,9 @@ public class BuildingFacade {
         @ApiResponse(code = 404, message = "building with given id wasn't found")
     })
     public Building find(@PathParam("id") @ApiParam(value = "id", required = true) Long id) {
-        Building building = buildingBean.find(id);
+        //Building building = buildingBean.find(id);
+        Building building = buildingRepository.findBy(id);
+
         if (building != null) {
             permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
                     building.getComplex().getId(), Permission.READ);
@@ -98,7 +97,7 @@ public class BuildingFacade {
                 permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
                         complex.getId(), Permission.UPDATE);
                 building.setComplex(complex);
-                buildingBean.update(building);
+                buildingRepository.save(building);
                 return building;
             }
         }
@@ -112,11 +111,12 @@ public class BuildingFacade {
         @ApiResponse(code = 404, message = "building with given id doesn't exist")
     })
     public Response delete(@PathParam("id") @ApiParam(value = "id", required = true) Long id) {
-        Building building = buildingBean.find(id);
+        Building building = buildingRepository.findBy(id);
         if (building != null) {
             permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
                     building.getComplex().getId(), Permission.UPDATE);
-            buildingBean.delete(building);
+            //buildingBean.delete(building);
+            buildingRepository.remove(building);
             return Response.ok().build();
         }
         throw new EntityNotFoundException();
@@ -135,7 +135,7 @@ public class BuildingFacade {
         if (complexId != null) {
             Complex complex = complexBean.find(complexId);
             if (complex != null) {
-                return buildingBean.findByComplex(complex);
+                return buildingRepository.findByComplex(complex);
             }
         }
         throw new EntityNotFoundException();
@@ -148,7 +148,7 @@ public class BuildingFacade {
         @ApiResponse(code = 404, message = "building doesn't exist")
     })
     public Response saveConfiguration(@PathParam("id") @ApiParam(value = "buildingId", required = true) Long buildingId) {
-        Building building = buildingBean.find(buildingId);
+        Building building = buildingRepository.findBy(buildingId);
         if (building != null) {
             permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
                     building.getComplex().getId(), Permission.UPDATE);

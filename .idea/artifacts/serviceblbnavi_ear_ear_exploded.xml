@@ -8,7 +8,7 @@
       </element>
       <element id="dir-copy" path="$PROJECT_DIR$/serviceblbnavi-ear/src/main/application" />
       <element id="archive" name="serviceblbnavi-rest-1.0.war">
-        <element id="artifact" artifact-name="serviceblbnavi-rest:war exploded" />
+        <element id="artifact" artifact-name="serviceblbnavi-rest:ejb exploded" />
       </element>
       <element id="directory" name="lib">
         <element id="archive" name="serviceblbnavi-domain-1.0.jar">
