@@ -1,15 +1,13 @@
 package co.blastlab.serviceblbnavi.dao;
 
+import co.blastlab.serviceblbnavi.dao.repository.ComplexRepository;
 import co.blastlab.serviceblbnavi.domain.Complex;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
+import java.util.*;
 
 /**
  *
@@ -20,6 +18,9 @@ public class ComplexBean {
 
     @Inject
     private EntityManager em;
+
+    @Inject
+    private ComplexRepository complexRepository;
 
     public void create(Complex complex) {
         em.persist(complex);
@@ -36,9 +37,10 @@ public class ComplexBean {
     }
 
     public List<Complex> findAllByPerson(Long personId) {
-        List<Complex> complexes = em.createNamedQuery(Complex.FIND_BY_PERSON, Complex.class)
+        /*List<Complex> complexes = em.createNamedQuery(Complex.FIND_BY_PERSON, Complex.class)
                 .setParameter("personId", personId)
-                .getResultList();
+                .getResultList();*/
+        List<Complex> complexes = complexRepository.findAllByPerson(personId);
         Set<Complex> complexSet = new HashSet<>(complexes);
         complexes = new ArrayList<>(complexSet);
 

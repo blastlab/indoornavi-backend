@@ -1,10 +1,10 @@
 package co.blastlab.serviceblbnavi.rest.facade;
 
-import co.blastlab.serviceblbnavi.dao.BuildingBean;
 import co.blastlab.serviceblbnavi.dao.BuildingConfigurationBean;
 import co.blastlab.serviceblbnavi.dao.ComplexBean;
 import co.blastlab.serviceblbnavi.dao.PermissionBean;
 import co.blastlab.serviceblbnavi.dao.repository.BuildingRepository;
+import co.blastlab.serviceblbnavi.dao.repository.ComplexRepository;
 import co.blastlab.serviceblbnavi.domain.Building;
 import co.blastlab.serviceblbnavi.domain.BuildingConfiguration;
 import co.blastlab.serviceblbnavi.domain.Complex;
@@ -31,14 +31,14 @@ import java.util.List;
 @Stateless
 public class BuildingFacade {
 
-    @EJB
-    private BuildingBean buildingBean;
-
     @Inject
     private BuildingRepository buildingRepository;
 
     @EJB
     private ComplexBean complexBean;
+
+    @Inject
+    private ComplexRepository complexRepository;
 
     @EJB
     private PermissionBean permissionBean;
@@ -56,7 +56,8 @@ public class BuildingFacade {
 
             permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
                     building.getComplexId(), Permission.UPDATE);
-            Complex complex = complexBean.find(building.getComplexId());
+            //Complex complex = complexBean.find(building.getComplexId());
+            Complex complex = complexRepository.findBy(building.getComplexId());
             if (complex != null) {
                 building.setComplex(complex);
                 buildingRepository.save(building);
@@ -74,7 +75,6 @@ public class BuildingFacade {
         @ApiResponse(code = 404, message = "building with given id wasn't found")
     })
     public Building find(@PathParam("id") @ApiParam(value = "id", required = true) Long id) {
-        //Building building = buildingBean.find(id);
         Building building = buildingRepository.findBy(id);
 
         if (building != null) {
@@ -92,7 +92,7 @@ public class BuildingFacade {
     })
     public Building update(@ApiParam(value = "building", required = true) Building building) {
         if (building.getId() != null) {
-            Complex complex = complexBean.findByBuildingId(building.getId());
+            Complex complex = complexRepository.findByBuildingId(building.getId());
             if (complex != null) {
                 permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
                         complex.getId(), Permission.UPDATE);
@@ -115,7 +115,6 @@ public class BuildingFacade {
         if (building != null) {
             permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
                     building.getComplex().getId(), Permission.UPDATE);
-            //buildingBean.delete(building);
             buildingRepository.remove(building);
             return Response.ok().build();
         }
@@ -133,7 +132,8 @@ public class BuildingFacade {
         permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
                 complexId, Permission.READ);
         if (complexId != null) {
-            Complex complex = complexBean.find(complexId);
+            //Complex complex = complexBean.find(complexId);
+            Complex complex = complexRepository.findBy(complexId);
             if (complex != null) {
                 return buildingRepository.findByComplex(complex);
             }

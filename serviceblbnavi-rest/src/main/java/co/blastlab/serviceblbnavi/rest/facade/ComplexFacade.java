@@ -16,6 +16,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 import com.wordnik.swagger.annotations.*;
 
 import javax.ejb.EJB;
+import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityExistsException;
 import javax.persistence.EntityNotFoundException;
@@ -30,7 +31,7 @@ import java.util.Objects;
  */
 @Path("/complex")
 @Api("/complex")
-//@Stateless
+@Stateless
 public class ComplexFacade {
 
     @EJB
@@ -192,7 +193,6 @@ public class ComplexFacade {
             if (!personId.equals(authorizationBean.getCurrentUser().getId())) {
                 throw new PermissionException();
             }
-            //Person person = personBean.find(personId);
             Person person = personRepository.findBy(personId);
             if (person != null) {
                 return complexBean.findAllByPerson(personId);
