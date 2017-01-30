@@ -20,5 +20,7 @@
     <orderEntry type="module" module-name="serviceblbnavi-rest" />
     <orderEntry type="module" module-name="serviceblbnavi-domain" />
     <orderEntry type="library" name="Maven: commons-lang:commons-lang:2.6" level="project" />
+    <orderEntry type="library" name="Maven: org.hibernate:hibernate-jpamodelgen:5.2.6.Final" level="project" />
+    <orderEntry type="library" name="Maven: org.jboss.logging:jboss-logging:3.3.0.Final" level="project" />
   </component>
 </module>
