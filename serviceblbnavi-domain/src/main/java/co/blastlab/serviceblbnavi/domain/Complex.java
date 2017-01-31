@@ -4,36 +4,18 @@ import co.blastlab.serviceblbnavi.views.View;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
+
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.List;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
-import javax.persistence.OrderBy;
-import javax.persistence.Transient;
 
 /**
  *
  * @author Michał Koszałka
  */
-@NamedQueries({
-    @NamedQuery(name = Complex.FIND_BY_PERSON, query = "SELECT c FROM Complex c JOIN c.ACL_complexes aclComplexes where aclComplexes.person.id = :personId"),
-    @NamedQuery(name = Complex.FIND_BY_PERSON_AND_ID, query = "SELECT c FROM Complex c JOIN c.ACL_complexes aclComplexes where aclComplexes.person.id = :personId AND c.id = :id"),
-    @NamedQuery(name = Complex.FIND_BY_BUILDING, query = "SELECT c FROM Complex c JOIN c.buildings buildings where buildings.id = :buildingId"),
-    @NamedQuery(name = Complex.FIND_BY_FLOOR, query = "SELECT c FROM Complex c JOIN c.buildings buildings JOIN buildings.floors floors where floors.id = :floorId"),
-    @NamedQuery(name = Complex.FIND_BY_NAME, query = "SELECT c FROM Complex c where c.name = :name")
-})
 @Entity
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY, setterVisibility = JsonAutoDetect.Visibility.NONE, getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class Complex extends CustomIdGenerationEntity implements Serializable {
-
-    public static final String FIND_BY_PERSON = "Complex.findByPerson";
-    public static final String FIND_BY_PERSON_AND_ID = "Complex.findByPersonAndId";
-    public static final String FIND_BY_BUILDING = "Complex.findByBuilding";
-    public static final String FIND_BY_FLOOR = "Complex.findByFloor";
-    public static final String FIND_BY_NAME = "Complex.findByName";
 
     @Column(unique = true)
     private String name;

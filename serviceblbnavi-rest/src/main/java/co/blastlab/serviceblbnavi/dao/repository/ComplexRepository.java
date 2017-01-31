@@ -13,17 +13,18 @@ import java.util.List;
 
 @Repository
 public abstract class ComplexRepository implements EntityRepository<Complex, Long>, CriteriaSupport<Complex> {
-    ///SELECT c FROM Complex c JOIN c.buildings buildings where buildings.id = :buildingId
-    public Complex findByBuildingId(Long id){
+
+    public abstract Complex findOptionalByName(String name);
+
+    public Complex findByBuildingId(Long id) {
         return criteria()
-                //.join(ACL_Complex_.person, where(Person.class).eq(Person_.id, id))
                 .join(Complex_.buildings, where(Building.class).eq(Building_.id, id))
                 .getSingleResult();
     }
+
     @Query("SELECT c FROM Complex c JOIN c.ACL_complexes aclComplexes where aclComplexes.person.id = ?1")
-    public abstract List<Complex> findAllByPerson(Long personId); /*{
-         return criteria()
-                 .fetch(Complex_.ACL_complexes, JoinType.INNER)
-                 .join(ACL_Complex_.person, where(Person.class).eq(Person_.id, personId));
-    }*/
+    public abstract List<Complex> findAllByPerson(Long personId);  //TODO Change @Query to criteria api
+
+    @Query("SELECT c FROM Complex c JOIN c.buildings buildings JOIN buildings.floors floors where floors.id = ?1")
+    public abstract Complex findByFloorId(Long id); //TODO Change @Query to criteria api
 }
