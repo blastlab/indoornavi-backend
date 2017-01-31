@@ -5,8 +5,6 @@ import co.blastlab.serviceblbnavi.domain.Complex;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
-import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
 import java.util.*;
 
 /**
@@ -17,29 +15,9 @@ import java.util.*;
 public class ComplexBean {
 
     @Inject
-    private EntityManager em;
-
-    @Inject
     private ComplexRepository complexRepository;
 
-    public void create(Complex complex) {
-        em.persist(complex);
-        em.flush();
-    }
-
-    public Complex find(Long id) {
-        return em.find(Complex.class, id);
-    }
-
-    public void delete(Complex complex) {
-        em.remove(em.contains(complex) ? complex : em.merge(complex));
-
-    }
-
     public List<Complex> findAllByPerson(Long personId) {
-        /*List<Complex> complexes = em.createNamedQuery(Complex.FIND_BY_PERSON, Complex.class)
-                .setParameter("personId", personId)
-                .getResultList();*/
         List<Complex> complexes = complexRepository.findAllByPerson(personId);
         Set<Complex> complexSet = new HashSet<>(complexes);
         complexes = new ArrayList<>(complexSet);
@@ -56,50 +34,4 @@ public class ComplexBean {
 
         return complexes;
     }
-
-    public Complex findByPersonAndId(Long personId, Long id) {
-        try {
-            return em.createNamedQuery(Complex.FIND_BY_PERSON_AND_ID, Complex.class)
-                    .setParameter("personId", personId)
-                    .setParameter("id", id)
-                    .getSingleResult();
-        } catch (NoResultException e) {
-            return null;
-        }
-    }
-
-    public Complex findByBuildingId(Long id) {
-        try {
-            return em.createNamedQuery(Complex.FIND_BY_BUILDING, Complex.class)
-                    .setParameter("buildingId", id)
-                    .getSingleResult();
-        } catch (NoResultException e) {
-            return null;
-        }
-    }
-
-    public Complex findByFloorId(Long id) {
-        try {
-            return em.createNamedQuery(Complex.FIND_BY_FLOOR, Complex.class)
-                    .setParameter("floorId", id)
-                    .getSingleResult();
-        } catch (NoResultException e) {
-            return null;
-        }
-    }
-
-    public Complex findByName(String name) {
-        try {
-            return em.createNamedQuery(Complex.FIND_BY_NAME, Complex.class)
-                    .setParameter("name", name)
-                    .getSingleResult();
-        } catch (NoResultException e) {
-            return null;
-        }
-    }
-
-    public void update(Complex complex) {
-        em.merge(complex);
-    }
-
 }
