@@ -1,6 +1,5 @@
 package co.blastlab.serviceblbnavi.rest.facade;
 
-import co.blastlab.serviceblbnavi.dao.BuildingBean;
 import co.blastlab.serviceblbnavi.dao.BuildingConfigurationBean;
 import co.blastlab.serviceblbnavi.dao.PermissionBean;
 import co.blastlab.serviceblbnavi.dao.repository.BuildingRepository;
@@ -35,9 +34,6 @@ public class BuildingConfigurationFacade {
     @Inject
     private ComplexRepository complexRepository;
 
-    @EJB
-    private BuildingBean buildingBean;
-
     @Inject
     private BuildingRepository buildingRepository;
 
@@ -55,7 +51,7 @@ public class BuildingConfigurationFacade {
         if (complex != null) {
             permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
                     complex.getId(), Permission.UPDATE);
-            Building building = buildingBean.findByComplexNameAndBuildingName(complexName, buildingName);
+            Building building = buildingRepository.findByComplexNameAndBuildingName(complexName, buildingName);
             if (building != null) {
                 if (buildingConfigurationBean.saveConfiguration(building)) {
                     return Response.noContent().build();

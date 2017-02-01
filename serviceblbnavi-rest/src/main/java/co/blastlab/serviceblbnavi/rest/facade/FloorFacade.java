@@ -3,28 +3,21 @@ package co.blastlab.serviceblbnavi.rest.facade;
 import co.blastlab.serviceblbnavi.dao.BuildingBean;
 import co.blastlab.serviceblbnavi.dao.FloorBean;
 import co.blastlab.serviceblbnavi.dao.PermissionBean;
+import co.blastlab.serviceblbnavi.dao.repository.BuildingRepository;
 import co.blastlab.serviceblbnavi.domain.Building;
 import co.blastlab.serviceblbnavi.domain.Floor;
 import co.blastlab.serviceblbnavi.domain.Permission;
 import co.blastlab.serviceblbnavi.rest.bean.AuthorizationBean;
 import co.blastlab.serviceblbnavi.views.View;
 import com.fasterxml.jackson.annotation.JsonView;
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
-import com.wordnik.swagger.annotations.ApiParam;
-import com.wordnik.swagger.annotations.ApiResponse;
-import com.wordnik.swagger.annotations.ApiResponses;
-import java.util.List;
+import com.wordnik.swagger.annotations.*;
+
 import javax.ejb.EJB;
 import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
+import java.util.List;
 
 /**
  *
@@ -40,6 +33,9 @@ public class FloorFacade {
     @EJB
     private BuildingBean buildingBean;
 
+    @Inject
+    private BuildingRepository buildingRepository;
+
     @EJB
     private PermissionBean permissionBean;
 
@@ -53,7 +49,8 @@ public class FloorFacade {
     })
     public Floor create(@ApiParam(value = "floor", required = true) Floor floor) {
         if (floor.getBuildingId() != null) {
-            Building building = buildingBean.find(floor.getBuildingId());
+            //Building building = buildingBean.find(floor.getBuildingId());
+            Building building = buildingRepository.findBy(floor.getBuildingId());
             if (building != null) {
                 permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
                         building.getComplex().getId(), Permission.UPDATE);
@@ -109,7 +106,8 @@ public class FloorFacade {
     })
     public Floor update(@ApiParam(value = "floor", required = true) Floor floor) {
         if (floor.getBuildingId() != null) {
-            Building building = buildingBean.find(floor.getBuildingId());
+            //Building building = buildingBean.find(floor.getBuildingId());
+            Building building = buildingRepository.findBy(floor.getBuildingId());
             if (building != null) {
                 permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
                         building.getComplex().getId(), Permission.UPDATE);
@@ -129,7 +127,8 @@ public class FloorFacade {
         @ApiResponse(code = 404, message = "building id or building empty or doesn't exist")
     })
     public Response updateFloors(@PathParam("id") Long buildingId, @ApiParam(value = "floors", required = true) List<Floor> floors) {
-        Building building = buildingBean.find(buildingId);
+        //Building building = buildingBean.find(buildingId);
+        Building building = buildingRepository.findBy(buildingId);
         if (building != null) {
             permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
                     building.getComplex().getId(), Permission.UPDATE);
