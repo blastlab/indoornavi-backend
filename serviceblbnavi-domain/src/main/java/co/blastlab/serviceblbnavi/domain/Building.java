@@ -4,30 +4,19 @@ import co.blastlab.serviceblbnavi.views.View;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
+
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.List;
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
-import javax.persistence.OrderBy;
-import javax.persistence.Transient;
 
 /**
  *
  * @author Michał Koszałka
  */
-@NamedQueries({
-    @NamedQuery(name = Building.FIND_BY_COMPLEX_NAME_AND_BUILDING_NAME, query = "SELECT b FROM Building b WHERE b.complex.name = :complexName AND b.name = :buildingName")
-})
+
 @Entity
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY, setterVisibility = JsonAutoDetect.Visibility.NONE, getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class Building extends CustomIdGenerationEntity implements Serializable {
-
-    public static final String FIND_BY_COMPLEX = "Building.findByComplex";
-    public static final String FIND_BY_COMPLEX_NAME_AND_BUILDING_NAME = "Building.findByComplexNameAndBuildingName";
 
     private String name;
 

@@ -3,31 +3,19 @@ package co.blastlab.serviceblbnavi.domain;
 import co.blastlab.serviceblbnavi.security.PasswordEncoder;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.List;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
-import javax.persistence.PrePersist;
-import javax.persistence.PreUpdate;
-import javax.persistence.Transient;
 
 /**
  *
  * @author Michał Koszałka
  */
-@NamedQueries({
-    @NamedQuery(name = Person.FIND_BY_EMAIL, query = "SELECT p FROM Person p WHERE p.email = :email"),
-    @NamedQuery(name = Person.FIND_BY_AUTH_TOKEN, query = "SELECT p FROM Person p WHERE p.authToken = :authToken")
-})
+
 @Entity
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY, setterVisibility = JsonAutoDetect.Visibility.NONE, getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class Person extends CustomIdGenerationEntity implements Serializable {
-
-    public static final String FIND_BY_EMAIL = "Person.findByEmail";
-    public static final String FIND_BY_AUTH_TOKEN = "Person.findByAuthToken";
 
     public static final String PASSWORD_DIGEST_ALG = "SHA-512";
 

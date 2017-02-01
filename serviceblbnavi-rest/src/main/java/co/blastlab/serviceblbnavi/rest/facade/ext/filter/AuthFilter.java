@@ -1,11 +1,10 @@
 package co.blastlab.serviceblbnavi.rest.facade.ext.filter;
 
-import co.blastlab.serviceblbnavi.dao.PersonBean;
+import co.blastlab.serviceblbnavi.dao.repository.PersonRepository;
 import co.blastlab.serviceblbnavi.domain.Person;
 import co.blastlab.serviceblbnavi.rest.bean.AuthorizationBean;
-import java.io.IOException;
+
 import javax.annotation.Priority;
-import javax.ejb.EJB;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.ws.rs.Priorities;
@@ -14,6 +13,7 @@ import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
+import java.io.IOException;
 
 /**
  * Filter that checks all requests and perform authentication.
@@ -30,8 +30,8 @@ public class AuthFilter implements ContainerRequestFilter {
     @Inject
     private AuthorizationBean authorizationBean;
 
-    @EJB
-    private PersonBean personBean;
+    @Inject
+    private PersonRepository personRepository;
 
     @Override
     public void filter(ContainerRequestContext requestCtx) throws IOException {
@@ -51,7 +51,7 @@ public class AuthFilter implements ContainerRequestFilter {
                 throw new WebApplicationException(Response.Status.UNAUTHORIZED);
             }
 
-            Person person = personBean.findByAuthToken(authToken);
+            Person person = personRepository.findByAuthToken(authToken);
             if (person == null) {
                 throw new WebApplicationException(Response.Status.UNAUTHORIZED);
             }
