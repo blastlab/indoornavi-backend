@@ -3,28 +3,21 @@ package co.blastlab.serviceblbnavi.rest.facade;
 import co.blastlab.serviceblbnavi.dao.FloorBean;
 import co.blastlab.serviceblbnavi.dao.GoalBean;
 import co.blastlab.serviceblbnavi.dao.PermissionBean;
+import co.blastlab.serviceblbnavi.dao.repository.FloorRepository;
 import co.blastlab.serviceblbnavi.domain.Floor;
 import co.blastlab.serviceblbnavi.domain.Goal;
 import co.blastlab.serviceblbnavi.domain.Permission;
 import co.blastlab.serviceblbnavi.rest.bean.AuthorizationBean;
 import co.blastlab.serviceblbnavi.views.View;
 import com.fasterxml.jackson.annotation.JsonView;
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
-import com.wordnik.swagger.annotations.ApiParam;
-import com.wordnik.swagger.annotations.ApiResponse;
-import com.wordnik.swagger.annotations.ApiResponses;
-import java.util.List;
+import com.wordnik.swagger.annotations.*;
+
 import javax.ejb.EJB;
 import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
+import java.util.List;
 
 /**
  *
@@ -46,6 +39,9 @@ public class GoalFacade {
     @EJB
     private FloorBean floorBean;
 
+    @Inject
+    private FloorRepository floorRepository;
+
     @POST
     @ApiOperation(value = "create goal", response = Goal.class)
     @ApiResponses({
@@ -54,7 +50,7 @@ public class GoalFacade {
     @JsonView(View.GoalInternal.class)
     public Goal create(@ApiParam(value = "goal", required = true) Goal goal) {
         if (goal.getFloorId() != null) {
-            Floor floor = floorBean.find(goal.getFloorId());
+            Floor floor = floorRepository.findBy(goal.getFloorId());
             if (floor != null) {
                 permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
                         floor.getBuilding().getComplex().getId(), Permission.UPDATE);

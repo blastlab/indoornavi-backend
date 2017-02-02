@@ -2,29 +2,20 @@ package co.blastlab.serviceblbnavi.domain;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.hibernate.validator.constraints.NotEmpty;
 
-import java.io.Serializable;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
 import javax.persistence.Transient;
-import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 
 /**
  *
  * @author Michał Koszałka
  */
 @Entity
-@NamedQueries({
-    @NamedQuery(name = Beacon.FIND_BY_FLOOR, query = "SELECT b FROM Beacon b WHERE b.floor = :floor")
-})
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY, setterVisibility = JsonAutoDetect.Visibility.NONE, getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class Beacon extends CustomIdGenerationEntity implements Serializable {
-
-    public static final String FIND_BY_FLOOR = "Beacon.findByFloor";
 
     private String mac;
 

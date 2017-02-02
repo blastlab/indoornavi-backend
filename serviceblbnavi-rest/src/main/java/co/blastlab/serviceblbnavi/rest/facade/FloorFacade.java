@@ -1,9 +1,9 @@
 package co.blastlab.serviceblbnavi.rest.facade;
 
-import co.blastlab.serviceblbnavi.dao.BuildingBean;
 import co.blastlab.serviceblbnavi.dao.FloorBean;
 import co.blastlab.serviceblbnavi.dao.PermissionBean;
 import co.blastlab.serviceblbnavi.dao.repository.BuildingRepository;
+import co.blastlab.serviceblbnavi.dao.repository.FloorRepository;
 import co.blastlab.serviceblbnavi.domain.Building;
 import co.blastlab.serviceblbnavi.domain.Floor;
 import co.blastlab.serviceblbnavi.domain.Permission;
@@ -13,6 +13,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 import com.wordnik.swagger.annotations.*;
 
 import javax.ejb.EJB;
+import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
 import javax.ws.rs.*;
@@ -25,13 +26,14 @@ import java.util.List;
  */
 @Path("/floor")
 @Api("/floor")
+@Stateless
 public class FloorFacade {
 
     @EJB
     private FloorBean floorBean;
 
-    @EJB
-    private BuildingBean buildingBean;
+    @Inject
+    private FloorRepository floorRepository;
 
     @Inject
     private BuildingRepository buildingRepository;
@@ -49,14 +51,14 @@ public class FloorFacade {
     })
     public Floor create(@ApiParam(value = "floor", required = true) Floor floor) {
         if (floor.getBuildingId() != null) {
-            //Building building = buildingBean.find(floor.getBuildingId());
             Building building = buildingRepository.findBy(floor.getBuildingId());
             if (building != null) {
                 permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
                         building.getComplex().getId(), Permission.UPDATE);
                 floor.setBuilding(building);
                 floor.setBuildingId(building.getId());
-                floorBean.create(floor);
+                //floorBean.create(floor);
+                floorRepository.save(floor);
                 return floor;
             }
         }
@@ -71,7 +73,8 @@ public class FloorFacade {
         @ApiResponse(code = 404, message = "floor with given id wasn't found")
     })
     public Floor find(@PathParam("id") @ApiParam(value = "id", required = true) Long id) {
-        Floor floor = floorBean.find(id);
+        //Floor floor = floorBean.find(id);
+        Floor floor = floorRepository.findBy(id);
         if (floor != null) {
             permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
                     floor.getBuilding().getComplex().getId(), Permission.READ);
@@ -88,11 +91,13 @@ public class FloorFacade {
         @ApiResponse(code = 404, message = "floor with given id doesn't exist")
     })
     public Response delete(@PathParam("id") @ApiParam(value = "id", required = true) Long id) {
-        Floor floor = floorBean.find(id);
+        //Floor floor = floorBean.find(id);
+        Floor floor = floorRepository.findBy(id);
         if (floor != null) {
             permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
                     floor.getBuilding().getComplex().getId(), Permission.UPDATE);
-            floorBean.delete(floor);
+            //floorBean.delete(floor);
+            floorRepository.remove(floor);
             return Response.ok().build();
         }
         throw new EntityNotFoundException();
@@ -113,7 +118,8 @@ public class FloorFacade {
                         building.getComplex().getId(), Permission.UPDATE);
                 floor.setBuilding(building);
                 floor.setBuildingId(building.getId());
-                floorBean.update(floor);
+                //floorBean.update(floor);
+                floorRepository.save(floor);
                 return floor;
             }
         }
@@ -153,7 +159,8 @@ public class FloorFacade {
             permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
                     floorInDB.getBuilding().getComplex().getId(), Permission.UPDATE);
             floorInDB.setmToPix(floor.getmToPix());
-            floorBean.update(floorInDB);
+            //floorBean.update(floorInDB);
+            floorRepository.save(floorInDB);
             return Response.ok().build();
         }
         throw new EntityNotFoundException();
