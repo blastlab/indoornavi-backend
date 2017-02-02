@@ -5,6 +5,7 @@ import co.blastlab.serviceblbnavi.dao.FloorBean;
 import co.blastlab.serviceblbnavi.dao.PermissionBean;
 import co.blastlab.serviceblbnavi.dao.WaypointBean;
 import co.blastlab.serviceblbnavi.dao.repository.BuildingRepository;
+import co.blastlab.serviceblbnavi.dao.repository.FloorRepository;
 import co.blastlab.serviceblbnavi.domain.Building;
 import co.blastlab.serviceblbnavi.domain.Floor;
 import co.blastlab.serviceblbnavi.domain.Permission;
@@ -34,6 +35,9 @@ public class WaypointFacade {
     @EJB
     private FloorBean floorBean;
 
+    @Inject
+    private FloorRepository floorRepository;
+
     @EJB
     private PermissionBean permissionBean;
 
@@ -53,7 +57,8 @@ public class WaypointFacade {
     })
     public Waypoint createWaypoint(@ApiParam(value = "waypoint", required = true) Waypoint waypoint) {
         if (waypoint.getFloorId() != null) {
-            Floor floor = floorBean.find(waypoint.getFloorId());
+            //Floor floor = floorBean.find(waypoint.getFloorId());
+            Floor floor = floorRepository.findBy(waypoint.getFloorId());
             if (floor != null) {
                 permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
                         floor.getBuilding().getComplex().getId(), Permission.UPDATE);
@@ -121,7 +126,8 @@ public class WaypointFacade {
     })
     public List<Waypoint> getActiveWaypointsByFloorId(@ApiParam(value = "id", required = true) @PathParam("id") Long floorId) {
         if (floorId != null) {
-            Floor floor = floorBean.find(floorId);
+            //Floor floor = floorBean.find(floorId);
+            Floor floor = floorRepository.findBy(floorId);
             if (floor != null) {
                 permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
                         floor.getBuilding().getComplex().getId(), Permission.READ);

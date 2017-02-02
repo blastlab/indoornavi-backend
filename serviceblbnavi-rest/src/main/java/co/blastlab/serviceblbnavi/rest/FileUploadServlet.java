@@ -3,6 +3,7 @@ package co.blastlab.serviceblbnavi.rest;
 import co.blastlab.serviceblbnavi.dao.FloorBean;
 import co.blastlab.serviceblbnavi.dao.PermissionBean;
 import co.blastlab.serviceblbnavi.dao.exception.PermissionException;
+import co.blastlab.serviceblbnavi.dao.repository.FloorRepository;
 import co.blastlab.serviceblbnavi.dao.repository.PersonRepository;
 import co.blastlab.serviceblbnavi.domain.Floor;
 import co.blastlab.serviceblbnavi.domain.Permission;
@@ -44,6 +45,9 @@ public class FileUploadServlet extends HttpServlet {
     private FloorBean floorBean;
 
     @Inject
+    private FloorRepository floorRepository;
+
+    @Inject
     private PersonRepository personRepository;
 
     @EJB
@@ -66,7 +70,8 @@ public class FileUploadServlet extends HttpServlet {
             authorize(request);
             response.setContentType("text/html;charset=UTF-8");
 
-            Floor floor = floorBean.find(Long.parseLong(request.getParameter("floor")));
+            //Floor floor = floorBean.find(Long.parseLong(request.getParameter("floor")));
+            Floor floor = floorRepository.findBy(Long.parseLong(request.getParameter("floor")));
             permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
                     floor.getBuilding().getComplex().getId(), Permission.UPDATE);
             final Part filePart = request.getPart("image");
@@ -77,7 +82,8 @@ public class FileUploadServlet extends HttpServlet {
             floor.setBitmapHeight(bi.getHeight());
             floor.setBitmapWidth(bi.getWidth());
             floor.setBitmap(bytes);
-            floorBean.update(floor);
+            //floorBean.update(floor);
+            floorRepository.save(floor);
         } catch (PermissionException e) {
             response.setStatus(CORSFilter.UNAUTHORIZED);
         } catch (NumberFormatException e) {
@@ -91,7 +97,10 @@ public class FileUploadServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse response)
             throws ServletException, IOException {
         try {
-            Floor floor = floorBean.find(Long.parseLong(
+            /*Floor floor = floorBean.find(Long.parseLong(
+                    req.getPathInfo().substring(SEPARATOR_INDEX))
+            );*/
+            Floor floor = floorRepository.findBy(Long.parseLong(
                     req.getPathInfo().substring(SEPARATOR_INDEX))
             );
             if (floor == null || floor.getBitmap() == null) {
