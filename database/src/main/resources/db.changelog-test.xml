@@ -28,13 +28,24 @@
 		<delete tableName="buildingconfiguration"/>
 	</changeSet>
 
-	<changeSet id="Beacon" author="mcichosz" context="test" runAlways="true" runOnChange="true">
-		<delete tableName="beacon"/>
-	</changeSet>
-
 	<changeSet id="Floor" author="mcichosz" context="test" runAlways="true" runOnChange="true">
 		<delete tableName="floor"/>
 		<loadUpdateData tableName="floor" file="test/Floor.csv" primaryKey="id" />
+	</changeSet>
+
+	<changeSet id="Beacon" author="mcichosz" context="test" runAlways="true" runOnChange="true">
+		<delete tableName="beacon"/>
+		<loadUpdateData tableName="beacon" file="test/Beacon.csv" primaryKey="id" />
+	</changeSet>
+
+	<changeSet id="Vertex" author="mcichosz" context="test" runAlways="true" runOnChange="true">
+		<delete tableName="vertex"/>
+		<loadUpdateData tableName="vertex" file="test/Vertex.csv" primaryKey="id" />
+	</changeSet>
+
+	<changeSet id="VertexFloorChangeability" author="mcichosz" context="test" runAlways="true" runOnChange="true">
+		<delete tableName="VertexFloorChangeability"/>
+		<loadUpdateData tableName="vertexfloorchangeabilityview" file="test/VertexFloorChangeability.csv" primaryKey="id" />
 	</changeSet>
 
 	<changeSet id="Edge" author="mcichosz" context="test" runAlways="true" runOnChange="true">
