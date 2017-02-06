@@ -15,7 +15,6 @@ import co.blastlab.serviceblbnavi.views.View;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.wordnik.swagger.annotations.*;
 
-import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityExistsException;
@@ -34,7 +33,7 @@ import java.util.Objects;
 @Stateless
 public class ComplexFacade {
 
-    @EJB
+    @Inject
     private ComplexBean complexBean;
 
     @Inject
@@ -46,7 +45,7 @@ public class ComplexFacade {
     @Inject
     private ACL_ComplexRepository aclComplexRepository;
 
-    @EJB
+    @Inject
     private PermissionBean permissionBean;
 
     @Inject

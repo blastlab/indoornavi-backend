@@ -11,7 +11,6 @@ import co.blastlab.serviceblbnavi.views.View;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.wordnik.swagger.annotations.*;
 
-import javax.ejb.EJB;
 import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
 import javax.ws.rs.*;
@@ -26,13 +25,13 @@ import java.util.List;
 @Api("/vertex")
 public class VertexFacade {
 
-    @EJB
+    @Inject
     private VertexBean vertexBean;
 
     @Inject
     private FloorRepository floorRepository;
 
-    @EJB
+    @Inject
     private PermissionBean permissionBean;
 
     @Inject

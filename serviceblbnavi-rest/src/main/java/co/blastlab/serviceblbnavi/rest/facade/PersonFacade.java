@@ -8,7 +8,6 @@ import co.blastlab.serviceblbnavi.views.View;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.wordnik.swagger.annotations.*;
 
-import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityExistsException;
@@ -26,7 +25,7 @@ import javax.ws.rs.Path;
 @Stateless
 public class PersonFacade {
 
-    @EJB
+    @Inject
     private PersonBean personBean;
 
     @Inject

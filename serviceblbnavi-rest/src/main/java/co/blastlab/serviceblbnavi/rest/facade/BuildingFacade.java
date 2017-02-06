@@ -13,7 +13,6 @@ import co.blastlab.serviceblbnavi.views.View;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.wordnik.swagger.annotations.*;
 
-import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
@@ -36,10 +35,10 @@ public class BuildingFacade {
     @Inject
     private ComplexRepository complexRepository;
 
-    @EJB
+    @Inject
     private PermissionBean permissionBean;
 
-    @EJB
+    @Inject
     private BuildingConfigurationBean buildingConfigurationBean;
 
     @Inject

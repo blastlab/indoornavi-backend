@@ -15,7 +15,6 @@ import co.blastlab.serviceblbnavi.views.View;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.wordnik.swagger.annotations.*;
 
-import javax.ejb.EJB;
 import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
 import javax.ws.rs.*;
@@ -29,22 +28,22 @@ import java.util.List;
 @Api("/waypoint")
 public class WaypointFacade {
 
-    @EJB
+    @Inject
     private WaypointBean waypointBean;
 
-    @EJB
+    @Inject
     private FloorBean floorBean;
 
     @Inject
     private FloorRepository floorRepository;
 
-    @EJB
+    @Inject
     private PermissionBean permissionBean;
 
     @Inject
     private AuthorizationBean authorizationBean;
 
-    @EJB
+    @Inject
     private BuildingBean buildingBean;
 
     @Inject
