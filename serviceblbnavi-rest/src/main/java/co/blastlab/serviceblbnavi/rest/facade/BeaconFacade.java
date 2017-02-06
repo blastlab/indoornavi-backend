@@ -9,7 +9,6 @@ import co.blastlab.serviceblbnavi.domain.Permission;
 import co.blastlab.serviceblbnavi.rest.bean.AuthorizationBean;
 import com.wordnik.swagger.annotations.*;
 
-import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
@@ -32,7 +31,7 @@ public class BeaconFacade {
     @Inject
     private FloorRepository floorRepository;
 
-    @EJB
+    @Inject
     private PermissionBean permissionBean;
 
     @Inject

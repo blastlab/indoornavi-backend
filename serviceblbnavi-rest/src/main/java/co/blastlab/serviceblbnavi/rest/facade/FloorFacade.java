@@ -12,7 +12,6 @@ import co.blastlab.serviceblbnavi.views.View;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.wordnik.swagger.annotations.*;
 
-import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
@@ -29,7 +28,7 @@ import java.util.List;
 @Stateless
 public class FloorFacade {
 
-    @EJB
+    @Inject
     private FloorBean floorBean;
 
     @Inject
@@ -38,7 +37,7 @@ public class FloorFacade {
     @Inject
     private BuildingRepository buildingRepository;
 
-    @EJB
+    @Inject
     private PermissionBean permissionBean;
 
     @Inject

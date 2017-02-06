@@ -11,7 +11,6 @@ import co.blastlab.serviceblbnavi.domain.Permission;
 import co.blastlab.serviceblbnavi.rest.bean.AuthorizationBean;
 import com.wordnik.swagger.annotations.*;
 
-import javax.ejb.EJB;
 import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
 import javax.ws.rs.*;
@@ -25,7 +24,7 @@ import javax.ws.rs.core.Response;
 @Api("/buildingConfiguration")
 public class BuildingConfigurationFacade {
 
-    @EJB
+    @Inject
     private PermissionBean permissionBean;
 
     @Inject
@@ -37,7 +36,7 @@ public class BuildingConfigurationFacade {
     @Inject
     private BuildingRepository buildingRepository;
 
-    @EJB
+    @Inject
     private BuildingConfigurationBean buildingConfigurationBean;
 
     @POST
