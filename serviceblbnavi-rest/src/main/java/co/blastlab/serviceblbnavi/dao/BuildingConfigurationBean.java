@@ -7,7 +7,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
@@ -37,7 +36,7 @@ public class BuildingConfigurationBean {
     @NaviProduction
     private EntityManager emProduction;
 
-    @EJB
+    @Inject
     private BuildingBean buildingBean;
 
     public void create(BuildingConfiguration buildingConfiguration) {
