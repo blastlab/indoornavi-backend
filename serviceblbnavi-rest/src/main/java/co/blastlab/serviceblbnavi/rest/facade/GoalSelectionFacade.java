@@ -6,12 +6,9 @@ import co.blastlab.serviceblbnavi.domain.Goal;
 import co.blastlab.serviceblbnavi.domain.GoalSelection;
 import co.blastlab.serviceblbnavi.views.View;
 import com.fasterxml.jackson.annotation.JsonView;
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
-import com.wordnik.swagger.annotations.ApiParam;
-import com.wordnik.swagger.annotations.ApiResponse;
-import com.wordnik.swagger.annotations.ApiResponses;
-import javax.ejb.EJB;
+import com.wordnik.swagger.annotations.*;
+
+import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -26,10 +23,10 @@ import javax.ws.rs.Produces;
 @Produces("application/json")
 public class GoalSelectionFacade {
 
-    @EJB
+    @Inject
     private GoalSelectionBean goalSelectionBean;
 
-    @EJB
+    @Inject
     private GoalBean goalBean;
     
     @POST

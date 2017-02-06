@@ -16,7 +16,6 @@ import com.wordnik.swagger.annotations.ApiImplicitParams;
 import com.wordnik.swagger.annotations.ApiOperation;
 import org.apache.commons.io.IOUtils;
 
-import javax.ejb.EJB;
 import javax.imageio.ImageIO;
 import javax.inject.Inject;
 import javax.servlet.ServletException;
@@ -41,7 +40,7 @@ import java.util.Base64;
 @Api(value = "/floor/image/")
 public class FileUploadServlet extends HttpServlet {
 
-    @EJB
+    @Inject
     private FloorBean floorBean;
 
     @Inject
@@ -50,7 +49,7 @@ public class FileUploadServlet extends HttpServlet {
     @Inject
     private PersonRepository personRepository;
 
-    @EJB
+    @Inject
     private PermissionBean permissionBean;
 
     @Inject
