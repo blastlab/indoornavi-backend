@@ -56,7 +56,6 @@ public class FloorFacade {
                         building.getComplex().getId(), Permission.UPDATE);
                 floor.setBuilding(building);
                 floor.setBuildingId(building.getId());
-                //floorBean.create(floor);
                 floorRepository.save(floor);
                 return floor;
             }
@@ -72,7 +71,6 @@ public class FloorFacade {
         @ApiResponse(code = 404, message = "floor with given id wasn't found")
     })
     public Floor find(@PathParam("id") @ApiParam(value = "id", required = true) Long id) {
-        //Floor floor = floorBean.find(id);
         Floor floor = floorRepository.findBy(id);
         if (floor != null) {
             permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
@@ -90,12 +88,10 @@ public class FloorFacade {
         @ApiResponse(code = 404, message = "floor with given id doesn't exist")
     })
     public Response delete(@PathParam("id") @ApiParam(value = "id", required = true) Long id) {
-        //Floor floor = floorBean.find(id);
         Floor floor = floorRepository.findBy(id);
         if (floor != null) {
             permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
                     floor.getBuilding().getComplex().getId(), Permission.UPDATE);
-            //floorBean.delete(floor);
             floorRepository.remove(floor);
             return Response.ok().build();
         }
@@ -110,14 +106,12 @@ public class FloorFacade {
     })
     public Floor update(@ApiParam(value = "floor", required = true) Floor floor) {
         if (floor.getBuildingId() != null) {
-            //Building building = buildingBean.find(floor.getBuildingId());
             Building building = buildingRepository.findBy(floor.getBuildingId());
             if (building != null) {
                 permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
                         building.getComplex().getId(), Permission.UPDATE);
                 floor.setBuilding(building);
                 floor.setBuildingId(building.getId());
-                //floorBean.update(floor);
                 floorRepository.save(floor);
                 return floor;
             }
@@ -132,7 +126,6 @@ public class FloorFacade {
         @ApiResponse(code = 404, message = "building id or building empty or doesn't exist")
     })
     public Response updateFloors(@PathParam("id") Long buildingId, @ApiParam(value = "floors", required = true) List<Floor> floors) {
-        //Building building = buildingBean.find(buildingId);
         Building building = buildingRepository.findBy(buildingId);
         if (building != null) {
             permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
@@ -158,7 +151,6 @@ public class FloorFacade {
             permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
                     floorInDB.getBuilding().getComplex().getId(), Permission.UPDATE);
             floorInDB.setmToPix(floor.getmToPix());
-            //floorBean.update(floorInDB);
             floorRepository.save(floorInDB);
             return Response.ok().build();
         }
