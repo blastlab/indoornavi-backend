@@ -1,30 +1,23 @@
 package co.blastlab.serviceblbnavi.rest.facade;
 
-import co.blastlab.serviceblbnavi.dao.FloorBean;
 import co.blastlab.serviceblbnavi.dao.PermissionBean;
 import co.blastlab.serviceblbnavi.dao.VertexBean;
+import co.blastlab.serviceblbnavi.dao.repository.FloorRepository;
+import co.blastlab.serviceblbnavi.dao.repository.VertexRepository;
 import co.blastlab.serviceblbnavi.domain.Floor;
 import co.blastlab.serviceblbnavi.domain.Permission;
 import co.blastlab.serviceblbnavi.domain.Vertex;
 import co.blastlab.serviceblbnavi.rest.bean.AuthorizationBean;
 import co.blastlab.serviceblbnavi.views.View;
 import com.fasterxml.jackson.annotation.JsonView;
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
-import com.wordnik.swagger.annotations.ApiParam;
-import com.wordnik.swagger.annotations.ApiResponse;
-import com.wordnik.swagger.annotations.ApiResponses;
-import java.util.List;
-import javax.ejb.EJB;
+import com.wordnik.swagger.annotations.*;
+
+import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
+import java.util.List;
 
 /**
  *
@@ -32,15 +25,19 @@ import javax.ws.rs.core.Response;
  */
 @Path("/vertex")
 @Api("/vertex")
+@Stateless
 public class VertexFacade {
 
-    @EJB
+    @Inject
     private VertexBean vertexBean;
 
-    @EJB
-    private FloorBean floorBean;
+    @Inject
+    VertexRepository vertexRepository;
 
-    @EJB
+    @Inject
+    private FloorRepository floorRepository;
+
+    @Inject
     private PermissionBean permissionBean;
 
     @Inject
@@ -54,12 +51,13 @@ public class VertexFacade {
     @JsonView(View.VertexInternal.class)
     public Vertex create(@ApiParam(value = "vertex", required = true) Vertex vertex) {
         if (vertex.getFloorId() != null) {
-            Floor floor = floorBean.find(vertex.getFloorId());
+            Floor floor = floorRepository.findBy(vertex.getFloorId());
             if (floor != null) {
                 permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
                         floor.getBuilding().getComplex().getId(), Permission.UPDATE);
                 vertex.setFloor(floor);
-                vertexBean.create(vertex);
+                //vertexBean.create(vertex);
+                vertexRepository.save(vertex);
                 return vertex;
             }
         }
@@ -74,10 +72,12 @@ public class VertexFacade {
     })
     public Response delete(@PathParam("id") @ApiParam(value = "id", required = true) Long id) {
         Vertex vertex = vertexBean.find(id);
+        //Vertex vertex = vertexRepository.findOptionalBy(id);
         if (vertex != null) {
             permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
                     vertex.getFloor().getBuilding().getComplex().getId(), Permission.UPDATE);
             vertexBean.delete(vertex);
+            //vertexRepository.removeAndFlush(vertex);
             return Response.ok().build();
         }
         throw new EntityNotFoundException();
@@ -93,7 +93,8 @@ public class VertexFacade {
     public Vertex update(@ApiParam(value = "vertex", required = true) Vertex vertex) {
         System.out.println(vertex.getId() + " " + vertex.getX() + " " + vertex.getY());
         if (vertex.getId() != null) {
-            Vertex v = vertexBean.find(vertex.getId());
+            //Vertex v = vertexBean.find(vertex.getId());
+            Vertex v = vertexRepository.findOptionalBy(vertex.getId());
             if (v != null) {
                 permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
                         v.getFloor().getBuilding().getComplex().getId(), Permission.UPDATE);

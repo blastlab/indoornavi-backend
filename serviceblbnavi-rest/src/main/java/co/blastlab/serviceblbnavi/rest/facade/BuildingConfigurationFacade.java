@@ -1,27 +1,19 @@
 package co.blastlab.serviceblbnavi.rest.facade;
 
-import co.blastlab.serviceblbnavi.dao.BuildingBean;
 import co.blastlab.serviceblbnavi.dao.BuildingConfigurationBean;
-import co.blastlab.serviceblbnavi.dao.ComplexBean;
 import co.blastlab.serviceblbnavi.dao.PermissionBean;
+import co.blastlab.serviceblbnavi.dao.repository.BuildingRepository;
+import co.blastlab.serviceblbnavi.dao.repository.ComplexRepository;
 import co.blastlab.serviceblbnavi.domain.Building;
 import co.blastlab.serviceblbnavi.domain.BuildingConfiguration;
 import co.blastlab.serviceblbnavi.domain.Complex;
 import co.blastlab.serviceblbnavi.domain.Permission;
 import co.blastlab.serviceblbnavi.rest.bean.AuthorizationBean;
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
-import com.wordnik.swagger.annotations.ApiParam;
-import com.wordnik.swagger.annotations.ApiResponse;
-import com.wordnik.swagger.annotations.ApiResponses;
-import javax.ejb.EJB;
+import com.wordnik.swagger.annotations.*;
+
 import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
-import javax.ws.rs.GET;
-import javax.ws.rs.InternalServerErrorException;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 
 /**
@@ -32,19 +24,19 @@ import javax.ws.rs.core.Response;
 @Api("/buildingConfiguration")
 public class BuildingConfigurationFacade {
 
-    @EJB
+    @Inject
     private PermissionBean permissionBean;
 
     @Inject
     private AuthorizationBean authorizationBean;
 
-    @EJB
-    private ComplexBean complexBean;
+    @Inject
+    private ComplexRepository complexRepository;
 
-    @EJB
-    private BuildingBean buildingBean;
+    @Inject
+    private BuildingRepository buildingRepository;
 
-    @EJB
+    @Inject
     private BuildingConfigurationBean buildingConfigurationBean;
 
     @POST
@@ -54,11 +46,11 @@ public class BuildingConfigurationFacade {
             @PathParam("complexName") @ApiParam(value = "complexName", required = true) String complexName,
             @PathParam("buildingName") @ApiParam(value = "buildingName", required = true) String buildingName,
             @PathParam("version") @ApiParam(value = "version", required = true) Integer version) {
-        Complex complex = complexBean.findByName(complexName);
+        Complex complex = complexRepository.findOptionalByName(complexName);
         if (complex != null) {
             permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
                     complex.getId(), Permission.UPDATE);
-            Building building = buildingBean.findByComplexNameAndBuildingName(complexName, buildingName);
+            Building building = buildingRepository.findByComplexNameAndBuildingName(complexName, buildingName);
             if (building != null) {
                 if (buildingConfigurationBean.saveConfiguration(building)) {
                     return Response.noContent().build();

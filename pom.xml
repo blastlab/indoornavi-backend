@@ -11,7 +11,7 @@
     <modules>
         <module>serviceblbnavi-ear</module>
         <module>serviceblbnavi-rest</module>
-        <module>serviceblbnavi-domain</module>
-        <module>serviceblbnavi-dao</module>
+        <!--<module>serviceblbnavi-domain</module>-->
+        <!--<module>serviceblbnavi-dao</module>-->
     </modules>
 </project>

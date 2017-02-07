@@ -4,6 +4,8 @@ import co.blastlab.serviceblbnavi.dao.BuildingBean;
 import co.blastlab.serviceblbnavi.dao.FloorBean;
 import co.blastlab.serviceblbnavi.dao.PermissionBean;
 import co.blastlab.serviceblbnavi.dao.WaypointBean;
+import co.blastlab.serviceblbnavi.dao.repository.BuildingRepository;
+import co.blastlab.serviceblbnavi.dao.repository.FloorRepository;
 import co.blastlab.serviceblbnavi.domain.Building;
 import co.blastlab.serviceblbnavi.domain.Floor;
 import co.blastlab.serviceblbnavi.domain.Permission;
@@ -11,21 +13,12 @@ import co.blastlab.serviceblbnavi.domain.Waypoint;
 import co.blastlab.serviceblbnavi.rest.bean.AuthorizationBean;
 import co.blastlab.serviceblbnavi.views.View;
 import com.fasterxml.jackson.annotation.JsonView;
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
-import com.wordnik.swagger.annotations.ApiParam;
-import com.wordnik.swagger.annotations.ApiResponse;
-import com.wordnik.swagger.annotations.ApiResponses;
-import java.util.List;
-import javax.ejb.EJB;
+import com.wordnik.swagger.annotations.*;
+
 import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
-import javax.ws.rs.BadRequestException;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
+import javax.ws.rs.*;
+import java.util.List;
 
 /**
  *
@@ -35,20 +28,26 @@ import javax.ws.rs.PathParam;
 @Api("/waypoint")
 public class WaypointFacade {
 
-    @EJB
+    @Inject
     private WaypointBean waypointBean;
 
-    @EJB
+    @Inject
     private FloorBean floorBean;
 
-    @EJB
+    @Inject
+    private FloorRepository floorRepository;
+
+    @Inject
     private PermissionBean permissionBean;
 
     @Inject
     private AuthorizationBean authorizationBean;
 
-    @EJB
+    @Inject
     private BuildingBean buildingBean;
+
+    @Inject
+    BuildingRepository buildingRepository;
 
     @POST
     @ApiOperation(value = "create waypoint", response = Waypoint.class)
@@ -57,7 +56,8 @@ public class WaypointFacade {
     })
     public Waypoint createWaypoint(@ApiParam(value = "waypoint", required = true) Waypoint waypoint) {
         if (waypoint.getFloorId() != null) {
-            Floor floor = floorBean.find(waypoint.getFloorId());
+            //Floor floor = floorBean.find(waypoint.getFloorId());
+            Floor floor = floorRepository.findBy(waypoint.getFloorId());
             if (floor != null) {
                 permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
                         floor.getBuilding().getComplex().getId(), Permission.UPDATE);
@@ -125,7 +125,8 @@ public class WaypointFacade {
     })
     public List<Waypoint> getActiveWaypointsByFloorId(@ApiParam(value = "id", required = true) @PathParam("id") Long floorId) {
         if (floorId != null) {
-            Floor floor = floorBean.find(floorId);
+            //Floor floor = floorBean.find(floorId);
+            Floor floor = floorRepository.findBy(floorId);
             if (floor != null) {
                 permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
                         floor.getBuilding().getComplex().getId(), Permission.READ);
@@ -144,7 +145,8 @@ public class WaypointFacade {
     })
     public List<Waypoint> getWaypointsByBuildingId(@ApiParam(value = "id", required = true) @PathParam("id") Long buildingId) {
         if (buildingId != null) {
-            Building building = buildingBean.find(buildingId);
+            //Building building = buildingBean.find(buildingId);
+            Building building = buildingRepository.findBy(buildingId);
             if (building != null) {
                 permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
                         building.getComplex().getId(), Permission.READ);
