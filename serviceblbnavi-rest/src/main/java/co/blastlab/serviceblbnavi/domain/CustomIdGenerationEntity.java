@@ -1,10 +1,11 @@
 package co.blastlab.serviceblbnavi.domain;
 
-import java.io.Serializable;
+import org.hibernate.annotations.GenericGenerator;
+
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
-import org.hibernate.annotations.GenericGenerator;
+import java.io.Serializable;
 
 /**
  *

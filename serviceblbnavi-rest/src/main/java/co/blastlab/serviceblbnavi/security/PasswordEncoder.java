@@ -1,8 +1,9 @@
 package co.blastlab.serviceblbnavi.security;
 
+import org.apache.commons.lang.RandomStringUtils;
+
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import org.apache.commons.lang.RandomStringUtils;
 
 /**
  * PasswordEncoder generates authorization token.

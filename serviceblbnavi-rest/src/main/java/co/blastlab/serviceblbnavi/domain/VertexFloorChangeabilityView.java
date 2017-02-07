@@ -1,12 +1,9 @@
 package co.blastlab.serviceblbnavi.domain;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+
+import javax.persistence.*;
 import java.io.Serializable;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
 
 /**
  *

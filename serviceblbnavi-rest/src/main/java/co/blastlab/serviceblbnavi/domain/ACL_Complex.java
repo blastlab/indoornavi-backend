@@ -1,9 +1,10 @@
 package co.blastlab.serviceblbnavi.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import java.io.Serializable;
+
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
+import java.io.Serializable;
 
 /**
  *
