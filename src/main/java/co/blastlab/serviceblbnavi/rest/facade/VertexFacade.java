@@ -32,7 +32,7 @@ public class VertexFacade {
     private VertexBean vertexBean;
 
     @Inject
-    VertexRepository vertexRepository;
+    private VertexRepository vertexRepository;
 
     @Inject
     private FloorRepository floorRepository;
@@ -72,7 +72,7 @@ public class VertexFacade {
     })
     public Response delete(@PathParam("id") @ApiParam(value = "id", required = true) Long id) {
         Vertex vertex = vertexBean.find(id);
-        //Vertex vertex = vertexRepository.findOptionalBy(id);
+        //Vertex vertex = vertexRepository.findOptionalBy(2L);
         if (vertex != null) {
             permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
                     vertex.getFloor().getBuilding().getComplex().getId(), Permission.UPDATE);

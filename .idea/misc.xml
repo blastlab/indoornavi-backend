@@ -6,7 +6,7 @@
   <component name="FrameworkDetectionExcludesConfiguration">
     <file type="ejb" url="file://$PROJECT_DIR$/serviceblbnavi-dao" />
     <file type="javaeeApplication" url="file://$PROJECT_DIR$/serviceblbnavi-ear" />
-    <file type="web" url="file://$PROJECT_DIR$/serviceblbnavi-rest" />
+    <file type="web" url="file://$PROJECT_DIR$" />
   </component>
   <component name="MavenProjectsManager">
     <option name="originalFiles">
