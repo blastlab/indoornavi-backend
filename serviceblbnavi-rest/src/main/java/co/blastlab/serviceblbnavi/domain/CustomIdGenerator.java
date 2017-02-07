@@ -1,9 +1,10 @@
 package co.blastlab.serviceblbnavi.domain;
 
-import java.io.Serializable;
 import org.hibernate.HibernateException;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.id.IncrementGenerator;
+
+import java.io.Serializable;
 
 /**
  *
