@@ -3,7 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/serviceblbnavi.iml" filepath="$PROJECT_DIR$/serviceblbnavi.iml" />
-      <module fileurl="file://$PROJECT_DIR$/serviceblbnavi-dao/serviceblbnavi-dao.iml" filepath="$PROJECT_DIR$/serviceblbnavi-dao/serviceblbnavi-dao.iml" />
       <module fileurl="file://$PROJECT_DIR$/serviceblbnavi-domain/serviceblbnavi-domain.iml" filepath="$PROJECT_DIR$/serviceblbnavi-domain/serviceblbnavi-domain.iml" />
       <module fileurl="file://$PROJECT_DIR$/serviceblbnavi-ear/serviceblbnavi-ear.iml" filepath="$PROJECT_DIR$/serviceblbnavi-ear/serviceblbnavi-ear.iml" />
       <module fileurl="file://$PROJECT_DIR$/serviceblbnavi-rest/serviceblbnavi-rest.iml" filepath="$PROJECT_DIR$/serviceblbnavi-rest/serviceblbnavi-rest.iml" />

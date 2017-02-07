@@ -7,25 +7,14 @@ import co.blastlab.serviceblbnavi.domain.Edge;
 import co.blastlab.serviceblbnavi.domain.Permission;
 import co.blastlab.serviceblbnavi.domain.Vertex;
 import co.blastlab.serviceblbnavi.rest.bean.AuthorizationBean;
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
-import com.wordnik.swagger.annotations.ApiParam;
-import com.wordnik.swagger.annotations.ApiResponse;
-import com.wordnik.swagger.annotations.ApiResponses;
-import java.util.ArrayList;
-import java.util.List;
-import javax.ejb.EJB;
+import com.wordnik.swagger.annotations.*;
+
 import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
-import javax.ws.rs.BadRequestException;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.HeaderParam;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -35,13 +24,13 @@ import javax.ws.rs.core.Response;
 @Api("/edge")
 public class EdgeFacade {
 
-    @EJB
+    @Inject
     private EdgeBean edgeBean;
 
-    @EJB
+    @Inject
     private VertexBean vertexBean;
 
-    @EJB
+    @Inject
     private PermissionBean permissionBean;
 
     @Inject

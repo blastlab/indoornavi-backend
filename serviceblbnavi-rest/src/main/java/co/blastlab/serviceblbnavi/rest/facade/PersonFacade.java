@@ -1,16 +1,14 @@
 package co.blastlab.serviceblbnavi.rest.facade;
 
 import co.blastlab.serviceblbnavi.dao.PersonBean;
+import co.blastlab.serviceblbnavi.dao.repository.PersonRepository;
 import co.blastlab.serviceblbnavi.domain.Person;
 import co.blastlab.serviceblbnavi.rest.bean.AuthorizationBean;
 import co.blastlab.serviceblbnavi.views.View;
 import com.fasterxml.jackson.annotation.JsonView;
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
-import com.wordnik.swagger.annotations.ApiParam;
-import com.wordnik.swagger.annotations.ApiResponse;
-import com.wordnik.swagger.annotations.ApiResponses;
-import javax.ejb.EJB;
+import com.wordnik.swagger.annotations.*;
+
+import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityExistsException;
 import javax.persistence.EntityNotFoundException;
@@ -20,15 +18,18 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 
 /**
- *
  * @author Michał Koszałka
  */
 @Path("/person")
 @Api("/person")
+@Stateless
 public class PersonFacade {
 
-    @EJB
+    @Inject
     private PersonBean personBean;
+
+    @Inject
+    private PersonRepository personRepository;
 
     @Inject
     private AuthorizationBean authorizationBean;
@@ -37,16 +38,16 @@ public class PersonFacade {
     @JsonView(View.PersonInternal.class)
     @ApiOperation(value = "register", response = Person.class)
     @ApiResponses({
-        @ApiResponse(code = 409, message = "person with given email exists")
+            @ApiResponse(code = 409, message = "person with given email exists")
     })
     public Person register(@ApiParam(value = "person", required = true) Person person) {
-        Person p = personBean.findByEmail(person.getEmail());
+        Person p = personRepository.findOptionalByEmail(person.getEmail());
         if (p != null) {
             throw new EntityExistsException();
         }
         p = new Person(person.getEmail(), person.getPlainPassword());
         p.generateAuthToken();
-        personBean.create(p);
+        personRepository.save(p);
         return p;
     }
 
@@ -54,13 +55,15 @@ public class PersonFacade {
     @JsonView(View.PersonInternal.class)
     @ApiOperation(value = "register", response = Person.class)
     @ApiResponses({
-        @ApiResponse(code = 404, message = "invalid login data")
+            @ApiResponse(code = 404, message = "invalid login data")
     })
     public Person login(@ApiParam(value = "person", required = true) Person person) {
-        Person p = personBean.findByEmail(person.getEmail());
+        Person p = personRepository.findOptionalByEmail(person.getEmail());
+
         if (p == null) {
             throw new EntityNotFoundException();
         }
+
         personBean.checkPassword(p, person.getPlainPassword());
         personBean.generateAuthToken(p);
         return p;

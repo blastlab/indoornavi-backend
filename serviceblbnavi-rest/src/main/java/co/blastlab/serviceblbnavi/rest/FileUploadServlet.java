@@ -2,8 +2,9 @@ package co.blastlab.serviceblbnavi.rest;
 
 import co.blastlab.serviceblbnavi.dao.FloorBean;
 import co.blastlab.serviceblbnavi.dao.PermissionBean;
-import co.blastlab.serviceblbnavi.dao.PersonBean;
 import co.blastlab.serviceblbnavi.dao.exception.PermissionException;
+import co.blastlab.serviceblbnavi.dao.repository.FloorRepository;
+import co.blastlab.serviceblbnavi.dao.repository.PersonRepository;
 import co.blastlab.serviceblbnavi.domain.Floor;
 import co.blastlab.serviceblbnavi.domain.Permission;
 import co.blastlab.serviceblbnavi.domain.Person;
@@ -13,11 +14,8 @@ import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiImplicitParam;
 import com.wordnik.swagger.annotations.ApiImplicitParams;
 import com.wordnik.swagger.annotations.ApiOperation;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.util.Base64;
-import javax.ejb.EJB;
+import org.apache.commons.io.IOUtils;
+
 import javax.imageio.ImageIO;
 import javax.inject.Inject;
 import javax.servlet.ServletException;
@@ -27,9 +25,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
-import org.apache.commons.io.IOUtils;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.util.Base64;
 
 /**
  *
@@ -40,13 +40,16 @@ import org.apache.commons.io.IOUtils;
 @Api(value = "/floor/image/")
 public class FileUploadServlet extends HttpServlet {
 
-    @EJB
+    @Inject
     private FloorBean floorBean;
 
-    @EJB
-    private PersonBean personBean;
+    @Inject
+    private FloorRepository floorRepository;
 
-    @EJB
+    @Inject
+    private PersonRepository personRepository;
+
+    @Inject
     private PermissionBean permissionBean;
 
     @Inject
@@ -66,7 +69,8 @@ public class FileUploadServlet extends HttpServlet {
             authorize(request);
             response.setContentType("text/html;charset=UTF-8");
 
-            Floor floor = floorBean.find(Long.parseLong(request.getParameter("floor")));
+            //Floor floor = floorBean.find(Long.parseLong(request.getParameter("floor")));
+            Floor floor = floorRepository.findBy(Long.parseLong(request.getParameter("floor")));
             permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
                     floor.getBuilding().getComplex().getId(), Permission.UPDATE);
             final Part filePart = request.getPart("image");
@@ -77,7 +81,8 @@ public class FileUploadServlet extends HttpServlet {
             floor.setBitmapHeight(bi.getHeight());
             floor.setBitmapWidth(bi.getWidth());
             floor.setBitmap(bytes);
-            floorBean.update(floor);
+            //floorBean.update(floor);
+            floorRepository.save(floor);
         } catch (PermissionException e) {
             response.setStatus(CORSFilter.UNAUTHORIZED);
         } catch (NumberFormatException e) {
@@ -91,7 +96,10 @@ public class FileUploadServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse response)
             throws ServletException, IOException {
         try {
-            Floor floor = floorBean.find(Long.parseLong(
+            /*Floor floor = floorBean.find(Long.parseLong(
+                    req.getPathInfo().substring(SEPARATOR_INDEX))
+            );*/
+            Floor floor = floorRepository.findBy(Long.parseLong(
                     req.getPathInfo().substring(SEPARATOR_INDEX))
             );
             if (floor == null || floor.getBitmap() == null) {
@@ -108,7 +116,7 @@ public class FileUploadServlet extends HttpServlet {
     private void authorize(HttpServletRequest request) {
         String authToken = request.getHeader("auth_token");
         if (authToken != null) {
-            Person person = personBean.findByAuthToken(authToken);
+            Person person = personRepository.findByAuthToken(authToken);
             if (person != null) {
                 authorizationBean.setCurrentUser(person);
                 return;

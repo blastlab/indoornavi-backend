@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="2.1" xmlns="http://xmlns.jcp.org/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
+    <persistence-unit name="NaviPU" transaction-type="JTA">
+        <!--<provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>-->
+        <jta-data-source>java:/jdbc/Navi</jta-data-source>
+
+        <!--<exclude-unlisted-classes>false</exclude-unlisted-classes>--> <!-- Import all entity classes -->
+        <class>co.blastlab.serviceblbnavi.domain.Person</class>
+        <properties>
+            <property name="hibernate.enable_lazy_load_no_trans" value="true"/>
+            <property name="hibernate.show_sql" value="true"/>
+            <property name="hibernate.use_sql_comments" value="true"/>
+            <!--jta platform for wildfly-->
+            <property name="hibernate.transaction.jta.platform" value="org.hibernate.service.jta.platform.internal.JBossAppServerJtaPlatform" />
+            <!--for properly id generation-->
+            <property name="hibernate.id.new_generator_mappings" value="false"/>
+            <!--jta platform for glassfish-->
+            <!--<property name="hibernate.transaction.jta.platform" value="org.hibernate.service.jta.platform.internal.SunOneJtaPlatform"/>-->
+        </properties>
+    </persistence-unit>
+    
+    <persistence-unit name="NaviProductionPU" transaction-type="JTA">
+        <!--<provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>-->
+        <jta-data-source>java:/jdbc/NaviProduction</jta-data-source>
+        <exclude-unlisted-classes>false</exclude-unlisted-classes> <!-- Import all entity classes -->
+        <properties>
+            <property name="hibernate.enable_lazy_load_no_trans" value="true"/>
+            <property name="hibernate.show_sql" value="true"/>
+            <property name="hibernate.use_sql_comments" value="true"/>
+            <!--jta platform for wildfly-->
+            <property name="hibernate.transaction.jta.platform" value="org.hibernate.service.jta.platform.internal.JBossAppServerJtaPlatform" />
+            <!--for properly id generation-->
+            <property name="hibernate.id.new_generator_mappings" value="false"/>
+            <!--jta platform for glassfish-->
+            <!--<property name="hibernate.transaction.jta.platform" value="org.hibernate.service.jta.platform.internal.SunOneJtaPlatform"/>-->
+        </properties>
+    </persistence-unit>
+</persistence>
