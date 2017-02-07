@@ -22,13 +22,16 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="true" />
+        <module name="database" />
+        <module name="serviceblbnavi" />
         <module name="serviceblbnavi-domain" />
         <module name="serviceblbnavi-ear" />
         <module name="serviceblbnavi-rest" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="serviceblbnavi" target="1.5" />
+      <module name="database" target="1.7" />
+      <module name="serviceblbnavi" target="1.8" />
       <module name="serviceblbnavi-dao" target="1.8" />
       <module name="serviceblbnavi-domain" target="1.7" />
       <module name="serviceblbnavi-ear" target="1.7" />

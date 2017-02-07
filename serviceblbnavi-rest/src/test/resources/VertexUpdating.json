@@ -1,9 +1,0 @@
-{
-  "id": "{id}",
-  "x": "{x:10}",
-  "y": "{y:10}",
-  "inactive": "{inactive}",
-  "isFloorDownChangeable": "{isFloorDownChangeable}",
-  "isFloorUpChangeable": "{isFloorUpChangeable}",
-  "floorId": "{floorId:2}"
-}
