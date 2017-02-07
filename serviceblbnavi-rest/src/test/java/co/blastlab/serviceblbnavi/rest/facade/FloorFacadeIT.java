@@ -16,6 +16,7 @@ public class FloorFacadeIT extends BaseIT {
 	private static final Integer TEST_LEVEL_2 = 2;
 
 	private static final Integer ID_FOR_DELETE = 1;
+	private static final Integer ID_FOR_FAIL_DELETE = 999;
 	private static final Integer ID_FOR_UPDATE = 2;
 
 	private static final Integer BITMAP_HEIGHT_FOR_UPDATE = 90;
@@ -72,10 +73,10 @@ public class FloorFacadeIT extends BaseIT {
 
 	@Test
 	public void failInDeletingFloor() {
-		given()
-				.pathParam("id",ID_FOR_DELETE)
+		given().pathParam("id",ID_FOR_DELETE)
 				.when().delete(FLOOR_PATH_WITH_ID)
 				.then().statusCode(HttpStatus.SC_UNAUTHORIZED);
+
 	}
 
 	@Test
