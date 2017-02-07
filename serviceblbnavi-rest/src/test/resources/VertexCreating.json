@@ -1,0 +1,8 @@
+{
+  "x": "{x:10}",
+  "y": "{y:11}",
+  "inactive": "{inactive}",
+  "isFloorDownChangeable": "{isFloorDownChangeable}",
+  "isFloorUpChangeable": "{isFloorUpChangeable}",
+  "floorId": "{floorId:2}"
+}
