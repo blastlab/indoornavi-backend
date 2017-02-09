@@ -16,7 +16,7 @@ services:
       APP_ENVIRONMENT: development
       APP_DB_HOST: db
       APP_DB_HOST_PROD: db_prod
-    entrypoint: ["wait-for-container-end", "-c", "liquibase", "-c", "liquibase_prod", "--", "/start-server.sh"]
+    entrypoint: ["wait-for-container-end.sh", "-c", "liquibase", "-c", "liquibase_prod", "--", "/start-server.sh"]
 
   db:
     extends:

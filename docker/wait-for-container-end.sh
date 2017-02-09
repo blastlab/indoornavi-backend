@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Blocks untill given container can be rached by ping.
-# Usefull when other container must finish before this container can start work.
+# Blocks until given container can be reached by ping.
+# Useful when other container must finish before this container can start work.
 
 write_error_and_exit() {
 	echo $1 >&2
