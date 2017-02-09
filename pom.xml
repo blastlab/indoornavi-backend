@@ -15,14 +15,6 @@
         <deltaspike.version>1.7.1</deltaspike.version>
         <war.output.directory>${project.basedir}/deployments</war.output.directory>
     </properties>
-	
-    <modules>
-        <!--<module>database</module>-->
-        <!--<module>serviceblbnavi-ear</module>
-        <module>serviceblbnavi-rest</module>
-        &lt;!&ndash;<module>serviceblbnavi-domain</module>&ndash;&gt;
-        &lt;!&ndash;<module>serviceblbnavi-dao</module>&ndash;&gt;-->
-    </modules>
 
     <dependencyManagement>
         <dependencies>
@@ -42,20 +34,6 @@
             <artifactId>javaee-web-api</artifactId>
             <version>7.0</version>
             <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>serviceblbnavi-dao</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
-            <type>ejb</type>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>serviceblbnavi-domain</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
-            <type>jar</type>
         </dependency>
         <dependency>
             <groupId>commons-fileupload</groupId>
@@ -94,10 +72,6 @@
                     <groupId>antlr</groupId>
                     <artifactId>antlr</artifactId>
                 </exclusion>
-                <exclusion>
-                    <groupId>dom4j</groupId>
-                    <artifactId>dom4j</artifactId>
-                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -105,12 +79,6 @@
             <artifactId>hibernate-core</artifactId>
             <version>5.1.0.Final</version>
             <scope>provided</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>dom4j</groupId>
-                    <artifactId>dom4j</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>javax</groupId>
@@ -151,7 +119,7 @@
             <artifactId>distributions-bom</artifactId>
             <version>${deltaspike.version}</version>
             <type>pom</type>
-            <scope>provided</scope><!--było "import"-->
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.deltaspike.core</groupId>
