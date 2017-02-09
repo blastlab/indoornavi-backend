@@ -22,7 +22,6 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="true" />
-        <module name="database" />
         <module name="serviceblbnavi" />
         <module name="serviceblbnavi-domain" />
         <module name="serviceblbnavi-ear" />

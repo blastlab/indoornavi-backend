@@ -4,9 +4,6 @@ import co.blastlab.serviceblbnavi.rest.facade.util.RequestBodyBuilder;
 import org.apache.http.HttpStatus;
 import org.junit.Test;
 
-import java.util.Arrays;
-import java.util.List;
-
 import static org.hamcrest.Matchers.equalTo;
 
 public class VertexFacadeIT extends BaseIT {
@@ -18,7 +15,7 @@ public class VertexFacadeIT extends BaseIT {
 
 	private static final Integer FLOOR_ID_FOR_CHECK = 2;
 
-	private static final Integer ID_FOR_DUPLICATE = 1;
+	private static final Integer ID_FOR_UPDATE = 3;
 	private static final Integer ID_FOR_DELETE = 2;
 
 	private static final Double X_CONSTANT_VALUE = 10.0;
@@ -120,5 +117,24 @@ public class VertexFacadeIT extends BaseIT {
 			.pathParam("id",ID_FOR_DELETE)
 			.when().delete(VERTEX_PATH_WITH_ID)
 			.then().statusCode(HttpStatus.SC_OK);
+	}
+	@Test
+	public void updateExistingVertex() {
+		String body = new RequestBodyBuilder("VertexUpdating.json")
+				.setParameter("id", ID_FOR_UPDATE)
+				.setParameter("inactive", INACTIVE_TRUE)
+				.setParameter("isFloorDownChangeable",IS_FLOOR_DOWN_CHANGEABLE_TRUE)
+				.setParameter("isFloorUpChangeable",IS_FLOOR_UP_CHANGEABLE_TRUE)
+				.build();
+		givenUser()
+				.body(body)
+				.when().put(VERTEX_PATH)
+				.then().statusCode(HttpStatus.SC_OK)
+				.body(
+						"id", equalTo(ID_FOR_UPDATE),
+						"inactive", equalTo(INACTIVE_FALSE),
+						"isFloorDownChangeable", equalTo(IS_FLOOR_DOWN_CHANGEABLE_FALSE),
+						"isFloorUpChangeable", equalTo(IS_FLOOR_UP_CHANGEABLE_FALSE)
+				);
 	}
 }

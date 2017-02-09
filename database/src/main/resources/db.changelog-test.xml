@@ -43,11 +43,6 @@
 		<loadUpdateData tableName="vertex" file="test/Vertex.csv" primaryKey="id" />
 	</changeSet>
 
-	<changeSet id="VertexFloorChangeability" author="mcichosz" context="test" runAlways="true" runOnChange="true">
-		<delete tableName="VertexFloorChangeability"/>
-		<loadUpdateData tableName="vertexfloorchangeabilityview" file="test/VertexFloorChangeability.csv" primaryKey="id" />
-	</changeSet>
-
 	<changeSet id="Edge" author="mcichosz" context="test" runAlways="true" runOnChange="true">
 		<delete tableName="edge"/>
 	</changeSet>

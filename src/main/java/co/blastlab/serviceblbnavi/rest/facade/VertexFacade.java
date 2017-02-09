@@ -72,12 +72,12 @@ public class VertexFacade {
     })
     public Response delete(@PathParam("id") @ApiParam(value = "id", required = true) Long id) {
         Vertex vertex = vertexBean.find(id);
-        //Vertex vertex = vertexRepository.findOptionalBy(2L);
+        //Vertex vertex = vertexRepository.findOptionalBy(id);
         if (vertex != null) {
             permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
                     vertex.getFloor().getBuilding().getComplex().getId(), Permission.UPDATE);
-            vertexBean.delete(vertex);
-            //vertexRepository.removeAndFlush(vertex);
+            //vertexBean.delete(vertex);
+            vertexRepository.removeAndFlush(vertex);
             return Response.ok().build();
         }
         throw new EntityNotFoundException();
@@ -93,8 +93,8 @@ public class VertexFacade {
     public Vertex update(@ApiParam(value = "vertex", required = true) Vertex vertex) {
         System.out.println(vertex.getId() + " " + vertex.getX() + " " + vertex.getY());
         if (vertex.getId() != null) {
-            //Vertex v = vertexBean.find(vertex.getId());
-            Vertex v = vertexRepository.findOptionalBy(vertex.getId());
+            Vertex v = vertexBean.find(vertex.getId());
+            //Vertex v = vertexRepository.findOptionalBy(vertex.getId());
             if (v != null) {
                 permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
                         v.getFloor().getBuilding().getComplex().getId(), Permission.UPDATE);
