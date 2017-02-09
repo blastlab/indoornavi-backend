@@ -3,11 +3,11 @@ services:
   core:
     build: .
     ports:
-      - '8080:8080'
+      - '80:8080'
       - '8787:8787'
       - '9990:9990'
     volumes:
-      - ./serviceblbnavi-ear/deployments:/opt/jboss/wildfly/standalone/deployments
+      - ./deployments:/opt/jboss/wildfly/standalone/deployments
     depends_on:
       - db
       - db_prod
