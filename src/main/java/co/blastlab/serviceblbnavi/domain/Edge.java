@@ -2,15 +2,15 @@ package co.blastlab.serviceblbnavi.domain;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.io.Serializable;
 
-/**
- *
- * @author Michał Koszałka
- */
 @Entity
+@Getter
+@Setter
 @NamedQueries({
     @NamedQuery(name = Edge.FIND_BY_TARGET_AND_SOURCE, query = "SELECT e FROM Edge e WHERE e.source.id = :sourceId AND e.target.id = :targetId"),
     @NamedQuery(name = Edge.FIND_VERTEX_FLOOR_ID, query = "SELECT e FROM Edge e WHERE e.source.floor.id = :floorId"),
@@ -39,53 +39,4 @@ public class Edge extends CustomIdGenerationEntity implements Serializable {
 
     @Transient
     private Long targetId;
-
-    public Long getSourceId() {
-        if (this.source != null) {
-            return this.source.getId();
-        } else {
-            return sourceId;
-        }
-    }
-
-    public void setSourceId(Long sourceId) {
-        this.sourceId = sourceId;
-    }
-
-    public Long getTargetId() {
-        if (this.target != null) {
-            return this.target.getId();
-        } else {
-            return targetId;
-        }
-    }
-
-    public void setTargetId(Long targetId) {
-        this.targetId = targetId;
-    }
-
-    public Double getWeight() {
-        return weight;
-    }
-
-    public void setWeight(Double weight) {
-        this.weight = weight;
-    }
-
-    public Vertex getSource() {
-        return source;
-    }
-
-    public void setSource(Vertex source) {
-        this.source = source;
-    }
-
-    public Vertex getTarget() {
-        return target;
-    }
-
-    public void setTarget(Vertex target) {
-        this.target = target;
-    }
-
 }

@@ -4,16 +4,16 @@ import co.blastlab.serviceblbnavi.views.View;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.List;
 
-/**
- *
- * @author Michał Koszałka
- */
 @Entity
+@Getter
+@Setter
 @NamedQueries({
     @NamedQuery(name = Waypoint.FIND_BY_BUILDING_ID, query = "SELECT w FROM Waypoint w WHERE w.floor.building.id = :buildingId"),
     @NamedQuery(name = Waypoint.FIND_ACTIVE_BY_FLOOR_ID, query = "SELECT w FROM Waypoint w WHERE w.floor.id = :floorId AND w.inactive = false")
@@ -56,85 +56,4 @@ public class Waypoint extends CustomIdGenerationEntity implements Serializable {
             inactive = false;
         }
     }
-    
-    public Long getFloorId() {
-        return floorId;
-    }
-
-    public void setFloorId(Long floorId) {
-        this.floorId = floorId;
-    }
-
-    public Double getX() {
-        return x;
-    }
-
-    public void setX(Double x) {
-        this.x = x;
-    }
-
-    public Double getY() {
-        return y;
-    }
-
-    public void setY(Double y) {
-        this.y = y;
-    }
-
-    public Integer getTimeToCheckout() {
-        return timeToCheckout;
-    }
-
-    public void setTimeToCheckout(Integer timeToCheckout) {
-        this.timeToCheckout = timeToCheckout;
-    }
-
-    public Double getDistance() {
-        return distance;
-    }
-
-    public void setDistance(Double distance) {
-        this.distance = distance;
-    }
-
-    public String getDetails() {
-        return details;
-    }
-
-    public void setDetails(String details) {
-        this.details = details;
-    }
-
-    public Floor getFloor() {
-        return floor;
-    }
-
-    public void setFloor(Floor floor) {
-        this.floor = floor;
-    }
-
-    public List<WaypointVisit> getWaypointVisits() {
-        return waypointVisits;
-    }
-
-    public void setWaypointVisits(List<WaypointVisit> waypointVisits) {
-        this.waypointVisits = waypointVisits;
-    }
-
-    public Boolean getInactive() {
-        return inactive;
-    }
-
-    public void setInactive(Boolean inactive) {
-        this.inactive = inactive;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
 }
