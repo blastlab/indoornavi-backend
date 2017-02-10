@@ -43,6 +43,9 @@
           <element id="library" level="project" name="Maven: org.apache.deltaspike.modules:deltaspike-jpa-module-impl:1.7.1" />
           <element id="library" level="project" name="Maven: org.apache.deltaspike.modules:deltaspike-jpa-module-api:1.7.1" />
           <element id="library" level="project" name="Maven: javax.validation:validation-api:1.0.0.GA" />
+          <element id="library" level="project" name="Maven: org.jooq:jooq:3.9.1" />
+          <element id="library" level="project" name="Maven: org.jooq:jooq-meta:3.9.1" />
+          <element id="library" level="project" name="Maven: org.jooq:jooq-codegen:3.9.1" />
         </element>
       </element>
       <element id="directory" name="META-INF">
