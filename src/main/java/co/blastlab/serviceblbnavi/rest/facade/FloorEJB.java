@@ -111,7 +111,7 @@ public class FloorEJB implements FloorFacade {
         if (floorInDB != null) {
             permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
                     floorInDB.getBuilding().getComplex().getId(), Permission.UPDATE);
-            floorInDB.setmToPix(floor.getmToPix());
+            floorInDB.setMToPix(floor.getMToPix());
             floorRepository.save(floorInDB);
             return Response.ok().build();
         }
