@@ -56,7 +56,6 @@ public class VertexFacade {
                 permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
                         floor.getBuilding().getComplex().getId(), Permission.UPDATE);
                 vertex.setFloor(floor);
-                //vertexBean.create(vertex);
                 vertexRepository.save(vertex);
                 return vertex;
             }
@@ -71,12 +70,10 @@ public class VertexFacade {
         @ApiResponse(code = 404, message = "vertex with given id doesn't exist")
     })
     public Response delete(@PathParam("id") @ApiParam(value = "id", required = true) Long id) {
-        Vertex vertex = vertexBean.find(id);
-        //Vertex vertex = vertexRepository.findOptionalBy(id);
+        Vertex vertex = vertexRepository.findBy(id);
         if (vertex != null) {
             permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
                     vertex.getFloor().getBuilding().getComplex().getId(), Permission.UPDATE);
-            //vertexBean.delete(vertex);
             vertexRepository.removeAndFlush(vertex);
             return Response.ok().build();
         }
@@ -93,14 +90,13 @@ public class VertexFacade {
     public Vertex update(@ApiParam(value = "vertex", required = true) Vertex vertex) {
         System.out.println(vertex.getId() + " " + vertex.getX() + " " + vertex.getY());
         if (vertex.getId() != null) {
-            Vertex v = vertexBean.find(vertex.getId());
-            //Vertex v = vertexRepository.findOptionalBy(vertex.getId());
+            Vertex v = vertexRepository.findBy(vertex.getId());
             if (v != null) {
                 permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
                         v.getFloor().getBuilding().getComplex().getId(), Permission.UPDATE);
                 v.setX(vertex.getX());
                 v.setY(vertex.getY());
-                vertexBean.update(v);
+                vertexRepository.save(v);
                 return v;
             }
         }
@@ -116,7 +112,9 @@ public class VertexFacade {
     })
     public List<Vertex> findByFloor(@ApiParam(value = "id", required = true) @PathParam("id") Long floorId) {
         if (floorId != null) {
-            List<Vertex> vertices = vertexBean.findAll(floorId);
+            Floor floor = floorRepository.findBy(floorId);
+            List<Vertex> vertices = vertexRepository.findByFloor(floor);
+
             if (vertices.size() > 0) {
                 permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
                         vertices.get(0).getFloor().getBuilding().getComplex().getId(), Permission.READ);
@@ -135,7 +133,9 @@ public class VertexFacade {
     })
     public List<Vertex> findAllActiveByFloor(@ApiParam(value = "id", required = true) @PathParam("id") Long floorId) {
         if (floorId != null) {
-            List<Vertex> vertices = vertexBean.findAllActive(floorId);
+            Floor floor = floorRepository.findBy(floorId);
+            Boolean inactive = false;
+            List<Vertex> vertices = vertexRepository.findByFloorAndInactive(floor, inactive);
             if (vertices.size() > 0) {
                 permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
                         vertices.get(0).getFloor().getBuilding().getComplex().getId(), Permission.READ);
@@ -154,7 +154,8 @@ public class VertexFacade {
     })
     public Vertex findById(@ApiParam(value = "id", required = true) @PathParam("id") Long vertexId) {
         if (vertexId != null) {
-            Vertex vertex = vertexBean.find(vertexId);
+            //Vertex vertex = vertexBean.find(vertexId);
+            Vertex vertex = vertexRepository.findBy(vertexId);
             if (vertex != null) {
                 permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(), 
                         vertex.getFloor().getBuilding().getComplex().getId(), Permission.READ);
@@ -173,7 +174,7 @@ public class VertexFacade {
         @ApiResponse(code = 404, message = "vertex with given id wasn't found")
     })
     public Vertex dectivate(@ApiParam(value = "id", required = true) @PathParam("id") Long vertexId) {
-        Vertex vertex = vertexBean.find(vertexId);
+        Vertex vertex = vertexRepository.findBy(vertexId);
         if (vertex != null) {
             permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(), 
                     vertex.getFloor().getBuilding().getComplex().getId(), Permission.UPDATE);
