@@ -4,16 +4,16 @@ import co.blastlab.serviceblbnavi.views.View;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.List;
 
-/**
- *
- * @author Michał Koszałka
- */
 @Entity
+@Getter
+@Setter
 @NamedQueries({
     @NamedQuery(name = Goal.FIND_BY_BUILDING, query = "SELECT g FROM Goal g WHERE g.floor.building.id = :buildingId"),
     @NamedQuery(name = Goal.FIND_BY_FLOOR, query = "SELECT g FROM Goal g WHERE g.floor.id = :floorId"),
@@ -50,62 +50,6 @@ public class Goal extends CustomIdGenerationEntity implements Serializable {
         if (inactive == null) {
             inactive = false;
         }
-    }
-
-    public Long getFloorId() {
-        return floorId;
-    }
-
-    public void setFloorId(Long floorId) {
-        this.floorId = floorId;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Boolean getInactive() {
-        return inactive;
-    }
-
-    public void setInactive(Boolean inactive) {
-        this.inactive = inactive;
-    }
-
-    public List<GoalSelection> getGoalSelections() {
-        return goalSelections;
-    }
-
-    public void setGoalSelections(List<GoalSelection> goalSelections) {
-        this.goalSelections = goalSelections;
-    }
-
-    public Double getX() {
-        return x;
-    }
-
-    public void setX(Double x) {
-        this.x = x;
-    }
-
-    public Double getY() {
-        return y;
-    }
-
-    public void setY(Double y) {
-        this.y = y;
-    }
-
-    public Floor getFloor() {
-        return floor;
-    }
-
-    public void setFloor(Floor floor) {
-        this.floor = floor;
     }
 
 }
