@@ -2,6 +2,8 @@ package co.blastlab.serviceblbnavi.domain;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
@@ -10,11 +12,9 @@ import javax.persistence.Transient;
 import java.io.Serializable;
 import java.util.List;
 
-/**
- *
- * @author Michał Koszałka
- */
 @Entity
+@Getter
+@Setter
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY, setterVisibility = JsonAutoDetect.Visibility.NONE, getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class BuildingExit extends CustomIdGenerationEntity implements Serializable {
 
@@ -38,69 +38,4 @@ public class BuildingExit extends CustomIdGenerationEntity implements Serializab
 
     @Transient
     private Long vertexId;
-
-    public Long getVertexId() {
-        return vertexId;
-    }
-
-    public void setVertexId(Long vertexId) {
-        this.vertexId = vertexId;
-    }
-
-    public List<BuildingConnection> getTargetConnections() {
-        return targetConnections;
-    }
-
-    public void setTargetConnections(List<BuildingConnection> targetConnections) {
-        this.targetConnections = targetConnections;
-    }
-
-    public List<BuildingConnection> getSourceConnections() {
-        return sourceConnections;
-    }
-
-    public void setSourceConnections(List<BuildingConnection> sourceConnections) {
-        this.sourceConnections = sourceConnections;
-    }
-
-    public Double getLatitude() {
-        return latitude;
-    }
-
-    public void setLatitude(Double latitude) {
-        this.latitude = latitude;
-    }
-
-    public Double getLongitude() {
-        return longitude;
-    }
-
-    public void setLongitude(Double longitude) {
-        this.longitude = longitude;
-    }
-
-    public boolean isExitIn() {
-        return exitIn;
-    }
-
-    public void setExitIn(boolean exitIn) {
-        this.exitIn = exitIn;
-    }
-
-    public boolean isExitOut() {
-        return exitOut;
-    }
-
-    public void setExitOut(boolean exitOut) {
-        this.exitOut = exitOut;
-    }
-
-    public Vertex getVertex() {
-        return vertex;
-    }
-
-    public void setVertex(Vertex vertex) {
-        this.vertex = vertex;
-    }
-
 }
