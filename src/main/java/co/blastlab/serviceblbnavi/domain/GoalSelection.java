@@ -1,7 +1,9 @@
 package co.blastlab.serviceblbnavi.domain;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonSetter;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -35,4 +37,25 @@ public class GoalSelection extends CustomIdGenerationEntity implements Serializa
 
     @Transient
     private Long goalId;
+
+    // TODO: Check why is it here
+    @JsonGetter("X")
+    public Double getXCapitalized() {
+        return x;
+    }
+
+    @JsonSetter("X")
+    public void setXCapitalized(Double x) {
+        this.x = x;
+    }
+
+    @JsonGetter("Y")
+    public Double getYCapitalized() {
+        return y;
+    }
+
+    @JsonSetter("Y")
+    public void setYCapitalized(Double y) {
+        this.y = y;
+    }
 }
