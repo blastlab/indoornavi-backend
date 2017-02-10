@@ -13,6 +13,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <liquibase.version>3.4.0</liquibase.version>
         <deltaspike.version>1.7.1</deltaspike.version>
+        <lombok.version>1.16.12</lombok.version>
         <war.output.directory>${project.basedir}/deployments</war.output.directory>
     </properties>
 
@@ -157,6 +158,12 @@
             <groupId>dom4j</groupId>
             <artifactId>dom4j</artifactId>
             <version>1.6.1</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
