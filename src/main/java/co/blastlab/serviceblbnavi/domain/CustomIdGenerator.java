@@ -6,10 +6,6 @@ import org.hibernate.id.IncrementGenerator;
 
 import java.io.Serializable;
 
-/**
- *
- * @author Grzegorz Konupek
- */
 public class CustomIdGenerator extends IncrementGenerator {
 
     @Override

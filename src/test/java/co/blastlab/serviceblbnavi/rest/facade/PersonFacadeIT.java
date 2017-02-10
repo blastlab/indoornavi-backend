@@ -2,19 +2,16 @@ package co.blastlab.serviceblbnavi.rest.facade;
 
 import co.blastlab.serviceblbnavi.rest.facade.util.RequestBodyBuilder;
 import io.restassured.RestAssured;
-import io.restassured.response.Response;
-import io.restassured.response.ResponseBody;
 import org.apache.http.HttpStatus;
+import org.junit.Test;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;
 
-import org.junit.Test;
-
 public class PersonFacadeIT extends BaseIT {
 
 	private static final String USER_PATH = "/person";
-	private static final String GET_USER_PATH = "/person/current";
+	private static final String GET_CURRENT_USER_PATH = "/person/current";
 	private static final String TEST_EMAIL = "yzzncgnghnbfzzzfghdghdfhff@abcd.com";
 	private static final String TEST_EMAIL_FOR_NEW_PERSON = "aaasss@abcd.com";
 	private static final String NONEEXISTING_PERSON = "zzzzzzzzzzzz@abcd.com";
@@ -72,7 +69,7 @@ public class PersonFacadeIT extends BaseIT {
 	}
 
 	@Test
-	public void createAndFindPerson() {
+	public void createAndGetCurrentUser() {
 		String body = new RequestBodyBuilder("UserRegistration.json")
 			.setParameter("email", TEST_MAIL_AND_GET)
 			.setParameter("plainPassword", "12345")
@@ -91,7 +88,7 @@ public class PersonFacadeIT extends BaseIT {
 
 		given()
 			.header("auth_token", response)
-			.when().get(GET_USER_PATH)
+			.when().get(GET_CURRENT_USER_PATH)
 			.then().statusCode(HttpStatus.SC_OK)
 			.body(
 				"id", greaterThan(0),
@@ -101,9 +98,9 @@ public class PersonFacadeIT extends BaseIT {
 	}
 
 	@Test
-	public void findPerson() {
+	public void getCurrentUser() {
 		givenUser()
-			.when().get(GET_USER_PATH)
+			.when().get(GET_CURRENT_USER_PATH)
 			.then().statusCode(HttpStatus.SC_OK)
 			.body(
 				"id", greaterThan(0),
@@ -114,7 +111,7 @@ public class PersonFacadeIT extends BaseIT {
 	@Test
 	public void findPersonWithoutAuthToken() {
 		given()
-			.when().get(GET_USER_PATH)
+			.when().get(GET_CURRENT_USER_PATH)
 			.then().statusCode(HttpStatus.SC_UNAUTHORIZED);
 	}
 

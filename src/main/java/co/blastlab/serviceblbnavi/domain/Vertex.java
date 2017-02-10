@@ -4,16 +4,16 @@ import co.blastlab.serviceblbnavi.views.View;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.List;
 
-/**
- *
- * @author Michał Koszałka
- */
 @Entity
+@Getter
+@Setter
 @NamedQueries({
     @NamedQuery(name = Vertex.FIND_ACTIVE_BY_FLOOR, query = "SELECT v FROM Vertex v WHERE v.floor.id = :floorId AND v.inactive = false")
 })
@@ -84,94 +84,6 @@ public class Vertex extends CustomIdGenerationEntity implements Serializable {
                 + ", floor=" + floor
                 + ", vertexFloorChangeabilityView=" + vertexFloorChangeabilityView
                 + '}';
-    }
-
-    public Long getFloorId() {
-        return floorId;
-    }
-
-    public void setFloorId(Long floorId) {
-        this.floorId = floorId;
-    }
-
-    public List<BuildingExit> getBuildingExits() {
-        return buildingExits;
-    }
-
-    public void setBuildingExits(List<BuildingExit> buildingExits) {
-        this.buildingExits = buildingExits;
-    }
-
-    public List<Edge> getTargetEdges() {
-        return targetEdges;
-    }
-
-    public void setTargetEdges(List<Edge> targetEdges) {
-        this.targetEdges = targetEdges;
-    }
-
-    public List<Edge> getSourceEdges() {
-        return sourceEdges;
-    }
-
-    public void setSourceEdges(List<Edge> sourceEdges) {
-        this.sourceEdges = sourceEdges;
-    }
-
-    public Double getX() {
-        return x;
-    }
-
-    public void setX(Double x) {
-        this.x = x;
-    }
-
-    public Double getY() {
-        return y;
-    }
-
-    public void setY(Double y) {
-        this.y = y;
-    }
-
-    public Floor getFloor() {
-        return floor;
-    }
-
-    public void setFloor(Floor floor) {
-        this.floor = floor;
-    }
-
-    public boolean isIsFloorDownChangeable() {
-        return isFloorDownChangeable;
-    }
-
-    public void setIsFloorDownChangeable(boolean isFloorDownChangeable) {
-        this.isFloorDownChangeable = isFloorDownChangeable;
-    }
-
-    public boolean isIsFloorUpChangeable() {
-        return isFloorUpChangeable;
-    }
-
-    public void setIsFloorUpChangeable(boolean isFloorUpChangeable) {
-        this.isFloorUpChangeable = isFloorUpChangeable;
-    }
-
-    public VertexFloorChangeabilityView getVertexFloorChangeabilityView() {
-        return vertexFloorChangeabilityView;
-    }
-
-    public void setVertexFloorChangeabilityView(VertexFloorChangeabilityView vertexFloorChangeabilityView) {
-        this.vertexFloorChangeabilityView = vertexFloorChangeabilityView;
-    }
-
-    public Boolean getInactive() {
-        return inactive;
-    }
-
-    public void setInactive(Boolean inactive) {
-        this.inactive = inactive;
     }
 
 }

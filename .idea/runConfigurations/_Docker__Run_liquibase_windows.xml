@@ -25,8 +25,6 @@
           <option name="goals">
             <list>
               <option value="exec:exec" />
-              <option value="-pl" />
-              <option value="serviceblbnavi-rest" />
               <option value="-Dexec.executable=docker-compose" />
               <option value="-Dexec.args=up --build --no-deps liquibase" />
             </list>
