@@ -123,8 +123,5 @@
     <orderEntry type="library" scope="PROVIDED" name="Maven: dom4j:dom4j:1.6.1" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: xml-apis:xml-apis:1.0.b2" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.projectlombok:lombok:1.16.12" level="project" />
-    <orderEntry type="library" name="Maven: org.jooq:jooq:3.9.1" level="project" />
-    <orderEntry type="library" name="Maven: org.jooq:jooq-meta:3.9.1" level="project" />
-    <orderEntry type="library" name="Maven: org.jooq:jooq-codegen:3.9.1" level="project" />
   </component>
 </module>

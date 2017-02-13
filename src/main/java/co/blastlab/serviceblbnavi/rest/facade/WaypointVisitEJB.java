@@ -2,6 +2,7 @@ package co.blastlab.serviceblbnavi.rest.facade;
 
 import co.blastlab.serviceblbnavi.dao.WaypointBean;
 import co.blastlab.serviceblbnavi.dao.WaypointVisitBean;
+import co.blastlab.serviceblbnavi.dao.repository.WaypointVisitRepository;
 import co.blastlab.serviceblbnavi.domain.Waypoint;
 import co.blastlab.serviceblbnavi.domain.WaypointVisit;
 
@@ -15,8 +16,10 @@ public class WaypointVisitEJB {
     private WaypointVisitBean waypointVisitBean;
 
     @Inject
-    private WaypointBean waypointBean;
+    private WaypointVisitRepository waypointVisitRepository;
 
+    @Inject
+    private WaypointBean waypointBean;
 
     public WaypointVisit create(WaypointVisit waypointVisit) {
         if (waypointVisit.getWaypointId() != null && waypointVisit.getDevice() != null
@@ -28,7 +31,8 @@ public class WaypointVisitEJB {
             Waypoint waypoint = waypointBean.findById(waypointVisit.getWaypointId());
             if (waypoint != null) {
                 waypointVisit.setWaypoint(waypoint);
-                waypointVisitBean.create(waypointVisit);
+                //waypointVisitBean.create(waypointVisit);
+                waypointVisitRepository.save(waypointVisit);
                 return waypointVisit;
             }
         }

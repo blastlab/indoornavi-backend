@@ -1,6 +1,5 @@
 package co.blastlab.serviceblbnavi.rest.facade;
 
-import co.blastlab.serviceblbnavi.dao.FloorBean;
 import co.blastlab.serviceblbnavi.dao.PermissionBean;
 import co.blastlab.serviceblbnavi.dao.repository.BuildingRepository;
 import co.blastlab.serviceblbnavi.dao.repository.FloorRepository;
@@ -18,9 +17,6 @@ import java.util.List;
 
 @Stateless
 public class FloorEJB implements FloorFacade {
-
-    @Inject
-    private FloorBean floorBean;
 
     @Inject
     private FloorRepository floorRepository;
@@ -98,7 +94,7 @@ public class FloorEJB implements FloorFacade {
                     building.getComplex().getId(), Permission.UPDATE);
             for (Floor floor : floors) {
                 floor.setBuilding(building);
-                floorBean.updateFloorLevels(floors);
+                updateFloorLevels(floors);
                 return Response.ok().build();
             }
         }
@@ -118,4 +114,13 @@ public class FloorEJB implements FloorFacade {
         throw new EntityNotFoundException();
     }
 
+    public void updateFloorLevels(List<Floor> floors) {
+        floors.stream().map((f) -> {
+            Floor floor = floorRepository.findBy(f.getId());
+            floor.setLevel(f.getLevel());
+            return floor;
+        }).forEach((floor) -> {
+            floorRepository.save(floor);
+        });
+    }
 }

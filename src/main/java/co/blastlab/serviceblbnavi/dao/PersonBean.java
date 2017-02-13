@@ -7,16 +7,12 @@ import co.blastlab.serviceblbnavi.security.PasswordEncoder;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
-import javax.persistence.EntityManager;
 
 /**
  * @author Michał Koszałka
  */
 @Stateless
 public class PersonBean{
-
-    @Inject
-    private EntityManager em;
 
     @Inject
     private PersonRepository personRepository;
