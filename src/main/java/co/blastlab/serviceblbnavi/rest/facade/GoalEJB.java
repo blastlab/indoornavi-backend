@@ -1,6 +1,5 @@
 package co.blastlab.serviceblbnavi.rest.facade;
 
-import co.blastlab.serviceblbnavi.dao.FloorBean;
 import co.blastlab.serviceblbnavi.dao.GoalBean;
 import co.blastlab.serviceblbnavi.dao.PermissionBean;
 import co.blastlab.serviceblbnavi.dao.repository.FloorRepository;
@@ -8,7 +7,6 @@ import co.blastlab.serviceblbnavi.domain.Floor;
 import co.blastlab.serviceblbnavi.domain.Goal;
 import co.blastlab.serviceblbnavi.domain.Permission;
 import co.blastlab.serviceblbnavi.rest.bean.AuthorizationBean;
-
 
 import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
@@ -26,9 +24,6 @@ public class GoalEJB implements GoalFacade {
 
     @Inject
     private AuthorizationBean authorizationBean;
-
-    @Inject
-    private FloorBean floorBean;
 
     @Inject
     private FloorRepository floorRepository;

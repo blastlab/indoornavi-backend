@@ -1,7 +1,7 @@
 package co.blastlab.serviceblbnavi.rest.facade;
 
 import co.blastlab.serviceblbnavi.dao.GoalBean;
-import co.blastlab.serviceblbnavi.dao.GoalSelectionBean;
+import co.blastlab.serviceblbnavi.dao.repository.GoalSelectionRepository;
 import co.blastlab.serviceblbnavi.domain.Goal;
 import co.blastlab.serviceblbnavi.domain.GoalSelection;
 
@@ -12,7 +12,7 @@ import javax.persistence.EntityNotFoundException;
 public class GoalSelectionEJB implements GoalSelectionFacade {
 
     @Inject
-    private GoalSelectionBean goalSelectionBean;
+    private GoalSelectionRepository goalSelectionRepository;
 
     @Inject
     private GoalBean goalBean;
@@ -28,7 +28,7 @@ public class GoalSelectionEJB implements GoalSelectionFacade {
             Goal goal = goalBean.find(goalSelection.getGoalId());
             if (goal != null) {
                 goalSelection.setGoal(goal);
-                goalSelectionBean.create(goalSelection);
+                goalSelectionRepository.save(goalSelection);
                 return goalSelection;
             }
         }

@@ -1,7 +1,6 @@
 package co.blastlab.serviceblbnavi.rest.facade;
 
 import co.blastlab.serviceblbnavi.dao.PermissionBean;
-import co.blastlab.serviceblbnavi.dao.VertexBean;
 import co.blastlab.serviceblbnavi.dao.repository.FloorRepository;
 import co.blastlab.serviceblbnavi.dao.repository.VertexRepository;
 import co.blastlab.serviceblbnavi.domain.Floor;
@@ -18,9 +17,6 @@ import java.util.List;
 
 @Stateless
 public class VertexEJB implements VertexFacade {
-
-    @Inject
-    private VertexBean vertexBean;
 
     @Inject
     private VertexRepository vertexRepository;
@@ -42,7 +38,6 @@ public class VertexEJB implements VertexFacade {
                 permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
                         floor.getBuilding().getComplex().getId(), Permission.UPDATE);
                 vertex.setFloor(floor);
-                //vertexBean.create(vertex);
                 vertexRepository.save(vertex);
                 return vertex;
             }
@@ -52,12 +47,10 @@ public class VertexEJB implements VertexFacade {
 
 
     public Response delete(Long id) {
-        Vertex vertex = vertexBean.find(id);
-        //Vertex vertex = vertexRepository.findOptionalBy(id);
+        Vertex vertex = vertexRepository.findBy(id);
         if (vertex != null) {
             permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
                     vertex.getFloor().getBuilding().getComplex().getId(), Permission.UPDATE);
-            //vertexBean.delete(vertex);
             vertexRepository.removeAndFlush(vertex);
             return Response.ok().build();
         }
@@ -69,14 +62,13 @@ public class VertexEJB implements VertexFacade {
     public Vertex update(Vertex vertex) {
         System.out.println(vertex.getId() + " " + vertex.getX() + " " + vertex.getY());
         if (vertex.getId() != null) {
-            Vertex v = vertexBean.find(vertex.getId());
-            //Vertex v = vertexRepository.findOptionalBy(vertex.getId());
+            Vertex v = vertexRepository.findBy(vertex.getId());
             if (v != null) {
                 permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
                         v.getFloor().getBuilding().getComplex().getId(), Permission.UPDATE);
                 v.setX(vertex.getX());
                 v.setY(vertex.getY());
-                vertexBean.update(v);
+                vertexRepository.save(v);
                 return v;
             }
         }
@@ -86,7 +78,8 @@ public class VertexEJB implements VertexFacade {
 
     public List<Vertex> findByFloor(Long floorId) {
         if (floorId != null) {
-            List<Vertex> vertices = vertexBean.findAll(floorId);
+            Floor floor = floorRepository.findBy(floorId);
+            List<Vertex> vertices = vertexRepository.findByFloor(floor);
             if (vertices.size() > 0) {
                 permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
                         vertices.get(0).getFloor().getBuilding().getComplex().getId(), Permission.READ);
@@ -99,7 +92,8 @@ public class VertexEJB implements VertexFacade {
 
     public List<Vertex> findAllActiveByFloor(Long floorId) {
         if (floorId != null) {
-            List<Vertex> vertices = vertexBean.findAllActive(floorId);
+            Floor floor = floorRepository.findBy(floorId);
+            List<Vertex> vertices = vertexRepository.findByFloorAndInactive(floor, false);
             if (vertices.size() > 0) {
                 permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
                         vertices.get(0).getFloor().getBuilding().getComplex().getId(), Permission.READ);
@@ -112,9 +106,9 @@ public class VertexEJB implements VertexFacade {
 
     public Vertex findById(Long vertexId) {
         if (vertexId != null) {
-            Vertex vertex = vertexBean.find(vertexId);
+            Vertex vertex = vertexRepository.findBy(vertexId);
             if (vertex != null) {
-                permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(), 
+                permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
                         vertex.getFloor().getBuilding().getComplex().getId(), Permission.READ);
                 vertex.setFloorId(vertex.getFloor().getId());
                 return vertex;
@@ -124,12 +118,13 @@ public class VertexEJB implements VertexFacade {
     }
 
 
-    public Vertex dectivate(Long vertexId) {
-        Vertex vertex = vertexBean.find(vertexId);
+    public Vertex deactivate(Long vertexId) {
+        Vertex vertex = vertexRepository.findBy(vertexId);
         if (vertex != null) {
-            permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(), 
+            permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
                     vertex.getFloor().getBuilding().getComplex().getId(), Permission.UPDATE);
-            vertexBean.deactivate(vertex);
+            vertex.setInactive(true);
+            vertexRepository.save(vertex);
             return vertex;
         }
         throw new EntityNotFoundException();

@@ -1,7 +1,6 @@
 package co.blastlab.serviceblbnavi.rest.facade;
 
 import co.blastlab.serviceblbnavi.dao.BuildingBean;
-import co.blastlab.serviceblbnavi.dao.FloorBean;
 import co.blastlab.serviceblbnavi.dao.PermissionBean;
 import co.blastlab.serviceblbnavi.dao.WaypointBean;
 import co.blastlab.serviceblbnavi.dao.repository.BuildingRepository;
@@ -14,7 +13,7 @@ import co.blastlab.serviceblbnavi.rest.bean.AuthorizationBean;
 
 import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
-import javax.ws.rs.*;
+import javax.ws.rs.BadRequestException;
 import java.util.List;
 
 
@@ -22,9 +21,6 @@ public class WaypointEJB implements WaypointFacade {
 
     @Inject
     private WaypointBean waypointBean;
-
-    @Inject
-    private FloorBean floorBean;
 
     @Inject
     private FloorRepository floorRepository;
