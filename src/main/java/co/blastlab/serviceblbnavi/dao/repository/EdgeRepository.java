@@ -5,8 +5,12 @@ import co.blastlab.serviceblbnavi.domain.Vertex;
 import org.apache.deltaspike.data.api.EntityRepository;
 import org.apache.deltaspike.data.api.Repository;
 
+import java.util.List;
+
 @Repository
 public interface EdgeRepository extends EntityRepository<Edge, Long> {
 
     public Edge findOptionalBySourceAndTarget(Vertex source, Vertex target);
+
+    public List<Edge> findBySource(Vertex source);
 }

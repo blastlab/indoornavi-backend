@@ -10,12 +10,13 @@ import co.blastlab.serviceblbnavi.domain.Complex;
 import co.blastlab.serviceblbnavi.domain.Permission;
 import co.blastlab.serviceblbnavi.rest.bean.AuthorizationBean;
 
+import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 
-
+@Stateless
 public class BuildingConfigurationEJB implements BuildingConfigurationFacade {
 
     @Inject

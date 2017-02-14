@@ -6,9 +6,10 @@ import org.apache.deltaspike.data.api.EntityManagerResolver;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 
-public class CustomEntityManagerResolver implements EntityManagerResolver {
+public class ProductionDBEntityManagerResolver implements EntityManagerResolver {
 
-    @Inject @NaviProduction
+    @Inject
+    @NaviProduction
     private EntityManager emProd;
 
     @Override

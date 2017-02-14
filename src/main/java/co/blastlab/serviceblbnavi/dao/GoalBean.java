@@ -1,10 +1,11 @@
 package co.blastlab.serviceblbnavi.dao;
 
 import co.blastlab.serviceblbnavi.domain.Goal;
-import java.util.List;
+
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
+import java.util.List;
 
 /**
  *
@@ -36,11 +37,6 @@ public class GoalBean {
         goals.stream().forEach((v) -> {
             update(v);
         });
-    }
-
-    public void deactivate(Goal goal) {
-        goal.setInactive(true);
-        update(goal);
     }
 
     public List<Goal> findAllByBuildingId(Long buildingId) {

@@ -16,7 +16,7 @@ public abstract class VertexRepository implements EntityRepository<Vertex, Long>
 
     public void save(List<Vertex> vertices) {
         vertices.stream().forEach((v) -> {
-            save(v);
+            this.save(v);
         });
     }
 }
