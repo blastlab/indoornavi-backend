@@ -6,10 +6,11 @@ import co.blastlab.serviceblbnavi.dao.repository.WaypointVisitRepository;
 import co.blastlab.serviceblbnavi.domain.Waypoint;
 import co.blastlab.serviceblbnavi.domain.WaypointVisit;
 
+import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
 
-
+@Stateless
 public class WaypointVisitEJB {
 
     @Inject

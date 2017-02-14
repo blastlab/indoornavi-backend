@@ -1,6 +1,5 @@
 package co.blastlab.serviceblbnavi.dao.repository;
 
-import co.blastlab.serviceblbnavi.dao.qualifier.NaviProdDB;
 import co.blastlab.serviceblbnavi.domain.Building;
 import co.blastlab.serviceblbnavi.domain.Building_;
 import co.blastlab.serviceblbnavi.domain.Complex;
@@ -13,7 +12,6 @@ import org.apache.deltaspike.data.api.criteria.CriteriaSupport;
 import java.util.List;
 
 @Repository
-@NaviProdDB
 public abstract class ComplexRepository implements EntityRepository<Complex, Long>, CriteriaSupport<Complex> {
 
     public abstract Complex findOptionalByName(String name);

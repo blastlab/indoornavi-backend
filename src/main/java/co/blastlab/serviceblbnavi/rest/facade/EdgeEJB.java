@@ -1,14 +1,16 @@
 package co.blastlab.serviceblbnavi.rest.facade;
 
-import co.blastlab.serviceblbnavi.dao.EdgeBean;
 import co.blastlab.serviceblbnavi.dao.PermissionBean;
 import co.blastlab.serviceblbnavi.dao.repository.EdgeRepository;
+import co.blastlab.serviceblbnavi.dao.repository.FloorRepository;
 import co.blastlab.serviceblbnavi.dao.repository.VertexRepository;
 import co.blastlab.serviceblbnavi.domain.Edge;
+import co.blastlab.serviceblbnavi.domain.Floor;
 import co.blastlab.serviceblbnavi.domain.Permission;
 import co.blastlab.serviceblbnavi.domain.Vertex;
 import co.blastlab.serviceblbnavi.rest.bean.AuthorizationBean;
 
+import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
 import javax.ws.rs.BadRequestException;
@@ -16,17 +18,17 @@ import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.List;
 
-
+@Stateless
 public class EdgeEJB implements EdgeFacade {
-
-    @Inject
-    private EdgeBean edgeBean;
 
     @Inject
     private EdgeRepository edgeRepository;
 
     @Inject
     private VertexRepository vertexRepository;
+
+    @Inject
+    private FloorRepository floorRepository;
 
     @Inject
     private PermissionBean permissionBean;
@@ -61,9 +63,14 @@ public class EdgeEJB implements EdgeFacade {
         });
     }
 
-    public List<Edge> findByVertexFloorId(Long id) {
-        if (id != null) {
-            List<Edge> result = edgeBean.findByVertexFloorId(id);
+    public List<Edge> findByVertexFloorId(Long floorId) {
+        if (floorId != null) {
+            Floor floor = floorRepository.findBy(floorId);
+            List<Vertex> vertices = vertexRepository.findByFloor(floor);
+            List<Edge> result = new ArrayList<>();
+            vertices.stream().forEach((vertex) -> {
+                result.addAll(edgeRepository.findBySource(vertex));
+            });
             if (result.size() > 0) {
                 permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
                         result.get(0).getSource().getFloor().getBuilding().getComplex().getId(),
@@ -77,7 +84,8 @@ public class EdgeEJB implements EdgeFacade {
 
     public List<Edge> findByVertexId(Long vertexId) {
         if (vertexId != null) {
-            List<Edge> result = edgeBean.findByVertexId(vertexId);
+            Vertex vertex = vertexRepository.findBy(vertexId);
+            List<Edge> result = edgeRepository.findBySource(vertex);
             if (result.size() > 0) {
                 permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
                         result.get(0).getSource().getFloor().getBuilding().getComplex().getId(),
@@ -95,20 +103,17 @@ public class EdgeEJB implements EdgeFacade {
 
         Edge firstEdge = edgeRepository.findOptionalBySourceAndTarget(source, target);
         Edge secondEdge = edgeRepository.findOptionalBySourceAndTarget(target, source);
-        /*Edge firstEdge = edgeBean.findOptionalBySourceAndTarget(sourceId, targetId);
-        Edge secondEdge = edgeBean.findOptionalBySourceAndTarget(targetId, sourceId);*/
+
         if (firstEdge != null) {
             permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
                     firstEdge.getSource().getFloor().getBuilding().getComplex().getId(),
                     Permission.UPDATE);
-            //edgeBean.delete(firstEdge);
             edgeRepository.remove(firstEdge);
         }
         if (secondEdge != null) {
             permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
                     secondEdge.getSource().getFloor().getBuilding().getComplex().getId(),
                     Permission.UPDATE);
-            //edgeBean.delete(secondEdge);
             edgeRepository.remove(secondEdge);
         }
         return Response.ok().build();
@@ -116,7 +121,10 @@ public class EdgeEJB implements EdgeFacade {
 
 
     public Edge findBySourceIdAndTargetId(Long sourceId, Long targetId) {
-        Edge edge = edgeBean.findBySourceAndTarget(sourceId, targetId);
+        Vertex source = vertexRepository.findBy(sourceId);
+        Vertex target = vertexRepository.findBy(targetId);
+        Edge edge = edgeRepository.findOptionalBySourceAndTarget(source, target);
+
         if (edge != null) {
             permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
                     edge.getSource().getFloor().getBuilding().getComplex().getId(),
@@ -145,7 +153,10 @@ public class EdgeEJB implements EdgeFacade {
             if (edge.getSource() == null || edge.getTarget() == null) {
                 throw new BadRequestException();
             }
-            Edge newEdge = edgeBean.findBySourceAndTarget(edge.getSourceId(), edge.getTargetId());
+            //Edge newEdge = edgeBean.findBySourceAndTarget(edge.getSourceId(), edge.getTargetId());
+            Vertex source = vertexRepository.findBy(edge.getSourceId());
+            Vertex target = vertexRepository.findBy(edge.getTargetId());
+            Edge newEdge = edgeRepository.findOptionalBySourceAndTarget(source, target);
             if (newEdge == null) {
                 throw new BadRequestException();
             }
