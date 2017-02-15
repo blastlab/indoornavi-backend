@@ -14,6 +14,7 @@
         <liquibase.version>3.4.0</liquibase.version>
         <deltaspike.version>1.7.1</deltaspike.version>
         <lombok.version>1.16.12</lombok.version>
+        <jackson.version>2.8.1</jackson.version>
         <war.output.directory>${project.basedir}/deployments</war.output.directory>
     </properties>
 
@@ -90,13 +91,13 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-annotations</artifactId>
-            <version>2.5.1</version>
+            <version>${jackson.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>2.5.1</version>
+            <version>${jackson.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -192,6 +193,7 @@
                             <directory>${war.output.directory}</directory>
                             <includes>
                                 <include>*.war</include>
+                                <!--<include>*.war.undeployed</include>-->
                             </includes>
                         </fileset>
                     </filesets>

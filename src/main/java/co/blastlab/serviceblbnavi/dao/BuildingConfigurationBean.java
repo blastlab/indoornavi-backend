@@ -3,6 +3,7 @@ package co.blastlab.serviceblbnavi.dao;
 import co.blastlab.serviceblbnavi.dao.qualifier.NaviProduction;
 import co.blastlab.serviceblbnavi.domain.Building;
 import co.blastlab.serviceblbnavi.domain.BuildingConfiguration;
+import co.blastlab.serviceblbnavi.dto.building.BuildingDto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -20,10 +21,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-/**
- *
- * @author Grzegorz Konupek
- */
 @Stateless
 public class BuildingConfigurationBean {
 
@@ -141,21 +138,20 @@ public class BuildingConfigurationBean {
     }
 
     private String generateConfigurationFromBuilding(Building building) throws JsonProcessingException {
-        building.getFloors().stream().forEach((floor) -> {
-            floor.getWaypoints().stream().forEach((waypoint) -> {
+        building.getFloors().forEach((floor) -> {
+            floor.getWaypoints().forEach((waypoint) -> {
                 waypoint.setWaypointVisits(null);
             });
             floor.setVertices(floor.getVertices().stream().filter(
-                    vertex -> !vertex.getInactive()).collect(Collectors.toList()));
+                    vertex -> !vertex.isInactive()).collect(Collectors.toList()));
             floor.setGoals(floor.getGoals().stream().filter(
-                    goal -> !goal.getInactive()).collect(Collectors.toList()));
+                    goal -> !goal.isInactive()).collect(Collectors.toList()));
             floor.getGoals().forEach((goal) -> {
                 goal.setGoalSelections(null);
             });
         });
-        building.setBuildingConfigurations(null);
         return new ObjectMapper().setSerializationInclusion(JsonInclude.Include.NON_NULL)
-                .writeValueAsString(building);
+                .writeValueAsString(new BuildingDto(building));
     }
 
     public BuildingConfiguration findLatestVersionByBuildingId(Long id) {

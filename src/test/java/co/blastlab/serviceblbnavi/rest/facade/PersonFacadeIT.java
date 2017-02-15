@@ -14,7 +14,7 @@ public class PersonFacadeIT extends BaseIT {
 	private static final String GET_CURRENT_USER_PATH = "/person/current";
 	private static final String TEST_EMAIL = "yzzncgnghnbfzzzfghdghdfhff@abcd.com";
 	private static final String TEST_EMAIL_FOR_NEW_PERSON = "aaasss@abcd.com";
-	private static final String NONEEXISTING_PERSON = "zzzzzzzzzzzz@abcd.com";
+	private static final String NON_EXISTING_PERSON = "zzzzzzzzzzzz@abcd.com";
 	private static final String TEST_MAIL_AND_GET = "aaabbbvvv@abcd.com";
 	private static final String EXISTING_EMAIL = "abcd@efg.hij";
 	private static final String EXISTING_PASSWORD = "start123";
@@ -118,7 +118,7 @@ public class PersonFacadeIT extends BaseIT {
 	@Test
 	public void tryToLoginWithNoneexistingPerson() {
 		String body = new RequestBodyBuilder("UserRegistration.json")
-			.setParameter("email", NONEEXISTING_PERSON)
+			.setParameter("email", NON_EXISTING_PERSON)
 			.build();
 
 		given()

@@ -2,6 +2,8 @@ package co.blastlab.serviceblbnavi.rest.facade;
 
 
 import co.blastlab.serviceblbnavi.domain.Person;
+import co.blastlab.serviceblbnavi.dto.person.PersonRequestDto;
+import co.blastlab.serviceblbnavi.dto.person.PersonResponseDto;
 import co.blastlab.serviceblbnavi.views.View;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.wordnik.swagger.annotations.*;
@@ -22,20 +24,20 @@ public interface PersonFacade {
     @ApiResponses({
             @ApiResponse(code = 409, message = "person with given email exists")
     })
-    Person register(@ApiParam(value = "person", required = true) Person person);
+    PersonResponseDto register(@ApiParam(value = "person", required = true) PersonRequestDto person);
 
 
     @PUT
     @JsonView(View.PersonInternal.class)
-    @ApiOperation(value = "register", response = Person.class)
+    @ApiOperation(value = "login", response = Person.class)
     @ApiResponses({
             @ApiResponse(code = 404, message = "invalid login data")
     })
-    Person login(@ApiParam(value = "person", required = true) Person person);
+    PersonResponseDto login(@ApiParam(value = "person", required = true) PersonRequestDto person);
 
     @GET
     @JsonView(View.PersonInternal.class)
     @Path("/current")
     @ApiOperation(value = "find current user")
-    Person get();
+    PersonResponseDto get();
 }

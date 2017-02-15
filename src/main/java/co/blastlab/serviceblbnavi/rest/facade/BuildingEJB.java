@@ -8,13 +8,15 @@ import co.blastlab.serviceblbnavi.domain.Building;
 import co.blastlab.serviceblbnavi.domain.BuildingConfiguration;
 import co.blastlab.serviceblbnavi.domain.Complex;
 import co.blastlab.serviceblbnavi.domain.Permission;
+import co.blastlab.serviceblbnavi.dto.building.BuildingDto;
 import co.blastlab.serviceblbnavi.rest.bean.AuthorizationBean;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
-import javax.ws.rs.*;
+import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.core.Response;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -36,43 +38,52 @@ public class BuildingEJB implements BuildingFacade {
     @Inject
     private AuthorizationBean authorizationBean;
 
-    public Building create(Building building) {
+    public BuildingDto create(BuildingDto building) {
         if (building.getComplexId() != null) {
-
             permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
                     building.getComplexId(), Permission.UPDATE);
             Complex complex = complexRepository.findBy(building.getComplexId());
             if (complex != null) {
-                building.setComplex(complex);
-                buildingRepository.save(building);
-                return building;
+                Building buildingEntity = new Building();
+                buildingEntity.setComplex(complex);
+                buildingEntity.setName(building.getName());
+                buildingEntity.setMinimumFloor(building.getMinimumFloor());
+                buildingEntity.setDegree(building.getDegree());
+                buildingEntity = buildingRepository.save(buildingEntity);
+                return new BuildingDto(buildingEntity);
             }
         }
         throw new EntityNotFoundException();
     }
 
 
-    public Building find(Long id) {
-        Building building = buildingRepository.findBy(id);
+    public BuildingDto find(Long id) {
+        Building buildingEntity = buildingRepository.findBy(id);
 
-        if (building != null) {
+        if (buildingEntity != null) {
             permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
-                    building.getComplex().getId(), Permission.READ);
-            return building;
+                    buildingEntity.getComplex().getId(), Permission.READ);
+            return new BuildingDto(buildingEntity);
         }
         throw new EntityNotFoundException();
     }
 
 
-    public Building update(Building building) {
+    public BuildingDto update(BuildingDto building) {
         if (building.getId() != null) {
             Complex complex = complexRepository.findByBuildingId(building.getId());
             if (complex != null) {
                 permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
                         complex.getId(), Permission.UPDATE);
-                building.setComplex(complex);
-                buildingRepository.save(building);
-                return building;
+                Building buildingEntity = buildingRepository.findBy(building.getId());
+                if (buildingEntity != null) {
+                    buildingEntity.setComplex(complex);
+                    buildingEntity.setName(building.getName());
+                    buildingEntity.setMinimumFloor(building.getMinimumFloor());
+                    buildingEntity.setDegree(building.getDegree());
+                    buildingEntity = buildingRepository.save(buildingEntity);
+                    return new BuildingDto(buildingEntity);
+                }
             }
         }
         throw new EntityNotFoundException();
@@ -91,13 +102,15 @@ public class BuildingEJB implements BuildingFacade {
     }
 
 
-    public List<Building> findAll(Long complexId) {
+    public List<BuildingDto> findAll(Long complexId) {
         permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
                 complexId, Permission.READ);
         if (complexId != null) {
             Complex complex = complexRepository.findBy(complexId);
             if (complex != null) {
-                return buildingRepository.findByComplex(complex);
+                List<BuildingDto> buildings = new ArrayList<>();
+                buildingRepository.findByComplex(complex).forEach((buildingEntity -> buildings.add(new BuildingDto(buildingEntity))));
+                return buildings;
             }
         }
         throw new EntityNotFoundException();
@@ -146,8 +159,8 @@ public class BuildingEJB implements BuildingFacade {
     }
 
 
-    public Building restoreConfiguration(Long id) {
-        return buildingConfigurationBean.restoreConfiguration(id);
+    public BuildingDto restoreConfiguration(Long id) {
+        return new BuildingDto(buildingConfigurationBean.restoreConfiguration(id));
     }
 
 }

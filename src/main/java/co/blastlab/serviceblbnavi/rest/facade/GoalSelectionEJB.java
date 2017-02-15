@@ -4,6 +4,7 @@ import co.blastlab.serviceblbnavi.dao.GoalBean;
 import co.blastlab.serviceblbnavi.dao.GoalSelectionBean;
 import co.blastlab.serviceblbnavi.domain.Goal;
 import co.blastlab.serviceblbnavi.domain.GoalSelection;
+import co.blastlab.serviceblbnavi.dto.goal.GoalSelectionDto;
 
 import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
@@ -18,18 +19,20 @@ public class GoalSelectionEJB implements GoalSelectionFacade {
     private GoalBean goalBean;
     
 
-    public GoalSelection create(GoalSelection goalSelection) {
+    public GoalSelectionDto create(GoalSelectionDto goalSelection) {
         if (goalSelection.getGoalId() != null && goalSelection.getDevice() != null
-                && (goalSelection.getCreationDateTimestamp() != null || goalSelection.getTimestamp() != null)) {
-            if (goalSelection.getTimestamp() != null) {
-                goalSelection.setCreationDateTimestamp(goalSelection.getTimestamp());
-                goalSelection.setTimestamp(null);
-            }
+                && goalSelection.getTimestamp() != null) {
             Goal goal = goalBean.find(goalSelection.getGoalId());
             if (goal != null) {
-                goalSelection.setGoal(goal);
-                goalSelectionBean.create(goalSelection);
-                return goalSelection;
+                GoalSelection goalSelectionEntity = new GoalSelection();
+                goalSelectionEntity.setX(goalSelection.getX());
+                goalSelectionEntity.setY(goalSelection.getY());
+                goalSelectionEntity.setFloorLevel(goalSelection.getFloorLevel());
+                goalSelectionEntity.setDevice(goalSelection.getDevice());
+                goalSelectionEntity.setCreationDateTimestamp(goalSelection.getTimestamp());
+                goalSelectionEntity.setGoal(goal);
+                goalSelectionBean.create(goalSelectionEntity);
+                return new GoalSelectionDto(goalSelectionEntity);
             }
         }
         throw new EntityNotFoundException();
