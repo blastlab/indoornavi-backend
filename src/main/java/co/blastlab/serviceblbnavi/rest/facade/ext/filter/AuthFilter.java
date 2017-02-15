@@ -15,14 +15,11 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
 import java.io.IOException;
 
-/**
- * Filter that checks all requests and perform authentication.
- *
- * @author Michal Koszalka
- */
+
 @RequestScoped
 @Provider
 @Priority(Priorities.AUTHENTICATION)
+@TokenAuthorization
 public class AuthFilter implements ContainerRequestFilter {
 
     private static final String AUTH_TOKEN = "auth_token";
@@ -35,28 +32,27 @@ public class AuthFilter implements ContainerRequestFilter {
 
     @Override
     public void filter(ContainerRequestContext requestCtx) throws IOException {
+
+        //TODO: Is it correct to abort requestCtx with status.OK?
         if (requestCtx.getRequest().getMethod().equals("OPTIONS")) {
             requestCtx.abortWith(Response.status(Response.Status.OK).build());
             return;
         }
-        String path = requestCtx.getUriInfo().getAbsolutePath().toString();
-        
-        if (!path.endsWith("/person") && !path.contains("/api") && !path.contains("swagger.json")
-                && (!path.endsWith("/goalSelection") && !path.endsWith("/waypointVisit") || !requestCtx.getMethod().equals("POST"))
-                && !(path.contains("building") && path.contains("config") && requestCtx.getMethod().equals("GET"))
-                && !(path.contains("buildingConfiguration") && requestCtx.getMethod().equals("GET"))) {
-            System.out.println("authorization filtering");
-            String authToken = requestCtx.getHeaderString(AUTH_TOKEN);
-            if (authToken == null) {
-                throw new WebApplicationException(Response.Status.UNAUTHORIZED);
-            }
 
-            Person person = personRepository.findByAuthToken(authToken);
-            if (person == null) {
-                throw new WebApplicationException(Response.Status.UNAUTHORIZED);
-            }
+        System.out.println("authorization filtering");
 
-            authorizationBean.setCurrentUser(person);
+        String authToken = requestCtx.getHeaderString(AUTH_TOKEN);
+
+        if (authToken == null) {
+            throw new WebApplicationException(Response.Status.UNAUTHORIZED);
         }
+
+        Person person = personRepository.findByAuthToken(authToken);
+        if (person == null) {
+            throw new WebApplicationException(Response.Status.UNAUTHORIZED);
+        }
+
+        authorizationBean.setCurrentUser(person);
+
     }
 }

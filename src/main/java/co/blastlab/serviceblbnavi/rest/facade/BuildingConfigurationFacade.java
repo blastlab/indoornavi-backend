@@ -1,6 +1,7 @@
 package co.blastlab.serviceblbnavi.rest.facade;
 
 
+import co.blastlab.serviceblbnavi.rest.facade.ext.filter.TokenAuthorization;
 import com.wordnik.swagger.annotations.*;
 
 import javax.ws.rs.*;
@@ -13,6 +14,7 @@ public interface BuildingConfigurationFacade {
     @POST
     @Path("/{complexName}/{buildingName}/{version: \\d+}")
     @ApiOperation(value = "creates building configuration")
+    @TokenAuthorization
     Response create(
             @PathParam("complexName") @ApiParam(value = "complexName", required = true) String complexName,
             @PathParam("buildingName") @ApiParam(value = "buildingName", required = true) String buildingName,
