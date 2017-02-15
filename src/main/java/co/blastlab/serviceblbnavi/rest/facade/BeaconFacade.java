@@ -2,6 +2,7 @@ package co.blastlab.serviceblbnavi.rest.facade;
 
 
 import co.blastlab.serviceblbnavi.domain.Beacon;
+import co.blastlab.serviceblbnavi.rest.facade.ext.filter.TokenAuthorization;
 import com.wordnik.swagger.annotations.*;
 
 import javax.ws.rs.*;
@@ -11,6 +12,7 @@ import java.util.List;
 
 @Path("/beacon")
 @Api("/beacon")
+@TokenAuthorization
 public interface BeaconFacade {
 
     @POST
