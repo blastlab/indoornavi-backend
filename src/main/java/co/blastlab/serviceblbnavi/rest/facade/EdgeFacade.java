@@ -2,6 +2,7 @@ package co.blastlab.serviceblbnavi.rest.facade;
 
 
 import co.blastlab.serviceblbnavi.domain.Edge;
+import co.blastlab.serviceblbnavi.dto.edge.EdgeDto;
 import com.wordnik.swagger.annotations.*;
 
 import javax.ws.rs.*;
@@ -13,17 +14,16 @@ import java.util.List;
 public interface EdgeFacade {
 
     @POST
-    @ApiOperation(value = "create edges", response = Edge.class, responseContainer = "List")
+    @ApiOperation(value = "create edges", response = EdgeDto.class, responseContainer = "List")
     @ApiResponses({
-            @ApiResponse(code = 404, message = "target or source id emtpy or doesn't exist")
+            @ApiResponse(code = 404, message = "target or source id empty or doesn't exist")
     })
-    List<Edge> create(@ApiParam(value = "edges", required = true) List<Edge> edges);
-
+    List<EdgeDto> create(@ApiParam(value = "edges", required = true) List<EdgeDto> edges);
 
 
     @PUT
     @ApiOperation(value = "update edges", response = Edge.class, responseContainer = "List")
-    List<Edge> update(@ApiParam(value = "edges", required = true) List<Edge> edges);
+    List<EdgeDto> update(List<EdgeDto> edges);
 
 
     @DELETE
@@ -38,11 +38,11 @@ public interface EdgeFacade {
 
     @GET
     @Path("/{id: \\d+}")
-    @ApiOperation(value = "find edges by floor id", response = Edge.class, responseContainer = "List")
+    @ApiOperation(value = "find edges by floor id", response = EdgeDto.class, responseContainer = "List")
     @ApiResponses({
             @ApiResponse(code = 404, message = "floor with given id wasn't found")
     })
-    List<Edge> findByVertexFloorId(@PathParam("id") @ApiParam(value = "id", required = true) Long id);
+    List<EdgeDto> findByVertexFloorId(@PathParam("id") @ApiParam(value = "id", required = true) Long id);
 
     @GET
     @Path("/vertex/{id: \\d+}")
@@ -50,14 +50,14 @@ public interface EdgeFacade {
     @ApiResponses({
             @ApiResponse(code = 404, message = "vertex with given id wasn't found")
     })
-    List<Edge> findByVertexId(@PathParam("id") @ApiParam(value = "id", required = true) Long vertexId);
+    List<EdgeDto> findByVertexId(@PathParam("id") @ApiParam(value = "id", required = true) Long vertexId);
 
     @GET
     @ApiOperation(value = "find edge", response = Edge.class)
     @ApiResponses({
             @ApiResponse(code = 404, message = "edge with given target and source id doesn't exist")
     })
-    Edge findBySourceIdAndTargetId(
+    EdgeDto findBySourceIdAndTargetId(
             @ApiParam(value = "sourceId", required = true) @HeaderParam("sourceId") Long sourceId,
             @ApiParam(value = "targetId", required = true) @HeaderParam("targetId") Long targetId);
 }

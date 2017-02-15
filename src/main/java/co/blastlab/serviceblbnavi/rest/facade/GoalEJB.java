@@ -7,12 +7,13 @@ import co.blastlab.serviceblbnavi.dao.repository.FloorRepository;
 import co.blastlab.serviceblbnavi.domain.Floor;
 import co.blastlab.serviceblbnavi.domain.Goal;
 import co.blastlab.serviceblbnavi.domain.Permission;
+import co.blastlab.serviceblbnavi.dto.goal.GoalDto;
 import co.blastlab.serviceblbnavi.rest.bean.AuthorizationBean;
-
 
 import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
 import javax.ws.rs.core.Response;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -34,15 +35,20 @@ public class GoalEJB implements GoalFacade {
     private FloorRepository floorRepository;
 
 
-    public Goal create(Goal goal) {
+    public GoalDto create(GoalDto goal) {
         if (goal.getFloorId() != null) {
             Floor floor = floorRepository.findBy(goal.getFloorId());
             if (floor != null) {
                 permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
                         floor.getBuilding().getComplex().getId(), Permission.UPDATE);
-                goal.setFloor(floor);
-                goalBean.create(goal);
-                return goal;
+                Goal goalEntity = new Goal();
+                goalEntity.setInactive(goal.isInactive());
+                goalEntity.setY(goal.getY());
+                goalEntity.setX(goal.getX());
+                goalEntity.setName(goal.getName());
+                goalEntity.setFloor(floor);
+                goalBean.create(goalEntity);
+                return new GoalDto(goalEntity);
             }
         }
         throw new EntityNotFoundException();
@@ -61,17 +67,25 @@ public class GoalEJB implements GoalFacade {
     }
 
 
-    public Goal updateName(Goal goal) {
+    public GoalDto updateName(GoalDto goal) {
         if (goal.getId() != null) {
-            Goal g = goalBean.find(goal.getId());
-            if (g != null) {
+            Goal goalEntity = goalBean.find(goal.getId());
+            if (goalEntity != null) {
                 permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
-                        g.getFloor().getBuilding().getComplex().getId(), Permission.UPDATE);
-                g.setInactive(true);
-                goal.setFloor(g.getFloor());
-                goal.setId(null);
-                goalBean.update(g);
-                goalBean.create(goal);
+                        goalEntity.getFloor().getBuilding().getComplex().getId(), Permission.UPDATE);
+
+                // TODO: WTF is this method doing?! why setInactive(true) on previously created Goal and then create new Goal?
+                // method name is updateName!
+                goalEntity.setInactive(true);
+                Goal newGoalEntity = new Goal();
+                newGoalEntity.setInactive(goal.isInactive());
+                newGoalEntity.setY(goal.getY());
+                newGoalEntity.setX(goal.getX());
+                newGoalEntity.setName(goal.getName());
+                newGoalEntity.setFloor(goalEntity.getFloor());
+                goalEntity.setId(null);
+                goalBean.update(goalEntity);
+                goalBean.create(newGoalEntity);
                 return goal;
             }
         }
@@ -79,15 +93,15 @@ public class GoalEJB implements GoalFacade {
     }
     
 
-    public Goal updateCoordinates(Goal goal) {
+    public GoalDto updateCoordinates(GoalDto goal) {
         if (goal.getId() != null) {
-            Goal g = goalBean.find(goal.getId());
-            if (g != null) {
+            Goal goalEntity = goalBean.find(goal.getId());
+            if (goalEntity != null) {
                 permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
-                        g.getFloor().getBuilding().getComplex().getId(), Permission.UPDATE);
-                g.setX(goal.getX());
-                g.setY(goal.getY());
-                goalBean.update(g);
+                        goalEntity.getFloor().getBuilding().getComplex().getId(), Permission.UPDATE);
+                goalEntity.setX(goal.getX());
+                goalEntity.setY(goal.getY());
+                goalBean.update(goalEntity);
                 return goal;
             }
         }
@@ -95,53 +109,59 @@ public class GoalEJB implements GoalFacade {
     }
 
 
-    public Goal deactivate(Long goalId) {
-        Goal goal = goalBean.find(goalId);
-        if (goal != null) {
+    public GoalDto deactivate(Long goalId) {
+        Goal goalEntity = goalBean.find(goalId);
+        if (goalEntity != null) {
             permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
-                    goal.getFloor().getBuilding().getComplex().getId(), Permission.UPDATE);
-            goalBean.deactivate(goal);
-            return goal;
+                    goalEntity.getFloor().getBuilding().getComplex().getId(), Permission.UPDATE);
+            goalBean.deactivate(goalEntity);
+            return new GoalDto(goalEntity);
         }
         throw new EntityNotFoundException();
     }
 
 
-    public List<Goal> findByBuilding(Long buildingId) {
+    public List<GoalDto> findByBuilding(Long buildingId) {
         if (buildingId != null) {
             List<Goal> goals = goalBean.findAllByBuildingId(buildingId);
             if (goals.size() > 0) {
                 permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
                         goals.get(0).getFloor().getBuilding().getComplex().getId(), Permission.READ);
             }
-            return goals;
+            return convertToDtos(goals);
         }
         throw new EntityNotFoundException();
     }
 
 
-    public List<Goal> findByFloor(Long floorId) {
+    public List<GoalDto> findByFloor(Long floorId) {
         if (floorId != null) {
             List<Goal> goals = goalBean.findAllByFloorId(floorId);
             if (goals.size() > 0) {
                 permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
                         goals.get(0).getFloor().getBuilding().getComplex().getId(), Permission.READ);
             }
-            return goals;
+            return convertToDtos(goals);
         }
         throw new EntityNotFoundException();
     }
     
 
-    public List<Goal> findActiveByFloor(Long floorId) {
+    public List<GoalDto> findActiveByFloor(Long floorId) {
         if (floorId != null) {
             List<Goal> goals = goalBean.findActiveByFloorId(floorId);
             if (goals.size() > 0) {
                 permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
                         goals.get(0).getFloor().getBuilding().getComplex().getId(), Permission.READ);
             }
-            return goals;
+            return convertToDtos(goals);
         }
         throw new EntityNotFoundException();
+    }
+
+    private List<GoalDto> convertToDtos(List<Goal> goals) {
+        List<GoalDto> goalDtos = new ArrayList<>();
+        goals.forEach((goal -> goalDtos.add(new GoalDto(goal))));
+        return goalDtos;
     }
 }

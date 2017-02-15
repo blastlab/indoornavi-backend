@@ -1,11 +1,12 @@
 package co.blastlab.serviceblbnavi.dao;
 
 import co.blastlab.serviceblbnavi.domain.Edge;
-import java.util.List;
+
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
+import java.util.List;
 
 /**
  *
@@ -22,9 +23,7 @@ public class EdgeBean {
     }
 
     public void create(List<Edge> edges) {
-        edges.stream().forEach((edge) -> {
-            this.create(edge);
-        });
+        edges.forEach(this::create);
     }
 
     public Edge find(Long id) {
@@ -61,8 +60,6 @@ public class EdgeBean {
     }
 
     public void update(List<Edge> edges) {
-        edges.stream().forEach((e) -> {
-            update(e);
-        });
+        edges.forEach(this::update);
     }
 }

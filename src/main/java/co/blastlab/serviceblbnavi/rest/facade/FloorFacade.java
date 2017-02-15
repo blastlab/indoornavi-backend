@@ -1,9 +1,7 @@
 package co.blastlab.serviceblbnavi.rest.facade;
 
 
-import co.blastlab.serviceblbnavi.domain.Floor;
-import co.blastlab.serviceblbnavi.views.View;
-import com.fasterxml.jackson.annotation.JsonView;
+import co.blastlab.serviceblbnavi.dto.floor.FloorDto;
 import com.wordnik.swagger.annotations.*;
 
 import javax.ws.rs.*;
@@ -15,19 +13,18 @@ import java.util.List;
 public interface FloorFacade {
 
     @POST
-    @ApiOperation(value = "create floor", response = Floor.class)
+    @ApiOperation(value = "create floor", response = FloorDto.class)
     @ApiResponses({
             @ApiResponse(code = 404, message = "building id empty or building doesn't exist")
     })
-    Floor create(@ApiParam(value = "floor", required = true) Floor floor);
+    FloorDto create(@ApiParam(value = "floor", required = true) FloorDto floor);
 
     @PUT
-    @JsonView(View.FloorInternal.class)
-    @ApiOperation(value = "update floor", response = Floor.class)
+    @ApiOperation(value = "update floor", response = FloorDto.class)
     @ApiResponses({
             @ApiResponse(code = 404, message = "building id or building empty or doesn't exist")
     })
-    Floor update(@ApiParam(value = "floor", required = true) Floor floor);
+    FloorDto update(@ApiParam(value = "floor", required = true) FloorDto floor);
 
     @DELETE
     @Path("/{id: \\d+}")
@@ -39,12 +36,11 @@ public interface FloorFacade {
 
     @GET
     @Path("/{id: \\d+}")
-    @JsonView(View.FloorInternal.class)
-    @ApiOperation(value = "find floor", response = Floor.class)
+    @ApiOperation(value = "find floor", response = FloorDto.class)
     @ApiResponses({
             @ApiResponse(code = 404, message = "floor with given id wasn't found")
     })
-    Floor find(@PathParam("id") @ApiParam(value = "id", required = true) Long id);
+    FloorDto find(@PathParam("id") @ApiParam(value = "id", required = true) Long id);
 
     @PUT
     @Path("/{id: \\d+}")
@@ -52,7 +48,7 @@ public interface FloorFacade {
     @ApiResponses({
             @ApiResponse(code = 404, message = "building id or building empty or doesn't exist")
     })
-    Response updateFloors(@PathParam("id") Long buildingId, @ApiParam(value = "floors", required = true) List<Floor> floors);
+    Response updateFloors(@PathParam("id") Long buildingId, @ApiParam(value = "floors", required = true) List<FloorDto> floors);
 
     @PUT
     @Path("/mToPix")
@@ -60,5 +56,5 @@ public interface FloorFacade {
     @ApiResponses({
             @ApiResponse(code = 404, message = "floor with given id doesn't exist")
     })
-    Response updatemToPix(@ApiParam(value = "floor", required = true) Floor floor);
+    Response updatemToPix(@ApiParam(value = "floor", required = true) FloorDto floor);
 }

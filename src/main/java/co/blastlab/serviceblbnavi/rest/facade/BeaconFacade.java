@@ -1,7 +1,7 @@
 package co.blastlab.serviceblbnavi.rest.facade;
 
 
-import co.blastlab.serviceblbnavi.domain.Beacon;
+import co.blastlab.serviceblbnavi.dto.beacon.BeaconDto;
 import com.wordnik.swagger.annotations.*;
 
 import javax.ws.rs.*;
@@ -14,18 +14,18 @@ import java.util.List;
 public interface BeaconFacade {
 
     @POST
-    @ApiOperation(value = "create beacon", response = Beacon.class)
+    @ApiOperation(value = "create beacon", response = BeaconDto.class)
     @ApiResponses({
             @ApiResponse(code = 404, message = "floor id empty or floor doesn't exist")
     })
-    Beacon create(@ApiParam(value = "beacon", required = true) Beacon beacon);
+    BeaconDto create(@ApiParam(value = "beacon", required = true) BeaconDto beacon);
 
     @PUT
-    @ApiOperation(value = "update beacon", response = Beacon.class)
+    @ApiOperation(value = "update beacon", response = BeaconDto.class)
     @ApiResponses({
             @ApiResponse(code = 404, message = "floor id or floor empty or doesn't exist")
     })
-    Beacon update(@ApiParam(value = "beacon", required = true) Beacon beacon);
+    BeaconDto update(@ApiParam(value = "beacon", required = true) BeaconDto beacon);
 
     @DELETE
     @Path("/{id: \\d+}")
@@ -37,17 +37,17 @@ public interface BeaconFacade {
 
     @GET
     @Path("/{id: \\d+}")
-    @ApiOperation(value = "find beacon", response = Beacon.class)
+    @ApiOperation(value = "find beacon", response = BeaconDto.class)
     @ApiResponses({
             @ApiResponse(code = 404, message = "beacon with given id wasn't found")
     })
-    Beacon find(@PathParam("id") @ApiParam(value = "id", required = true) Long id);
+    BeaconDto find(@PathParam("id") @ApiParam(value = "id", required = true) Long id);
 
     @GET
     @Path("/floor/{id: \\d+}")
-    @ApiOperation(value = "find beacons by floor id", response = Beacon.class)
+    @ApiOperation(value = "find beacons by floor id", response = BeaconDto.class)
     @ApiResponses({
             @ApiResponse(code = 404, message = "floorId empty or floor doesn't exist")
     })
-    List<Beacon> findAll(@PathParam("id") @ApiParam(value = "id", required = true) Long floorId);
+    List<BeaconDto> findAll(@PathParam("id") @ApiParam(value = "id", required = true) Long floorId);
 }

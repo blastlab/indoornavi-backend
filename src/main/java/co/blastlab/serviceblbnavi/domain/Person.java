@@ -2,12 +2,13 @@ package co.blastlab.serviceblbnavi.domain;
 
 import co.blastlab.serviceblbnavi.security.PasswordEncoder;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.OneToMany;
 import java.io.Serializable;
 import java.util.List;
 
@@ -23,16 +24,11 @@ public class Person extends CustomIdGenerationEntity implements Serializable {
     @Column(unique = true)
     private String email;
 
-    @JsonIgnore
     private String password;
 
-    @JsonIgnore
     private String salt;
 
     private String authToken;
-
-    @Transient
-    private String plainPassword;
 
     @OneToMany(mappedBy = "person")
     private List<ACL_Complex> ACL_Complexes;
@@ -40,16 +36,9 @@ public class Person extends CustomIdGenerationEntity implements Serializable {
 
     public Person(String email, String plainPassword) {
         this.email = email;
-        this.plainPassword = plainPassword;
-    }
-
-    @PrePersist
-    @PreUpdate
-    public void hashPassword() {
         if (plainPassword != null) {
             salt = PasswordEncoder.getSalt();
             password = PasswordEncoder.getShaPassword(PASSWORD_DIGEST_ALG, plainPassword, salt);
-            plainPassword = null;
         }
     }
 

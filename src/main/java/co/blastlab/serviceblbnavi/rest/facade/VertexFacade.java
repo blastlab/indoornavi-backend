@@ -1,9 +1,7 @@
 package co.blastlab.serviceblbnavi.rest.facade;
 
 
-import co.blastlab.serviceblbnavi.domain.Vertex;
-import co.blastlab.serviceblbnavi.views.View;
-import com.fasterxml.jackson.annotation.JsonView;
+import co.blastlab.serviceblbnavi.dto.vertex.VertexDto;
 import com.wordnik.swagger.annotations.*;
 
 import javax.ws.rs.*;
@@ -16,20 +14,18 @@ public interface VertexFacade {
 
 
     @POST
-    @ApiOperation(value = "create vertex", response = Vertex.class)
+    @ApiOperation(value = "create vertex", response = VertexDto.class)
     @ApiResponses({
             @ApiResponse(code = 404, message = "floor id emtpy or floor doesn't exist")
     })
-    @JsonView(View.VertexInternal.class)
-    Vertex create(@ApiParam(value = "vertex", required = true) Vertex vertex);
+    VertexDto create(@ApiParam(value = "vertex", required = true) VertexDto vertex);
 
     @PUT
-    @ApiOperation(value = "update vertex", response = Vertex.class)
-    @JsonView(View.VertexInternal.class)
+    @ApiOperation(value = "update vertex", response = VertexDto.class)
     @ApiResponses({
             @ApiResponse(code = 404, message = "vertex id empty or doesn't exist")
     })
-    Vertex update(@ApiParam(value = "vertex", required = true) Vertex vertex);
+    VertexDto update(@ApiParam(value = "vertex", required = true) VertexDto vertex);
 
     @DELETE
     @Path("/{id: \\d+}")
@@ -41,37 +37,33 @@ public interface VertexFacade {
 
     @GET
     @Path("/floor/{id: \\d+}")
-    @JsonView(View.VertexInternal.class)
-    @ApiOperation(value = "find vertexes for specified floor", response = Vertex.class, responseContainer = "List")
+    @ApiOperation(value = "find vertexes for specified floor", response = VertexDto.class, responseContainer = "List")
     @ApiResponses({
             @ApiResponse(code = 404, message = "floor with given id wasn't found")
     })
-    List<Vertex> findByFloor(@ApiParam(value = "id", required = true) @PathParam("id") Long floorId);
+    List<VertexDto> findByFloor(@ApiParam(value = "id", required = true) @PathParam("id") Long floorId);
 
     @GET
     @Path("/floor/{id: \\d+}/active")
-    @JsonView(View.VertexInternal.class)
-    @ApiOperation(value = "find active vertices for specified floor", response = Vertex.class, responseContainer = "List")
+    @ApiOperation(value = "find active vertices for specified floor", response = VertexDto.class, responseContainer = "List")
     @ApiResponses({
             @ApiResponse(code = 404, message = "floor with given id wasn't found")
     })
-    List<Vertex> findAllActiveByFloor(@ApiParam(value = "id", required = true) @PathParam("id") Long floorId);
+    List<VertexDto> findAllActiveByFloor(@ApiParam(value = "id", required = true) @PathParam("id") Long floorId);
 
     @GET
     @Path("/{id: \\d+}")
-    @JsonView(View.VertexInternal.class)
-    @ApiOperation(value = "find vertex by id", response = Vertex.class)
+    @ApiOperation(value = "find vertex by id", response = VertexDto.class)
     @ApiResponses({
             @ApiResponse(code = 404, message = "vertex with given id wasn't found")
     })
-    Vertex findById(@ApiParam(value = "id", required = true) @PathParam("id") Long vertexId);
+    VertexDto findById(@ApiParam(value = "id", required = true) @PathParam("id") Long vertexId);
 
     @PUT
     @Path("/{id: \\d+}/deactivate")
-    @JsonView(View.GoalInternal.class)
-    @ApiOperation(value = "deactivates vertex of given id", response = Vertex.class)
+    @ApiOperation(value = "deactivates vertex of given id", response = VertexDto.class)
     @ApiResponses({
             @ApiResponse(code = 404, message = "vertex with given id wasn't found")
     })
-    Vertex dectivate(@ApiParam(value = "id", required = true) @PathParam("id") Long vertexId);
+    VertexDto deactivate(@ApiParam(value = "id", required = true) @PathParam("id") Long vertexId);
 }

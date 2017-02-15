@@ -48,8 +48,8 @@ public class VertexFacadeIT extends BaseIT {
 				//"y", equalTo(Y_CONSTANT_VALUE),
 				"floorId", equalTo(FLOOR_ID_FOR_CHECK),
 				"inactive", equalTo(INACTIVE_TRUE),
-				"isFloorDownChangeable", equalTo(IS_FLOOR_DOWN_CHANGEABLE_FALSE),
-				"isFloorUpChangeable", equalTo(IS_FLOOR_UP_CHANGEABLE_FALSE)
+				"floorDownChangeable", equalTo(IS_FLOOR_DOWN_CHANGEABLE_FALSE),
+				"floorUpChangeable", equalTo(IS_FLOOR_UP_CHANGEABLE_FALSE)
 			);
 	}
 
@@ -70,8 +70,8 @@ public class VertexFacadeIT extends BaseIT {
 				//"y", equalTo(Y_CONSTANT_VALUE),
 				"floorId", equalTo(FLOOR_ID_FOR_CHECK),
 				"inactive", equalTo(INACTIVE_TRUE),
-				"isFloorDownChangeable", equalTo(IS_FLOOR_DOWN_CHANGEABLE_FALSE),
-				"isFloorUpChangeable", equalTo(IS_FLOOR_UP_CHANGEABLE_FALSE)
+				"floorDownChangeable", equalTo(IS_FLOOR_DOWN_CHANGEABLE_FALSE),
+				"floorUpChangeable", equalTo(IS_FLOOR_UP_CHANGEABLE_FALSE)
 			);
 	}
 
@@ -92,8 +92,8 @@ public class VertexFacadeIT extends BaseIT {
 				//"y", equalTo(Y_CONSTANT_VALUE),
 				"floorId", equalTo(FLOOR_ID_FOR_CHECK),
 				"inactive", equalTo(INACTIVE_TRUE),
-				"isFloorDownChangeable", equalTo(IS_FLOOR_DOWN_CHANGEABLE_FALSE),
-				"isFloorUpChangeable", equalTo(IS_FLOOR_UP_CHANGEABLE_FALSE)
+				"floorDownChangeable", equalTo(IS_FLOOR_DOWN_CHANGEABLE_FALSE),
+				"floorUpChangeable", equalTo(IS_FLOOR_UP_CHANGEABLE_FALSE)
 			)
 			.extract().response().path("id");
 
@@ -106,8 +106,8 @@ public class VertexFacadeIT extends BaseIT {
 				//"y", equalTo(Y_CONSTANT_VALUE),
 				"floorId", equalTo(FLOOR_ID_FOR_CHECK),
 				"inactive", equalTo(INACTIVE_TRUE),
-				"isFloorDownChangeable", equalTo(IS_FLOOR_DOWN_CHANGEABLE_FALSE),
-				"isFloorUpChangeable", equalTo(IS_FLOOR_UP_CHANGEABLE_FALSE)
+				"floorDownChangeable", equalTo(IS_FLOOR_DOWN_CHANGEABLE_FALSE),
+				"floorUpChangeable", equalTo(IS_FLOOR_UP_CHANGEABLE_FALSE)
 			);
 	}
 
@@ -118,6 +118,7 @@ public class VertexFacadeIT extends BaseIT {
 			.when().delete(VERTEX_PATH_WITH_ID)
 			.then().statusCode(HttpStatus.SC_OK);
 	}
+
 	@Test
 	public void updateExistingVertex() {
 		String body = new RequestBodyBuilder("VertexUpdating.json")
@@ -133,8 +134,8 @@ public class VertexFacadeIT extends BaseIT {
 				.body(
 						"id", equalTo(ID_FOR_UPDATE),
 						"inactive", equalTo(INACTIVE_FALSE),
-						"isFloorDownChangeable", equalTo(IS_FLOOR_DOWN_CHANGEABLE_FALSE),
-						"isFloorUpChangeable", equalTo(IS_FLOOR_UP_CHANGEABLE_FALSE)
+						"floorDownChangeable", equalTo(IS_FLOOR_DOWN_CHANGEABLE_FALSE),
+						"floorUpChangeable", equalTo(IS_FLOOR_UP_CHANGEABLE_FALSE)
 				);
 	}
 }

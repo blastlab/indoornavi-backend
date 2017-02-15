@@ -1,37 +1,34 @@
 package co.blastlab.serviceblbnavi.rest;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.module.jaxb.JaxbAnnotationIntrospector;
-import com.wordnik.swagger.converter.ModelConverters;
+import com.fasterxml.jackson.databind.MapperFeature;
+import com.fasterxml.jackson.module.jaxb.JaxbAnnotationModule;
 import com.wordnik.swagger.jaxrs.config.BeanConfig;
+import com.wordnik.swagger.util.Json;
+
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
 
-/**
- *
- * @author Michał Koszałka
- */
-@ApplicationPath("/rest/v1")
+@ApplicationPath(RestApplication.BASE_PATH)
 public class RestApplication extends Application {
 
     public static final String BASE_PATH = "/rest/v1";
 
     public RestApplication() {
-        // ObjectMapper needed to correct handling of @JsonIgnore annotations in models by Swagger.
-        // see: https://github.com/swagger-api/swagger-core/issues/960
-        ObjectMapper obMap = new ObjectMapper();
-        obMap.setAnnotationIntrospector(new JaxbAnnotationIntrospector(obMap.getTypeFactory()));
-        ModelConverters.getInstance().addConverter(new com.wordnik.swagger.jackson.ModelResolver(obMap));
+        Json.mapper().registerModule(new JaxbAnnotationModule());
+        Json.mapper().disable(MapperFeature.DEFAULT_VIEW_INCLUSION);
 
         BeanConfig beanConfig = new BeanConfig();
         beanConfig.setVersion("1.0.0");
         beanConfig.setSchemes(new String[]{"http"});
-        beanConfig.setBasePath("/rest/v1");
+        beanConfig.setBasePath(BASE_PATH);
         beanConfig.setResourcePackage("co.blastlab.serviceblbnavi.rest.facade");
-        beanConfig.setDescription("<p>For most of rest methods auth_token is needed to be executed. Only: <ul>"
-                + "<li>create person</li>"
-                + "</ul> is available without auth_token.</p>"
-                + "<p> For others, 401 exception will be thrown.</p>");
+        String description = String.join(" ",
+                "For most of rest methods auth_token is needed to be executed. Only:",
+                "<b>create person</b>",
+                "is available without auth_token.",
+                "For others, 401 exception will be thrown."
+        );
+        beanConfig.setDescription(description);
         beanConfig.setScan(true);
     }
 }
