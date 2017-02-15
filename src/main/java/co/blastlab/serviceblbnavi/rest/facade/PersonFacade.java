@@ -2,6 +2,7 @@ package co.blastlab.serviceblbnavi.rest.facade;
 
 
 import co.blastlab.serviceblbnavi.domain.Person;
+import co.blastlab.serviceblbnavi.rest.facade.ext.filter.TokenAuthorization;
 import co.blastlab.serviceblbnavi.views.View;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.wordnik.swagger.annotations.*;
@@ -37,5 +38,6 @@ public interface PersonFacade {
     @JsonView(View.PersonInternal.class)
     @Path("/current")
     @ApiOperation(value = "find current user")
+    @TokenAuthorization
     Person get();
 }
