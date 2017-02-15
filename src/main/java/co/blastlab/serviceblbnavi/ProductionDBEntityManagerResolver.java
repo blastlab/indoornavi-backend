@@ -1,4 +1,4 @@
-package co.blastlab.serviceblbnavi.dao;
+package co.blastlab.serviceblbnavi;
 
 import co.blastlab.serviceblbnavi.dao.qualifier.NaviProduction;
 import org.apache.deltaspike.data.api.EntityManagerResolver;
