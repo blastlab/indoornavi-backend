@@ -1,6 +1,6 @@
 package co.blastlab.serviceblbnavi.rest.facade;
 
-import co.blastlab.serviceblbnavi.dao.PermissionBean;
+import co.blastlab.serviceblbnavi.rest.bean.PermissionBean;
 import co.blastlab.serviceblbnavi.dao.repository.BeaconRepository;
 import co.blastlab.serviceblbnavi.dao.repository.FloorRepository;
 import co.blastlab.serviceblbnavi.domain.Beacon;
@@ -35,14 +35,18 @@ public class BeaconEJB implements BeaconFacade {
         if (beacon.getFloorId() != null) {
             Floor floor = floorRepository.findBy(beacon.getFloorId());
             if (floor != null) {
-                permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
-                        floor.getBuilding().getComplex().getId(), Permission.UPDATE);
-                beacon.setFloor(floor);
-                beaconRepository.save(beacon);
-                return beacon;
+                return createOrUpdate(beacon, floor);
             }
         }
         throw new EntityNotFoundException();
+    }
+
+    private Beacon createOrUpdate(Beacon beacon, Floor floor) {
+        permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
+                floor.getBuilding().getComplex().getId(), Permission.UPDATE);
+        beacon.setFloor(floor);
+        beaconRepository.save(beacon);
+        return beacon;
     }
 
 
@@ -73,11 +77,7 @@ public class BeaconEJB implements BeaconFacade {
         if (beacon.getFloorId() != null) {
             Floor floor = floorRepository.findBy(beacon.getFloorId());
             if (floor != null) {
-                permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
-                        floor.getBuilding().getComplex().getId(), Permission.UPDATE);
-                beacon.setFloor(floor);
-                beaconRepository.save(beacon);
-                return beacon;
+                return createOrUpdate(beacon, floor);
             }
         }
         throw new EntityNotFoundException();

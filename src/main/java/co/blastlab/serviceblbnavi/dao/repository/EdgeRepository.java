@@ -10,7 +10,7 @@ import java.util.List;
 @Repository
 public interface EdgeRepository extends EntityRepository<Edge, Long> {
 
-    public Edge findOptionalBySourceAndTarget(Vertex source, Vertex target);
+    Edge findOptionalBySourceAndTarget(Vertex source, Vertex target);
 
-    public List<Edge> findBySource(Vertex source);
+    List<Edge> findBySource(Vertex source);
 }

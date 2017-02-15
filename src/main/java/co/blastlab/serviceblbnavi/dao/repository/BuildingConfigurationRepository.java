@@ -9,8 +9,5 @@ import org.apache.deltaspike.data.api.Repository;
 @Repository
 public interface BuildingConfigurationRepository extends EntityRepository<BuildingConfiguration, Long> {
 
-    @Query("SELECT bc FROM BuildingConfiguration bc WHERE bc.building.name = ?2 AND bc.building.complex.name = ?1 AND bc.version = ?3")
-    BuildingConfiguration findByComplexNameAndBuildingNameAndVersion(String complexName, String buildingName, int version);
-
     BuildingConfiguration findOptionalByBuildingAndVersion(Building building, Integer version);
 }

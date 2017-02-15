@@ -1,6 +1,5 @@
 package co.blastlab.serviceblbnavi.rest.facade;
 
-import co.blastlab.serviceblbnavi.dao.GoalBean;
 import co.blastlab.serviceblbnavi.dao.repository.GoalRepository;
 import co.blastlab.serviceblbnavi.dao.repository.GoalSelectionRepository;
 import co.blastlab.serviceblbnavi.domain.Goal;
@@ -19,9 +18,6 @@ public class GoalSelectionEJB implements GoalSelectionFacade {
     @Inject
     private GoalRepository goalRepository;
 
-    @Inject
-    private GoalBean goalBean;
-    
 
     public GoalSelection create(GoalSelection goalSelection) {
         if (goalSelection.getGoalId() != null && goalSelection.getDevice() != null
