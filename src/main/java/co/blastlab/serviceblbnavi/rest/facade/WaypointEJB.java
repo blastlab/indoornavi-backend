@@ -1,6 +1,6 @@
 package co.blastlab.serviceblbnavi.rest.facade;
 
-import co.blastlab.serviceblbnavi.dao.PermissionBean;
+import co.blastlab.serviceblbnavi.rest.bean.PermissionBean;
 import co.blastlab.serviceblbnavi.dao.repository.BuildingRepository;
 import co.blastlab.serviceblbnavi.dao.repository.FloorRepository;
 import co.blastlab.serviceblbnavi.dao.repository.WaypointRepository;
@@ -50,7 +50,7 @@ public class WaypointEJB implements WaypointFacade {
         }
         throw new BadRequestException();
     }
-    
+
 
     public Waypoint updateWaypoint(Waypoint newWaypoint) {
         if (newWaypoint.getId() != null) {
@@ -71,7 +71,7 @@ public class WaypointEJB implements WaypointFacade {
         }
         throw new BadRequestException();
     }
-    
+
 
     public Waypoint updateWaypointsCoordinates(Waypoint newWaypoint) {
         if (newWaypoint.getId() != null) {
@@ -96,7 +96,6 @@ public class WaypointEJB implements WaypointFacade {
             if (floor != null) {
                 permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
                         floor.getBuilding().getComplex().getId(), Permission.READ);
-                //List<Waypoint> waypoints = waypointBean.findActiveByFloorId(floorId);
                 List<Waypoint> waypoints = waypointRepository.findByFloorAndInactive(floor, false);
                 return waypoints;
             }
@@ -107,7 +106,6 @@ public class WaypointEJB implements WaypointFacade {
 
     public List<Waypoint> getWaypointsByBuildingId(Long buildingId) {
         if (buildingId != null) {
-            //Building building = buildingBean.find(buildingId);
             Building building = buildingRepository.findBy(buildingId);
             if (building != null) {
                 permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
@@ -118,17 +116,15 @@ public class WaypointEJB implements WaypointFacade {
                 floors.stream().forEach((floor) -> {
                     waypoints.addAll(waypointRepository.findByFloor(floor));
                 });
-                //List<Waypoint> waypoints = waypointBean.findByBuildingId(buildingId);
                 return waypoints;
             }
             throw new EntityNotFoundException();
         }
         throw new EntityNotFoundException();
     }
-    
+
 
     public Waypoint deactivate(Long waypointId) {
-        //Waypoint waypoint = waypointBean.findById(waypointId);
         Waypoint waypoint = waypointRepository.findBy(waypointId);
         if (waypoint != null) {
             permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),

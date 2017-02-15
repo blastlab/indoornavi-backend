@@ -1,7 +1,7 @@
 package co.blastlab.serviceblbnavi.rest.facade;
 
-import co.blastlab.serviceblbnavi.dao.BuildingConfigurationBean;
-import co.blastlab.serviceblbnavi.dao.PermissionBean;
+import co.blastlab.serviceblbnavi.rest.bean.BuildingConfigurationBean;
+import co.blastlab.serviceblbnavi.rest.bean.PermissionBean;
 import co.blastlab.serviceblbnavi.dao.repository.BuildingConfigurationRepository;
 import co.blastlab.serviceblbnavi.dao.repository.BuildingRepository;
 import co.blastlab.serviceblbnavi.dao.repository.ComplexRepository;
@@ -55,7 +55,7 @@ public class BuildingConfigurationEJB implements BuildingConfigurationFacade {
         }
         throw new EntityNotFoundException();
     }
-    
+
 
     public String getConfigurationByComplexNameAndBuildingName(String complexName, String buildingName, Integer version) {
         BuildingConfiguration buildingConfiguration = buildingConfigurationBean.findByComplexNameAndBuildingNameAndVersion(complexName, buildingName, version);
@@ -66,9 +66,9 @@ public class BuildingConfigurationEJB implements BuildingConfigurationFacade {
     }
 
 
-    public String getConfigurationChecksumByComplexNameAndBuildingName(String complexName,String buildingName, Integer version) {
+    public String getConfigurationChecksumByComplexNameAndBuildingName(String complexName, String buildingName, Integer version) {
         BuildingConfiguration buildingConfiguration = buildingConfigurationBean.findByComplexNameAndBuildingNameAndVersion(complexName, buildingName, version);
-        if (buildingConfiguration != null && buildingConfiguration.getConfigurationChecksum()!= null) {
+        if (buildingConfiguration != null && buildingConfiguration.getConfigurationChecksum() != null) {
             return buildingConfiguration.getConfigurationChecksum();
         }
         throw new EntityNotFoundException();

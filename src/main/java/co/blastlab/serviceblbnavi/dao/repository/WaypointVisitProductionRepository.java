@@ -10,5 +10,5 @@ import javax.persistence.FlushModeType;
 
 @Repository
 @EntityManagerConfig(entityManagerResolver = ProductionDBEntityManagerResolver.class, flushMode = FlushModeType.COMMIT)
-public interface WaypointVisitRepository extends EntityRepository<WaypointVisit, Long> {
+public interface WaypointVisitProductionRepository extends EntityRepository<WaypointVisit, Long> {
 }

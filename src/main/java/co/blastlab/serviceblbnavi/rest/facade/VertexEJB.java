@@ -1,6 +1,6 @@
 package co.blastlab.serviceblbnavi.rest.facade;
 
-import co.blastlab.serviceblbnavi.dao.PermissionBean;
+import co.blastlab.serviceblbnavi.rest.bean.PermissionBean;
 import co.blastlab.serviceblbnavi.dao.repository.FloorRepository;
 import co.blastlab.serviceblbnavi.dao.repository.VertexRepository;
 import co.blastlab.serviceblbnavi.domain.Floor;
@@ -51,7 +51,7 @@ public class VertexEJB implements VertexFacade {
         if (vertex != null) {
             permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
                     vertex.getFloor().getBuilding().getComplex().getId(), Permission.UPDATE);
-            vertexRepository.removeAndFlush(vertex);
+            vertexRepository.remove(vertex);
             return Response.ok().build();
         }
         throw new EntityNotFoundException();

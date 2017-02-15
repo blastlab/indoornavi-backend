@@ -1,6 +1,6 @@
 package co.blastlab.serviceblbnavi.rest.facade;
 
-import co.blastlab.serviceblbnavi.dao.PermissionBean;
+import co.blastlab.serviceblbnavi.rest.bean.PermissionBean;
 import co.blastlab.serviceblbnavi.dao.repository.EdgeRepository;
 import co.blastlab.serviceblbnavi.dao.repository.FloorRepository;
 import co.blastlab.serviceblbnavi.dao.repository.VertexRepository;
@@ -52,7 +52,6 @@ public class EdgeEJB implements EdgeFacade {
             }
             throw new EntityNotFoundException();
         }
-        //edgeBean.create(edges);
         this.save(edges);
         return edges;
     }
@@ -153,7 +152,6 @@ public class EdgeEJB implements EdgeFacade {
             if (edge.getSource() == null || edge.getTarget() == null) {
                 throw new BadRequestException();
             }
-            //Edge newEdge = edgeBean.findBySourceAndTarget(edge.getSourceId(), edge.getTargetId());
             Vertex source = vertexRepository.findBy(edge.getSourceId());
             Vertex target = vertexRepository.findBy(edge.getTargetId());
             Edge newEdge = edgeRepository.findOptionalBySourceAndTarget(source, target);
@@ -166,7 +164,6 @@ public class EdgeEJB implements EdgeFacade {
             newEdge.setWeight(edge.getWeight());
             newEdges.add(newEdge);
         }
-        //edgeBean.update(newEdges);
         this.save(newEdges);
         return newEdges;
     }
