@@ -78,7 +78,7 @@ public class BuildingConfigurationBean {
         building.getFloors().forEach((floor) -> {
             emProduction.merge(floor);
             floor.getBeacons().forEach((beacon) -> {
-                emProduction.merge(beacon);
+                //emProduction.merge(beacon);
             });
             floor.getVertices().forEach((vertex) -> {
                 emProduction.merge(vertex);
