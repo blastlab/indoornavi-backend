@@ -115,12 +115,8 @@ public class ComplexEJB implements ComplexFacade {
 
     public Response delete(Long id) {
         if (id != null) {
-            try {
-                permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(), id, Permission.DELETE);
-            } catch (PermissionException e) {
-                e.printStackTrace();
-                return Response.status(Response.Status.UNAUTHORIZED).build();
-            }
+            permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(), id, Permission.DELETE);
+
             Complex complex = complexRepository.findBy(id);
             if (complex != null) {
                 complexRepository.remove(complex);
