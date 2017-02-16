@@ -11,8 +11,7 @@ import java.util.List;
 @Repository
 public interface BuildingRepository extends EntityRepository<Building, Long>{
 
-    public List<Building> findByComplex(Complex complex);
+    List<Building> findByComplex(Complex complex);
 
-    @Query("SELECT b FROM Building b WHERE b.complex.name = ?1 AND b.name = ?2")
-    public Building findByComplexNameAndBuildingName(String complexName, String buildingName);
+    Building findOptionalByComplexAndName(Complex complex, String buildingName);
 }
