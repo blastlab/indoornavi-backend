@@ -75,5 +75,5 @@ public interface VertexFacade {
     @ApiResponses({
             @ApiResponse(code = 404, message = "vertex with given id wasn't found")
     })
-    Vertex dectivate(@ApiParam(value = "id", required = true) @PathParam("id") Long vertexId);
+    Vertex deactivate(@ApiParam(value = "id", required = true) @PathParam("id") Long vertexId);
 }

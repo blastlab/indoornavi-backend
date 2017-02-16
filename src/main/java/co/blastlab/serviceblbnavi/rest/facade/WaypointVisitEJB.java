@@ -1,22 +1,22 @@
 package co.blastlab.serviceblbnavi.rest.facade;
 
-import co.blastlab.serviceblbnavi.dao.WaypointBean;
-import co.blastlab.serviceblbnavi.dao.WaypointVisitBean;
+import co.blastlab.serviceblbnavi.dao.repository.WaypointRepository;
+import co.blastlab.serviceblbnavi.dao.repository.WaypointVisitProductionRepository;
 import co.blastlab.serviceblbnavi.domain.Waypoint;
 import co.blastlab.serviceblbnavi.domain.WaypointVisit;
 
+import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
 
-
+@Stateless
 public class WaypointVisitEJB {
 
     @Inject
-    private WaypointVisitBean waypointVisitBean;
+    private WaypointVisitProductionRepository waypointVisitProductionRepository;
 
     @Inject
-    private WaypointBean waypointBean;
-
+    private WaypointRepository waypointRepository;
 
     public WaypointVisit create(WaypointVisit waypointVisit) {
         if (waypointVisit.getWaypointId() != null && waypointVisit.getDevice() != null
@@ -25,10 +25,10 @@ public class WaypointVisitEJB {
                 waypointVisit.setCreationDateTimestamp(waypointVisit.getTimestamp());
                 waypointVisit.setTimestamp(null);
             }
-            Waypoint waypoint = waypointBean.findById(waypointVisit.getWaypointId());
+            Waypoint waypoint = waypointRepository.findBy(waypointVisit.getWaypointId());
             if (waypoint != null) {
                 waypointVisit.setWaypoint(waypoint);
-                waypointVisitBean.create(waypointVisit);
+                waypointVisitProductionRepository.save(waypointVisit);
                 return waypointVisit;
             }
         }
