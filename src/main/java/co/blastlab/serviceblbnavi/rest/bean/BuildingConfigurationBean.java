@@ -1,9 +1,7 @@
 package co.blastlab.serviceblbnavi.rest.bean;
 
 import co.blastlab.serviceblbnavi.dao.qualifier.NaviProduction;
-import co.blastlab.serviceblbnavi.dao.repository.BuildingConfigurationRepository;
-import co.blastlab.serviceblbnavi.dao.repository.BuildingRepository;
-import co.blastlab.serviceblbnavi.dao.repository.ComplexRepository;
+import co.blastlab.serviceblbnavi.dao.repository.*;
 import co.blastlab.serviceblbnavi.domain.Building;
 import co.blastlab.serviceblbnavi.domain.BuildingConfiguration;
 import co.blastlab.serviceblbnavi.domain.Complex;
@@ -47,6 +45,12 @@ public class BuildingConfigurationBean {
 
     @Inject
     private BuildingConfigurationRepository buildingConfigurationRepository;
+
+    @Inject
+    private BuildingConfigurationProductionRepository buildingConfigurationProductionRepository;
+
+    @Inject
+    private BuildingProductionRepository buildingProductionRepository;
 
     public BuildingConfiguration findByComplexNameAndBuildingNameAndVersion(String complexName, String buildingName, Integer version) {
         Complex complex = complexRepository.findOptionalByName(complexName);
@@ -105,10 +109,7 @@ public class BuildingConfigurationBean {
             buildingConfiguration.setBuilding(building);
             BuildingConfiguration bc;
             try {
-                bc = emProduction.createNamedQuery(BuildingConfiguration.FIND_BY_BUILDING_ID_AND_VERSION, BuildingConfiguration.class)
-                        .setParameter("buildingId", building.getId())
-                        .setParameter("version", DB_VERSION)
-                        .getSingleResult();
+                bc = buildingConfigurationProductionRepository.findByBuildingAndVersion(building, DB_VERSION);
             } catch (NoResultException e) {
                 bc = null;
             }
