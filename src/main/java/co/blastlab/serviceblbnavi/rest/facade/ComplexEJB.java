@@ -154,7 +154,7 @@ public class ComplexEJB implements ComplexFacade {
         return complex;
     }
 
-    public List<Complex> findAllByPerson(Long personId) {
+    private List<Complex> findAllByPerson(Long personId) {
         List<Complex> complexes = complexRepository.findAllByPerson(personId);
         Set<Complex> complexSet = new HashSet<>(complexes);
         complexes = new ArrayList<>(complexSet);

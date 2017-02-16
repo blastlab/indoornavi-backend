@@ -11,12 +11,6 @@ import java.io.Serializable;
 @Entity
 @Getter
 @Setter
-@NamedQueries({
-    @NamedQuery(name = Edge.FIND_BY_TARGET_AND_SOURCE, query = "SELECT e FROM Edge e WHERE e.source.id = :sourceId AND e.target.id = :targetId"),
-    @NamedQuery(name = Edge.FIND_VERTEX_FLOOR_ID, query = "SELECT e FROM Edge e WHERE e.source.floor.id = :floorId"),
-    @NamedQuery(name = Edge.FIND_VERTEX_ID, query = "SELECT e FROM Edge e WHERE e.source.id = :vertexId")
-        
-})
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.ANY, getterVisibility = JsonAutoDetect.Visibility.ANY)
 public class Edge extends CustomIdGenerationEntity implements Serializable {
 
