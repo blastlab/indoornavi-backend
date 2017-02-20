@@ -18,9 +18,6 @@ import java.util.List;
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY, setterVisibility = JsonAutoDetect.Visibility.NONE, getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class Waypoint extends CustomIdGenerationEntity implements Serializable, Updatable {
 
-    public static final String FIND_BY_BUILDING_ID = "Waypoint.findByBuildingId";
-    public static final String FIND_ACTIVE_BY_FLOOR_ID = "Waypoint.findActiveByFloorId";
-
     private Double x;
 
     private Double y;
