@@ -62,7 +62,7 @@ public class BuildingConfigurationBean {
     public boolean saveConfiguration(Building building) {
         //merge developer building to production
         emProduction.merge(building.getComplex());
-        removeSQL(building, emProduction);
+        emProduction.remove(emProduction.contains(building) ? building : emProduction.merge(building));
         emProduction.merge(building);
         building.getFloors().forEach((floor) -> {
             emProduction.merge(floor);
@@ -149,7 +149,7 @@ public class BuildingConfigurationBean {
         if (building == null) {
             throw new EntityNotFoundException();
         }
-        removeSQL(building, em);
+        em.remove(em.contains(building) ? building : em.merge(building));
         buildingRepository.attachAndRemove(building);
         em.merge(building);
         building.getFloors().forEach((floor) -> {
@@ -175,11 +175,5 @@ public class BuildingConfigurationBean {
             });
         });
         return building;
-    }
-
-    private void removeSQL(Building building, EntityManager em) {
-        em.createNativeQuery("DELETE FROM Building WHERE id = :id")
-                .setParameter("id", building.getId())
-                .executeUpdate();
     }
 }

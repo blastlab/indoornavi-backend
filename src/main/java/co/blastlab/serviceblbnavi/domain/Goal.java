@@ -17,10 +17,6 @@ import java.util.List;
 @Setter
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY, setterVisibility = JsonAutoDetect.Visibility.NONE, getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class Goal extends CustomIdGenerationEntity implements Serializable, Updatable {
-
-    public static final String FIND_BY_BUILDING = "Goal.findByBuilding";
-    public static final String FIND_BY_FLOOR = "Goal.findByFloor";
-    public static final String FIND_ACTIVE_BY_FLOOR = "Goal.findActiveByFloor";
     private String name;
 
     private Double x;

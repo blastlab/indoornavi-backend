@@ -18,8 +18,6 @@ import java.util.List;
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY, setterVisibility = JsonAutoDetect.Visibility.NONE, getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class Vertex extends CustomIdGenerationEntity implements Serializable, Updatable {
 
-    public static final String FIND_ACTIVE_BY_FLOOR = "Vertex.findActiveByFloor";
-
     private Double x;
 
     private Double y;

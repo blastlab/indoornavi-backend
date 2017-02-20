@@ -21,7 +21,7 @@ public abstract class UpdaterBean<T extends Updatable> {
     private AuthorizationBean authorizationBean;
 
     @Inject
-    PermissionBean permissionBean;
+    private PermissionBean permissionBean;
 
     public T create(T entity, EntityRepository repository) {
         if (entity.getFloorId() != null) {

@@ -14,10 +14,6 @@ import java.io.Serializable;
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.ANY, getterVisibility = JsonAutoDetect.Visibility.ANY)
 public class Edge extends CustomIdGenerationEntity implements Serializable {
 
-    public static final String FIND_BY_TARGET_AND_SOURCE = "Edge.findByTargetAndSource";
-    public static final String FIND_VERTEX_FLOOR_ID = "Edge.findByVertexFloorId";
-    public static final String FIND_VERTEX_ID = "Edge.findByVertexId";
-
     private Double weight;
 
     @JsonIgnore

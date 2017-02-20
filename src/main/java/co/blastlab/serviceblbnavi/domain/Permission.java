@@ -17,8 +17,6 @@ import java.util.List;
 @Setter
 public class Permission extends CustomIdGenerationEntity implements Serializable {
 
-    public static final String FIND_BY_PERSON_ID_AND_COMPLEX_ID = "Permission.findByPersonIdAndComplexId";
-
     public static final String READ = "READ";
     public static final String CREATE = "CREATE";
     public static final String UPDATE = "UPDATE";

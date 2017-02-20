@@ -51,13 +51,13 @@ public class PersonEJB implements PersonFacade {
         return authorizationBean.getCurrentUser();
     }
 
-    public void checkPassword(Person person, String plainPassword) {
+    private void checkPassword(Person person, String plainPassword) {
         if (!PasswordEncoder.getShaPassword(Person.PASSWORD_DIGEST_ALG, plainPassword, person.getSalt()).equalsIgnoreCase(person.getPassword())) {
             throw new PermissionException();
         }
     }
 
-    public String generateAuthToken(Person person) {
+    private String generateAuthToken(Person person) {
         String token = PasswordEncoder.getAuthToken();
         person.setAuthToken(token);
         personRepository.save(person);
