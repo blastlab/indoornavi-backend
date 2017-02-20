@@ -1,5 +1,6 @@
 package co.blastlab.serviceblbnavi.domain;
 
+import co.blastlab.serviceblbnavi.rest.facade.ext.Updatable;
 import co.blastlab.serviceblbnavi.views.View;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -14,13 +15,8 @@ import java.util.List;
 @Entity
 @Getter
 @Setter
-@NamedQueries({
-    @NamedQuery(name = Vertex.FIND_ACTIVE_BY_FLOOR, query = "SELECT v FROM Vertex v WHERE v.floor.id = :floorId AND v.inactive = false")
-})
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY, setterVisibility = JsonAutoDetect.Visibility.NONE, getterVisibility = JsonAutoDetect.Visibility.NONE)
-public class Vertex extends CustomIdGenerationEntity implements Serializable {
-
-    public static final String FIND_ACTIVE_BY_FLOOR = "Vertex.findActiveByFloor";
+public class Vertex extends CustomIdGenerationEntity implements Serializable, Updatable {
 
     private Double x;
 

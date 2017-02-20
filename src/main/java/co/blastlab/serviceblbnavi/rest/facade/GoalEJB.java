@@ -1,13 +1,11 @@
 package co.blastlab.serviceblbnavi.rest.facade;
 
+import co.blastlab.serviceblbnavi.domain.*;
+import co.blastlab.serviceblbnavi.rest.bean.UpdaterBean;
 import co.blastlab.serviceblbnavi.rest.bean.PermissionBean;
 import co.blastlab.serviceblbnavi.dao.repository.BuildingRepository;
 import co.blastlab.serviceblbnavi.dao.repository.FloorRepository;
 import co.blastlab.serviceblbnavi.dao.repository.GoalRepository;
-import co.blastlab.serviceblbnavi.domain.Building;
-import co.blastlab.serviceblbnavi.domain.Floor;
-import co.blastlab.serviceblbnavi.domain.Goal;
-import co.blastlab.serviceblbnavi.domain.Permission;
 import co.blastlab.serviceblbnavi.rest.bean.AuthorizationBean;
 
 import javax.ejb.Stateless;
@@ -18,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Stateless
-public class GoalEJB implements GoalFacade {
+public class GoalEJB extends UpdaterBean<Goal> implements GoalFacade {
 
     @Inject
     private GoalRepository goalRepository;
@@ -36,17 +34,7 @@ public class GoalEJB implements GoalFacade {
     private BuildingRepository buildingRepository;
 
     public Goal create(Goal goal) {
-        if (goal.getFloorId() != null) {
-            Floor floor = floorRepository.findBy(goal.getFloorId());
-            if (floor != null) {
-                permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
-                        floor.getBuilding().getComplex().getId(), Permission.UPDATE);
-                goal.setFloor(floor);
-                goalRepository.save(goal);
-                return goal;
-            }
-        }
-        throw new EntityNotFoundException();
+        return this.create(goal, goalRepository);
     }
 
 
@@ -81,31 +69,12 @@ public class GoalEJB implements GoalFacade {
 
 
     public Goal updateCoordinates(Goal goal) {
-        if (goal.getId() != null) {
-            Goal g = goalRepository.findBy(goal.getId());
-            if (g != null) {
-                permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
-                        g.getFloor().getBuilding().getComplex().getId(), Permission.UPDATE);
-                g.setX(goal.getX());
-                g.setY(goal.getY());
-                goalRepository.save(g);
-                return goal;
-            }
-        }
-        throw new EntityNotFoundException();
+        return this.updateCoordinates(goal, goalRepository);
     }
 
 
     public Goal deactivate(Long goalId) {
-        Goal goal = goalRepository.findBy(goalId);
-        if (goal != null) {
-            permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
-                    goal.getFloor().getBuilding().getComplex().getId(), Permission.UPDATE);
-            goal.setInactive(true);
-            goalRepository.save(goal);
-            return goal;
-        }
-        throw new EntityNotFoundException();
+        return this.deactivate(goalId, goalRepository);
     }
 
     public List<Goal> findByBuilding(Long buildingId) {
