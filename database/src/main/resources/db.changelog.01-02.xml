@@ -45,5 +45,10 @@
             <column name = "building_id"/>
         </dropColumn>
     </changeSet>
-    
+
+    <changeSet id="addUniqueConstraint1-1" author="jsmolkowska">
+        <addUniqueConstraint tableName="beacon" columnNames="minor, major"
+                             constraintName="unique_minor_major" />
+    </changeSet>
+
 </databaseChangeLog>
