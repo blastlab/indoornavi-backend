@@ -5,6 +5,7 @@ import co.blastlab.serviceblbnavi.domain.Edge;
 import co.blastlab.serviceblbnavi.dto.edge.EdgeDto;
 import com.wordnik.swagger.annotations.*;
 
+import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import java.util.List;
@@ -18,12 +19,12 @@ public interface EdgeFacade {
     @ApiResponses({
             @ApiResponse(code = 404, message = "target or source id empty or doesn't exist")
     })
-    List<EdgeDto> create(@ApiParam(value = "edges", required = true) List<EdgeDto> edges);
+    List<EdgeDto> create(@ApiParam(value = "edges", required = true) @Valid List<EdgeDto> edges);
 
 
     @PUT
     @ApiOperation(value = "update edges", response = Edge.class, responseContainer = "List")
-    List<EdgeDto> update(List<EdgeDto> edges);
+    List<EdgeDto> update(@ApiParam(value = "edges", required = true) @Valid List<EdgeDto> edges);
 
 
     @DELETE

@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,8 +44,12 @@ public class VertexDto {
 
     private Long id;
 
+    @NotNull
+    @Min(0)
     private Double x;
 
+    @NotNull
+    @Min(0)
     private Double y;
 
     private boolean inactive;
@@ -52,6 +58,7 @@ public class VertexDto {
 
     private boolean isFloorUpChangeable;
 
+    @NotNull
     private Long floorId;
 
     private List<Long> buildingExitsIds = new ArrayList<>();

@@ -4,6 +4,7 @@ package co.blastlab.serviceblbnavi.rest.facade;
 import co.blastlab.serviceblbnavi.dto.goal.GoalDto;
 import com.wordnik.swagger.annotations.*;
 
+import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import java.util.List;
@@ -17,7 +18,7 @@ public interface GoalFacade {
     @ApiResponses({
             @ApiResponse(code = 404, message = "floor id emtpy or floor doesn't exist")
     })
-    GoalDto create(@ApiParam(value = "goal", required = true) GoalDto goal);
+    GoalDto create(@ApiParam(value = "goal", required = true) @Valid GoalDto goal);
 
     @PUT
     @Path("/name")
@@ -25,7 +26,7 @@ public interface GoalFacade {
     @ApiResponses({
             @ApiResponse(code = 404, message = "goal id or goal empty or doesn't exist")
     })
-    GoalDto updateName(@ApiParam(value = "goal", required = true) GoalDto goal);
+    GoalDto updateName(@ApiParam(value = "goal", required = true) @Valid GoalDto goal);
 
     @DELETE
     @Path("/{id: \\d+}")
@@ -41,7 +42,7 @@ public interface GoalFacade {
     @ApiResponses({
             @ApiResponse(code = 404, message = "goal id or goal empty or doesn't exist")
     })
-    GoalDto updateCoordinates(@ApiParam(value = "goal", required = true) GoalDto goal);
+    GoalDto updateCoordinates(@ApiParam(value = "goal", required = true) @Valid GoalDto goal);
 
     @PUT
     @Path("/{id: \\d+}/deactivate")

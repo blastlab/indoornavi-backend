@@ -6,7 +6,10 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.validator.constraints.NotEmpty;
 
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 @Getter
@@ -25,16 +28,26 @@ public class GoalSelectionDto {
 
     private Long id;
 
+    @NotNull
+    @NotEmpty
     private String device;
 
+    @NotNull
+    @Min(0)
     private Double x;
 
+    @NotNull
+    @Min(0)
     private Double y;
 
+    @NotNull
     private Integer floorLevel;
 
+    // TODO: any other restrictions here? like it can't be in a future or in a past
+    @NotNull
     private Date timestamp;
 
+    @NotNull
     private Long goalId;
 
     // TODO: Check why is it here

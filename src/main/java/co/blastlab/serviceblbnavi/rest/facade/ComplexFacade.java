@@ -4,6 +4,7 @@ package co.blastlab.serviceblbnavi.rest.facade;
 import co.blastlab.serviceblbnavi.dto.complex.ComplexDto;
 import com.wordnik.swagger.annotations.*;
 
+import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import java.util.List;
@@ -14,14 +15,14 @@ public interface ComplexFacade {
 
     @POST
     @ApiOperation(value = "create complex", response = ComplexDto.class)
-    ComplexDto create(@ApiParam(value = "complex", required = true) ComplexDto complex);
+    ComplexDto create(@ApiParam(value = "complex", required = true) @Valid ComplexDto complex);
 
     @PUT
     @ApiOperation(value = "update complex by id", response = Response.class)
     @ApiResponses({
             @ApiResponse(code = 404, message = "complex id empty or complex doesn't exist")
     })
-    ComplexDto update(@ApiParam(value = "complex", required = true) ComplexDto complex);
+    ComplexDto update(@ApiParam(value = "complex", required = true) @Valid ComplexDto complex);
 
     @DELETE
     @Path("/{id: \\d+}")

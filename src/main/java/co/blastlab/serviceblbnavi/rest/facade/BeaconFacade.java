@@ -4,6 +4,7 @@ package co.blastlab.serviceblbnavi.rest.facade;
 import co.blastlab.serviceblbnavi.dto.beacon.BeaconDto;
 import com.wordnik.swagger.annotations.*;
 
+import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import java.util.List;
@@ -18,14 +19,14 @@ public interface BeaconFacade {
     @ApiResponses({
             @ApiResponse(code = 404, message = "floor id empty or floor doesn't exist")
     })
-    BeaconDto create(@ApiParam(value = "beacon", required = true) BeaconDto beacon);
+    BeaconDto create(@ApiParam(value = "beacon", required = true) @Valid BeaconDto beacon);
 
     @PUT
     @ApiOperation(value = "update beacon", response = BeaconDto.class)
     @ApiResponses({
             @ApiResponse(code = 404, message = "floor id or floor empty or doesn't exist")
     })
-    BeaconDto update(@ApiParam(value = "beacon", required = true) BeaconDto beacon);
+    BeaconDto update(@ApiParam(value = "beacon", required = true) @Valid BeaconDto beacon);
 
     @DELETE
     @Path("/{id: \\d+}")

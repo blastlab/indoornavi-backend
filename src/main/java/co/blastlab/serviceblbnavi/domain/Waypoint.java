@@ -5,6 +5,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -38,5 +39,5 @@ public class Waypoint extends CustomIdGenerationEntity implements Serializable {
     private Floor floor;
 
     @OneToMany(mappedBy = "waypoint", cascade = CascadeType.REMOVE)
-    private List<WaypointVisit> waypointVisits;
+    private List<WaypointVisit> waypointVisits = new ArrayList<>();
 }

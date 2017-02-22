@@ -5,6 +5,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -19,9 +22,13 @@ public class EdgeDto {
 
     private Long id;
 
+    @NotNull
+    @Min(0)
     private Double weight;
 
+    @NotNull
     private Long sourceId;
 
+    @NotNull
     private Long targetId;
 }
