@@ -21,6 +21,8 @@ public abstract class RestAssuredIT {
 		RestAssured.config = config()
 			.redirect(redirectConfig().followRedirects(false));
 
+		RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
+
 		RestAssured.requestSpecification = new RequestSpecBuilder()
 			.setContentType(ContentType.JSON)
 			.setAccept(ContentType.JSON)

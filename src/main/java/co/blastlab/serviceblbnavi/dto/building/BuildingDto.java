@@ -6,7 +6,11 @@ import com.fasterxml.jackson.annotation.JsonView;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.validator.constraints.NotEmpty;
 
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,12 +30,19 @@ public class BuildingDto {
 
     private Long id;
 
+    @NotNull
+    @NotEmpty
     private String name;
 
+    @NotNull
     private Integer minimumFloor;
 
+    @NotNull
+    @Min(0)
+    @Max(360)
     private Double degree;
 
+    @NotNull
     private Long complexId;
 
     @JsonView({View.BuildingInternal.class})

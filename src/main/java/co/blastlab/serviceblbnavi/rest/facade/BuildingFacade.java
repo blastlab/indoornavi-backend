@@ -6,6 +6,7 @@ import co.blastlab.serviceblbnavi.views.View;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.wordnik.swagger.annotations.*;
 
+import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import java.util.List;
@@ -16,14 +17,14 @@ public interface BuildingFacade {
 
     @POST
     @ApiOperation(value = "create", response = BuildingDto.class)
-    BuildingDto create(@ApiParam(value = "building", required = true) BuildingDto building);
+    BuildingDto create(@ApiParam(value = "building", required = true) @Valid BuildingDto building);
 
     @PUT
     @ApiOperation(value = "update building", response = BuildingDto.class)
     @ApiResponses({
             @ApiResponse(code = 404, message = "complex id or complex empty or doesn't exist")
     })
-    BuildingDto update(@ApiParam(value = "building", required = true) BuildingDto building);
+    BuildingDto update(@ApiParam(value = "building", required = true) @Valid BuildingDto building);
 
     @DELETE
     @Path("/{id: \\d+}")

@@ -4,6 +4,7 @@ package co.blastlab.serviceblbnavi.rest.facade;
 import co.blastlab.serviceblbnavi.dto.floor.FloorDto;
 import com.wordnik.swagger.annotations.*;
 
+import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import java.util.List;
@@ -17,14 +18,14 @@ public interface FloorFacade {
     @ApiResponses({
             @ApiResponse(code = 404, message = "building id empty or building doesn't exist")
     })
-    FloorDto create(@ApiParam(value = "floor", required = true) FloorDto floor);
+    FloorDto create(@ApiParam(value = "floor", required = true) @Valid FloorDto floor);
 
     @PUT
     @ApiOperation(value = "update floor", response = FloorDto.class)
     @ApiResponses({
             @ApiResponse(code = 404, message = "building id or building empty or doesn't exist")
     })
-    FloorDto update(@ApiParam(value = "floor", required = true) FloorDto floor);
+    FloorDto update(@ApiParam(value = "floor", required = true) @Valid FloorDto floor);
 
     @DELETE
     @Path("/{id: \\d+}")
@@ -48,7 +49,7 @@ public interface FloorFacade {
     @ApiResponses({
             @ApiResponse(code = 404, message = "building id or building empty or doesn't exist")
     })
-    Response updateFloors(@PathParam("id") Long buildingId, @ApiParam(value = "floors", required = true) List<FloorDto> floors);
+    Response updateFloors(@PathParam("id") Long buildingId, @ApiParam(value = "floors", required = true) @Valid List<FloorDto> floors);
 
     @PUT
     @Path("/mToPix")
@@ -56,5 +57,5 @@ public interface FloorFacade {
     @ApiResponses({
             @ApiResponse(code = 404, message = "floor with given id doesn't exist")
     })
-    Response updatemToPix(@ApiParam(value = "floor", required = true) FloorDto floor);
+    Response updatemToPix(@ApiParam(value = "floor", required = true) @Valid FloorDto floor);
 }

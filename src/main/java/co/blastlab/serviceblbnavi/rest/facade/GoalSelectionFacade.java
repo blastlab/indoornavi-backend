@@ -6,6 +6,7 @@ import co.blastlab.serviceblbnavi.views.View;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.wordnik.swagger.annotations.*;
 
+import javax.validation.Valid;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -21,5 +22,5 @@ public interface GoalSelectionFacade {
             @ApiResponse(code = 404, message = "invalid goal selection\'s data")
     })
     @JsonView(View.GoalSelectionInternal.class)
-    GoalSelectionDto create(@ApiParam(value = "goalSelection", required = true) GoalSelectionDto goalSelection);
+    GoalSelectionDto create(@ApiParam(value = "goalSelection", required = true) @Valid GoalSelectionDto goalSelection);
 }

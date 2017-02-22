@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 @Getter
@@ -17,9 +18,13 @@ public class WaypointVisitDto {
         this.setWaypointId(waypointVisit.getWaypoint() != null ? waypointVisit.getWaypoint().getId() : null);
     }
 
+    @NotNull
     private String device;
 
+    // TODO: any other restrictions here? like it can't be in a future or in a past
+    @NotNull
     private Date timestamp;
 
+    @NotNull
     private Long waypointId;
 }

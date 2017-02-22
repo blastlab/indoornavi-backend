@@ -5,6 +5,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -33,6 +34,6 @@ public class Goal extends CustomIdGenerationEntity implements Serializable {
     private Floor floor;
 
     @OneToMany(mappedBy = "goal", cascade = CascadeType.REMOVE)
-    private List<GoalSelection> goalSelections;
+    private List<GoalSelection> goalSelections = new ArrayList<>();
 
 }

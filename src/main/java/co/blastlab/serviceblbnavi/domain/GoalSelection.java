@@ -14,7 +14,7 @@ import java.util.Date;
 @Getter
 @Setter
 public class GoalSelection extends CustomIdGenerationEntity implements Serializable {
-
+    // TODO: why is it a string?
     private String device;
 
     private Double x;

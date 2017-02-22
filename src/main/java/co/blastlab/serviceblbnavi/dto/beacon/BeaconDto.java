@@ -4,6 +4,10 @@ import co.blastlab.serviceblbnavi.domain.Beacon;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.validator.constraints.NotEmpty;
+
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 
 @Getter
 @Setter
@@ -22,17 +26,30 @@ public class BeaconDto {
 
     private Long id;
 
+    @NotNull
+    @NotEmpty
     private String mac;
 
+    @NotNull
+    @Min(0)
     private Double x;
 
+    @NotNull
+    @Min(0)
     private Double y;
 
+    @NotNull
+    @Min(0)
     private Double z;
 
+    @NotNull
+    @Min(0)
     private Integer minor;
 
+    @NotNull
+    @Min(0)
     private Integer major;
 
+    @NotNull
     private Long floorId;
 }

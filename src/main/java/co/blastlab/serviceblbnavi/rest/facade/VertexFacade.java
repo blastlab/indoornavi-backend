@@ -4,6 +4,7 @@ package co.blastlab.serviceblbnavi.rest.facade;
 import co.blastlab.serviceblbnavi.dto.vertex.VertexDto;
 import com.wordnik.swagger.annotations.*;
 
+import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import java.util.List;
@@ -18,14 +19,14 @@ public interface VertexFacade {
     @ApiResponses({
             @ApiResponse(code = 404, message = "floor id emtpy or floor doesn't exist")
     })
-    VertexDto create(@ApiParam(value = "vertex", required = true) VertexDto vertex);
+    VertexDto create(@ApiParam(value = "vertex", required = true) @Valid VertexDto vertex);
 
     @PUT
     @ApiOperation(value = "update vertex", response = VertexDto.class)
     @ApiResponses({
             @ApiResponse(code = 404, message = "vertex id empty or doesn't exist")
     })
-    VertexDto update(@ApiParam(value = "vertex", required = true) VertexDto vertex);
+    VertexDto update(@ApiParam(value = "vertex", required = true) @Valid VertexDto vertex);
 
     @DELETE
     @Path("/{id: \\d+}")

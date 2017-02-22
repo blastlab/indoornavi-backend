@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Getter
@@ -28,20 +30,30 @@ public class WaypointDto {
 
     private Long id;
 
+    @NotNull
+    @Min(0)
     private Double x;
 
+    @NotNull
+    @Min(0)
     private Double y;
 
+    @NotNull
+    @Min(0)
     private Integer timeToCheckout;
 
+    @NotNull
+    @Min(0)
     private Double distance;
 
     private String details;
 
     private boolean inactive;
 
+    @NotNull
     private String name;
 
+    @NotNull
     private Long floorId;
 
     @JsonView({View.WaypointInternal.class})

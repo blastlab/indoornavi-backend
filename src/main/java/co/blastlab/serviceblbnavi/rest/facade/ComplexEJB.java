@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Function;
+import java.util.function.Predicate;
 
 
 @Stateless
@@ -100,7 +100,7 @@ public class ComplexEJB implements ComplexFacade {
     public Response delete(Long id) {
         if (id != null) {
             try {
-                permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(), id, Permission.DELETE);
+                permissionBean.checkPermission(id, Permission.DELETE);
             } catch (PermissionException e) {
                 e.printStackTrace();
                 return Response.status(Response.Status.UNAUTHORIZED).build();
@@ -148,9 +148,9 @@ public class ComplexEJB implements ComplexFacade {
     }
 
 
-    private void checkForDuplicateComplex(String name, Function<Complex, Boolean> additionalCondition) {
+    private void checkForDuplicateComplex(String name, Predicate<Complex> additionalCondition) {
         Complex complexEntity = complexRepository.findOptionalByName(name);
-        if (complexEntity != null && additionalCondition.apply(complexEntity)) {
+        if (complexEntity != null && additionalCondition.test(complexEntity)) {
             throw new EntityExistsException();
         }
     }

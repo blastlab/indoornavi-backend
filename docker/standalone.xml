@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 
-<server xmlns="urn:jboss:domain:4.2">
+<server xmlns="urn:jboss:domain:4.0">
     <extensions>
         <extension module="org.jboss.as.clustering.infinispan"/>
         <extension module="org.jboss.as.connector"/>
@@ -41,11 +41,6 @@
                 </authorization>
             </security-realm>
             <security-realm name="ApplicationRealm">
-                <server-identities>
-                    <ssl>
-                        <keystore path="application.keystore" relative-to="jboss.server.config.dir" keystore-password="password" alias="server" key-password="password" generate-self-signed-certificate-host="localhost"/>
-                    </ssl>
-                </server-identities>
                 <authentication>
                     <local default-user="$local" allowed-users="*" skip-group-loading="true"/>
                     <properties path="application-users.properties" relative-to="jboss.server.config.dir"/>
@@ -151,7 +146,7 @@
                 <xa-datasource jndi-name="java:/jdbc/NaviProduction" pool-name="NaviProduction" enabled="true" use-ccm="true">
                     <driver>mariadbXA</driver>
                     <xa-datasource-property name="URL">jdbc:mysql://${app.db.host.prod}:3306/NaviProduction</xa-datasource-property>
-                   <security>
+                    <security>
                         <user-name>root</user-name>
                         <password></password>
                     </security>
@@ -379,14 +374,14 @@
             </core-environment>
             <recovery-environment socket-binding="txn-recovery-environment" status-socket-binding="txn-status-manager"/>
         </subsystem>
-        <subsystem xmlns="urn:jboss:domain:undertow:3.1">
+        <subsystem xmlns="urn:jboss:domain:undertow:3.0">
             <buffer-cache name="default"/>
             <server name="default-server">
-                <http-listener name="default" socket-binding="http" redirect-socket="https" enable-http2="true"/>
-                <https-listener name="https" socket-binding="https" security-realm="ApplicationRealm" enable-http2="true"/>
+                <http-listener name="default" socket-binding="http" redirect-socket="https" />
                 <host name="default-host" alias="localhost">
                     <filter-ref name="server-header"/>
                     <filter-ref name="x-powered-by-header"/>
+                    <filter-ref name="request-dumper" />
                 </host>
             </server>
             <servlet-container name="default">
@@ -398,6 +393,8 @@
             <filters>
                 <response-header name="server-header" header-name="Server" header-value="WildFly/10"/>
                 <response-header name="x-powered-by-header" header-name="X-Powered-By" header-value="Undertow/1"/>
+                <filter name="request-dumper" module="io.undertow.core"
+                        class-name="io.undertow.server.handlers.RequestDumpingHandler"/>
             </filters>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:webservices:2.0">

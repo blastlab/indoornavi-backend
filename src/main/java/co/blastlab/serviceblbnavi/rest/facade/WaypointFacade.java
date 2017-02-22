@@ -6,6 +6,7 @@ import co.blastlab.serviceblbnavi.views.View;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.wordnik.swagger.annotations.*;
 
+import javax.validation.Valid;
 import javax.ws.rs.*;
 import java.util.List;
 
@@ -18,14 +19,14 @@ public interface WaypointFacade {
     @ApiResponses({
             @ApiResponse(code = 400, message = "invalid waypoint's data")
     })
-    WaypointDto createWaypoint(@ApiParam(value = "waypoint", required = true) WaypointDto waypoint);
+    WaypointDto createWaypoint(@ApiParam(value = "waypoint", required = true) @Valid WaypointDto waypoint);
 
     @PUT
     @ApiOperation(value = "update waypoint's data", response = WaypointDto.class)
     @ApiResponses({
             @ApiResponse(code = 400, message = "invalid waypoint's data")
     })
-    WaypointDto updateWaypoint(@ApiParam(value = "waypoint", required = true) WaypointDto waypoint);
+    WaypointDto updateWaypoint(@ApiParam(value = "waypoint", required = true) @Valid WaypointDto waypoint);
 
     @PUT
     @Path("/coordinates")
@@ -33,7 +34,7 @@ public interface WaypointFacade {
     @ApiResponses({
             @ApiResponse(code = 400, message = "invalid waypoint's data")
     })
-    WaypointDto updateWaypointsCoordinates(@ApiParam(value = "waypoint", required = true) WaypointDto waypoint);
+    WaypointDto updateWaypointsCoordinates(@ApiParam(value = "waypoint", required = true) @Valid WaypointDto waypoint);
 
     @GET
     @Path("/floor/{id: \\d+}/active")

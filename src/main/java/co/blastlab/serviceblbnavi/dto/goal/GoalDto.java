@@ -4,7 +4,10 @@ import co.blastlab.serviceblbnavi.domain.Goal;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.validator.constraints.NotEmpty;
 
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Getter
@@ -23,14 +26,21 @@ public class GoalDto {
 
     private Long id;
 
+    @NotNull
+    @NotEmpty
     private String name;
 
+    @NotNull
+    @Min(0)
     private Double x;
 
+    @NotNull
+    @Min(0)
     private Double y;
 
     private boolean inactive;
 
+    @NotNull
     private Long floorId;
 
     private List<Long> goalSelectionsIds;

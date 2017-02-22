@@ -61,7 +61,7 @@
         <dependency>
             <groupId>io.rest-assured</groupId>
             <artifactId>rest-assured</artifactId>
-            <version>3.0.1</version>
+            <version>3.0.2</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -193,7 +193,6 @@
                             <directory>${war.output.directory}</directory>
                             <includes>
                                 <include>*.war</include>
-                                <!--<include>*.war.undeployed</include>-->
                             </includes>
                         </fileset>
                     </filesets>
