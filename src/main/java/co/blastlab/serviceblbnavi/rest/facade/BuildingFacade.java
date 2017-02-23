@@ -2,6 +2,7 @@ package co.blastlab.serviceblbnavi.rest.facade;
 
 
 import co.blastlab.serviceblbnavi.dto.building.BuildingDto;
+import co.blastlab.serviceblbnavi.rest.facade.ext.filter.TokenAuthorization;
 import co.blastlab.serviceblbnavi.views.View;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.wordnik.swagger.annotations.*;
@@ -16,10 +17,12 @@ import java.util.List;
 public interface BuildingFacade {
 
     @POST
+    @TokenAuthorization
     @ApiOperation(value = "create", response = BuildingDto.class)
     BuildingDto create(@ApiParam(value = "building", required = true) @Valid BuildingDto.New building);
 
     @PUT
+    @TokenAuthorization
     @ApiOperation(value = "update building", response = BuildingDto.class)
     @ApiResponses({
             @ApiResponse(code = 404, message = "complex id or complex empty or doesn't exist")
@@ -32,6 +35,7 @@ public interface BuildingFacade {
     @ApiResponses({
             @ApiResponse(code = 404, message = "building with given id doesn't exist")
     })
+    @TokenAuthorization
     Response delete(@PathParam("id") @ApiParam(value = "id", required = true) Long id);
 
     @GET
@@ -41,6 +45,7 @@ public interface BuildingFacade {
     @ApiResponses({
             @ApiResponse(code = 404, message = "building with given id wasn't found")
     })
+    @TokenAuthorization
     BuildingDto find(@PathParam("id") @ApiParam(value = "id", required = true) Long id);
 
     @GET
@@ -49,6 +54,7 @@ public interface BuildingFacade {
     @ApiResponses({
             @ApiResponse(code = 404, message = "complex doesn't exist")
     })
+    @TokenAuthorization
     List<BuildingDto> findAll(@PathParam("id") @ApiParam(value = "complexId", required = true) Long complexId);
 
     @PUT
@@ -57,6 +63,7 @@ public interface BuildingFacade {
     @ApiResponses({
             @ApiResponse(code = 404, message = "building doesn't exist")
     })
+    @TokenAuthorization
     Response saveConfiguration(@PathParam("id") @ApiParam(value = "buildingId", required = true) Long buildingId);
 
     @GET
@@ -83,6 +90,7 @@ public interface BuildingFacade {
     @ApiResponses({
             @ApiResponse(code = 404, message = "building doesn't exist or has no configuration checksum set")
     })
+    @TokenAuthorization
     String getConfigurationChecksumByComplexNameAndBuildingName(
             @PathParam("complexName") @ApiParam(value = "complexName", required = true) String complexName,
             @PathParam("buildingName") @ApiParam(value = "buildingName", required = true) String buildingName);
@@ -93,5 +101,6 @@ public interface BuildingFacade {
     @ApiResponses({
             @ApiResponse(code = 404, message = "building doesn't exist or has no configuration saved")
     })
+    @TokenAuthorization
     BuildingDto restoreConfiguration(@PathParam("id") @ApiParam(value = "id", required = true) Long id);
 }

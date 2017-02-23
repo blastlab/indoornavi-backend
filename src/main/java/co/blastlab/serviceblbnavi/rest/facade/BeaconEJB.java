@@ -1,6 +1,6 @@
 package co.blastlab.serviceblbnavi.rest.facade;
 
-import co.blastlab.serviceblbnavi.dao.PermissionBean;
+import co.blastlab.serviceblbnavi.rest.bean.PermissionBean;
 import co.blastlab.serviceblbnavi.dao.repository.BeaconRepository;
 import co.blastlab.serviceblbnavi.dao.repository.FloorRepository;
 import co.blastlab.serviceblbnavi.domain.Beacon;
@@ -31,17 +31,8 @@ public class BeaconEJB implements BeaconFacade {
     public BeaconDto create(BeaconDto beacon) {
         Floor floor = floorRepository.findBy(beacon.getFloorId());
         if (floor != null) {
-            permissionBean.checkPermission(floor, Permission.UPDATE);
             Beacon beaconEntity = new Beacon();
-            beaconEntity.setX(beacon.getX());
-            beaconEntity.setY(beacon.getY());
-            beaconEntity.setZ(beacon.getZ());
-            beaconEntity.setFloor(floor);
-            beaconEntity.setMac(beacon.getMac());
-            beaconEntity.setMinor(beacon.getMinor());
-            beaconEntity.setMajor(beacon.getMajor());
-            beaconEntity = beaconRepository.save(beaconEntity);
-            return new BeaconDto(beaconEntity);
+            return createOrUpdate(beaconEntity, beacon, floor);
         }
         throw new EntityNotFoundException();
     }
@@ -71,17 +62,8 @@ public class BeaconEJB implements BeaconFacade {
     public BeaconDto update(BeaconDto beacon) {
         Floor floor = floorRepository.findBy(beacon.getFloorId());
         if (floor != null) {
-            permissionBean.checkPermission(floor, Permission.UPDATE);
             Beacon beaconEntity = beaconRepository.findBy(beacon.getId());
-            beaconEntity.setFloor(floor);
-            beaconEntity.setX(beacon.getX());
-            beaconEntity.setY(beacon.getY());
-            beaconEntity.setZ(beacon.getZ());
-            beaconEntity.setMac(beacon.getMac());
-            beaconEntity.setMinor(beacon.getMinor());
-            beaconEntity.setMajor(beacon.getMajor());
-            beaconEntity = beaconRepository.save(beaconEntity);
-            return new BeaconDto(beaconEntity);
+            return createOrUpdate(beaconEntity, beacon, floor);
         }
         throw new EntityNotFoundException();
     }
@@ -98,5 +80,18 @@ public class BeaconEJB implements BeaconFacade {
             }
         }
         throw new EntityNotFoundException();
+    }
+
+    private BeaconDto createOrUpdate(Beacon beaconEntity, BeaconDto beacon, Floor floor) {
+        permissionBean.checkPermission(floor, Permission.UPDATE);
+        beaconEntity.setX(beacon.getX());
+        beaconEntity.setY(beacon.getY());
+        beaconEntity.setZ(beacon.getZ());
+        beaconEntity.setFloor(floor);
+        beaconEntity.setMac(beacon.getMac());
+        beaconEntity.setMinor(beacon.getMinor());
+        beaconEntity.setMajor(beacon.getMajor());
+        beaconEntity = beaconRepository.save(beaconEntity);
+        return new BeaconDto(beaconEntity);
     }
 }

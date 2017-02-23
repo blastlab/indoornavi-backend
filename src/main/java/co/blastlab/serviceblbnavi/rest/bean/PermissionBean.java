@@ -1,12 +1,11 @@
-package co.blastlab.serviceblbnavi.dao;
+package co.blastlab.serviceblbnavi.rest.bean;
 
 import co.blastlab.serviceblbnavi.dao.exception.PermissionException;
-import co.blastlab.serviceblbnavi.domain.*;
-import co.blastlab.serviceblbnavi.rest.bean.AuthorizationBean;
+import co.blastlab.serviceblbnavi.dao.repository.PermissionRepository;
+import co.blastlab.serviceblbnavi.domain.Permission;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
-import javax.persistence.EntityManager;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,17 +13,10 @@ import java.util.List;
 public class PermissionBean {
 
     @Inject
-    private EntityManager em;
-
-    @Inject
-    private AuthorizationBean authorizationBean;
-
-    public Permission findByName(String name) {
-        return em.createNamedQuery(Permission.FIND_BY_NAME, Permission.class).setParameter("name", name).getSingleResult();
-    }
+    private PermissionRepository permissionRepository;
 
     public List<String> getPermissions(Long personId, Long complexId) {
-        List<Permission> permissions = em.createNamedQuery(Permission.FIND_BY_PERSON_ID_AND_COMPLEX_ID, Permission.class).setParameter("personId", personId).setParameter("complexId", complexId).getResultList();
+        List<Permission> permissions = permissionRepository.findByPersonIdAndComplexId(personId, complexId);
         List<String> permissionStrings = new ArrayList<>();
         permissions.forEach(permission -> {
             permissionStrings.add(permission.getName());
