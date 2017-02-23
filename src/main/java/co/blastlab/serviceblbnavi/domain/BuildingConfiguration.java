@@ -8,12 +8,6 @@ import lombok.Setter;
 import javax.persistence.*;
 import java.io.Serializable;
 
-@NamedQueries({
-        @NamedQuery(name = BuildingConfiguration.FIND_BY_COMPLEX_NAME_AND_BUILDING_NAME_AND_VERSION, query = "SELECT bc FROM BuildingConfiguration bc WHERE bc.building.name = :buildingName AND bc.building.complex.name = :complexName AND bc.version = :version"),
-        @NamedQuery(name = BuildingConfiguration.FIND_BY_BUILDING_ID_AND_VERSION, query = "SELECT bc FROM BuildingConfiguration bc WHERE bc.building.id = :buildingId AND bc.version = :version"),
-        @NamedQuery(name = BuildingConfiguration.FIND_BY_BUILDING_ID_SORT_VERSION_FROM_NEWEST, query = "SELECT bc FROM BuildingConfiguration bc WHERE bc.building.id = :buildingId ORDER BY bc.version DESC"),
-        @NamedQuery(name = BuildingConfiguration.FIND_BY_VERSION, query = "SELECT bc FROM BuildingConfiguration bc WHERE bc.version = :version"),
-})
 @Entity
 @Getter
 @Setter
@@ -22,11 +16,6 @@ import java.io.Serializable;
     @UniqueConstraint(columnNames = {"version", "building_id"})
 )
 public class BuildingConfiguration extends CustomIdGenerationEntity implements Serializable {
-
-    public static final String FIND_BY_COMPLEX_NAME_AND_BUILDING_NAME_AND_VERSION = "BuildingConfiguration.findByComplexNameAndBuildingNameAndVersion";
-    public static final String FIND_BY_BUILDING_ID_AND_VERSION = "BuildingConfiguration.findByBuildingAndVersion";
-    public static final String FIND_BY_BUILDING_ID_SORT_VERSION_FROM_NEWEST = "BuildingConfiguration.findByBuildingIdSortVersionFromNewest";
-    public static final String FIND_BY_VERSION = "BuildingConfiguration.findByVersion";
 
     private Integer version;
 
