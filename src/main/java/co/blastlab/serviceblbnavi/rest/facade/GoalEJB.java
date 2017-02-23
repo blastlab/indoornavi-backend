@@ -1,12 +1,16 @@
 package co.blastlab.serviceblbnavi.rest.facade;
 
-import co.blastlab.serviceblbnavi.domain.*;
-import co.blastlab.serviceblbnavi.rest.bean.UpdaterBean;
-import co.blastlab.serviceblbnavi.rest.bean.PermissionBean;
+import co.blastlab.serviceblbnavi.dao.FloorBean;
 import co.blastlab.serviceblbnavi.dao.repository.BuildingRepository;
 import co.blastlab.serviceblbnavi.dao.repository.FloorRepository;
 import co.blastlab.serviceblbnavi.dao.repository.GoalRepository;
-import co.blastlab.serviceblbnavi.rest.bean.AuthorizationBean;
+import co.blastlab.serviceblbnavi.domain.Building;
+import co.blastlab.serviceblbnavi.domain.Floor;
+import co.blastlab.serviceblbnavi.domain.Goal;
+import co.blastlab.serviceblbnavi.domain.Permission;
+import co.blastlab.serviceblbnavi.dto.goal.GoalDto;
+import co.blastlab.serviceblbnavi.rest.bean.PermissionBean;
+import co.blastlab.serviceblbnavi.rest.bean.UpdaterBean;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
@@ -16,33 +20,45 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Stateless
-public class GoalEJB extends UpdaterBean<Goal> implements GoalFacade {
-
-    @Inject
-    private GoalRepository goalRepository;
+public class GoalEJB extends UpdaterBean<GoalDto, Goal> implements GoalFacade {
 
     @Inject
     private PermissionBean permissionBean;
 
     @Inject
-    private AuthorizationBean authorizationBean;
+    private FloorBean floorBean;
 
     @Inject
     private FloorRepository floorRepository;
 
     @Inject
+    private GoalRepository goalRepository;
+
+    @Inject
     private BuildingRepository buildingRepository;
 
-    public Goal create(Goal goal) {
-        return this.create(goal, goalRepository);
+
+    public GoalDto create(GoalDto goal) {
+        Floor floor = floorRepository.findBy(goal.getFloorId());
+        if (floor != null) {
+            permissionBean.checkPermission(floor, Permission.UPDATE);
+            Goal goalEntity = new Goal();
+            goalEntity.setInactive(goal.isInactive());
+            goalEntity.setY(goal.getY());
+            goalEntity.setX(goal.getX());
+            goalEntity.setName(goal.getName());
+            goalEntity.setFloor(floor);
+            goalEntity = goalRepository.save(goalEntity);
+            return new GoalDto(goalEntity);
+        }
+        throw new EntityNotFoundException();
     }
 
 
     public Response delete(Long id) {
         Goal goal = goalRepository.findBy(id);
         if (goal != null) {
-            permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
-                    goal.getFloor().getBuilding().getComplex().getId(), Permission.UPDATE);
+            permissionBean.checkPermission(goal, Permission.UPDATE);
             goalRepository.remove(goal);
             return Response.ok().build();
         }
@@ -50,75 +66,83 @@ public class GoalEJB extends UpdaterBean<Goal> implements GoalFacade {
     }
 
 
-    public Goal updateName(Goal goal) {
+    public GoalDto updateName(GoalDto goal) {
         if (goal.getId() != null) {
-            Goal g = goalRepository.findBy(goal.getId());
-            if (g != null) {
-                permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
-                        g.getFloor().getBuilding().getComplex().getId(), Permission.UPDATE);
-                g.setInactive(true);
-                goal.setFloor(g.getFloor());
-                goal.setId(null);
-                goalRepository.save(g);
-                goalRepository.save(goal);
+            Goal goalEntity = goalRepository.findBy(goal.getId());
+            if (goalEntity != null) {
+                permissionBean.checkPermission(goalEntity, Permission.UPDATE);
+
+                // TODO: WTF is this method doing?! why setInactive(true) on previously created Goal and then create new Goal?
+                // method name is updateName!
+                goalEntity.setInactive(true);
+                Goal newGoalEntity = new Goal();
+                newGoalEntity.setInactive(goal.isInactive());
+                newGoalEntity.setY(goal.getY());
+                newGoalEntity.setX(goal.getX());
+                newGoalEntity.setName(goal.getName());
+                newGoalEntity.setFloor(goalEntity.getFloor());
+                goalEntity.setId(null);
+                goalRepository.save(goalEntity);
+                goalRepository.save(newGoalEntity);
                 return goal;
             }
         }
         throw new EntityNotFoundException();
     }
+    
 
-
-    public Goal updateCoordinates(Goal goal) {
-        return this.updateCoordinates(goal, goalRepository);
+    public GoalDto updateCoordinates(GoalDto goal) {
+        return super.updateCoordinates(goal, goalRepository);
     }
 
 
-    public Goal deactivate(Long goalId) {
-        return this.deactivate(goalId, goalRepository);
+    public GoalDto deactivate(Long goalId) {
+        GoalDto goal = new GoalDto();
+        goal.setId(goalId);
+        return super.deactivate(goal, goalRepository);
     }
 
-    public List<Goal> findByBuilding(Long buildingId) {
+
+    public List<GoalDto> findByBuilding(Long buildingId) {
         if (buildingId != null) {
             Building building = buildingRepository.findBy(buildingId);
             List<Floor> floors = floorRepository.findByBuilding(building);
-            List<Goal> goals = new ArrayList<>();
-            floors.stream().forEach((floor) -> {
-                goals.addAll(goalRepository.findByFloor(floor));
-            });
-            if (goals.size() > 0) {
-                permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
-                        goals.get(0).getFloor().getBuilding().getComplex().getId(), Permission.READ);
-            }
+            List<GoalDto> goals = new ArrayList<>();
+            floors.forEach((floor -> goals.addAll(findByFloor(floor.getId()))));
             return goals;
         }
         throw new EntityNotFoundException();
     }
 
 
-    public List<Goal> findByFloor(Long floorId) {
+    public List<GoalDto> findByFloor(Long floorId) {
         if (floorId != null) {
             Floor floor = floorRepository.findBy(floorId);
             List<Goal> goals = goalRepository.findByFloor(floor);
             if (goals.size() > 0) {
-                permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
-                        goals.get(0).getFloor().getBuilding().getComplex().getId(), Permission.READ);
+                permissionBean.checkPermission(goals.get(0), Permission.READ);
             }
-            return goals;
+            return convertToDtos(goals);
         }
         throw new EntityNotFoundException();
     }
+    
 
-
-    public List<Goal> findActiveByFloor(Long floorId) {
+    public List<GoalDto> findActiveByFloor(Long floorId) {
         if (floorId != null) {
             Floor floor = floorRepository.findBy(floorId);
             List<Goal> goals = goalRepository.findByFloorAndInactive(floor, false);
             if (goals.size() > 0) {
-                permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
-                        goals.get(0).getFloor().getBuilding().getComplex().getId(), Permission.READ);
+                permissionBean.checkPermission(goals.get(0), Permission.READ);
             }
-            return goals;
+            return convertToDtos(goals);
         }
         throw new EntityNotFoundException();
+    }
+
+    private List<GoalDto> convertToDtos(List<Goal> goals) {
+        List<GoalDto> goalDtos = new ArrayList<>();
+        goals.forEach((goal -> goalDtos.add(new GoalDto(goal))));
+        return goalDtos;
     }
 }

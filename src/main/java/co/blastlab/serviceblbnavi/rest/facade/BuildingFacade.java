@@ -1,12 +1,13 @@
 package co.blastlab.serviceblbnavi.rest.facade;
 
 
-import co.blastlab.serviceblbnavi.domain.Building;
+import co.blastlab.serviceblbnavi.dto.building.BuildingDto;
 import co.blastlab.serviceblbnavi.rest.facade.ext.filter.TokenAuthorization;
 import co.blastlab.serviceblbnavi.views.View;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.wordnik.swagger.annotations.*;
 
+import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import java.util.List;
@@ -16,17 +17,17 @@ import java.util.List;
 public interface BuildingFacade {
 
     @POST
-    @ApiOperation(value = "create", response = Building.class)
     @TokenAuthorization
-    Building create(@ApiParam(value = "building", required = true) Building building);
+    @ApiOperation(value = "create", response = BuildingDto.class)
+    BuildingDto create(@ApiParam(value = "building", required = true) @Valid BuildingDto.New building);
 
     @PUT
-    @ApiOperation(value = "update building", response = Building.class)
+    @TokenAuthorization
+    @ApiOperation(value = "update building", response = BuildingDto.class)
     @ApiResponses({
             @ApiResponse(code = 404, message = "complex id or complex empty or doesn't exist")
     })
-    @TokenAuthorization
-    Building update(@ApiParam(value = "building", required = true) Building building);
+    BuildingDto update(@ApiParam(value = "building", required = true) @Valid BuildingDto building);
 
     @DELETE
     @Path("/{id: \\d+}")
@@ -40,22 +41,21 @@ public interface BuildingFacade {
     @GET
     @Path("/{id: \\d+}")
     @JsonView(View.BuildingInternal.class)
-    @ApiOperation(value = "find building")
+    @ApiOperation(value = "find building", response = BuildingDto.class)
     @ApiResponses({
             @ApiResponse(code = 404, message = "building with given id wasn't found")
     })
     @TokenAuthorization
-    Building find(@PathParam("id") @ApiParam(value = "id", required = true) Long id);
+    BuildingDto find(@PathParam("id") @ApiParam(value = "id", required = true) Long id);
 
     @GET
     @Path("/complex/{id: \\d+}")
-    @JsonView(View.ComplexInternal.class)
     @ApiOperation(value = "find buildings by complex id")
     @ApiResponses({
             @ApiResponse(code = 404, message = "complex doesn't exist")
     })
     @TokenAuthorization
-    List<Building> findAll(@PathParam("id") @ApiParam(value = "complexId", required = true) Long complexId);
+    List<BuildingDto> findAll(@PathParam("id") @ApiParam(value = "complexId", required = true) Long complexId);
 
     @PUT
     @Path("/{id: \\d+}/config/")
@@ -102,5 +102,5 @@ public interface BuildingFacade {
             @ApiResponse(code = 404, message = "building doesn't exist or has no configuration saved")
     })
     @TokenAuthorization
-    Building restoreConfiguration(@PathParam("id") @ApiParam(value = "id", required = true) Long id);
+    BuildingDto restoreConfiguration(@PathParam("id") @ApiParam(value = "id", required = true) Long id);
 }

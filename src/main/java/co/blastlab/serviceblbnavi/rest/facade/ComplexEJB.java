@@ -1,6 +1,5 @@
 package co.blastlab.serviceblbnavi.rest.facade;
 
-import co.blastlab.serviceblbnavi.rest.bean.PermissionBean;
 import co.blastlab.serviceblbnavi.dao.exception.PermissionException;
 import co.blastlab.serviceblbnavi.dao.repository.ACL_ComplexRepository;
 import co.blastlab.serviceblbnavi.dao.repository.ComplexRepository;
@@ -10,14 +9,20 @@ import co.blastlab.serviceblbnavi.domain.ACL_Complex;
 import co.blastlab.serviceblbnavi.domain.Complex;
 import co.blastlab.serviceblbnavi.domain.Permission;
 import co.blastlab.serviceblbnavi.domain.Person;
+import co.blastlab.serviceblbnavi.dto.complex.ComplexDto;
 import co.blastlab.serviceblbnavi.rest.bean.AuthorizationBean;
+import co.blastlab.serviceblbnavi.rest.bean.PermissionBean;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityExistsException;
 import javax.persistence.EntityNotFoundException;
 import javax.ws.rs.core.Response;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.function.Predicate;
 
 
 @Stateless
@@ -41,73 +46,54 @@ public class ComplexEJB implements ComplexFacade {
     @Inject
     private AuthorizationBean authorizationBean;
 
-    public Complex create(Complex complex) {
-        Complex c = complexRepository.findOptionalByName(complex.getName());
-        if (c != null) {
-            throw new EntityExistsException();
-        }
-        complexRepository.saveAndFlush(complex);
-        List<ACL_Complex> aclComplexes = new ArrayList<>();
-        aclComplexes.add(new ACL_Complex(authorizationBean.getCurrentUser(), complex, permissionRepository.findByName(Permission.READ)));
-        aclComplexes.add(new ACL_Complex(authorizationBean.getCurrentUser(), complex, permissionRepository.findByName(Permission.CREATE)));
-        aclComplexes.add(new ACL_Complex(authorizationBean.getCurrentUser(), complex, permissionRepository.findByName(Permission.UPDATE)));
-        aclComplexes.add(new ACL_Complex(authorizationBean.getCurrentUser(), complex, permissionRepository.findByName(Permission.DELETE)));
-        for (ACL_Complex aclComplex : aclComplexes) {
-            aclComplexRepository.save(aclComplex);
-        }
-        complex.setPermissions(permissionBean.getPermissions(authorizationBean.getCurrentUser().getId(), complex.getId()));
-        return complex;
+    public ComplexDto create(ComplexDto complex) {
+        checkForDuplicateComplex(complex.getName(), (c) -> true);
+        Complex complexEntity = new Complex();
+        complexEntity.setName(complex.getName());
+        complexEntity = complexRepository.saveAndFlush(complexEntity);
+        aclComplexRepository.save(new ACL_Complex(authorizationBean.getCurrentUser(), complexEntity, permissionRepository.findByName(Permission.READ)));
+        aclComplexRepository.save(new ACL_Complex(authorizationBean.getCurrentUser(), complexEntity, permissionRepository.findByName(Permission.CREATE)));
+        aclComplexRepository.save(new ACL_Complex(authorizationBean.getCurrentUser(), complexEntity, permissionRepository.findByName(Permission.UPDATE)));
+        aclComplexRepository.save(new ACL_Complex(authorizationBean.getCurrentUser(), complexEntity, permissionRepository.findByName(Permission.DELETE)));
+        return new ComplexDto(complexEntity, permissionBean.getPermissions(authorizationBean.getCurrentUser().getId(), complexEntity.getId()));
     }
 
-    public Complex findByBuilding(Long id) {
+
+    public ComplexDto find(Long id) {
         if (id != null) {
-            Complex complex = complexRepository.findByBuildingId(id);
-            if (complex!= null){
-                return findBySth(complex);
+            List<String> permissions = checkPermissions(id);
+            Complex complexEntity = complexRepository.findBy(id);
+            if (complexEntity != null) {
+                return new ComplexDto(complexEntity, permissions);
             }
         }
         throw new EntityNotFoundException();
     }
 
-    public Complex findByFloor(Long id) {
+
+    public ComplexDto findComplete(Long id) {
+        return find(id);
+    }
+
+
+    public ComplexDto findByBuilding(Long id) {
         if (id != null) {
-            Complex complex = complexRepository.findByFloorId(id);
-            if (complex!= null){
-                return findBySth(complex);
+            Complex complexEntity = complexRepository.findByBuildingId(id);
+            if (complexEntity != null) {
+                List<String> permissions = checkPermissions(complexEntity.getId());
+                return new ComplexDto(complexEntity, permissions);
             }
         }
         throw new EntityNotFoundException();
     }
 
-    private Complex findBySth(Complex complex){
-        List<String> permissions = permissionBean.getPermissions(authorizationBean.getCurrentUser().getId(), complex.getId());
-        if (!permissions.contains(Permission.READ)) {
-            throw new PermissionException();
-        }
-        complex.setPermissions(permissions);
-        return complex;
-    }
 
-
-    public Complex findComplete(Long id) {
-        return findById(id);
-
-    }
-
-    public Complex find(Long id) {
-        return findById(id);
-    }
-
-    private Complex findById(Long id){
+    public ComplexDto findByFloor(Long id) {
         if (id != null) {
-            List<String> permissions = permissionBean.getPermissions(authorizationBean.getCurrentUser().getId(), id);
-            if (!permissions.contains(Permission.READ)) {
-                throw new PermissionException();
-            }
-            Complex complex = complexRepository.findBy(id);
-            if (complex != null) {
-                complex.setPermissions(permissions);
-                return complex;
+            Complex complexEntity = complexRepository.findByFloorId(id);
+            if (complexEntity != null) {
+                List<String> permissions = checkPermissions(complexEntity.getId());
+                return new ComplexDto(complexEntity, permissions);
             }
         }
         throw new EntityNotFoundException();
@@ -115,8 +101,12 @@ public class ComplexEJB implements ComplexFacade {
 
     public Response delete(Long id) {
         if (id != null) {
-            permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(), id, Permission.DELETE);
-
+            try {
+                permissionBean.checkPermission(id, Permission.DELETE);
+            } catch (PermissionException e) {
+                e.printStackTrace();
+                return Response.status(Response.Status.UNAUTHORIZED).build();
+            }
             Complex complex = complexRepository.findBy(id);
             if (complex != null) {
                 complexRepository.remove(complex);
@@ -127,44 +117,52 @@ public class ComplexEJB implements ComplexFacade {
     }
 
 
-    public List<Complex> findByPerson(Long personId) {
+    public List<ComplexDto> findByPerson(Long personId) {
         if (personId != null) {
             if (!personId.equals(authorizationBean.getCurrentUser().getId())) {
                 throw new PermissionException();
             }
             Person person = personRepository.findBy(personId);
             if (person != null) {
-                return findAllByPerson(personId);
+                List<ComplexDto> complexes = new ArrayList<>();
+                new HashSet<>(complexRepository.findAllByPerson(personId)).forEach((complexEntity -> {
+                    List<String> permissions = new ArrayList<>();
+                    complexEntity.getACL_complexes().forEach((aclComplex) -> {
+                        if (Objects.equals(aclComplex.getPerson().getId(), personId)) {
+                            permissions.add(aclComplex.getPermission().getName());
+                        }
+                    });
+                    complexes.add(new ComplexDto(complexEntity, permissions));
+                }));
+                return complexes;
             }
         }
         throw new EntityNotFoundException();
     }
 
 
-    public Complex update(Complex complex) {
-        Complex c = complexRepository.findOptionalByName(complex.getName());
-        if (c != null && !Objects.equals(c.getId(), complex.getId())) {
-            throw new EntityExistsException();
-        }
-        complexRepository.save(complex);
-        return complex;
+    public ComplexDto update(ComplexDto complex) {
+        checkForDuplicateComplex(complex.getName(), (c) -> !Objects.equals(c.getId(), complex.getId()));
+        Complex complexEntity = complexRepository.findBy(complex.getId());
+        complexEntity.setName(complex.getName());
+        complexEntity = complexRepository.save(complexEntity);
+        return new ComplexDto(complexEntity, permissionBean.getPermissions(authorizationBean.getCurrentUser().getId(), complexEntity.getId()));
     }
 
-    private List<Complex> findAllByPerson(Long personId) {
-        List<Complex> complexes = complexRepository.findAllByPerson(personId);
-        Set<Complex> complexSet = new HashSet<>(complexes);
-        complexes = new ArrayList<>(complexSet);
 
-        complexes.forEach((complex) -> {
-            List<String> permissions = new ArrayList<>();
-            complex.getACL_complexes().stream().forEach((aclComplex) -> {
-                if (Objects.equals(aclComplex.getPerson().getId(), personId)) {
-                    permissions.add(aclComplex.getPermission().getName());
-                }
-            });
-            complex.setPermissions(permissions);
-        });
+    private void checkForDuplicateComplex(String name, Predicate<Complex> additionalCondition) {
+        Complex complexEntity = complexRepository.findOptionalByName(name);
+        if (complexEntity != null && additionalCondition.test(complexEntity)) {
+            throw new EntityExistsException();
+        }
+    }
 
-        return complexes;
+
+    private List<String> checkPermissions(Long complexId) {
+        List<String> permissions = permissionBean.getPermissions(authorizationBean.getCurrentUser().getId(), complexId);
+        if (!permissions.contains(Permission.READ)) {
+            throw new PermissionException();
+        }
+        return permissions;
     }
 }

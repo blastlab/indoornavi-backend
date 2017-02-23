@@ -1,22 +1,18 @@
 package co.blastlab.serviceblbnavi.domain;
 
-import co.blastlab.serviceblbnavi.rest.facade.ext.Updatable;
-import co.blastlab.serviceblbnavi.views.View;
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonView;
+import co.blastlab.serviceblbnavi.rest.facade.ext.UpdatableEntity;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Getter
 @Setter
-@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY, setterVisibility = JsonAutoDetect.Visibility.NONE, getterVisibility = JsonAutoDetect.Visibility.NONE)
-public class Goal extends CustomIdGenerationEntity implements Serializable, Updatable {
+public class Goal extends CustomIdGenerationEntity implements Serializable, UpdatableEntity {
     private String name;
 
     private Double x;
@@ -24,24 +20,12 @@ public class Goal extends CustomIdGenerationEntity implements Serializable, Upda
     private Double y;
 
     @Column(nullable = false)
-    private Boolean inactive;
+    private boolean inactive;
 
-    @JsonIgnore
     @ManyToOne
     private Floor floor;
 
-    @JsonView({View.External.class, View.GoalInternal.class})
     @OneToMany(mappedBy = "goal", cascade = CascadeType.REMOVE)
-    private List<GoalSelection> goalSelections;
-
-    @Transient
-    private Long floorId;
-
-    @PrePersist
-    void prePersist() {
-        if (inactive == null) {
-            inactive = false;
-        }
-    }
+    private List<GoalSelection> goalSelections = new ArrayList<>();
 
 }

@@ -1,12 +1,12 @@
 package co.blastlab.serviceblbnavi.rest.facade;
 
 
-import co.blastlab.serviceblbnavi.domain.Person;
+import co.blastlab.serviceblbnavi.dto.person.PersonRequestDto;
 import co.blastlab.serviceblbnavi.rest.facade.ext.filter.TokenAuthorization;
-import co.blastlab.serviceblbnavi.views.View;
-import com.fasterxml.jackson.annotation.JsonView;
+import co.blastlab.serviceblbnavi.dto.person.PersonResponseDto;
 import com.wordnik.swagger.annotations.*;
 
+import javax.validation.Valid;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -18,26 +18,23 @@ import javax.ws.rs.Path;
 public interface PersonFacade {
 
     @POST
-    @JsonView(View.PersonInternal.class)
-    @ApiOperation(value = "register", response = Person.class)
+    @ApiOperation(value = "register", response = PersonResponseDto.class)
     @ApiResponses({
             @ApiResponse(code = 409, message = "person with given email exists")
     })
-    Person register(@ApiParam(value = "person", required = true) Person person);
+    PersonResponseDto register(@ApiParam(value = "person", required = true) @Valid PersonRequestDto person);
 
 
     @PUT
-    @JsonView(View.PersonInternal.class)
-    @ApiOperation(value = "register", response = Person.class)
+    @ApiOperation(value = "login", response = PersonResponseDto.class)
     @ApiResponses({
-            @ApiResponse(code = 404, message = "invalid login data")
+            @ApiResponse(code = 401, message = "invalid login data")
     })
-    Person login(@ApiParam(value = "person", required = true) Person person);
+    PersonResponseDto login(@ApiParam(value = "person", required = true) @Valid PersonRequestDto person);
 
     @GET
-    @JsonView(View.PersonInternal.class)
     @Path("/current")
     @ApiOperation(value = "find current user")
     @TokenAuthorization
-    Person get();
+    PersonResponseDto get();
 }

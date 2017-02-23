@@ -9,12 +9,11 @@ import co.blastlab.serviceblbnavi.domain.Building;
 import co.blastlab.serviceblbnavi.domain.BuildingConfiguration;
 import co.blastlab.serviceblbnavi.domain.Complex;
 import co.blastlab.serviceblbnavi.domain.Permission;
-import co.blastlab.serviceblbnavi.rest.bean.AuthorizationBean;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
-import javax.ws.rs.*;
+import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.core.Response;
 
 @Stateless
@@ -22,9 +21,6 @@ public class BuildingConfigurationEJB implements BuildingConfigurationFacade {
 
     @Inject
     private PermissionBean permissionBean;
-
-    @Inject
-    private AuthorizationBean authorizationBean;
 
     @Inject
     private ComplexRepository complexRepository;
@@ -42,8 +38,7 @@ public class BuildingConfigurationEJB implements BuildingConfigurationFacade {
     public Response create(String complexName, String buildingName, Integer version) {
         Complex complex = complexRepository.findOptionalByName(complexName);
         if (complex != null) {
-            permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
-                    complex.getId(), Permission.UPDATE);
+            permissionBean.checkPermission(complex.getId(), Permission.UPDATE);
             Building building = buildingRepository.findOptionalByComplexAndName(complex, buildingName);
             if (building != null) {
                 if (buildingConfigurationBean.saveConfiguration(building)) {

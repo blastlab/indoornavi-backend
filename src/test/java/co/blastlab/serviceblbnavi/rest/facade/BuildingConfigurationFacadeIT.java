@@ -4,6 +4,7 @@ import org.apache.http.HttpStatus;
 import org.junit.Test;
 
 import static io.restassured.RestAssured.given;
+
 public class BuildingConfigurationFacadeIT extends BaseIT {
 
 	private static final String BUILDING_CONFIGURATION_PATH = "/buildingConfiguration/{complexName}/{buildingName}/{version}";
