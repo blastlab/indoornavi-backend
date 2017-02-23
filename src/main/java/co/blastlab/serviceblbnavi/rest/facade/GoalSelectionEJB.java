@@ -21,7 +21,7 @@ public class GoalSelectionEJB implements GoalSelectionFacade {
 
 
     public GoalSelectionDto create(GoalSelectionDto goalSelection) {
-        Goal goal = goalRepository.find(goalSelection.getGoalId());
+        Goal goal = goalRepository.findBy(goalSelection.getGoalId());
         if (goal != null) {
             GoalSelection goalSelectionEntity = new GoalSelection();
             goalSelectionEntity.setX(goalSelection.getX());

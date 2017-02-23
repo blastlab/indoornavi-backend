@@ -1,6 +1,7 @@
 package co.blastlab.serviceblbnavi.dto.vertex;
 
 import co.blastlab.serviceblbnavi.domain.Vertex;
+import co.blastlab.serviceblbnavi.rest.facade.ext.Updatable;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,7 +15,7 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-public class VertexDto {
+public class VertexDto implements Updatable<VertexDto, Vertex> {
     public VertexDto(Vertex vertex, boolean floorUpChangeable, boolean floorDownChangeable) {
         this.setId(vertex.getId());
         this.setX(vertex.getX());
@@ -70,4 +71,9 @@ public class VertexDto {
     private List<Long> targetEdgesIds = new ArrayList<>();
 
     private List<Long> sourceEdgesIds = new ArrayList<>();
+
+    @Override
+    public VertexDto create(Vertex entity) {
+        return new VertexDto(entity);
+    }
 }

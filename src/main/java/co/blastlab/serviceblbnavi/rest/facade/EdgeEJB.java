@@ -1,6 +1,5 @@
 package co.blastlab.serviceblbnavi.rest.facade;
 
-import co.blastlab.serviceblbnavi.rest.bean.PermissionBean;
 import co.blastlab.serviceblbnavi.dao.repository.EdgeRepository;
 import co.blastlab.serviceblbnavi.dao.repository.FloorRepository;
 import co.blastlab.serviceblbnavi.dao.repository.VertexRepository;
@@ -9,6 +8,7 @@ import co.blastlab.serviceblbnavi.domain.Floor;
 import co.blastlab.serviceblbnavi.domain.Permission;
 import co.blastlab.serviceblbnavi.domain.Vertex;
 import co.blastlab.serviceblbnavi.dto.edge.EdgeDto;
+import co.blastlab.serviceblbnavi.rest.bean.PermissionBean;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
@@ -40,7 +40,7 @@ public class EdgeEJB implements EdgeFacade {
             Edge edgeEntity = new Edge();
             Vertex source = vertexRepository.findBy(edge.getSourceId());
             Vertex target = vertexRepository.findBy(edge.getTargetId());
-            if (source != null && target != null && edgeBean.findBySourceAndTarget(edge.getSourceId(), edge.getTargetId()) == null) {
+            if (source != null && target != null && edgeRepository.findOptionalBySourceAndTarget(source, target) == null) {
                 permissionBean.checkPermission(source, Permission.UPDATE);
                 edgeEntity.setWeight(edge.getWeight());
                 edgeEntity.setTarget(target);

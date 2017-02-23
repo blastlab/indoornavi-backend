@@ -1,6 +1,5 @@
 package co.blastlab.serviceblbnavi.rest.facade;
 
-import co.blastlab.serviceblbnavi.rest.bean.PermissionBean;
 import co.blastlab.serviceblbnavi.dao.exception.PermissionException;
 import co.blastlab.serviceblbnavi.dao.repository.ACL_ComplexRepository;
 import co.blastlab.serviceblbnavi.dao.repository.ComplexRepository;
@@ -12,13 +11,18 @@ import co.blastlab.serviceblbnavi.domain.Permission;
 import co.blastlab.serviceblbnavi.domain.Person;
 import co.blastlab.serviceblbnavi.dto.complex.ComplexDto;
 import co.blastlab.serviceblbnavi.rest.bean.AuthorizationBean;
+import co.blastlab.serviceblbnavi.rest.bean.PermissionBean;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityExistsException;
 import javax.persistence.EntityNotFoundException;
 import javax.ws.rs.core.Response;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.function.Predicate;
 
 
 @Stateless
@@ -160,24 +164,5 @@ public class ComplexEJB implements ComplexFacade {
             throw new PermissionException();
         }
         return permissions;
-    }
-
-
-    private List<Complex> findAllByPerson(Long personId) {
-        List<Complex> complexes = complexRepository.findAllByPerson(personId);
-        Set<Complex> complexSet = new HashSet<>(complexes);
-        complexes = new ArrayList<>(complexSet);
-
-        complexes.forEach((complex) -> {
-            List<String> permissions = new ArrayList<>();
-            complex.getACL_complexes().stream().forEach((aclComplex) -> {
-                if (Objects.equals(aclComplex.getPerson().getId(), personId)) {
-                    permissions.add(aclComplex.getPermission().getName());
-                }
-            });
-            complex.setPermissions(permissions);
-        });
-
-        return complexes;
     }
 }

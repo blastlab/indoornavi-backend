@@ -1,16 +1,12 @@
 package co.blastlab.serviceblbnavi.rest.facade.ext;
 
-import co.blastlab.serviceblbnavi.domain.Floor;
-
-public interface Updatable {
-
-    Long getFloorId();
+public interface Updatable<T, S> {
 
     Long getId();
 
-    Floor getFloor();
+    Long getFloorId();
 
-    void setFloor(Floor floor);
+    void setFloorId(Long floorId);
 
     void setX(Double x);
 
@@ -20,5 +16,7 @@ public interface Updatable {
 
     Double getY();
 
-    void setInactive(Boolean bool);
+    void setInactive(boolean bool);
+
+    T create(S entity);
 }

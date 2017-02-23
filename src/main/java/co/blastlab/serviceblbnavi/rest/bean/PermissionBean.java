@@ -2,7 +2,7 @@ package co.blastlab.serviceblbnavi.rest.bean;
 
 import co.blastlab.serviceblbnavi.dao.exception.PermissionException;
 import co.blastlab.serviceblbnavi.dao.repository.PermissionRepository;
-import co.blastlab.serviceblbnavi.domain.Permission;
+import co.blastlab.serviceblbnavi.domain.*;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
@@ -14,6 +14,9 @@ public class PermissionBean {
 
     @Inject
     private PermissionRepository permissionRepository;
+
+    @Inject
+    private AuthorizationBean authorizationBean;
 
     public List<String> getPermissions(Long personId, Long complexId) {
         List<Permission> permissions = permissionRepository.findByPersonIdAndComplexId(personId, complexId);
