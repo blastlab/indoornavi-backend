@@ -3,6 +3,8 @@ package co.blastlab.serviceblbnavi.rest.facade;
 import co.blastlab.serviceblbnavi.dao.exception.PermissionException;
 import co.blastlab.serviceblbnavi.dao.repository.PersonRepository;
 import co.blastlab.serviceblbnavi.domain.Person;
+import co.blastlab.serviceblbnavi.dto.person.PersonRequestDto;
+import co.blastlab.serviceblbnavi.dto.person.PersonResponseDto;
 import co.blastlab.serviceblbnavi.rest.bean.AuthorizationBean;
 import co.blastlab.serviceblbnavi.security.PasswordEncoder;
 
@@ -22,33 +24,33 @@ public class PersonEJB implements PersonFacade {
     private AuthorizationBean authorizationBean;
 
 
-    public Person register(Person person) {
-        Person p = personRepository.findOptionalByEmail(person.getEmail());
-        if (p != null) {
+    public PersonResponseDto register(PersonRequestDto person) {
+        Person personEntity = personRepository.findOptionalByEmail(person.getEmail());
+        if (personEntity != null) {
             throw new EntityExistsException();
         }
-        p = new Person(person.getEmail(), person.getPlainPassword());
-        p.generateAuthToken();
-        personRepository.save(p);
-        return p;
+        personEntity = new Person(person.getEmail(), person.getPlainPassword());
+        personEntity.generateAuthToken();
+        personEntity = personRepository.save(personEntity);
+        return new PersonResponseDto(personEntity);
     }
 
 
-    public Person login(Person person) {
-        Person p = personRepository.findOptionalByEmail(person.getEmail());
+    public PersonResponseDto login(PersonRequestDto person) {
+        Person personEntity = personRepository.findOptionalByEmail(person.getEmail());
 
-        if (p == null) {
+        if (personEntity == null) {
             throw new EntityNotFoundException();
         }
-
-        checkPassword(p, person.getPlainPassword());
-        generateAuthToken(p);
-        return p;
+        personEntity = new Person(person.getEmail(), person.getPlainPassword());
+        checkPassword(personEntity, person.getPlainPassword());
+        personEntity = generateAuthToken(personEntity);
+        return new PersonResponseDto(personEntity);
     }
 
 
-    public Person get() {
-        return authorizationBean.getCurrentUser();
+    public PersonResponseDto get() {
+        return new PersonResponseDto(authorizationBean.getCurrentUser());
     }
 
     private void checkPassword(Person person, String plainPassword) {
@@ -57,11 +59,10 @@ public class PersonEJB implements PersonFacade {
         }
     }
 
-    private String generateAuthToken(Person person) {
+    private Person generateAuthToken(Person person) {
         String token = PasswordEncoder.getAuthToken();
         person.setAuthToken(token);
-        personRepository.save(person);
-        return token;
+        return personRepository.save(person);
     }
 
 }

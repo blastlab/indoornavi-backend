@@ -8,6 +8,7 @@ import lombok.Setter;
 import javax.persistence.*;
 import java.io.Serializable;
 
+// TODO: remove all Json Annotations since it's not even parsed to Json at all
 @Entity
 @Getter
 @Setter

@@ -1,12 +1,13 @@
 package co.blastlab.serviceblbnavi.rest.facade;
 
 
-import co.blastlab.serviceblbnavi.domain.Waypoint;
+import co.blastlab.serviceblbnavi.dto.waypoint.WaypointDto;
 import co.blastlab.serviceblbnavi.rest.facade.ext.filter.TokenAuthorization;
 import co.blastlab.serviceblbnavi.views.View;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.wordnik.swagger.annotations.*;
 
+import javax.validation.Valid;
 import javax.ws.rs.*;
 import java.util.List;
 
@@ -16,49 +17,49 @@ import java.util.List;
 public interface WaypointFacade {
 
     @POST
-    @ApiOperation(value = "create waypoint", response = Waypoint.class)
+    @ApiOperation(value = "create waypoint", response = WaypointDto.class)
     @ApiResponses({
             @ApiResponse(code = 400, message = "invalid waypoint's data")
     })
-    Waypoint createWaypoint(@ApiParam(value = "waypoint", required = true) Waypoint waypoint);
+    WaypointDto createWaypoint(@ApiParam(value = "waypoint", required = true) @Valid WaypointDto waypoint);
 
     @PUT
-    @ApiOperation(value = "update waypoint's data", response = Waypoint.class)
+    @ApiOperation(value = "update waypoint's data", response = WaypointDto.class)
     @ApiResponses({
             @ApiResponse(code = 400, message = "invalid waypoint's data")
     })
-    Waypoint updateWaypoint(@ApiParam(value = "waypoint", required = true) Waypoint waypoint);
+    WaypointDto updateWaypoint(@ApiParam(value = "waypoint", required = true) @Valid WaypointDto waypoint);
 
     @PUT
     @Path("/coordinates")
-    @ApiOperation(value = "update waypoint's coordinates", response = Waypoint.class)
+    @ApiOperation(value = "update waypoint's coordinates", response = WaypointDto.class)
     @ApiResponses({
             @ApiResponse(code = 400, message = "invalid waypoint's data")
     })
-    Waypoint updateWaypointsCoordinates(@ApiParam(value = "waypoint", required = true) Waypoint waypoint);
+    WaypointDto updateWaypointsCoordinates(@ApiParam(value = "waypoint", required = true) @Valid WaypointDto waypoint);
 
     @GET
     @Path("/floor/{id: \\d+}/active")
-    @ApiOperation(value = "gets active waypoints by floor id", response = Waypoint.class, responseContainer = "List")
+    @ApiOperation(value = "gets active waypoints by floor id", response = WaypointDto.class, responseContainer = "List")
     @ApiResponses({
             @ApiResponse(code = 404, message = "building id was not found")
     })
-    List<Waypoint> getActiveWaypointsByFloorId(@ApiParam(value = "id", required = true) @PathParam("id") Long floorId);
+    List<WaypointDto> getActiveWaypointsByFloorId(@ApiParam(value = "id", required = true) @PathParam("id") Long floorId);
 
     @GET
     @Path("/building/{id: \\d+}")
-    @ApiOperation(value = "gets waypoints by building id", response = Waypoint.class, responseContainer = "List")
+    @ApiOperation(value = "gets waypoints by building id", response = WaypointDto.class, responseContainer = "List")
     @ApiResponses({
             @ApiResponse(code = 404, message = "building id was not found")
     })
-    List<Waypoint> getWaypointsByBuildingId(@ApiParam(value = "id", required = true) @PathParam("id") Long buildingId);
+    List<WaypointDto> getWaypointsByBuildingId(@ApiParam(value = "id", required = true) @PathParam("id") Long buildingId);
 
     @PUT
     @Path("/{id: \\d+}/deactivate")
     @JsonView(View.WaypointInternal.class)
-    @ApiOperation(value = "deactivates waypoint of given id", response = Waypoint.class)
+    @ApiOperation(value = "deactivates waypoint of given id", response = WaypointDto.class)
     @ApiResponses({
             @ApiResponse(code = 404, message = "waypoint with given id wasn't found")
     })
-    Waypoint deactivate(@ApiParam(value = "id", required = true) @PathParam("id") Long waypointId);
+    WaypointDto deactivate(@ApiParam(value = "id", required = true) @PathParam("id") Long waypointId);
 }

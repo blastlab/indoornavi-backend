@@ -1,7 +1,6 @@
 package co.blastlab.serviceblbnavi.rest.facade;
 
-import co.blastlab.serviceblbnavi.rest.bean.UpdaterBean;
-import co.blastlab.serviceblbnavi.rest.bean.PermissionBean;
+import co.blastlab.serviceblbnavi.dao.FloorBean;
 import co.blastlab.serviceblbnavi.dao.repository.BuildingRepository;
 import co.blastlab.serviceblbnavi.dao.repository.FloorRepository;
 import co.blastlab.serviceblbnavi.dao.repository.WaypointRepository;
@@ -9,7 +8,9 @@ import co.blastlab.serviceblbnavi.domain.Building;
 import co.blastlab.serviceblbnavi.domain.Floor;
 import co.blastlab.serviceblbnavi.domain.Permission;
 import co.blastlab.serviceblbnavi.domain.Waypoint;
-import co.blastlab.serviceblbnavi.rest.bean.AuthorizationBean;
+import co.blastlab.serviceblbnavi.dto.waypoint.WaypointDto;
+import co.blastlab.serviceblbnavi.rest.bean.PermissionBean;
+import co.blastlab.serviceblbnavi.rest.bean.UpdaterBean;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
@@ -19,10 +20,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Stateless
-public class WaypointEJB extends UpdaterBean<Waypoint> implements WaypointFacade {
+public class WaypointEJB extends UpdaterBean<WaypointDto, Waypoint> implements WaypointFacade {
 
     @Inject
-    private WaypointRepository waypointRepository;
+    private FloorBean floorBean;
 
     @Inject
     private FloorRepository floorRepository;
@@ -31,78 +32,95 @@ public class WaypointEJB extends UpdaterBean<Waypoint> implements WaypointFacade
     private PermissionBean permissionBean;
 
     @Inject
-    private AuthorizationBean authorizationBean;
-
-    @Inject
     private BuildingRepository buildingRepository;
 
+    @Inject
+    private WaypointRepository waypointRepository;
 
-    public Waypoint createWaypoint(Waypoint waypoint) {
-        return this.create(waypoint, waypointRepository);
+
+    public WaypointDto createWaypoint(WaypointDto waypoint) {
+        Floor floor = floorRepository.findBy(waypoint.getFloorId());
+        if (floor != null) {
+            permissionBean.checkPermission(floor, Permission.UPDATE);
+            Waypoint waypointEntity = new Waypoint();
+            waypointEntity.setInactive(waypoint.isInactive());
+            waypointEntity.setY(waypoint.getY());
+            waypointEntity.setX(waypoint.getX());
+            waypointEntity.setDistance(waypoint.getDistance());
+            waypointEntity.setTimeToCheckout(waypoint.getTimeToCheckout());
+            waypointEntity.setDetails(waypoint.getDetails());
+            waypointEntity.setName(waypoint.getName());
+            waypointEntity.setFloor(floor);
+            waypointEntity = waypointRepository.save(waypointEntity);
+            return new WaypointDto(waypointEntity);
+        }
+        throw new BadRequestException();
     }
+    
 
-
-    public Waypoint updateWaypoint(Waypoint newWaypoint) {
-        if (newWaypoint.getId() != null) {
-            Waypoint waypointInDB = waypointRepository.findBy(newWaypoint.getId());
-            if (waypointInDB != null) {
-                permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
-                        waypointInDB.getFloor().getBuilding().getComplex().getId(), Permission.UPDATE);
-                waypointInDB.setName(newWaypoint.getName());
-                waypointInDB.setDetails(newWaypoint.getDetails());
-                waypointInDB.setDistance(newWaypoint.getDistance());
-                waypointInDB.setTimeToCheckout(newWaypoint.getTimeToCheckout());
-                waypointInDB.setX(newWaypoint.getX());
-                waypointInDB.setY(newWaypoint.getY());
-                waypointRepository.save(waypointInDB);
-                return waypointInDB;
+    public WaypointDto updateWaypoint(WaypointDto waypoint) {
+        if (waypoint.getId() != null) {
+            Waypoint waypointEntity = waypointRepository.findBy(waypoint.getId());
+            if (waypointEntity != null) {
+                permissionBean.checkPermission(waypointEntity, Permission.UPDATE);
+                waypointEntity.setName(waypoint.getName());
+                waypointEntity.setDetails(waypoint.getDetails());
+                waypointEntity.setDistance(waypoint.getDistance());
+                waypointEntity.setTimeToCheckout(waypoint.getTimeToCheckout());
+                waypointEntity.setX(waypoint.getX());
+                waypointEntity.setY(waypoint.getY());
+                waypointEntity = waypointRepository.save(waypointEntity);
+                return new WaypointDto(waypointEntity);
             }
             throw new EntityNotFoundException();
         }
         throw new BadRequestException();
     }
+    
 
-
-    public Waypoint updateWaypointsCoordinates(Waypoint waypoint) {
-        return this.updateCoordinates(waypoint, waypointRepository);
+    public WaypointDto updateWaypointsCoordinates(WaypointDto waypoint) {
+        return super.updateCoordinates(waypoint, waypointRepository);
     }
 
 
-    public List<Waypoint> getActiveWaypointsByFloorId(Long floorId) {
+    public List<WaypointDto> getActiveWaypointsByFloorId(Long floorId) {
         if (floorId != null) {
             Floor floor = floorRepository.findBy(floorId);
             if (floor != null) {
-                permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
-                        floor.getBuilding().getComplex().getId(), Permission.READ);
-                List<Waypoint> waypoints = waypointRepository.findByFloorAndInactive(floor, false);
-                return waypoints;
+                permissionBean.checkPermission(floor, Permission.READ);
+                List<Waypoint> waypoints = waypointRepository.findByFloor(floor);
+                return convertToDtos(waypoints);
             }
         }
         throw new EntityNotFoundException();
     }
 
 
-    public List<Waypoint> getWaypointsByBuildingId(Long buildingId) {
+    public List<WaypointDto> getWaypointsByBuildingId(Long buildingId) {
         if (buildingId != null) {
             Building building = buildingRepository.findBy(buildingId);
             if (building != null) {
-                permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
-                        building.getComplex().getId(), Permission.READ);
-
-                List<Floor> floors = floorRepository.findByBuilding(building);
+                permissionBean.checkPermission(building, Permission.READ);
                 List<Waypoint> waypoints = new ArrayList<>();
-                floors.stream().forEach((floor) -> {
-                    waypoints.addAll(waypointRepository.findByFloor(floor));
-                });
-                return waypoints;
+                building.getFloors().forEach(floor -> waypoints.addAll(waypointRepository.findByFloor(floor)));
+                return convertToDtos(waypoints);
             }
             throw new EntityNotFoundException();
         }
         throw new EntityNotFoundException();
     }
+    
+
+    public WaypointDto deactivate(Long waypointId) {
+        WaypointDto waypoint = new WaypointDto();
+        waypoint.setId(waypointId);
+        return super.deactivate(waypoint, waypointRepository);
+    }
 
 
-    public Waypoint deactivate(Long waypointId) {
-        return this.deactivate(waypointId, waypointRepository);
+    private List<WaypointDto> convertToDtos(List<Waypoint> waypoints) {
+        List<WaypointDto> dtos = new ArrayList<>();
+        waypoints.forEach(waypoint -> dtos.add(new WaypointDto(waypoint)));
+        return dtos;
     }
 }

@@ -11,7 +11,7 @@ abstract class BaseIT extends RestAssuredIT {
 	static final String VALIDATION_ERROR_NAME = "constraint_violation";
 	static final String MALFORMED_DATA_NAME = "malformed_data";
 
-	protected RequestSpecification givenUser() {
+	RequestSpecification givenUser() {
 		return RestAssured.given().header("auth_token", "TestToken");
 	}
 }

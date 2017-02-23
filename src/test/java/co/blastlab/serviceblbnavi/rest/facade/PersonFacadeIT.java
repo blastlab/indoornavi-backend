@@ -14,7 +14,7 @@ public class PersonFacadeIT extends BaseIT {
 	private static final String GET_CURRENT_USER_PATH = "/person/current";
 	private static final String TEST_EMAIL = "yzzncgnghnbfzzzfghdghdfhff@abcd.com";
 	private static final String TEST_EMAIL_FOR_NEW_PERSON = "aaasss@abcd.com";
-	private static final String NONEEXISTING_PERSON = "zzzzzzzzzzzz@abcd.com";
+	private static final String NON_EXISTING_PERSON = "zzzzzzzzzzzz@abcd.com";
 	private static final String TEST_MAIL_AND_GET = "aaabbbvvv@abcd.com";
 	private static final String EXISTING_EMAIL = "abcd@efg.hij";
 	private static final String EXISTING_PASSWORD = "start123";
@@ -60,12 +60,30 @@ public class PersonFacadeIT extends BaseIT {
 		given()
 			.body(body)
 			.when().post(USER_PATH)
-			.then().statusCode(HttpStatus.SC_OK)
+			.then().statusCode(HttpStatus.SC_BAD_REQUEST)
 			.body(
-				"id", greaterThan(0),
-				"email", equalTo(TEST_EMAIL_FOR_NEW_PERSON),
-				"authToken", notNullValue()
+				"violations.size()", is(1),
+				"violations.get(0).path", is("arg0.plainPassword"),
+				"error", equalTo("constraint_violation")
 			);
+	}
+
+	@Test
+	public void createPersonWithInvalidEmail() {
+		String body = new RequestBodyBuilder("UserRegistration.json")
+				.setParameter("email", "INVALID")
+				.setParameter("plainPassword", "12345")
+				.build();
+
+		given()
+				.body(body)
+				.when().post(USER_PATH)
+				.then().statusCode(HttpStatus.SC_BAD_REQUEST)
+				.body(
+						"violations.size()", is(1),
+						"violations.get(0).path", is("arg0.email"),
+						"error", equalTo("constraint_violation")
+				);
 	}
 
 	@Test
@@ -118,7 +136,7 @@ public class PersonFacadeIT extends BaseIT {
 	@Test
 	public void tryToLoginWithNoneexistingPerson() {
 		String body = new RequestBodyBuilder("UserRegistration.json")
-			.setParameter("email", NONEEXISTING_PERSON)
+			.setParameter("email", NON_EXISTING_PERSON)
 			.build();
 
 		given()
@@ -168,5 +186,12 @@ public class PersonFacadeIT extends BaseIT {
 			.body(body)
 			.when().put(USER_PATH)
 			.then().statusCode(HttpStatus.SC_UNAUTHORIZED);//TODO:
+	}
+
+	@Test
+	public void loginWithoutParameters() {
+		String body = new RequestBodyBuilder("Empty.json").build();
+
+		given().body(body).when().put(USER_PATH).then().statusCode(HttpStatus.SC_BAD_REQUEST);
 	}
 }

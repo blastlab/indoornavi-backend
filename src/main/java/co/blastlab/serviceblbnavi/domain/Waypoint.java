@@ -1,22 +1,18 @@
 package co.blastlab.serviceblbnavi.domain;
 
-import co.blastlab.serviceblbnavi.rest.facade.ext.Updatable;
-import co.blastlab.serviceblbnavi.views.View;
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonView;
+import co.blastlab.serviceblbnavi.rest.facade.ext.UpdatableEntity;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Getter
 @Setter
-@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY, setterVisibility = JsonAutoDetect.Visibility.NONE, getterVisibility = JsonAutoDetect.Visibility.NONE)
-public class Waypoint extends CustomIdGenerationEntity implements Serializable, Updatable {
+public class Waypoint extends CustomIdGenerationEntity implements Serializable, UpdatableEntity {
 
     private Double x;
 
@@ -28,26 +24,14 @@ public class Waypoint extends CustomIdGenerationEntity implements Serializable, 
 
     private String details;
 
-    private Boolean inactive;
+    private boolean inactive;
 
     private String name;
 
-    @Transient
-    private Long floorId;
-
-    @JsonIgnore
     @ManyToOne
     @JoinColumn(updatable = false)
     private Floor floor;
 
-    @JsonView({View.External.class, View.WaypointInternal.class})
     @OneToMany(mappedBy = "waypoint", cascade = CascadeType.REMOVE)
-    private List<WaypointVisit> waypointVisits;
-
-    @PrePersist
-    void prePersist() {
-        if (inactive == null) {
-            inactive = false;
-        }
-    }
+    private List<WaypointVisit> waypointVisits = new ArrayList<>();
 }

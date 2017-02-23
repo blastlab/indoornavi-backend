@@ -15,8 +15,6 @@ public abstract class VertexRepository implements EntityRepository<Vertex, Long>
     public abstract List<Vertex> findByFloor(Floor floor);
 
     public void save(List<Vertex> vertices) {
-        vertices.stream().forEach((v) -> {
-            this.save(v);
-        });
+        vertices.forEach(this::save);
     }
 }

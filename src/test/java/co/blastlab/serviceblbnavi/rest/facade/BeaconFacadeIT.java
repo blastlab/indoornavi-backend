@@ -1,15 +1,18 @@
 package co.blastlab.serviceblbnavi.rest.facade;
 
 import co.blastlab.serviceblbnavi.rest.facade.util.RequestBodyBuilder;
+import co.blastlab.serviceblbnavi.rest.facade.util.violation.ViolationResponse;
 import org.apache.http.HttpStatus;
 import org.junit.Test;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Vector;
 
+import static co.blastlab.serviceblbnavi.rest.facade.util.violation.ViolationMatcher.validViolation;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.core.Is.is;
 
 public class BeaconFacadeIT extends BaseIT {
 
@@ -44,8 +47,6 @@ public class BeaconFacadeIT extends BaseIT {
 	private static final Integer TEST_MAJOR_3 = 4;
 
 	private static final List<Integer> TEST_MAJORS = Arrays.asList(56,777);
-
-
 
 	@Test
 	public void createNewBeacon() {
@@ -149,5 +150,53 @@ public class BeaconFacadeIT extends BaseIT {
 				"minor", equalTo(TEST_MINORS),
 				"major", equalTo(TEST_MAJORS)
 			);
+	}
+
+	@Test
+	public void shouldValidateEmptyBodyWhenCreatingBeacon() {
+		String body = new RequestBodyBuilder("Empty.json")
+				.build();
+
+		ViolationResponse violationResponse = givenUser()
+				.body(body)
+				.when().post(BEACON_PATH)
+				.then().statusCode(HttpStatus.SC_BAD_REQUEST)
+				.extract()
+				.as(ViolationResponse.class);
+
+		assertThat(violationResponse.getError(), is(VALIDATION_ERROR_NAME));
+		assertThat(violationResponse.getViolations().size(), is(7));
+		assertViolations(violationResponse);
+	}
+
+	@Test
+	public void shouldValidateEmptyBodyWhenUpdatingBeacon() {
+		String body = new RequestBodyBuilder("Empty.json")
+				.build();
+
+		ViolationResponse violationResponse = givenUser()
+				.body(body)
+				.when().put(BEACON_PATH)
+				.then().statusCode(HttpStatus.SC_BAD_REQUEST)
+				.extract()
+				.as(ViolationResponse.class);
+
+		assertThat(violationResponse.getError(), is(VALIDATION_ERROR_NAME));
+		assertThat(violationResponse.getViolations().size(), is(7));
+		assertViolations(violationResponse);
+	}
+
+	private void assertViolations(ViolationResponse violationResponse) {
+		assertThat(violationResponse.getViolations(),
+				containsInAnyOrder(
+						validViolation("mac", "may not be null"),
+						validViolation("x", "may not be null"),
+						validViolation("y", "may not be null"),
+						validViolation("z", "may not be null"),
+						validViolation("minor", "may not be null"),
+						validViolation("major", "may not be null"),
+						validViolation("floorId", "may not be null")
+				)
+		);
 	}
 }

@@ -1,9 +1,9 @@
 package co.blastlab.serviceblbnavi.rest.bean;
 
 import co.blastlab.serviceblbnavi.dao.repository.FloorRepository;
-import co.blastlab.serviceblbnavi.domain.Floor;
 import co.blastlab.serviceblbnavi.domain.Permission;
 import co.blastlab.serviceblbnavi.rest.facade.ext.Updatable;
+import co.blastlab.serviceblbnavi.rest.facade.ext.UpdatableEntity;
 import org.apache.deltaspike.data.api.EntityRepository;
 
 import javax.ejb.Stateless;
@@ -12,10 +12,10 @@ import javax.persistence.EntityNotFoundException;
 import javax.ws.rs.BadRequestException;
 
 @Stateless
-public abstract class UpdaterBean<T extends Updatable> {
+public abstract class UpdaterBean<T extends Updatable, S extends UpdatableEntity> {
 
     @Inject
-    private FloorRepository floorRepository;  //<T, Long>
+    private FloorRepository floorRepository;
 
     @Inject
     private AuthorizationBean authorizationBean;
@@ -23,45 +23,28 @@ public abstract class UpdaterBean<T extends Updatable> {
     @Inject
     private PermissionBean permissionBean;
 
-    public T create(T entity, EntityRepository repository) {
-        if (entity.getFloorId() != null) {
-            Floor floor = floorRepository.findBy(entity.getFloorId());
-            if (floor != null) {
-                permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
-                        floor.getBuilding().getComplex().getId(), Permission.UPDATE);
-                entity.setFloor(floor);
-                repository.save(entity);
-                return entity;
+    protected T updateCoordinates(T dto, EntityRepository<S, Long> repository) {
+        if (dto.getId() != null) {
+            S entity = repository.findBy(dto.getId());
+            if (entity != null) {
+                permissionBean.checkPermission(dto.getFloorId(), Permission.UPDATE);
+                entity.setX(dto.getX());
+                entity.setY(dto.getY());
+                entity = repository.save(entity);
+                return (T) dto.create(entity);
             }
             throw new EntityNotFoundException();
         }
         throw new BadRequestException();
     }
 
-    public T updateCoordinates(T entity, EntityRepository<T, Long> repository) {
-        if (entity.getId() != null) {
-            T entityInDB = repository.findBy(entity.getId());
-            if (entityInDB != null) {
-                permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
-                        entityInDB.getFloor().getBuilding().getComplex().getId(), Permission.UPDATE);
-                entityInDB.setX(entity.getX());
-                entityInDB.setY(entity.getY());
-                repository.save(entityInDB);
-                return entityInDB;
-            }
-            throw new EntityNotFoundException();
-        }
-        throw new BadRequestException();
-    }
-
-    public T deactivate(Long id, EntityRepository<T, Long> repository) {
-        T entity = repository.findBy(id);
+    protected T deactivate(T dto, EntityRepository<S, Long> repository) {
+        S entity = repository.findBy(dto.getId());
         if (entity != null) {
-            permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
-                    entity.getFloor().getBuilding().getComplex().getId(), Permission.UPDATE);
+            permissionBean.checkPermission(entity.getFloor().getBuilding().getComplex().getId(), Permission.UPDATE);
             entity.setInactive(true);
             repository.save(entity);
-            return entity;
+            return (T) dto.create(entity);
         }
         throw new EntityNotFoundException();
     }

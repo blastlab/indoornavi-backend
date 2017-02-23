@@ -3,5 +3,6 @@
   "level": "{level}",
   "bitmapWidth": "{bitmapWidth:6}",
   "bitmapHeight": "{bitmapHeight:0}",
-  "buildingId": "{buildingId}"
+  "buildingId": "{buildingId}",
+  "startZoom": "{startZoom:2}"
 }

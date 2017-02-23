@@ -2,7 +2,7 @@
   "x": "{x:10}",
   "y": "{y:11}",
   "inactive": "{inactive}",
-  "isFloorDownChangeable": "{isFloorDownChangeable}",
-  "isFloorUpChangeable": "{isFloorUpChangeable}",
+  "floorDownChangeable": "{isFloorDownChangeable}",
+  "floorUpChangeable": "{isFloorUpChangeable}",
   "floorId": "{floorId:2}"
 }

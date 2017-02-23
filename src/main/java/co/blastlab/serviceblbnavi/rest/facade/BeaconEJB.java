@@ -6,12 +6,13 @@ import co.blastlab.serviceblbnavi.dao.repository.FloorRepository;
 import co.blastlab.serviceblbnavi.domain.Beacon;
 import co.blastlab.serviceblbnavi.domain.Floor;
 import co.blastlab.serviceblbnavi.domain.Permission;
-import co.blastlab.serviceblbnavi.rest.bean.AuthorizationBean;
+import co.blastlab.serviceblbnavi.dto.beacon.BeaconDto;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
 import javax.ws.rs.core.Response;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -27,35 +28,21 @@ public class BeaconEJB implements BeaconFacade {
     @Inject
     private PermissionBean permissionBean;
 
-    @Inject
-    private AuthorizationBean authorizationBean;
-
-
-    public Beacon create(Beacon beacon) {
-        if (beacon.getFloorId() != null) {
-            Floor floor = floorRepository.findBy(beacon.getFloorId());
-            if (floor != null) {
-                return createOrUpdate(beacon, floor);
-            }
+    public BeaconDto create(BeaconDto beacon) {
+        Floor floor = floorRepository.findBy(beacon.getFloorId());
+        if (floor != null) {
+            Beacon beaconEntity = new Beacon();
+            return createOrUpdate(beaconEntity, beacon, floor);
         }
         throw new EntityNotFoundException();
     }
 
-    private Beacon createOrUpdate(Beacon beacon, Floor floor) {
-        permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
-                floor.getBuilding().getComplex().getId(), Permission.UPDATE);
-        beacon.setFloor(floor);
-        beaconRepository.save(beacon);
-        return beacon;
-    }
 
-
-    public Beacon find(Long id) {
-        Beacon beacon = beaconRepository.findBy(id);
-        if (beacon != null) {
-            permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
-                    beacon.getFloor().getBuilding().getComplex().getId(), Permission.READ);
-            return beacon;
+    public BeaconDto find(Long id) {
+        Beacon beaconEntity = beaconRepository.findBy(id);
+        if (beaconEntity != null) {
+            permissionBean.checkPermission(beaconEntity, Permission.READ);
+            return new BeaconDto(beaconEntity);
         }
         throw new EntityNotFoundException();
     }
@@ -64,8 +51,7 @@ public class BeaconEJB implements BeaconFacade {
     public Response delete(Long id) {
         Beacon beacon = beaconRepository.findBy(id);
         if (beacon != null) {
-            permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
-                    beacon.getFloor().getBuilding().getComplex().getId(), Permission.UPDATE);
+            permissionBean.checkPermission(beacon, Permission.UPDATE);
             beaconRepository.remove(beacon);
             return Response.ok().build();
         }
@@ -73,26 +59,39 @@ public class BeaconEJB implements BeaconFacade {
     }
 
 
-    public Beacon update(Beacon beacon) {
-        if (beacon.getFloorId() != null) {
-            Floor floor = floorRepository.findBy(beacon.getFloorId());
-            if (floor != null) {
-                return createOrUpdate(beacon, floor);
-            }
+    public BeaconDto update(BeaconDto beacon) {
+        Floor floor = floorRepository.findBy(beacon.getFloorId());
+        if (floor != null) {
+            Beacon beaconEntity = beaconRepository.findBy(beacon.getId());
+            return createOrUpdate(beaconEntity, beacon, floor);
         }
         throw new EntityNotFoundException();
     }
 
 
-    public List<Beacon> findAll(Long floorId) {
+    public List<BeaconDto> findAll(Long floorId) {
         if (floorId != null) {
             Floor floor = floorRepository.findBy(floorId);
             if (floor != null) {
-                permissionBean.checkPermission(authorizationBean.getCurrentUser().getId(),
-                        floor.getBuilding().getComplex().getId(), Permission.READ);
-                return beaconRepository.findByFloor(floor);
+                permissionBean.checkPermission(floor, Permission.READ);
+                List<BeaconDto> beacons = new ArrayList<>();
+                beaconRepository.findByFloor(floor).forEach((beaconEntity -> beacons.add(new BeaconDto(beaconEntity))));
+                return beacons;
             }
         }
         throw new EntityNotFoundException();
+    }
+
+    private BeaconDto createOrUpdate(Beacon beaconEntity, BeaconDto beacon, Floor floor) {
+        permissionBean.checkPermission(floor, Permission.UPDATE);
+        beaconEntity.setX(beacon.getX());
+        beaconEntity.setY(beacon.getY());
+        beaconEntity.setZ(beacon.getZ());
+        beaconEntity.setFloor(floor);
+        beaconEntity.setMac(beacon.getMac());
+        beaconEntity.setMinor(beacon.getMinor());
+        beaconEntity.setMajor(beacon.getMajor());
+        beaconEntity = beaconRepository.save(beaconEntity);
+        return new BeaconDto(beaconEntity);
     }
 }
