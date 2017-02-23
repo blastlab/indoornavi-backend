@@ -17,7 +17,7 @@ public interface BuildingFacade {
 
     @POST
     @ApiOperation(value = "create", response = BuildingDto.class)
-    BuildingDto create(@ApiParam(value = "building", required = true) @Valid BuildingDto building);
+    BuildingDto create(@ApiParam(value = "building", required = true) @Valid BuildingDto.New building);
 
     @PUT
     @ApiOperation(value = "update building", response = BuildingDto.class)

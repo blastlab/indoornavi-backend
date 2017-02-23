@@ -4,7 +4,6 @@
     "level": "{level_1:5}",
     "bitmapWidth": "{bitmapWidth_1:60}",
     "bitmapHeight": "{bitmapHeight_1:70}",
-    "mtoPix": "{mtoPix:2}",
     "startZoom": "{startZoom:2}",
     "buildingId": "{buildingId:2}"
   },
@@ -13,7 +12,6 @@
     "level": "{level_2:9}",
     "bitmapWidth": "{bitmapWidth_2:60}",
     "bitmapHeight": "{bitmapHeight_2:80}",
-    "mtoPix": "{mtoPix:2}",
     "startZoom": "{startZoom:2}",
     "buildingId": "{buildingId:2}"
   }

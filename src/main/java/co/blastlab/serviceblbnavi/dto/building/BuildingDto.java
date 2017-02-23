@@ -1,6 +1,7 @@
 package co.blastlab.serviceblbnavi.dto.building;
 
 import co.blastlab.serviceblbnavi.domain.Building;
+import co.blastlab.serviceblbnavi.dto.floor.FloorDto;
 import co.blastlab.serviceblbnavi.views.View;
 import com.fasterxml.jackson.annotation.JsonView;
 import lombok.Getter;
@@ -23,8 +24,7 @@ public class BuildingDto {
         this.setName(building.getName());
         this.setMinimumFloor(building.getMinimumFloor());
         this.setDegree(building.getDegree());
-        this.setComplexId(building.getComplex().getId());
-        building.getFloors().forEach((floor -> this.getFloorsIds().add(floor.getId())));
+        building.getFloors().forEach((floor -> this.getFloors().add(new FloorDto(floor))));
         building.getBuildingConfigurations().forEach((buildingConfiguration -> this.getBuildingConfigurationsIds().add(buildingConfiguration.getId())));
     }
 
@@ -42,12 +42,22 @@ public class BuildingDto {
     @Max(360)
     private Double degree;
 
-    @NotNull
-    private Long complexId;
-
     @JsonView({View.BuildingInternal.class})
-    private List<Long> floorsIds = new ArrayList<>();
+    private List<FloorDto> floors = new ArrayList<>();
 
     @JsonView({View.BuildingInternal.class})
     private List<Long> buildingConfigurationsIds = new ArrayList<>();
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    public static class New extends BuildingDto {
+        @NotNull
+        private Long complexId;
+
+        public New(Building building) {
+            super(building);
+            this.setComplexId(building.getComplex() != null ? building.getComplex().getId() : null);
+        }
+    }
 }

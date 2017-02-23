@@ -115,8 +115,8 @@ public class GoalEJB implements GoalFacade {
             List<Goal> goals = goalBean.findAllByBuildingId(buildingId);
             if (goals.size() > 0) {
                 permissionBean.checkPermission(goals.get(0), Permission.READ);
-                return convertToDtos(goals);
             }
+            return convertToDtos(goals);
         }
         throw new EntityNotFoundException();
     }
@@ -127,8 +127,8 @@ public class GoalEJB implements GoalFacade {
             List<Goal> goals = goalBean.findAllByFloorId(floorId);
             if (goals.size() > 0) {
                 permissionBean.checkPermission(goals.get(0), Permission.READ);
-                return convertToDtos(goals);
             }
+            return convertToDtos(goals);
         }
         throw new EntityNotFoundException();
     }
@@ -139,8 +139,8 @@ public class GoalEJB implements GoalFacade {
             List<Goal> goals = goalBean.findActiveByFloorId(floorId);
             if (goals.size() > 0) {
                 permissionBean.checkPermission(goals.get(0), Permission.READ);
-                return convertToDtos(goals);
             }
+            return convertToDtos(goals);
         }
         throw new EntityNotFoundException();
     }

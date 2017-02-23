@@ -34,7 +34,7 @@ public class BuildingEJB implements BuildingFacade {
     @Inject
     private BuildingConfigurationBean buildingConfigurationBean;
 
-    public BuildingDto create(BuildingDto building) {
+    public BuildingDto create(BuildingDto.New building) {
         permissionBean.checkPermission(building.getComplexId(), Permission.UPDATE);
         Complex complex = complexRepository.findBy(building.getComplexId());
         if (complex != null) {
