@@ -1,6 +1,7 @@
 package co.blastlab.serviceblbnavi.dto.goal;
 
 import co.blastlab.serviceblbnavi.domain.Goal;
+import co.blastlab.serviceblbnavi.rest.facade.ext.Updatable;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -13,7 +14,7 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-public class GoalDto {
+public class GoalDto implements Updatable<GoalDto, Goal> {
     public GoalDto(Goal goal) {
         this.setId(goal.getId());
         this.setName(goal.getName());
@@ -44,4 +45,9 @@ public class GoalDto {
     private Long floorId;
 
     private List<Long> goalSelectionsIds;
+
+    @Override
+    public GoalDto create(Goal entity) {
+        return new GoalDto(entity);
+    }
 }

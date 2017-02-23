@@ -1,7 +1,5 @@
 package co.blastlab.serviceblbnavi.rest.facade;
 
-import co.blastlab.serviceblbnavi.dao.PermissionBean;
-import co.blastlab.serviceblbnavi.dao.VertexBean;
 import co.blastlab.serviceblbnavi.dao.repository.FloorRepository;
 import co.blastlab.serviceblbnavi.dao.repository.VertexRepository;
 import co.blastlab.serviceblbnavi.domain.Floor;
@@ -9,6 +7,8 @@ import co.blastlab.serviceblbnavi.domain.Permission;
 import co.blastlab.serviceblbnavi.domain.Vertex;
 import co.blastlab.serviceblbnavi.dto.vertex.VertexDto;
 import co.blastlab.serviceblbnavi.rest.bean.AuthorizationBean;
+import co.blastlab.serviceblbnavi.rest.bean.PermissionBean;
+import co.blastlab.serviceblbnavi.rest.bean.UpdaterBean;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
@@ -19,10 +19,7 @@ import java.util.List;
 
 
 @Stateless
-public class VertexEJB implements VertexFacade {
-
-    @Inject
-    private VertexBean vertexBean;
+public class VertexEJB extends UpdaterBean<VertexDto, Vertex> implements VertexFacade {
 
     @Inject
     private VertexRepository vertexRepository;
@@ -46,7 +43,7 @@ public class VertexEJB implements VertexFacade {
             vertexEntity.setY(vertex.getY());
             vertexEntity.setFloor(floor);
             vertexEntity.setInactive(vertex.isInactive());
-            vertexRepository.save(vertexEntity);
+            vertexEntity = vertexRepository.save(vertexEntity);
             return new VertexDto(vertexEntity, vertex.isFloorUpChangeable(), vertex.isFloorDownChangeable());
         }
         throw new EntityNotFoundException();
@@ -54,11 +51,9 @@ public class VertexEJB implements VertexFacade {
 
 
     public Response delete(Long id) {
-        Vertex vertex = vertexBean.find(id);
-        //Vertex vertex = vertexRepository.findOptionalBy(id);
+        Vertex vertex = vertexRepository.findBy(id);
         if (vertex != null) {
             permissionBean.checkPermission(vertex, Permission.UPDATE);
-            //vertexBean.delete(vertex);
             vertexRepository.removeAndFlush(vertex);
             return Response.ok().build();
         }
@@ -68,26 +63,14 @@ public class VertexEJB implements VertexFacade {
 
 
     public VertexDto update(VertexDto vertex) {
-        // TODO: System.out.println rly? is it for debug purpose or logging? anyway it's wrong and it should be addressed
-        System.out.println(vertex.getId() + " " + vertex.getX() + " " + vertex.getY());
-        if (vertex.getId() != null) {
-            Vertex vertexEntity = vertexBean.find(vertex.getId());
-            //Vertex v = vertexRepository.findOptionalBy(vertex.getId());
-            if (vertexEntity != null) {
-                permissionBean.checkPermission(vertexEntity, Permission.UPDATE);
-                vertexEntity.setX(vertex.getX());
-                vertexEntity.setY(vertex.getY());
-                vertexBean.update(vertexEntity);
-                return new VertexDto(vertexEntity);
-            }
-        }
-        throw new EntityNotFoundException();
+        return super.updateCoordinates(vertex, vertexRepository);
     }
 
 
     public List<VertexDto> findByFloor(Long floorId) {
         if (floorId != null) {
-            List<Vertex> vertices = vertexBean.findAll(floorId);
+            Floor floor = floorRepository.findBy(floorId);
+            List<Vertex> vertices = vertexRepository.findByFloor(floor);
             if (vertices.size() > 0) {
                 permissionBean.checkPermission(vertices.get(0), Permission.READ);
             }
@@ -99,7 +82,8 @@ public class VertexEJB implements VertexFacade {
 
     public List<VertexDto> findAllActiveByFloor(Long floorId) {
         if (floorId != null) {
-            List<Vertex> vertices = vertexBean.findAllActive(floorId);
+            Floor floor = floorRepository.findBy(floorId);
+            List<Vertex> vertices = vertexRepository.findByFloorAndInactive(floor, false);
             if (vertices.size() > 0) {
                 permissionBean.checkPermission(vertices.get(0), Permission.READ);
             }
@@ -111,7 +95,7 @@ public class VertexEJB implements VertexFacade {
 
     public VertexDto findById(Long vertexId) {
         if (vertexId != null) {
-            Vertex vertex = vertexBean.find(vertexId);
+            Vertex vertex = vertexRepository.findBy(vertexId);
             if (vertex != null) {
                 permissionBean.checkPermission(vertex, Permission.READ);
                 vertex.setFloor(vertex.getFloor());
@@ -123,13 +107,9 @@ public class VertexEJB implements VertexFacade {
 
 
     public VertexDto deactivate(Long vertexId) {
-        Vertex vertex = vertexBean.find(vertexId);
-        if (vertex != null) {
-            permissionBean.checkPermission(vertex, Permission.UPDATE);
-            vertexBean.deactivate(vertex);
-            return new VertexDto(vertex);
-        }
-        throw new EntityNotFoundException();
+        VertexDto vertex = new VertexDto();
+        vertex.setId(vertexId);
+        return super.deactivate(vertex, vertexRepository);
     }
 
 

@@ -1,6 +1,7 @@
 package co.blastlab.serviceblbnavi.dto.waypoint;
 
 import co.blastlab.serviceblbnavi.domain.Waypoint;
+import co.blastlab.serviceblbnavi.rest.facade.ext.Updatable;
 import co.blastlab.serviceblbnavi.views.View;
 import com.fasterxml.jackson.annotation.JsonView;
 import lombok.Getter;
@@ -14,7 +15,7 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-public class WaypointDto {
+public class WaypointDto implements Updatable<WaypointDto, Waypoint> {
     public WaypointDto(Waypoint waypoint) {
         this.setId(waypoint.getId());
         this.setX(waypoint.getX());
@@ -58,4 +59,9 @@ public class WaypointDto {
 
     @JsonView({View.WaypointInternal.class})
     private List<Long> waypointVisitsIds;
+
+    @Override
+    public WaypointDto create(Waypoint entity) {
+        return new WaypointDto(entity);
+    }
 }

@@ -1,7 +1,5 @@
 package co.blastlab.serviceblbnavi.rest.facade;
 
-import co.blastlab.serviceblbnavi.rest.bean.BuildingConfigurationBean;
-import co.blastlab.serviceblbnavi.rest.bean.PermissionBean;
 import co.blastlab.serviceblbnavi.dao.repository.BuildingConfigurationRepository;
 import co.blastlab.serviceblbnavi.dao.repository.BuildingRepository;
 import co.blastlab.serviceblbnavi.dao.repository.ComplexRepository;
@@ -10,6 +8,8 @@ import co.blastlab.serviceblbnavi.domain.BuildingConfiguration;
 import co.blastlab.serviceblbnavi.domain.Complex;
 import co.blastlab.serviceblbnavi.domain.Permission;
 import co.blastlab.serviceblbnavi.dto.building.BuildingDto;
+import co.blastlab.serviceblbnavi.rest.bean.BuildingConfigurationBean;
+import co.blastlab.serviceblbnavi.rest.bean.PermissionBean;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
@@ -31,6 +31,9 @@ public class BuildingEJB implements BuildingFacade {
 
     @Inject
     private PermissionBean permissionBean;
+
+    @Inject
+    private BuildingConfigurationRepository buildingConfigurationRepository;
 
     @Inject
     private BuildingConfigurationBean buildingConfigurationBean;

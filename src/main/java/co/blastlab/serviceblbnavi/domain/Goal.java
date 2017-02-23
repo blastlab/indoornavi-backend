@@ -1,10 +1,6 @@
 package co.blastlab.serviceblbnavi.domain;
 
-import co.blastlab.serviceblbnavi.rest.facade.ext.Updatable;
-import co.blastlab.serviceblbnavi.views.View;
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonView;
+import co.blastlab.serviceblbnavi.rest.facade.ext.UpdatableEntity;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -16,7 +12,7 @@ import java.util.List;
 @Entity
 @Getter
 @Setter
-public class Goal extends CustomIdGenerationEntity implements Serializable, Updatable {
+public class Goal extends CustomIdGenerationEntity implements Serializable, UpdatableEntity {
     private String name;
 
     private Double x;

@@ -1,25 +1,26 @@
 package co.blastlab.serviceblbnavi.rest.facade;
 
 import co.blastlab.serviceblbnavi.dao.FloorBean;
-import co.blastlab.serviceblbnavi.dao.GoalBean;
-import co.blastlab.serviceblbnavi.dao.PermissionBean;
+import co.blastlab.serviceblbnavi.dao.repository.BuildingRepository;
 import co.blastlab.serviceblbnavi.dao.repository.FloorRepository;
+import co.blastlab.serviceblbnavi.dao.repository.GoalRepository;
+import co.blastlab.serviceblbnavi.domain.Building;
 import co.blastlab.serviceblbnavi.domain.Floor;
 import co.blastlab.serviceblbnavi.domain.Goal;
 import co.blastlab.serviceblbnavi.domain.Permission;
 import co.blastlab.serviceblbnavi.dto.goal.GoalDto;
+import co.blastlab.serviceblbnavi.rest.bean.PermissionBean;
+import co.blastlab.serviceblbnavi.rest.bean.UpdaterBean;
 
+import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.List;
 
-
-public class GoalEJB implements GoalFacade {
-
-    @Inject
-    private GoalBean goalBean;
+@Stateless
+public class GoalEJB extends UpdaterBean<GoalDto, Goal> implements GoalFacade {
 
     @Inject
     private PermissionBean permissionBean;
@@ -29,6 +30,12 @@ public class GoalEJB implements GoalFacade {
 
     @Inject
     private FloorRepository floorRepository;
+
+    @Inject
+    private GoalRepository goalRepository;
+
+    @Inject
+    private BuildingRepository buildingRepository;
 
 
     public GoalDto create(GoalDto goal) {
@@ -41,7 +48,7 @@ public class GoalEJB implements GoalFacade {
             goalEntity.setX(goal.getX());
             goalEntity.setName(goal.getName());
             goalEntity.setFloor(floor);
-            goalBean.create(goalEntity);
+            goalEntity = goalRepository.save(goalEntity);
             return new GoalDto(goalEntity);
         }
         throw new EntityNotFoundException();
@@ -49,10 +56,10 @@ public class GoalEJB implements GoalFacade {
 
 
     public Response delete(Long id) {
-        Goal goal = goalBean.find(id);
+        Goal goal = goalRepository.findBy(id);
         if (goal != null) {
             permissionBean.checkPermission(goal, Permission.UPDATE);
-            goalBean.delete(goal);
+            goalRepository.remove(goal);
             return Response.ok().build();
         }
         throw new EntityNotFoundException();
@@ -61,7 +68,7 @@ public class GoalEJB implements GoalFacade {
 
     public GoalDto updateName(GoalDto goal) {
         if (goal.getId() != null) {
-            Goal goalEntity = goalBean.find(goal.getId());
+            Goal goalEntity = goalRepository.findBy(goal.getId());
             if (goalEntity != null) {
                 permissionBean.checkPermission(goalEntity, Permission.UPDATE);
 
@@ -75,8 +82,8 @@ public class GoalEJB implements GoalFacade {
                 newGoalEntity.setName(goal.getName());
                 newGoalEntity.setFloor(goalEntity.getFloor());
                 goalEntity.setId(null);
-                goalBean.update(goalEntity);
-                goalBean.create(newGoalEntity);
+                goalRepository.save(goalEntity);
+                goalRepository.save(newGoalEntity);
                 return goal;
             }
         }
@@ -85,38 +92,24 @@ public class GoalEJB implements GoalFacade {
     
 
     public GoalDto updateCoordinates(GoalDto goal) {
-        if (goal.getId() != null) {
-            Goal goalEntity = goalBean.find(goal.getId());
-            if (goalEntity != null) {
-                permissionBean.checkPermission(goalEntity, Permission.UPDATE);
-                goalEntity.setX(goal.getX());
-                goalEntity.setY(goal.getY());
-                goalBean.update(goalEntity);
-                return goal;
-            }
-        }
-        throw new EntityNotFoundException();
+        return super.updateCoordinates(goal, goalRepository);
     }
 
 
     public GoalDto deactivate(Long goalId) {
-        Goal goalEntity = goalBean.find(goalId);
-        if (goalEntity != null) {
-            permissionBean.checkPermission(goalEntity, Permission.UPDATE);
-            goalBean.deactivate(goalEntity);
-            return new GoalDto(goalEntity);
-        }
-        throw new EntityNotFoundException();
+        GoalDto goal = new GoalDto();
+        goal.setId(goalId);
+        return super.deactivate(goal, goalRepository);
     }
 
 
     public List<GoalDto> findByBuilding(Long buildingId) {
         if (buildingId != null) {
-            List<Goal> goals = goalBean.findAllByBuildingId(buildingId);
-            if (goals.size() > 0) {
-                permissionBean.checkPermission(goals.get(0), Permission.READ);
-            }
-            return convertToDtos(goals);
+            Building building = buildingRepository.findBy(buildingId);
+            List<Floor> floors = floorRepository.findByBuilding(building);
+            List<GoalDto> goals = new ArrayList<>();
+            floors.forEach((floor -> goals.addAll(findByFloor(floor.getId()))));
+            return goals;
         }
         throw new EntityNotFoundException();
     }
@@ -124,7 +117,8 @@ public class GoalEJB implements GoalFacade {
 
     public List<GoalDto> findByFloor(Long floorId) {
         if (floorId != null) {
-            List<Goal> goals = goalBean.findAllByFloorId(floorId);
+            Floor floor = floorRepository.findBy(floorId);
+            List<Goal> goals = goalRepository.findByFloor(floor);
             if (goals.size() > 0) {
                 permissionBean.checkPermission(goals.get(0), Permission.READ);
             }
@@ -136,7 +130,8 @@ public class GoalEJB implements GoalFacade {
 
     public List<GoalDto> findActiveByFloor(Long floorId) {
         if (floorId != null) {
-            List<Goal> goals = goalBean.findActiveByFloorId(floorId);
+            Floor floor = floorRepository.findBy(floorId);
+            List<Goal> goals = goalRepository.findByFloorAndInactive(floor, false);
             if (goals.size() > 0) {
                 permissionBean.checkPermission(goals.get(0), Permission.READ);
             }

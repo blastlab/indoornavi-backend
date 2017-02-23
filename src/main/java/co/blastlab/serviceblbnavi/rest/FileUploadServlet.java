@@ -1,6 +1,6 @@
 package co.blastlab.serviceblbnavi.rest;
 
-import co.blastlab.serviceblbnavi.rest.bean.PermissionBean;
+import co.blastlab.serviceblbnavi.dao.FloorBean;
 import co.blastlab.serviceblbnavi.dao.exception.PermissionException;
 import co.blastlab.serviceblbnavi.dao.repository.FloorRepository;
 import co.blastlab.serviceblbnavi.dao.repository.PersonRepository;
@@ -8,6 +8,7 @@ import co.blastlab.serviceblbnavi.domain.Floor;
 import co.blastlab.serviceblbnavi.domain.Permission;
 import co.blastlab.serviceblbnavi.domain.Person;
 import co.blastlab.serviceblbnavi.rest.bean.AuthorizationBean;
+import co.blastlab.serviceblbnavi.rest.bean.PermissionBean;
 import co.blastlab.serviceblbnavi.rest.facade.ext.filter.CORSFilter;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiImplicitParam;
@@ -50,6 +51,9 @@ public class FileUploadServlet extends HttpServlet {
 
     @Inject
     private AuthorizationBean authorizationBean;
+
+    @Inject
+    private FloorBean floorBean;
 
     private static final Integer SEPARATOR_INDEX = 1;
 
