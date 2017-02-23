@@ -42,7 +42,6 @@ public class PersonEJB implements PersonFacade {
         if (personEntity == null) {
             throw new EntityNotFoundException();
         }
-        personEntity = new Person(person.getEmail(), person.getPlainPassword());
         checkPassword(personEntity, person.getPlainPassword());
         personEntity = generateAuthToken(personEntity);
         return new PersonResponseDto(personEntity);
