@@ -54,8 +54,8 @@ public class EdgeEJB implements EdgeFacade {
             List<Edge> result = edgeBean.findByVertexFloorId(id);
             if (result.size() > 0) {
                 permissionBean.checkPermission(result.get(0).getSource(), Permission.READ);
-                return convertToDtos(result);
             }
+            return convertToDtos(result);
         }
         throw new EntityNotFoundException();
     }
@@ -66,8 +66,8 @@ public class EdgeEJB implements EdgeFacade {
             List<Edge> result = edgeBean.findByVertexId(vertexId);
             if (result.size() > 0) {
                 permissionBean.checkPermission(result.get(0).getSource(), Permission.READ);
-                return convertToDtos(result);
             }
+            return convertToDtos(result);
         }
         throw new EntityNotFoundException();
     }

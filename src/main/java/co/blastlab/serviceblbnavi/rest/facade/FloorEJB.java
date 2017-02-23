@@ -38,10 +38,6 @@ public class FloorEJB implements FloorFacade {
         if (building != null) {
             permissionBean.checkPermission(building, Permission.UPDATE);
             Floor floorEntity = new Floor();
-            floorEntity.setMToPix(floor.getMToPix());
-            floorEntity.setStartZoom(floor.getStartZoom());
-            floorEntity.setBitmapWidth(floor.getBitmapWidth());
-            floorEntity.setBitmapHeight(floor.getBitmapHeight());
             floorEntity.setLevel(floor.getLevel());
             floorEntity.setBuilding(building);
             floorEntity = floorRepository.save(floorEntity);
@@ -77,10 +73,6 @@ public class FloorEJB implements FloorFacade {
         if (building != null) {
             permissionBean.checkPermission(building, Permission.UPDATE);
             Floor floorEntity = floorRepository.findBy(floor.getId());
-            floorEntity.setMToPix(floor.getMToPix());
-            floorEntity.setStartZoom(floor.getStartZoom());
-            floorEntity.setBitmapWidth(floor.getBitmapWidth());
-            floorEntity.setBitmapHeight(floor.getBitmapHeight());
             floorEntity.setLevel(floor.getLevel());
             floorEntity.setBuilding(building);
             floor.setBuildingId(building.getId());
@@ -105,7 +97,7 @@ public class FloorEJB implements FloorFacade {
     }
 
 
-    public Response updatemToPix(FloorDto floor) {
+    public Response updatemToPix(FloorDto.Extended floor) {
         Floor floorEntity = floorRepository.findBy(floor.getId());
         if (floorEntity != null) {
             permissionBean.checkPermission(floorEntity, Permission.UPDATE);

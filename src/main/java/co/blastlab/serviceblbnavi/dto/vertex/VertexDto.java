@@ -1,6 +1,7 @@
 package co.blastlab.serviceblbnavi.dto.vertex;
 
 import co.blastlab.serviceblbnavi.domain.Vertex;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -54,8 +55,11 @@ public class VertexDto {
 
     private boolean inactive;
 
+    // TODO: this is here just for compatibility with front, address it when front will be ready for changes
+    @JsonProperty("isFloorDownChangeable")
     private boolean isFloorDownChangeable;
 
+    @JsonProperty("isFloorUpChangeable")
     private boolean isFloorUpChangeable;
 
     @NotNull

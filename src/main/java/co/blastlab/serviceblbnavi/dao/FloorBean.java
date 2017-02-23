@@ -34,4 +34,9 @@ public class FloorBean {
             floorRepository.save(floor);
         });
     }
+
+    // TODO: we need this for upload image: FileUploadServlet tries to save floor via floorRepository which has no transaction
+    public Floor save(Floor floor) {
+        return floorRepository.save(floor);
+    }
 }

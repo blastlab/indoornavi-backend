@@ -57,5 +57,5 @@ public interface FloorFacade {
     @ApiResponses({
             @ApiResponse(code = 404, message = "floor with given id doesn't exist")
     })
-    Response updatemToPix(@ApiParam(value = "floor", required = true) @Valid FloorDto floor);
+    Response updatemToPix(@ApiParam(value = "floor", required = true) @Valid FloorDto.Extended floor);
 }

@@ -1,6 +1,7 @@
 package co.blastlab.serviceblbnavi.dto.floor;
 
 import co.blastlab.serviceblbnavi.domain.Floor;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -19,7 +20,6 @@ public class FloorDto {
         this.setLevel(floor.getLevel());
         this.setBitmapHeight(floor.getBitmapHeight());
         this.setBitmapWidth(floor.getBitmapWidth());
-        this.setMToPix(floor.getMToPix());
         this.setStartZoom(floor.getStartZoom());
         this.setBuildingId(floor.getBuilding() != null ? floor.getBuilding().getId() : null);
         floor.getBeacons().forEach((beacon -> this.getBeaconsIds().add(beacon.getId())));
@@ -35,21 +35,10 @@ public class FloorDto {
     @NotNull
     private Integer level;
 
-    @NotNull
-    @Min(0)
     private Integer bitmapWidth;
 
-    @NotNull
-    @Min(0)
     private Integer bitmapHeight;
 
-    @NotNull
-    @Min(0)
-    // TODO: this field can have more friendly name like: scale?
-    private Double mToPix;
-
-    @NotNull
-    @Min(0)
     private Double startZoom;
 
     @NotNull
@@ -62,4 +51,20 @@ public class FloorDto {
     private List<Long> goalsIds = new ArrayList<>();
 
     private List<Long> beaconsIds = new ArrayList<>();
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    public static class Extended extends FloorDto {
+        @NotNull
+        @Min(0)
+        // TODO: this field can have more friendly name like: scale?
+        @JsonProperty("mToPix")
+        private Double mToPix;
+
+        public Extended(Floor floor) {
+            super(floor);
+            this.setMToPix(floor.getMToPix());
+        }
+    }
 }

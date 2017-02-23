@@ -44,7 +44,6 @@ public class BuildingFacadeIT extends BaseIT {
         String body = new RequestBodyBuilder("BuildingUpdating.json")
                 .setParameter("id", 2)
                 .setParameter("name", UPDATED_NAME)
-                .setParameter("complexId", 2)
                 .setParameter("degree", 56)
                 .build();
 
@@ -132,7 +131,14 @@ public class BuildingFacadeIT extends BaseIT {
 
         assertThat(violationResponse.getError(), is(VALIDATION_ERROR_NAME));
         assertThat(violationResponse.getViolations().size(), is(4));
-        assertViolations(violationResponse);
+        assertThat(violationResponse.getViolations(),
+                containsInAnyOrder(
+                        validViolation("name", "may not be null", "may not be empty"),
+                        validViolation("minimumFloor", "may not be null"),
+                        validViolation("degree", "may not be null"),
+                        validViolation("complexId", "may not be null")
+                )
+        );
     }
 
     @Test
@@ -148,17 +154,12 @@ public class BuildingFacadeIT extends BaseIT {
                 .as(ViolationResponse.class);
 
         assertThat(violationResponse.getError(), is(VALIDATION_ERROR_NAME));
-        assertThat(violationResponse.getViolations().size(), is(4));
-        assertViolations(violationResponse);
-    }
-
-    private void assertViolations(ViolationResponse violationResponse) {
+        assertThat(violationResponse.getViolations().size(), is(3));
         assertThat(violationResponse.getViolations(),
                 containsInAnyOrder(
                         validViolation("name", "may not be null"),
                         validViolation("minimumFloor", "may not be null"),
-                        validViolation("degree", "may not be null"),
-                        validViolation("complexId", "may not be null")
+                        validViolation("degree", "may not be null")
                 )
         );
     }

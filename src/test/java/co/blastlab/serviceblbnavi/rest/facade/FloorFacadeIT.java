@@ -90,8 +90,6 @@ public class FloorFacadeIT extends BaseIT {
         String body = new RequestBodyBuilder("FloorUpdating.json")
                 .setParameter("level", TEST_LEVEL)
                 .setParameter("id", ID_FOR_UPDATE)
-                .setParameter("bitmapWidth", BITMAP_WIDTH_FOR_UPDATE)
-                .setParameter("bitmapHeight", BITMAP_HEIGHT_FOR_UPDATE)
                 .setParameter("buildingId", BUILDING_ID_FOR_UPDATE)
                 .build();
 
@@ -102,8 +100,6 @@ public class FloorFacadeIT extends BaseIT {
                 .body(
                         "level", equalTo(TEST_LEVEL),
                         "id", equalTo(ID_FOR_UPDATE),
-                        "bitmapWidth", equalTo(BITMAP_HEIGHT_FOR_UPDATE),
-                        "bitmapHeight", equalTo(BITMAP_WIDTH_FOR_UPDATE),
                         "buildingId", equalTo(BUILDING_ID_FOR_UPDATE)
                 );
     }
@@ -132,8 +128,13 @@ public class FloorFacadeIT extends BaseIT {
                 .as(ViolationResponse.class);
 
         assertThat(violationResponse.getError(), is(VALIDATION_ERROR_NAME));
-        assertThat(violationResponse.getViolations().size(), is(6));
-        assertViolations(violationResponse);
+        assertThat(violationResponse.getViolations().size(), is(2));
+        assertThat(violationResponse.getViolations(),
+                containsInAnyOrder(
+                        validViolation("level", "may not be null"),
+                        validViolation("buildingId", "may not be null")
+                )
+        );
     }
 
     @Test
@@ -148,7 +149,7 @@ public class FloorFacadeIT extends BaseIT {
                 .as(ViolationResponse.class);
 
         assertThat(violationResponse.getError(), is(VALIDATION_ERROR_NAME));
-        assertThat(violationResponse.getViolations().size(), is(6));
+        assertThat(violationResponse.getViolations().size(), is(2));
         assertViolations(violationResponse);
     }
 
@@ -166,7 +167,7 @@ public class FloorFacadeIT extends BaseIT {
                 .as(ViolationResponse.class);
 
         assertThat(violationResponse.getError(), is(VALIDATION_ERROR_NAME));
-        assertThat(violationResponse.getViolations().size(), is(6));
+        assertThat(violationResponse.getViolations().size(), is(2));
         assertViolations(violationResponse);
     }
 
@@ -182,19 +183,21 @@ public class FloorFacadeIT extends BaseIT {
                 .as(ViolationResponse.class);
 
         assertThat(violationResponse.getError(), is(VALIDATION_ERROR_NAME));
-        assertThat(violationResponse.getViolations().size(), is(6));
-        assertViolations(violationResponse);
+        assertThat(violationResponse.getViolations().size(), is(3));
+        assertThat(violationResponse.getViolations(),
+                containsInAnyOrder(
+                        validViolation("level", "may not be null"),
+                        validViolation("buildingId", "may not be null"),
+                        validViolation("mToPix", "may not be null")
+                )
+        );
     }
 
     private void assertViolations(ViolationResponse violationResponse) {
         assertThat(violationResponse.getViolations(),
                 containsInAnyOrder(
                         validViolation("level", "may not be null"),
-                        validViolation("mToPix", "may not be null"),
-                        validViolation("buildingId", "may not be null"),
-                        validViolation("bitmapHeight", "may not be null"),
-                        validViolation("startZoom", "may not be null"),
-                        validViolation("bitmapWidth", "may not be null")
+                        validViolation("buildingId", "may not be null")
                 )
         );
     }

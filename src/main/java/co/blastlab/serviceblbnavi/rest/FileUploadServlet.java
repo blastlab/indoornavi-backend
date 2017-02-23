@@ -82,7 +82,7 @@ public class FileUploadServlet extends HttpServlet {
             floor.setBitmapWidth(bi.getWidth());
             floor.setBitmap(bytes);
             //floorBean.update(floor);
-            floorRepository.save(floor);
+            floorBean.save(floor);
         } catch (PermissionException e) {
             response.setStatus(CORSFilter.UNAUTHORIZED);
         } catch (NumberFormatException e) {
