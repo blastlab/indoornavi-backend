@@ -70,11 +70,13 @@ public class VertexEJB extends UpdaterBean<VertexDto, Vertex> implements VertexF
     public List<VertexDto> findByFloor(Long floorId) {
         if (floorId != null) {
             Floor floor = floorRepository.findBy(floorId);
-            List<Vertex> vertices = vertexRepository.findByFloor(floor);
-            if (vertices.size() > 0) {
-                permissionBean.checkPermission(vertices.get(0), Permission.READ);
+            if (floor != null) {
+                List<Vertex> vertices = vertexRepository.findByFloor(floor);
+                if (vertices.size() > 0) {
+                    permissionBean.checkPermission(vertices.get(0), Permission.READ);
+                }
+                return convertToDtos(vertices);
             }
-            return convertToDtos(vertices);
         }
         throw new EntityNotFoundException();
     }
@@ -83,11 +85,13 @@ public class VertexEJB extends UpdaterBean<VertexDto, Vertex> implements VertexF
     public List<VertexDto> findAllActiveByFloor(Long floorId) {
         if (floorId != null) {
             Floor floor = floorRepository.findBy(floorId);
-            List<Vertex> vertices = vertexRepository.findByFloorAndInactive(floor, false);
-            if (vertices.size() > 0) {
-                permissionBean.checkPermission(vertices.get(0), Permission.READ);
+            if (floor != null) {
+                List<Vertex> vertices = vertexRepository.findByFloorAndInactive(floor, false);
+                if (vertices.size() > 0) {
+                    permissionBean.checkPermission(vertices.get(0), Permission.READ);
+                }
+                return convertToDtos(vertices);
             }
-            return convertToDtos(vertices);
         }
         throw new EntityNotFoundException();
     }
