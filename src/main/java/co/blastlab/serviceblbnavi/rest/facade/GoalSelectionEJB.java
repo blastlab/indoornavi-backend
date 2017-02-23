@@ -1,26 +1,27 @@
 package co.blastlab.serviceblbnavi.rest.facade;
 
-import co.blastlab.serviceblbnavi.dao.GoalBean;
-import co.blastlab.serviceblbnavi.dao.GoalSelectionBean;
+import co.blastlab.serviceblbnavi.dao.repository.GoalRepository;
+import co.blastlab.serviceblbnavi.dao.repository.GoalSelectionRepository;
 import co.blastlab.serviceblbnavi.domain.Goal;
 import co.blastlab.serviceblbnavi.domain.GoalSelection;
 import co.blastlab.serviceblbnavi.dto.goal.GoalSelectionDto;
 
+import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
 
-
+@Stateless
 public class GoalSelectionEJB implements GoalSelectionFacade {
 
     @Inject
-    private GoalSelectionBean goalSelectionBean;
+    private GoalSelectionRepository goalSelectionRepository;
 
     @Inject
-    private GoalBean goalBean;
-    
+    private GoalRepository goalRepository;
+
 
     public GoalSelectionDto create(GoalSelectionDto goalSelection) {
-        Goal goal = goalBean.find(goalSelection.getGoalId());
+        Goal goal = goalRepository.find(goalSelection.getGoalId());
         if (goal != null) {
             GoalSelection goalSelectionEntity = new GoalSelection();
             goalSelectionEntity.setX(goalSelection.getX());
@@ -29,7 +30,7 @@ public class GoalSelectionEJB implements GoalSelectionFacade {
             goalSelectionEntity.setDevice(goalSelection.getDevice());
             goalSelectionEntity.setCreationDateTimestamp(goalSelection.getTimestamp());
             goalSelectionEntity.setGoal(goal);
-            goalSelectionBean.create(goalSelectionEntity);
+            goalSelectionRepository.save(goalSelectionEntity);
             return new GoalSelectionDto(goalSelectionEntity);
         }
         throw new EntityNotFoundException();

@@ -2,6 +2,7 @@ package co.blastlab.serviceblbnavi.rest.facade;
 
 
 import co.blastlab.serviceblbnavi.dto.person.PersonRequestDto;
+import co.blastlab.serviceblbnavi.rest.facade.ext.filter.TokenAuthorization;
 import co.blastlab.serviceblbnavi.dto.person.PersonResponseDto;
 import com.wordnik.swagger.annotations.*;
 
@@ -34,5 +35,6 @@ public interface PersonFacade {
     @GET
     @Path("/current")
     @ApiOperation(value = "find current user")
+    @TokenAuthorization
     PersonResponseDto get();
 }

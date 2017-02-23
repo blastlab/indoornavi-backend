@@ -1,8 +1,10 @@
-package co.blastlab.serviceblbnavi.dao;
+package co.blastlab.serviceblbnavi.rest.bean;
 
 import co.blastlab.serviceblbnavi.dao.qualifier.NaviProduction;
+import co.blastlab.serviceblbnavi.dao.repository.*;
 import co.blastlab.serviceblbnavi.domain.Building;
 import co.blastlab.serviceblbnavi.domain.BuildingConfiguration;
+import co.blastlab.serviceblbnavi.domain.Complex;
 import co.blastlab.serviceblbnavi.dto.building.BuildingDto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -16,7 +18,6 @@ import javax.persistence.NoResultException;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -34,43 +35,31 @@ public class BuildingConfigurationBean {
     private EntityManager emProduction;
 
     @Inject
-    private BuildingBean buildingBean;
+    private BuildingRepository buildingRepository;
 
-    public void create(BuildingConfiguration buildingConfiguration) {
-        em.persist(buildingConfiguration);
-    }
+    @Inject
+    private ComplexRepository complexRepository;
+
+    @Inject
+    private BuildingConfigurationRepository buildingConfigurationRepository;
+
+    @Inject
+    private BuildingConfigurationProductionRepository buildingConfigurationProductionRepository;
+
+    @Inject
+    private BuildingProductionRepository buildingProductionRepository;
 
     public BuildingConfiguration findByComplexNameAndBuildingNameAndVersion(String complexName, String buildingName, Integer version) {
-        try {
-            return em.createNamedQuery(BuildingConfiguration.FIND_BY_COMPLEX_NAME_AND_BUILDING_NAME_AND_VERSION, BuildingConfiguration.class)
-                    .setParameter("complexName", complexName)
-                    .setParameter("buildingName", buildingName)
-                    .setParameter("version", version)
-                    .getSingleResult();
-        } catch (NoResultException e) {
-            return null;
-        }
-    }
-
-    public BuildingConfiguration findByBuildingAndVersion(Long buildingId, Integer version) {
-        return findByBuildingAndVersion(buildingId, version, em);
-    }
-
-    public BuildingConfiguration findByBuildingAndVersion(Long buildingId, Integer version, EntityManager em) {
-        try {
-            return em.createNamedQuery(BuildingConfiguration.FIND_BY_BUILDING_ID_AND_VERSION, BuildingConfiguration.class)
-                    .setParameter("buildingId", buildingId)
-                    .setParameter("version", version)
-                    .getSingleResult();
-        } catch (NoResultException e) {
-            return null;
-        }
+        Complex complex = complexRepository.findOptionalByName(complexName);
+        Building building = buildingRepository.findOptionalByComplexAndName(complex, buildingName);
+        BuildingConfiguration buildingConfiguration = buildingConfigurationRepository.findOptionalByBuildingAndVersion(building, version);
+        return buildingConfiguration;
     }
 
     public boolean saveConfiguration(Building building) {
         //merge developer building to production
         emProduction.merge(building.getComplex());
-        buildingBean.removeSQL(building, emProduction);
+        emProduction.remove(emProduction.contains(building) ? building : emProduction.merge(building));
         emProduction.merge(building);
         building.getFloors().forEach((floor) -> {
             emProduction.merge(floor);
@@ -117,10 +106,7 @@ public class BuildingConfigurationBean {
             buildingConfiguration.setBuilding(building);
             BuildingConfiguration bc;
             try {
-                bc = emProduction.createNamedQuery(BuildingConfiguration.FIND_BY_BUILDING_ID_AND_VERSION, BuildingConfiguration.class)
-                        .setParameter("buildingId", building.getId())
-                        .setParameter("version", DB_VERSION)
-                        .getSingleResult();
+                bc = buildingConfigurationProductionRepository.findByBuildingAndVersion(building, DB_VERSION);
             } catch (NoResultException e) {
                 bc = null;
             }
@@ -132,7 +118,7 @@ public class BuildingConfigurationBean {
             }
             return true;
         } catch (NoSuchAlgorithmException | UnsupportedEncodingException | JsonProcessingException ex) {
-            Logger.getLogger(BuildingBean.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(BuildingConfigurationBean.class.getName()).log(Level.SEVERE, null, ex);
             return false;
         }
     }
@@ -154,22 +140,13 @@ public class BuildingConfigurationBean {
                 .writeValueAsString(new BuildingDto(building));
     }
 
-    public BuildingConfiguration findLatestVersionByBuildingId(Long id) {
-        try {
-            return em.createNamedQuery(BuildingConfiguration.FIND_BY_BUILDING_ID_SORT_VERSION_FROM_NEWEST, BuildingConfiguration.class)
-                    .setParameter("buildingId", id)
-                    .getSingleResult();
-        } catch (NoResultException e) {
-            return null;
-        }
-    }
-
     public Building restoreConfiguration(Long id) {
         Building building = emProduction.find(Building.class, id);
         if (building == null) {
             throw new EntityNotFoundException();
         }
-        buildingBean.removeSQL(building, em);
+        em.remove(em.contains(building) ? building : em.merge(building));
+        buildingRepository.attachAndRemove(building);
         em.merge(building);
         building.getFloors().forEach((floor) -> {
             em.merge(floor);
@@ -194,11 +171,5 @@ public class BuildingConfigurationBean {
             });
         });
         return building;
-    }
-
-    public List<BuildingConfiguration> findAllByVersion(Integer version, EntityManager em) {
-        return em.createNamedQuery(BuildingConfiguration.FIND_BY_VERSION)
-                .setParameter("version", version)
-                .getResultList();
     }
 }

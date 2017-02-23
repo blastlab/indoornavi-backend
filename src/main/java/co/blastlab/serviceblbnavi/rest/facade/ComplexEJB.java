@@ -1,9 +1,10 @@
 package co.blastlab.serviceblbnavi.rest.facade;
 
-import co.blastlab.serviceblbnavi.dao.PermissionBean;
+import co.blastlab.serviceblbnavi.rest.bean.PermissionBean;
 import co.blastlab.serviceblbnavi.dao.exception.PermissionException;
 import co.blastlab.serviceblbnavi.dao.repository.ACL_ComplexRepository;
 import co.blastlab.serviceblbnavi.dao.repository.ComplexRepository;
+import co.blastlab.serviceblbnavi.dao.repository.PermissionRepository;
 import co.blastlab.serviceblbnavi.dao.repository.PersonRepository;
 import co.blastlab.serviceblbnavi.domain.ACL_Complex;
 import co.blastlab.serviceblbnavi.domain.Complex;
@@ -17,16 +18,11 @@ import javax.inject.Inject;
 import javax.persistence.EntityExistsException;
 import javax.persistence.EntityNotFoundException;
 import javax.ws.rs.core.Response;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.function.Predicate;
+import java.util.*;
 
 
 @Stateless
 public class ComplexEJB implements ComplexFacade {
-
 
     @Inject
     private ComplexRepository complexRepository;
@@ -41,6 +37,9 @@ public class ComplexEJB implements ComplexFacade {
     private PermissionBean permissionBean;
 
     @Inject
+    private PermissionRepository permissionRepository;
+
+    @Inject
     private AuthorizationBean authorizationBean;
 
     public ComplexDto create(ComplexDto complex) {
@@ -48,10 +47,10 @@ public class ComplexEJB implements ComplexFacade {
         Complex complexEntity = new Complex();
         complexEntity.setName(complex.getName());
         complexEntity = complexRepository.saveAndFlush(complexEntity);
-        aclComplexRepository.save(new ACL_Complex(authorizationBean.getCurrentUser(), complexEntity, permissionBean.findByName(Permission.READ)));
-        aclComplexRepository.save(new ACL_Complex(authorizationBean.getCurrentUser(), complexEntity, permissionBean.findByName(Permission.CREATE)));
-        aclComplexRepository.save(new ACL_Complex(authorizationBean.getCurrentUser(), complexEntity, permissionBean.findByName(Permission.UPDATE)));
-        aclComplexRepository.save(new ACL_Complex(authorizationBean.getCurrentUser(), complexEntity, permissionBean.findByName(Permission.DELETE)));
+        aclComplexRepository.save(new ACL_Complex(authorizationBean.getCurrentUser(), complexEntity, permissionRepository.findByName(Permission.READ)));
+        aclComplexRepository.save(new ACL_Complex(authorizationBean.getCurrentUser(), complexEntity, permissionRepository.findByName(Permission.CREATE)));
+        aclComplexRepository.save(new ACL_Complex(authorizationBean.getCurrentUser(), complexEntity, permissionRepository.findByName(Permission.UPDATE)));
+        aclComplexRepository.save(new ACL_Complex(authorizationBean.getCurrentUser(), complexEntity, permissionRepository.findByName(Permission.DELETE)));
         return new ComplexDto(complexEntity, permissionBean.getPermissions(authorizationBean.getCurrentUser().getId(), complexEntity.getId()));
     }
 
@@ -95,7 +94,6 @@ public class ComplexEJB implements ComplexFacade {
         }
         throw new EntityNotFoundException();
     }
-
 
     public Response delete(Long id) {
         if (id != null) {
@@ -165,4 +163,21 @@ public class ComplexEJB implements ComplexFacade {
     }
 
 
+    private List<Complex> findAllByPerson(Long personId) {
+        List<Complex> complexes = complexRepository.findAllByPerson(personId);
+        Set<Complex> complexSet = new HashSet<>(complexes);
+        complexes = new ArrayList<>(complexSet);
+
+        complexes.forEach((complex) -> {
+            List<String> permissions = new ArrayList<>();
+            complex.getACL_complexes().stream().forEach((aclComplex) -> {
+                if (Objects.equals(aclComplex.getPerson().getId(), personId)) {
+                    permissions.add(aclComplex.getPermission().getName());
+                }
+            });
+            complex.setPermissions(permissions);
+        });
+
+        return complexes;
+    }
 }

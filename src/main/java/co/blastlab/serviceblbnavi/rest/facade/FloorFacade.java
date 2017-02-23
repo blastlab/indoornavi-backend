@@ -2,6 +2,7 @@ package co.blastlab.serviceblbnavi.rest.facade;
 
 
 import co.blastlab.serviceblbnavi.dto.floor.FloorDto;
+import co.blastlab.serviceblbnavi.rest.facade.ext.filter.TokenAuthorization;
 import com.wordnik.swagger.annotations.*;
 
 import javax.validation.Valid;
@@ -11,6 +12,7 @@ import java.util.List;
 
 @Path("/floor")
 @Api("/floor")
+@TokenAuthorization
 public interface FloorFacade {
 
     @POST

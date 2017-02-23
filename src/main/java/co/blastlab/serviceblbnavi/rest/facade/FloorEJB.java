@@ -1,7 +1,6 @@
 package co.blastlab.serviceblbnavi.rest.facade;
 
-import co.blastlab.serviceblbnavi.dao.FloorBean;
-import co.blastlab.serviceblbnavi.dao.PermissionBean;
+import co.blastlab.serviceblbnavi.rest.bean.PermissionBean;
 import co.blastlab.serviceblbnavi.dao.repository.BuildingRepository;
 import co.blastlab.serviceblbnavi.dao.repository.FloorRepository;
 import co.blastlab.serviceblbnavi.domain.Building;
@@ -21,9 +20,6 @@ import java.util.List;
 public class FloorEJB implements FloorFacade {
 
     @Inject
-    private FloorBean floorBean;
-
-    @Inject
     private FloorRepository floorRepository;
 
     @Inject
@@ -36,12 +32,8 @@ public class FloorEJB implements FloorFacade {
     public FloorDto create(FloorDto floor) {
         Building building = buildingRepository.findBy(floor.getBuildingId());
         if (building != null) {
-            permissionBean.checkPermission(building, Permission.UPDATE);
             Floor floorEntity = new Floor();
-            floorEntity.setLevel(floor.getLevel());
-            floorEntity.setBuilding(building);
-            floorEntity = floorRepository.save(floorEntity);
-            return new FloorDto(floorEntity);
+            return createOrUpdate(floorEntity, floor, building);
         }
         throw new EntityNotFoundException();
     }
@@ -71,27 +63,23 @@ public class FloorEJB implements FloorFacade {
     public FloorDto update(FloorDto floor) {
         Building building = buildingRepository.findBy(floor.getBuildingId());
         if (building != null) {
-            permissionBean.checkPermission(building, Permission.UPDATE);
             Floor floorEntity = floorRepository.findBy(floor.getId());
-            floorEntity.setLevel(floor.getLevel());
-            floorEntity.setBuilding(building);
-            floor.setBuildingId(building.getId());
-            floorEntity = floorRepository.save(floorEntity);
-            return new FloorDto(floorEntity);
+            return createOrUpdate(floorEntity, floor, building);
         }
         throw new EntityNotFoundException();
     }
 
-
     public Response updateFloors(Long buildingId, List<FloorDto> floors) {
         Building building = buildingRepository.findBy(buildingId);
         if (building != null) {
-            permissionBean.checkPermission(building, Permission.UPDATE);
-            List<Floor> floorEntities = new ArrayList<>();
-            floors.forEach((floor -> floorEntities.add(floorRepository.findBy(floor.getId()))));
+            permissionBean.checkPermission(
+                    building, Permission.UPDATE);
+            List<Floor > floorEntities = new ArrayList<>() ;
+                floors.forEach((floor-> floorEntities.add(floorRepository.findBy(floor.getId()))));
             floorEntities.forEach((floorEntity -> floorEntity.setBuilding(building)));
-            floorBean.updateFloorLevels(floorEntities);
-            return Response.ok().build();
+                updateFloorLevels(floorEntities);
+                return Response.ok().build();
+
         }
         throw new EntityNotFoundException();
     }
@@ -108,4 +96,21 @@ public class FloorEJB implements FloorFacade {
         throw new EntityNotFoundException();
     }
 
+    private void updateFloorLevels(List<Floor> floors) {
+        floors.stream().map((f) -> {
+            Floor floor = floorRepository.findBy(f.getId());
+            floor.setLevel(f.getLevel());
+            return floor;
+        }).forEach((floor) -> {
+            floorRepository.save(floor);
+        });
+    }
+
+    private FloorDto createOrUpdate(Floor floorEntity, FloorDto floor, Building building){
+        permissionBean.checkPermission(building, Permission.UPDATE);
+        floorEntity.setLevel(floor.getLevel());
+        floorEntity.setBuilding(building);
+        floorEntity = floorRepository.save(floorEntity);
+        return new FloorDto(floorEntity);
+    }
 }

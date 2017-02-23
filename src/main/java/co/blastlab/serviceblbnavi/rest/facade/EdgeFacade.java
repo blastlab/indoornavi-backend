@@ -3,6 +3,7 @@ package co.blastlab.serviceblbnavi.rest.facade;
 
 import co.blastlab.serviceblbnavi.domain.Edge;
 import co.blastlab.serviceblbnavi.dto.edge.EdgeDto;
+import co.blastlab.serviceblbnavi.rest.facade.ext.filter.TokenAuthorization;
 import com.wordnik.swagger.annotations.*;
 
 import javax.validation.Valid;
@@ -12,6 +13,7 @@ import java.util.List;
 
 @Path("/edge")
 @Api("/edge")
+@TokenAuthorization
 public interface EdgeFacade {
 
     @POST

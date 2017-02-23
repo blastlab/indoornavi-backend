@@ -2,6 +2,7 @@ package co.blastlab.serviceblbnavi.rest.facade;
 
 
 import co.blastlab.serviceblbnavi.dto.complex.ComplexDto;
+import co.blastlab.serviceblbnavi.rest.facade.ext.filter.TokenAuthorization;
 import com.wordnik.swagger.annotations.*;
 
 import javax.validation.Valid;
@@ -11,6 +12,7 @@ import java.util.List;
 
 @Path("/complex")
 @Api("/complex")
+@TokenAuthorization
 public interface ComplexFacade {
 
     @POST
