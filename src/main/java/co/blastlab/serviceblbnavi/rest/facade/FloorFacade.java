@@ -2,12 +2,16 @@ package co.blastlab.serviceblbnavi.rest.facade;
 
 
 import co.blastlab.serviceblbnavi.dto.floor.FloorDto;
+import co.blastlab.serviceblbnavi.dto.floor.ImageUpload;
 import co.blastlab.serviceblbnavi.rest.facade.ext.filter.TokenAuthorization;
 import com.wordnik.swagger.annotations.*;
+import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 
 import javax.validation.Valid;
 import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.io.IOException;
 import java.util.List;
 
 @Path("/floor")
@@ -60,4 +64,15 @@ public interface FloorFacade {
             @ApiResponse(code = 404, message = "floor with given id doesn't exist")
     })
     Response updatemToPix(@ApiParam(value = "floor", required = true) @Valid FloorDto.Extended floor);
+
+    @POST
+    @Path("/image")
+    @ApiOperation(value = "upload image of the floor", response = Response.class)
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    Response uploadImage(@Valid @MultipartForm ImageUpload imageUpload) throws IOException;
+
+    @GET
+    @Path("/image/{id: \\d+}")
+    @ApiOperation(value = "download image of the floor", response = Response.class)
+    Response downloadImage(@PathParam("id") Long floorId);
 }
