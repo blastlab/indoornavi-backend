@@ -1,6 +1,5 @@
 package co.blastlab.serviceblbnavi.rest.facade;
 
-import co.blastlab.serviceblbnavi.dao.FloorBean;
 import co.blastlab.serviceblbnavi.dao.repository.BuildingRepository;
 import co.blastlab.serviceblbnavi.dao.repository.FloorRepository;
 import co.blastlab.serviceblbnavi.dao.repository.WaypointRepository;
@@ -21,9 +20,6 @@ import java.util.List;
 
 @Stateless
 public class WaypointEJB extends UpdaterBean<WaypointDto, Waypoint> implements WaypointFacade {
-
-    @Inject
-    private FloorBean floorBean;
 
     @Inject
     private FloorRepository floorRepository;
