@@ -117,6 +117,19 @@ public class FloorFacadeIT extends BaseIT {
     }
 
     @Test
+    public void updateNonExistingFloors() {
+        String body = new RequestBodyBuilder("FloorsUpdating.json")
+                .setParameter("id_1", "99")
+                .build();
+
+        givenUser()
+                .body(body)
+                .pathParam("id", BUILDING_ID_FOR_UPDATE)
+                .when().put(FLOOR_PATH_WITH_ID)
+                .then().statusCode(HttpStatus.SC_NOT_FOUND);
+    }
+
+    @Test
     public void shouldValidateEmptyBodyWhenCreatingFloor() {
         ViolationResponse violationResponse = givenUser()
                 .body(new RequestBodyBuilder("Empty.json").build())
