@@ -68,11 +68,17 @@ public interface FloorFacade {
     @POST
     @Path("/image")
     @ApiOperation(value = "upload image of the floor", response = Response.class)
+    @ApiResponses({
+            @ApiResponse(code = 404, message = "floor with given id doesn't exist")
+    })
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     Response uploadImage(@Valid @MultipartForm ImageUpload imageUpload) throws IOException;
 
     @GET
     @Path("/image/{id: \\d+}")
     @ApiOperation(value = "download image of the floor", response = Response.class)
+    @ApiResponses({
+            @ApiResponse(code = 404, message = "floor with given id doesn't exist or it has no image")
+    })
     Response downloadImage(@PathParam("id") Long floorId);
 }
