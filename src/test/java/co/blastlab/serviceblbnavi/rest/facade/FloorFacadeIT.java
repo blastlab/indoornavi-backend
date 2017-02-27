@@ -18,7 +18,7 @@ public class FloorFacadeIT extends BaseIT {
 	private static final String FLOOR_PATH_WITH_ID = "/floor/{id}";
 	private static final String SCALE_PATH = "/floor/mToPix";
 
-	private static final Integer TEST_LEVEL = 1;
+	private static final Integer TEST_LEVEL = 4;
 	private static final Integer TEST_LEVEL_2 = 2;
 
 	private static final Integer ID_FOR_DELETE = 1;
@@ -87,7 +87,7 @@ public class FloorFacadeIT extends BaseIT {
 	@Test
 	public void updateExistingFloor() {
 		String body = new RequestBodyBuilder("FloorUpdating.json")
-			.setParameter("level", TEST_LEVEL)
+			.setParameter("level", 8)
 			.setParameter("id", ID_FOR_UPDATE)
 			.setParameter("buildingId", BUILDING_ID_FOR_UPDATE)
 			.build();
@@ -97,7 +97,7 @@ public class FloorFacadeIT extends BaseIT {
 			.when().put(FLOOR_PATH)
 			.then().statusCode(HttpStatus.SC_OK)
 			.body(
-				"level", equalTo(TEST_LEVEL),
+				"level", equalTo(8),
 				"id", equalTo(ID_FOR_UPDATE),
 				"buildingId", equalTo(BUILDING_ID_FOR_UPDATE)
 			);

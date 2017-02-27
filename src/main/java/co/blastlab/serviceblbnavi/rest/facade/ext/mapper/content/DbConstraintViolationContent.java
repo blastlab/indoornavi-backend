@@ -1,6 +1,13 @@
 package co.blastlab.serviceblbnavi.rest.facade.ext.mapper.content;
 
-public class DbConstraintViolationContent extends ErrorResponseContent {
+
+
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+@Getter
+@NoArgsConstructor
+public class DbConstraintViolationContent extends ErrorResponseContent{
 
 	private static final String ERROR = "db_constraint_violation";
 
