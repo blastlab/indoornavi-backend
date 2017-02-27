@@ -76,12 +76,7 @@ public class BeaconFacadeIT extends BaseIT {
 		givenUser()
 			.body(body)
 			.when().post(BEACON_PATH)
-			.then().statusCode(HttpStatus.SC_OK)
-			.body(
-				"mac", equalTo(TEST_MAC_4),
-				"minor", equalTo(TEST_MINOR_4),
-				"major", equalTo(TEST_MAJOR_3)
-			);
+			.then().statusCode(HttpStatus.SC_BAD_REQUEST);
 	}
 
 	@Test
