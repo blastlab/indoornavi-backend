@@ -10,6 +10,6 @@ import javax.persistence.FlushModeType;
 
 @Repository
 @EntityManagerConfig(entityManagerResolver = ProductionDBEntityManagerResolver.class, flushMode = FlushModeType.COMMIT)
-public interface GoalSelectionRepository extends EntityRepository<GoalSelection, Long> {
+public interface GoalSelectionProductionRepository extends EntityRepository<GoalSelection, Long> {
 
 }

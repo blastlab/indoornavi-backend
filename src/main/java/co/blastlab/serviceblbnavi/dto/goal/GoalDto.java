@@ -2,6 +2,7 @@ package co.blastlab.serviceblbnavi.dto.goal;
 
 import co.blastlab.serviceblbnavi.domain.Goal;
 import co.blastlab.serviceblbnavi.rest.facade.ext.Updatable;
+import com.wordnik.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -26,6 +27,7 @@ public class GoalDto implements Updatable<GoalDto, Goal> {
 		goal.getGoalSelections().forEach((goalSelection -> this.getGoalSelectionsIds().add(goalSelection.getId())));
 	}
 
+	@ApiModelProperty(example = "1")
 	private Long id;
 
 	@NotNull
@@ -43,8 +45,10 @@ public class GoalDto implements Updatable<GoalDto, Goal> {
 	private boolean inactive;
 
 	@NotNull
+	@ApiModelProperty(example = "2")
 	private Long floorId;
 
+	@ApiModelProperty(hidden = true)
 	private List<Long> goalSelectionsIds;
 
 	@Override

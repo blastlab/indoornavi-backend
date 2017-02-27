@@ -17,12 +17,12 @@ public interface VertexFacade {
 	@POST
 	@ApiOperation(value = "create vertex", response = VertexDto.class)
 	@ApiResponses({
-		@ApiResponse(code = 404, message = "floor id emtpy or floor doesn't exist")
+		@ApiResponse(code = 404, message = "floor id empty or floor doesn't exist")
 	})
 	VertexDto create(@ApiParam(value = "vertex", required = true) @Valid VertexDto vertex);
 
 	@PUT
-	@ApiOperation(value = "update vertex", response = VertexDto.class)
+	@ApiOperation(value = "update vertex coordinates", response = VertexDto.class)
 	@ApiResponses({
 		@ApiResponse(code = 404, message = "vertex id empty or doesn't exist")
 	})
@@ -42,7 +42,7 @@ public interface VertexFacade {
 	@ApiResponses({
 		@ApiResponse(code = 404, message = "floor with given id wasn't found")
 	})
-	List<VertexDto> findByFloor(@ApiParam(value = "id", required = true) @PathParam("id") Long floorId);
+	List<VertexDto> findByFloor(@ApiParam(value = "floor id", required = true) @PathParam("id") Long floorId);
 
 	@GET
 	@Path("/floor/{id: \\d+}/active")
@@ -50,7 +50,7 @@ public interface VertexFacade {
 	@ApiResponses({
 		@ApiResponse(code = 404, message = "floor with given id wasn't found")
 	})
-	List<VertexDto> findAllActiveByFloor(@ApiParam(value = "id", required = true) @PathParam("id") Long floorId);
+	List<VertexDto> findAllActiveByFloor(@ApiParam(value = "floor id", required = true) @PathParam("id") Long floorId);
 
 	@GET
 	@Path("/{id: \\d+}")
@@ -58,7 +58,7 @@ public interface VertexFacade {
 	@ApiResponses({
 		@ApiResponse(code = 404, message = "vertex with given id wasn't found")
 	})
-	VertexDto findById(@ApiParam(value = "id", required = true) @PathParam("id") Long vertexId);
+	VertexDto findById(@ApiParam(value = "vertex id", required = true) @PathParam("id") Long vertexId);
 
 	@PUT
 	@Path("/{id: \\d+}/deactivate")
@@ -66,5 +66,5 @@ public interface VertexFacade {
 	@ApiResponses({
 		@ApiResponse(code = 404, message = "vertex with given id wasn't found")
 	})
-	VertexDto deactivate(@ApiParam(value = "id", required = true) @PathParam("id") Long vertexId);
+	VertexDto deactivate(@ApiParam(value = "vertex id", required = true) @PathParam("id") Long vertexId);
 }

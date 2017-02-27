@@ -35,7 +35,7 @@ public interface GoalFacade {
 	@ApiResponses({
 		@ApiResponse(code = 404, message = "goal with given id doesn't exist")
 	})
-	Response delete(@PathParam("id") @ApiParam(value = "id", required = true) Long id);
+	Response delete(@PathParam("id") @ApiParam(value = "goal id", required = true) Long id);
 
 	@PUT
 	@Path("/coordinates")
@@ -49,9 +49,9 @@ public interface GoalFacade {
 	@Path("/{id: \\d+}/deactivate")
 	@ApiOperation(value = "deactivates goal of given id", response = GoalDto.class)
 	@ApiResponses({
-		@ApiResponse(code = 404, message = "vertex with given id wasn't found")
+		@ApiResponse(code = 404, message = "goal with given id wasn't found")
 	})
-	GoalDto deactivate(@ApiParam(value = "id", required = true) @PathParam("id") Long goalId);
+	GoalDto deactivate(@ApiParam(value = "goal id", required = true) @PathParam("id") Long goalId);
 
 	@GET
 	@Path("/building/{id: \\d+}")
@@ -59,7 +59,7 @@ public interface GoalFacade {
 	@ApiResponses({
 		@ApiResponse(code = 404, message = "building with given id wasn't found")
 	})
-	List<GoalDto> findByBuilding(@ApiParam(value = "id", required = true) @PathParam("id") Long buildingId);
+	List<GoalDto> findByBuilding(@ApiParam(value = "building id", required = true) @PathParam("id") Long buildingId);
 
 	@GET
 	@Path("/floor/{id: \\d+}")
@@ -67,7 +67,7 @@ public interface GoalFacade {
 	@ApiResponses({
 		@ApiResponse(code = 404, message = "floor with given id wasn't found")
 	})
-	List<GoalDto> findByFloor(@ApiParam(value = "id", required = true) @PathParam("id") Long floorId);
+	List<GoalDto> findByFloor(@ApiParam(value = "floor id", required = true) @PathParam("id") Long floorId);
 
 	@GET
 	@Path("/floor/{id: \\d+}/active")
@@ -75,5 +75,5 @@ public interface GoalFacade {
 	@ApiResponses({
 		@ApiResponse(code = 404, message = "floor with given id wasn't found")
 	})
-	List<GoalDto> findActiveByFloor(@ApiParam(value = "id", required = true) @PathParam("id") Long floorId);
+	List<GoalDto> findActiveByFloor(@ApiParam(value = "floor id", required = true) @PathParam("id") Long floorId);
 }
