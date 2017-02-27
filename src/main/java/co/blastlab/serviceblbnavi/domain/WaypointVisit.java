@@ -15,13 +15,12 @@ import java.util.Date;
 @Setter
 public class WaypointVisit extends CustomIdGenerationEntity implements Serializable {
 
-    private String device;
+	private String device;
 
-    // TODO: IMHO we should change name of this field to simpler one like: creationDate
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date creationDateTimestamp;
+	// TODO: IMHO we should change name of this field to simpler one like: creationDate
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date creationDateTimestamp;
 
-    @ManyToOne
-    private Waypoint waypoint;
-
+	@ManyToOne
+	private Waypoint waypoint;
 }

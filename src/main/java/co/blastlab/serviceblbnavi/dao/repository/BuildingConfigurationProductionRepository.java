@@ -13,5 +13,5 @@ import javax.persistence.FlushModeType;
 @EntityManagerConfig(entityManagerResolver = ProductionDBEntityManagerResolver.class, flushMode = FlushModeType.COMMIT)
 public interface BuildingConfigurationProductionRepository extends EntityRepository<BuildingConfiguration, Long> {
 
-    BuildingConfiguration findByBuildingAndVersion(Building building, Integer version);
+	BuildingConfiguration findByBuildingAndVersion(Building building, Integer version);
 }

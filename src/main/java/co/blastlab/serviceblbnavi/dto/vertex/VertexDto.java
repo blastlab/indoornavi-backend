@@ -16,64 +16,65 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 public class VertexDto implements Updatable<VertexDto, Vertex> {
-    public VertexDto(Vertex vertex, boolean floorUpChangeable, boolean floorDownChangeable) {
-        this.setId(vertex.getId());
-        this.setX(vertex.getX());
-        this.setY(vertex.getY());
-        this.setInactive(vertex.isInactive());
-        this.setFloorDownChangeable(floorUpChangeable);
-        this.setFloorUpChangeable(floorDownChangeable);
-        this.setFloorId(vertex.getFloor() != null ? vertex.getFloor().getId() : null);
-        vertex.getBuildingExits().forEach((buildingExit -> this.getBuildingExitsIds().add(buildingExit.getId())));
-        vertex.getSourceEdges().forEach((sourceEdge -> this.getSourceEdgesIds().add(sourceEdge.getId())));
-        vertex.getTargetEdges().forEach((targetEdge -> this.getTargetEdgesIds().add(targetEdge.getId())));
-    }
 
-    public VertexDto(Vertex vertex) {
-        this.setId(vertex.getId());
-        this.setX(vertex.getX());
-        this.setY(vertex.getY());
-        this.setInactive(vertex.isInactive());
-        if (vertex.getVertexFloorChangeabilityView() != null) {
-            this.setFloorDownChangeable(vertex.getVertexFloorChangeabilityView().isFloorDownChangeable());
-            this.setFloorUpChangeable(vertex.getVertexFloorChangeabilityView().isFloorUpChangeable());
-        }
-        this.setFloorId(vertex.getFloor() != null ? vertex.getFloor().getId() : null);
-        vertex.getBuildingExits().forEach((buildingExit -> this.getBuildingExitsIds().add(buildingExit.getId())));
-        vertex.getSourceEdges().forEach((sourceEdge -> this.getSourceEdgesIds().add(sourceEdge.getId())));
-        vertex.getTargetEdges().forEach((targetEdge -> this.getTargetEdgesIds().add(targetEdge.getId())));
-    }
+	public VertexDto(Vertex vertex, boolean floorUpChangeable, boolean floorDownChangeable) {
+		this.setId(vertex.getId());
+		this.setX(vertex.getX());
+		this.setY(vertex.getY());
+		this.setInactive(vertex.isInactive());
+		this.setFloorDownChangeable(floorUpChangeable);
+		this.setFloorUpChangeable(floorDownChangeable);
+		this.setFloorId(vertex.getFloor() != null ? vertex.getFloor().getId() : null);
+		vertex.getBuildingExits().forEach((buildingExit -> this.getBuildingExitsIds().add(buildingExit.getId())));
+		vertex.getSourceEdges().forEach((sourceEdge -> this.getSourceEdgesIds().add(sourceEdge.getId())));
+		vertex.getTargetEdges().forEach((targetEdge -> this.getTargetEdgesIds().add(targetEdge.getId())));
+	}
 
-    private Long id;
+	public VertexDto(Vertex vertex) {
+		this.setId(vertex.getId());
+		this.setX(vertex.getX());
+		this.setY(vertex.getY());
+		this.setInactive(vertex.isInactive());
+		if (vertex.getVertexFloorChangeabilityView() != null) {
+			this.setFloorDownChangeable(vertex.getVertexFloorChangeabilityView().isFloorDownChangeable());
+			this.setFloorUpChangeable(vertex.getVertexFloorChangeabilityView().isFloorUpChangeable());
+		}
+		this.setFloorId(vertex.getFloor() != null ? vertex.getFloor().getId() : null);
+		vertex.getBuildingExits().forEach((buildingExit -> this.getBuildingExitsIds().add(buildingExit.getId())));
+		vertex.getSourceEdges().forEach((sourceEdge -> this.getSourceEdgesIds().add(sourceEdge.getId())));
+		vertex.getTargetEdges().forEach((targetEdge -> this.getTargetEdgesIds().add(targetEdge.getId())));
+	}
 
-    @NotNull
-    @Min(0)
-    private Double x;
+	private Long id;
 
-    @NotNull
-    @Min(0)
-    private Double y;
+	@NotNull
+	@Min(0)
+	private Double x;
 
-    private boolean inactive;
+	@NotNull
+	@Min(0)
+	private Double y;
 
-    // TODO: this is here just for compatibility with front, address it when front will be ready for changes
-    @JsonProperty("isFloorDownChangeable")
-    private boolean isFloorDownChangeable;
+	private boolean inactive;
 
-    @JsonProperty("isFloorUpChangeable")
-    private boolean isFloorUpChangeable;
+	// TODO: this is here just for compatibility with front, address it when front will be ready for changes
+	@JsonProperty("isFloorDownChangeable")
+	private boolean isFloorDownChangeable;
 
-    @NotNull
-    private Long floorId;
+	@JsonProperty("isFloorUpChangeable")
+	private boolean isFloorUpChangeable;
 
-    private List<Long> buildingExitsIds = new ArrayList<>();
+	@NotNull
+	private Long floorId;
 
-    private List<Long> targetEdgesIds = new ArrayList<>();
+	private List<Long> buildingExitsIds = new ArrayList<>();
 
-    private List<Long> sourceEdgesIds = new ArrayList<>();
+	private List<Long> targetEdgesIds = new ArrayList<>();
 
-    @Override
-    public VertexDto create(Vertex entity) {
-        return new VertexDto(entity);
-    }
+	private List<Long> sourceEdgesIds = new ArrayList<>();
+
+	@Override
+	public VertexDto create(Vertex entity) {
+		return new VertexDto(entity);
+	}
 }

@@ -71,19 +71,19 @@ public class PersonFacadeIT extends BaseIT {
 	@Test
 	public void createPersonWithInvalidEmail() {
 		String body = new RequestBodyBuilder("UserRegistration.json")
-				.setParameter("email", "INVALID")
-				.setParameter("plainPassword", "12345")
-				.build();
+			.setParameter("email", "INVALID")
+			.setParameter("plainPassword", "12345")
+			.build();
 
 		given()
-				.body(body)
-				.when().post(USER_PATH)
-				.then().statusCode(HttpStatus.SC_BAD_REQUEST)
-				.body(
-						"violations.size()", is(1),
-						"violations.get(0).path", is("arg0.email"),
-						"error", equalTo("constraint_violation")
-				);
+			.body(body)
+			.when().post(USER_PATH)
+			.then().statusCode(HttpStatus.SC_BAD_REQUEST)
+			.body(
+				"violations.size()", is(1),
+				"violations.get(0).path", is("arg0.email"),
+				"error", equalTo("constraint_violation")
+			);
 	}
 
 	@Test

@@ -13,19 +13,19 @@ import java.util.List;
 @Getter
 @Setter
 public class Goal extends CustomIdGenerationEntity implements Serializable, UpdatableEntity {
-    private String name;
 
-    private Double x;
+	private String name;
 
-    private Double y;
+	private Double x;
 
-    @Column(nullable = false)
-    private boolean inactive;
+	private Double y;
 
-    @ManyToOne
-    private Floor floor;
+	@Column(nullable = false)
+	private boolean inactive;
 
-    @OneToMany(mappedBy = "goal", cascade = CascadeType.REMOVE)
-    private List<GoalSelection> goalSelections = new ArrayList<>();
+	@ManyToOne
+	private Floor floor;
 
+	@OneToMany(mappedBy = "goal", cascade = CascadeType.REMOVE)
+	private List<GoalSelection> goalSelections = new ArrayList<>();
 }

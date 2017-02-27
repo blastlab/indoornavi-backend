@@ -8,12 +8,11 @@ import java.io.Serializable;
 
 public class CustomIdGenerator extends IncrementGenerator {
 
-    @Override
-    public synchronized Serializable generate(SessionImplementor session, Object object) throws HibernateException {
-        if (((CustomIdGenerationEntity)object).getId() != null) {
-            return ((CustomIdGenerationEntity)object).getId();
-        }
-        return super.generate(session, object);
-    }
-    
+	@Override
+	public synchronized Serializable generate(SessionImplementor session, Object object) throws HibernateException {
+		if (((CustomIdGenerationEntity) object).getId() != null) {
+			return ((CustomIdGenerationEntity) object).getId();
+		}
+		return super.generate(session, object);
+	}
 }

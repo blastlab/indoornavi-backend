@@ -14,24 +14,24 @@ import java.util.List;
 @Setter
 public class Waypoint extends CustomIdGenerationEntity implements Serializable, UpdatableEntity {
 
-    private Double x;
+	private Double x;
 
-    private Double y;
+	private Double y;
 
-    private Integer timeToCheckout;
+	private Integer timeToCheckout;
 
-    private Double distance;
+	private Double distance;
 
-    private String details;
+	private String details;
 
-    private boolean inactive;
+	private boolean inactive;
 
-    private String name;
+	private String name;
 
-    @ManyToOne
-    @JoinColumn(updatable = false)
-    private Floor floor;
+	@ManyToOne
+	@JoinColumn(updatable = false)
+	private Floor floor;
 
-    @OneToMany(mappedBy = "waypoint", cascade = CascadeType.REMOVE)
-    private List<WaypointVisit> waypointVisits = new ArrayList<>();
+	@OneToMany(mappedBy = "waypoint", cascade = CascadeType.REMOVE)
+	private List<WaypointVisit> waypointVisits = new ArrayList<>();
 }

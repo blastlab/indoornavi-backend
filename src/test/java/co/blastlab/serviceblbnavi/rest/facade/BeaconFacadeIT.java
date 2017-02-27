@@ -32,13 +32,12 @@ public class BeaconFacadeIT extends BaseIT {
 	private static final Integer TEST_MINOR_3 = 99;
 	private static final Integer TEST_MINOR_4 = 5;
 
-	private static final List<Integer> TEST_MINORS = Arrays.asList(30,1);
+	private static final List<Integer> TEST_MINORS = Arrays.asList(30, 1);
 
 	private static final Integer ID_FOR_DELETE = 1;
 	private static final Integer ID_FOR_UPDATE = 2;
 
-	private static final List<Integer> TEST_IDS = Arrays.asList(5,6);
-
+	private static final List<Integer> TEST_IDS = Arrays.asList(5, 6);
 
 	private static final Integer FLOOR_ID_FOR_FINDING_BEACONS = 5;
 
@@ -46,31 +45,31 @@ public class BeaconFacadeIT extends BaseIT {
 	private static final Integer TEST_MAJOR_2 = 99;
 	private static final Integer TEST_MAJOR_3 = 4;
 
-	private static final List<Integer> TEST_MAJORS = Arrays.asList(56,777);
+	private static final List<Integer> TEST_MAJORS = Arrays.asList(56, 777);
 
 	@Test
 	public void createNewBeacon() {
 		String body = new RequestBodyBuilder("BeaconCreating.json")
-				.setParameter("mac", TEST_MAC)
-				.setParameter("minor",TEST_MINOR)
-				.setParameter("major",TEST_MAJOR)
-				.build();
+			.setParameter("mac", TEST_MAC)
+			.setParameter("minor", TEST_MINOR)
+			.setParameter("major", TEST_MAJOR)
+			.build();
 
 		givenUser()
-				.body(body)
-				.when().post(BEACON_PATH)
-				.then().statusCode(HttpStatus.SC_OK)
-				.body(
-						"mac", equalTo(TEST_MAC)
-				);
+			.body(body)
+			.when().post(BEACON_PATH)
+			.then().statusCode(HttpStatus.SC_OK)
+			.body(
+				"mac", equalTo(TEST_MAC)
+			);
 	}
 
 	@Test
 	public void createDuplicateBeacon() {
 		String body = new RequestBodyBuilder("BeaconCreating.json")
 			.setParameter("mac", TEST_MAC_4)
-			.setParameter("minor",TEST_MINOR_4)
-			.setParameter("major",TEST_MAJOR_3)
+			.setParameter("minor", TEST_MINOR_4)
+			.setParameter("major", TEST_MAJOR_3)
 			.build();
 
 		givenUser()
@@ -82,32 +81,33 @@ public class BeaconFacadeIT extends BaseIT {
 	@Test
 	public void createNewAndFindBeacon() {
 		String body = new RequestBodyBuilder("BeaconCreating.json")
-				.setParameter("mac", TEST_MAC_2)
-				.setParameter("minor",TEST_MINOR_2)
-				.setParameter("major",TEST_MAJOR)
-				.build();
+			.setParameter("mac", TEST_MAC_2)
+			.setParameter("minor", TEST_MINOR_2)
+			.setParameter("major", TEST_MAJOR)
+			.build();
 
 		Integer response = givenUser()
-				.body(body)
-				.when().post(BEACON_PATH)
-				.then().statusCode(HttpStatus.SC_OK)
-				.body(
-						"mac", equalTo(TEST_MAC_2)
-				)
-				.extract().response().path("id");
+			.body(body)
+			.when().post(BEACON_PATH)
+			.then().statusCode(HttpStatus.SC_OK)
+			.body(
+				"mac", equalTo(TEST_MAC_2)
+			)
+			.extract().response().path("id");
 
 		givenUser()
-				.pathParam("id",response)
-				.when().get(BEACON_PATH_WITH_ID)
-				.then().statusCode(HttpStatus.SC_OK)
-				.body(
-						"mac", equalTo(TEST_MAC_2)
-				);
+			.pathParam("id", response)
+			.when().get(BEACON_PATH_WITH_ID)
+			.then().statusCode(HttpStatus.SC_OK)
+			.body(
+				"mac", equalTo(TEST_MAC_2)
+			);
 	}
+
 	@Test
 	public void deleteBeacon() {
 		givenUser()
-			.pathParam("id",ID_FOR_DELETE)
+			.pathParam("id", ID_FOR_DELETE)
 			.when().delete(BEACON_PATH_WITH_ID)
 			.then().statusCode(HttpStatus.SC_OK);
 	}
@@ -116,9 +116,9 @@ public class BeaconFacadeIT extends BaseIT {
 	public void updateExistingFloor() {
 		String body = new RequestBodyBuilder("BeaconUpdating.json")
 			.setParameter("mac", TEST_MAC_3)
-			.setParameter("id",ID_FOR_UPDATE)
-			.setParameter("minor",TEST_MINOR_3)
-			.setParameter("major",TEST_MAJOR_2)
+			.setParameter("id", ID_FOR_UPDATE)
+			.setParameter("minor", TEST_MINOR_3)
+			.setParameter("major", TEST_MAJOR_2)
 			.build();
 
 		givenUser()
@@ -136,7 +136,7 @@ public class BeaconFacadeIT extends BaseIT {
 	@Test
 	public void findBeaconsByFloorId() {
 		givenUser()
-			.pathParam("id",FLOOR_ID_FOR_FINDING_BEACONS)
+			.pathParam("id", FLOOR_ID_FOR_FINDING_BEACONS)
 			.when().get(BEACON_PATH_WITH_FLOOR_ID)
 			.then().statusCode(HttpStatus.SC_OK)
 			.body(
@@ -150,14 +150,14 @@ public class BeaconFacadeIT extends BaseIT {
 	@Test
 	public void shouldValidateEmptyBodyWhenCreatingBeacon() {
 		String body = new RequestBodyBuilder("Empty.json")
-				.build();
+			.build();
 
 		ViolationResponse violationResponse = givenUser()
-				.body(body)
-				.when().post(BEACON_PATH)
-				.then().statusCode(HttpStatus.SC_BAD_REQUEST)
-				.extract()
-				.as(ViolationResponse.class);
+			.body(body)
+			.when().post(BEACON_PATH)
+			.then().statusCode(HttpStatus.SC_BAD_REQUEST)
+			.extract()
+			.as(ViolationResponse.class);
 
 		assertThat(violationResponse.getError(), is(VALIDATION_ERROR_NAME));
 		assertThat(violationResponse.getViolations().size(), is(7));
@@ -167,14 +167,14 @@ public class BeaconFacadeIT extends BaseIT {
 	@Test
 	public void shouldValidateEmptyBodyWhenUpdatingBeacon() {
 		String body = new RequestBodyBuilder("Empty.json")
-				.build();
+			.build();
 
 		ViolationResponse violationResponse = givenUser()
-				.body(body)
-				.when().put(BEACON_PATH)
-				.then().statusCode(HttpStatus.SC_BAD_REQUEST)
-				.extract()
-				.as(ViolationResponse.class);
+			.body(body)
+			.when().put(BEACON_PATH)
+			.then().statusCode(HttpStatus.SC_BAD_REQUEST)
+			.extract()
+			.as(ViolationResponse.class);
 
 		assertThat(violationResponse.getError(), is(VALIDATION_ERROR_NAME));
 		assertThat(violationResponse.getViolations().size(), is(7));
@@ -183,15 +183,15 @@ public class BeaconFacadeIT extends BaseIT {
 
 	private void assertViolations(ViolationResponse violationResponse) {
 		assertThat(violationResponse.getViolations(),
-				containsInAnyOrder(
-						validViolation("mac", "may not be null"),
-						validViolation("x", "may not be null"),
-						validViolation("y", "may not be null"),
-						validViolation("z", "may not be null"),
-						validViolation("minor", "may not be null"),
-						validViolation("major", "may not be null"),
-						validViolation("floorId", "may not be null")
-				)
+			containsInAnyOrder(
+				validViolation("mac", "may not be null"),
+				validViolation("x", "may not be null"),
+				validViolation("y", "may not be null"),
+				validViolation("z", "may not be null"),
+				validViolation("minor", "may not be null"),
+				validViolation("major", "may not be null"),
+				validViolation("floorId", "may not be null")
+			)
 		);
 	}
 }

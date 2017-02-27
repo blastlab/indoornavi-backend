@@ -8,7 +8,7 @@ import org.apache.deltaspike.data.api.Repository;
 import java.util.List;
 
 @Repository
-public interface FloorRepository extends EntityRepository<Floor, Long>{
+public interface FloorRepository extends EntityRepository<Floor, Long> {
 
-    List<Floor> findByBuilding(Building building);
+	List<Floor> findByBuilding(Building building);
 }

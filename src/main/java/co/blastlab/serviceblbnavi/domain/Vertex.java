@@ -14,27 +14,27 @@ import java.util.List;
 @Setter
 public class Vertex extends CustomIdGenerationEntity implements Serializable, UpdatableEntity {
 
-    private Double x;
+	private Double x;
 
-    private Double y;
+	private Double y;
 
-    @Column(nullable = false)
-    private boolean inactive;
+	@Column(nullable = false)
+	private boolean inactive;
 
-    @OneToMany(mappedBy = "vertex", cascade = {CascadeType.REMOVE, CascadeType.MERGE})
-    private List<BuildingExit> buildingExits = new ArrayList<>();
+	@OneToMany(mappedBy = "vertex", cascade = {CascadeType.REMOVE, CascadeType.MERGE})
+	private List<BuildingExit> buildingExits = new ArrayList<>();
 
-    @OneToMany(mappedBy = "target", cascade = {CascadeType.REMOVE, CascadeType.MERGE})
-    private List<Edge> targetEdges = new ArrayList<>();
+	@OneToMany(mappedBy = "target", cascade = {CascadeType.REMOVE, CascadeType.MERGE})
+	private List<Edge> targetEdges = new ArrayList<>();
 
-    @OneToMany(mappedBy = "source", cascade = {CascadeType.REMOVE, CascadeType.MERGE})
-    private List<Edge> sourceEdges = new ArrayList<>();
+	@OneToMany(mappedBy = "source", cascade = {CascadeType.REMOVE, CascadeType.MERGE})
+	private List<Edge> sourceEdges = new ArrayList<>();
 
-    @ManyToOne
-    private Floor floor;
+	@ManyToOne
+	private Floor floor;
 
-    @OneToOne(mappedBy = "vertex", fetch = FetchType.EAGER)
-    private VertexFloorChangeabilityView vertexFloorChangeabilityView;
+	@OneToOne(mappedBy = "vertex", fetch = FetchType.EAGER)
+	private VertexFloorChangeabilityView vertexFloorChangeabilityView;
 
 //    @Override
 //    public String toString() {
@@ -50,5 +50,4 @@ public class Vertex extends CustomIdGenerationEntity implements Serializable, Up
 //                + ", vertexFloorChangeabilityView=" + vertexFloorChangeabilityView
 //                + '}';
 //    }
-
 }

@@ -2,21 +2,21 @@ package co.blastlab.serviceblbnavi.rest.facade.ext;
 
 public interface Updatable<T, S> {
 
-    Long getId();
+	Long getId();
 
-    Long getFloorId();
+	Long getFloorId();
 
-    void setFloorId(Long floorId);
+	void setFloorId(Long floorId);
 
-    void setX(Double x);
+	void setX(Double x);
 
-    void setY(Double y);
+	void setY(Double y);
 
-    Double getX();
+	Double getX();
 
-    Double getY();
+	Double getY();
 
-    void setInactive(boolean bool);
+	void setInactive(boolean bool);
 
-    T create(S entity);
+	T create(S entity);
 }

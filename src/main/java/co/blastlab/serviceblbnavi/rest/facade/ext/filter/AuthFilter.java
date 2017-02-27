@@ -15,44 +15,42 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
 import java.io.IOException;
 
-
 @RequestScoped
 @Provider
 @Priority(Priorities.AUTHENTICATION)
 @TokenAuthorization
 public class AuthFilter implements ContainerRequestFilter {
 
-    private static final String AUTH_TOKEN = "auth_token";
+	private static final String AUTH_TOKEN = "auth_token";
 
-    @Inject
-    private AuthorizationBean authorizationBean;
+	@Inject
+	private AuthorizationBean authorizationBean;
 
-    @Inject
-    private PersonRepository personRepository;
+	@Inject
+	private PersonRepository personRepository;
 
-    @Override
-    public void filter(ContainerRequestContext requestCtx) throws IOException {
+	@Override
+	public void filter(ContainerRequestContext requestCtx) throws IOException {
 
-        //TODO: Is it correct to abort requestCtx with status.OK?
-        if (requestCtx.getRequest().getMethod().equals("OPTIONS")) {
-            requestCtx.abortWith(Response.status(Response.Status.OK).build());
-            return;
-        }
+		//TODO: Is it correct to abort requestCtx with status.OK?
+		if (requestCtx.getRequest().getMethod().equals("OPTIONS")) {
+			requestCtx.abortWith(Response.status(Response.Status.OK).build());
+			return;
+		}
 
-        System.out.println("authorization filtering");
+		System.out.println("authorization filtering");
 
-        String authToken = requestCtx.getHeaderString(AUTH_TOKEN);
+		String authToken = requestCtx.getHeaderString(AUTH_TOKEN);
 
-        if (authToken == null) {
-            throw new WebApplicationException(Response.Status.UNAUTHORIZED);
-        }
+		if (authToken == null) {
+			throw new WebApplicationException(Response.Status.UNAUTHORIZED);
+		}
 
-        Person person = personRepository.findByAuthToken(authToken);
-        if (person == null) {
-            throw new WebApplicationException(Response.Status.UNAUTHORIZED);
-        }
+		Person person = personRepository.findByAuthToken(authToken);
+		if (person == null) {
+			throw new WebApplicationException(Response.Status.UNAUTHORIZED);
+		}
 
-        authorizationBean.setCurrentUser(person);
-
-    }
+		authorizationBean.setCurrentUser(person);
+	}
 }
