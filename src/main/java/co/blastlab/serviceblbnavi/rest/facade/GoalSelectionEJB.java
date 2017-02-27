@@ -1,7 +1,7 @@
 package co.blastlab.serviceblbnavi.rest.facade;
 
 import co.blastlab.serviceblbnavi.dao.repository.GoalRepository;
-import co.blastlab.serviceblbnavi.dao.repository.GoalSelectionRepository;
+import co.blastlab.serviceblbnavi.dao.repository.GoalSelectionProductionRepository;
 import co.blastlab.serviceblbnavi.domain.Goal;
 import co.blastlab.serviceblbnavi.domain.GoalSelection;
 import co.blastlab.serviceblbnavi.dto.goal.GoalSelectionDto;
@@ -14,7 +14,7 @@ import javax.persistence.EntityNotFoundException;
 public class GoalSelectionEJB implements GoalSelectionFacade {
 
 	@Inject
-	private GoalSelectionRepository goalSelectionRepository;
+	private GoalSelectionProductionRepository goalSelectionProductionRepository;
 
 	@Inject
 	private GoalRepository goalRepository;
@@ -29,7 +29,7 @@ public class GoalSelectionEJB implements GoalSelectionFacade {
 			goalSelectionEntity.setDevice(goalSelection.getDevice());
 			goalSelectionEntity.setCreationDateTimestamp(goalSelection.getTimestamp());
 			goalSelectionEntity.setGoal(goal);
-			goalSelectionRepository.save(goalSelectionEntity);
+			goalSelectionProductionRepository.save(goalSelectionEntity);
 			return new GoalSelectionDto(goalSelectionEntity);
 		}
 		throw new EntityNotFoundException();
