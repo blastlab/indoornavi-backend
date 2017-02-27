@@ -1,10 +1,14 @@
 package co.blastlab.serviceblbnavi.rest.facade;
 
 
+import co.blastlab.serviceblbnavi.dto.building.BuildingDto;
 import co.blastlab.serviceblbnavi.rest.facade.ext.filter.TokenAuthorization;
 import com.wordnik.swagger.annotations.*;
 
-import javax.ws.rs.*;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
 @Path("/buildingConfiguration")
@@ -22,7 +26,7 @@ public interface BuildingConfigurationFacade {
 
     @GET
     @Path("/{complexName}/{buildingName}/{version: \\d+}/")
-    @ApiOperation(value = "finds building's configuration by complex name, building name and version")
+    @ApiOperation(value = "finds building's configuration by complex name, building name and version", response = BuildingDto.class)
     @ApiResponses({
             @ApiResponse(code = 404, message = "building doesn't exist or has no configuration set")
     })
