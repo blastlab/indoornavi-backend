@@ -18,24 +18,24 @@ import java.util.List;
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY, setterVisibility = JsonAutoDetect.Visibility.NONE, getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class BuildingExit extends CustomIdGenerationEntity implements Serializable {
 
-    private Double latitude;
+	private Double latitude;
 
-    private Double longitude;
+	private Double longitude;
 
-    private boolean exitIn;
+	private boolean exitIn;
 
-    private boolean exitOut;
+	private boolean exitOut;
 
-    @JsonIgnore
-    @ManyToOne
-    private Vertex vertex;
+	@JsonIgnore
+	@ManyToOne
+	private Vertex vertex;
 
-    @OneToMany(mappedBy = "target")
-    private List<BuildingConnection> targetConnections;
+	@OneToMany(mappedBy = "target")
+	private List<BuildingConnection> targetConnections;
 
-    @OneToMany(mappedBy = "source")
-    private List<BuildingConnection> sourceConnections;
+	@OneToMany(mappedBy = "source")
+	private List<BuildingConnection> sourceConnections;
 
-    @Transient
-    private Long vertexId;
+	@Transient
+	private Long vertexId;
 }

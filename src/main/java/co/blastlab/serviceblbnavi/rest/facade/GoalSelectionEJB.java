@@ -13,26 +13,25 @@ import javax.persistence.EntityNotFoundException;
 @Stateless
 public class GoalSelectionEJB implements GoalSelectionFacade {
 
-    @Inject
-    private GoalSelectionRepository goalSelectionRepository;
+	@Inject
+	private GoalSelectionRepository goalSelectionRepository;
 
-    @Inject
-    private GoalRepository goalRepository;
+	@Inject
+	private GoalRepository goalRepository;
 
-
-    public GoalSelectionDto create(GoalSelectionDto goalSelection) {
-        Goal goal = goalRepository.findBy(goalSelection.getGoalId());
-        if (goal != null) {
-            GoalSelection goalSelectionEntity = new GoalSelection();
-            goalSelectionEntity.setX(goalSelection.getX());
-            goalSelectionEntity.setY(goalSelection.getY());
-            goalSelectionEntity.setFloorLevel(goalSelection.getFloorLevel());
-            goalSelectionEntity.setDevice(goalSelection.getDevice());
-            goalSelectionEntity.setCreationDateTimestamp(goalSelection.getTimestamp());
-            goalSelectionEntity.setGoal(goal);
-            goalSelectionRepository.save(goalSelectionEntity);
-            return new GoalSelectionDto(goalSelectionEntity);
-        }
-        throw new EntityNotFoundException();
-    }
+	public GoalSelectionDto create(GoalSelectionDto goalSelection) {
+		Goal goal = goalRepository.findBy(goalSelection.getGoalId());
+		if (goal != null) {
+			GoalSelection goalSelectionEntity = new GoalSelection();
+			goalSelectionEntity.setX(goalSelection.getX());
+			goalSelectionEntity.setY(goalSelection.getY());
+			goalSelectionEntity.setFloorLevel(goalSelection.getFloorLevel());
+			goalSelectionEntity.setDevice(goalSelection.getDevice());
+			goalSelectionEntity.setCreationDateTimestamp(goalSelection.getTimestamp());
+			goalSelectionEntity.setGoal(goal);
+			goalSelectionRepository.save(goalSelectionEntity);
+			return new GoalSelectionDto(goalSelectionEntity);
+		}
+		throw new EntityNotFoundException();
+	}
 }

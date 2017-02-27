@@ -7,7 +7,7 @@ import org.apache.deltaspike.data.api.Repository;
 @Repository
 public interface PersonRepository extends EntityRepository<Person, Long> {
 
-    Person findByAuthToken(String authToken);
+	Person findByAuthToken(String authToken);
 
-    Person findOptionalByEmail(String email);
+	Person findOptionalByEmail(String email);
 }

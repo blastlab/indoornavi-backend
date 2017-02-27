@@ -10,11 +10,11 @@ import javax.ws.rs.ext.Provider;
 @Provider
 public class ValidationMapper implements ExceptionMapper<ConstraintViolationException> {
 
-    @Override
-    public Response toResponse(ConstraintViolationException exception) {
-        return Response
-                .status(Response.Status.BAD_REQUEST)
-                .entity(new ConstraintViolationListErrorResponseContent(exception))
-                .build();
-    }
+	@Override
+	public Response toResponse(ConstraintViolationException exception) {
+		return Response
+			.status(Response.Status.BAD_REQUEST)
+			.entity(new ConstraintViolationListErrorResponseContent(exception))
+			.build();
+	}
 }

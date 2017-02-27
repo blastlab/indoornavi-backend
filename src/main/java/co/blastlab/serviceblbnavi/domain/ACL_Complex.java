@@ -18,15 +18,15 @@ import java.io.Serializable;
 @AllArgsConstructor
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY, setterVisibility = JsonAutoDetect.Visibility.NONE, getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class ACL_Complex extends CustomIdGenerationEntity implements Serializable {
- 
-    @JsonIgnore
-    @ManyToOne
-    private Person person;
 
-    @JsonIgnore
-    @ManyToOne
-    private Complex complex;
+	@JsonIgnore
+	@ManyToOne
+	private Person person;
 
-    @ManyToOne
-    private Permission permission;
+	@JsonIgnore
+	@ManyToOne
+	private Complex complex;
+
+	@ManyToOne
+	private Permission permission;
 }

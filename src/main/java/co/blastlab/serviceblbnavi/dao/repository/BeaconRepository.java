@@ -8,7 +8,7 @@ import org.apache.deltaspike.data.api.Repository;
 import java.util.List;
 
 @Repository
-public interface BeaconRepository extends EntityRepository<Beacon, Long>{
+public interface BeaconRepository extends EntityRepository<Beacon, Long> {
 
-    List<Beacon> findByFloor(Floor floor);
+	List<Beacon> findByFloor(Floor floor);
 }

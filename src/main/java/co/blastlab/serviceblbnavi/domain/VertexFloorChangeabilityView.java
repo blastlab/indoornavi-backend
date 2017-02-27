@@ -10,17 +10,16 @@ import java.io.Serializable;
 @Getter
 @Setter
 public class VertexFloorChangeabilityView implements Serializable {
-    
-    @Id
-    @Column(name = "vertex_id")
-    private Long vertexId;
 
-    private boolean isFloorUpChangeable;
+	@Id
+	@Column(name = "vertex_id")
+	private Long vertexId;
 
-    private boolean isFloorDownChangeable;
+	private boolean isFloorUpChangeable;
 
-    @OneToOne
-    @JoinColumn(name = "vertex_id")
-    private Vertex vertex;
-    
+	private boolean isFloorDownChangeable;
+
+	@OneToOne
+	@JoinColumn(name = "vertex_id")
+	private Vertex vertex;
 }

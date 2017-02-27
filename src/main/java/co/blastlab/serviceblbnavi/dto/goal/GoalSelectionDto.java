@@ -16,58 +16,59 @@ import java.util.Date;
 @Setter
 @NoArgsConstructor
 public class GoalSelectionDto {
-    public GoalSelectionDto(GoalSelection goalSelection) {
-        this.setId(goalSelection.getId());
-        this.setDevice(goalSelection.getDevice());
-        this.setX(goalSelection.getX());
-        this.setY(goalSelection.getY());
-        this.setFloorLevel(goalSelection.getFloorLevel());
-        this.setTimestamp(goalSelection.getCreationDateTimestamp());
-        this.setGoalId(goalSelection.getGoal() != null ? goalSelection.getGoal().getId() : null);
-    }
 
-    private Long id;
+	public GoalSelectionDto(GoalSelection goalSelection) {
+		this.setId(goalSelection.getId());
+		this.setDevice(goalSelection.getDevice());
+		this.setX(goalSelection.getX());
+		this.setY(goalSelection.getY());
+		this.setFloorLevel(goalSelection.getFloorLevel());
+		this.setTimestamp(goalSelection.getCreationDateTimestamp());
+		this.setGoalId(goalSelection.getGoal() != null ? goalSelection.getGoal().getId() : null);
+	}
 
-    @NotNull
-    @NotEmpty
-    private String device;
+	private Long id;
 
-    @NotNull
-    @Min(0)
-    private Double x;
+	@NotNull
+	@NotEmpty
+	private String device;
 
-    @NotNull
-    @Min(0)
-    private Double y;
+	@NotNull
+	@Min(0)
+	private Double x;
 
-    @NotNull
-    private Integer floorLevel;
+	@NotNull
+	@Min(0)
+	private Double y;
 
-    // TODO: any other restrictions here? like it can't be in a future or in a past
-    @NotNull
-    private Date timestamp;
+	@NotNull
+	private Integer floorLevel;
 
-    @NotNull
-    private Long goalId;
+	// TODO: any other restrictions here? like it can't be in a future or in a past
+	@NotNull
+	private Date timestamp;
 
-    // TODO: Check why is it here
-    @JsonGetter("X")
-    public Double getXCapitalized() {
-        return x;
-    }
+	@NotNull
+	private Long goalId;
 
-    @JsonSetter("X")
-    public void setXCapitalized(Double x) {
-        this.x = x;
-    }
+	// TODO: Check why is it here
+	@JsonGetter("X")
+	public Double getXCapitalized() {
+		return x;
+	}
 
-    @JsonGetter("Y")
-    public Double getYCapitalized() {
-        return y;
-    }
+	@JsonSetter("X")
+	public void setXCapitalized(Double x) {
+		this.x = x;
+	}
 
-    @JsonSetter("Y")
-    public void setYCapitalized(Double y) {
-        this.y = y;
-    }
+	@JsonGetter("Y")
+	public Double getYCapitalized() {
+		return y;
+	}
+
+	@JsonSetter("Y")
+	public void setYCapitalized(Double y) {
+		this.y = y;
+	}
 }

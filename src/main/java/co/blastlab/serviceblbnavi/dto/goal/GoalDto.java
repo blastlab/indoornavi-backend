@@ -15,39 +15,40 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 public class GoalDto implements Updatable<GoalDto, Goal> {
-    public GoalDto(Goal goal) {
-        this.setId(goal.getId());
-        this.setName(goal.getName());
-        this.setX(goal.getX());
-        this.setY(goal.getY());
-        this.setFloorId(goal.getFloor() != null ? goal.getFloor().getId() : null);
-        this.setInactive(goal.isInactive());
-        goal.getGoalSelections().forEach((goalSelection -> this.getGoalSelectionsIds().add(goalSelection.getId())));
-    }
 
-    private Long id;
+	public GoalDto(Goal goal) {
+		this.setId(goal.getId());
+		this.setName(goal.getName());
+		this.setX(goal.getX());
+		this.setY(goal.getY());
+		this.setFloorId(goal.getFloor() != null ? goal.getFloor().getId() : null);
+		this.setInactive(goal.isInactive());
+		goal.getGoalSelections().forEach((goalSelection -> this.getGoalSelectionsIds().add(goalSelection.getId())));
+	}
 
-    @NotNull
-    @NotEmpty
-    private String name;
+	private Long id;
 
-    @NotNull
-    @Min(0)
-    private Double x;
+	@NotNull
+	@NotEmpty
+	private String name;
 
-    @NotNull
-    @Min(0)
-    private Double y;
+	@NotNull
+	@Min(0)
+	private Double x;
 
-    private boolean inactive;
+	@NotNull
+	@Min(0)
+	private Double y;
 
-    @NotNull
-    private Long floorId;
+	private boolean inactive;
 
-    private List<Long> goalSelectionsIds;
+	@NotNull
+	private Long floorId;
 
-    @Override
-    public GoalDto create(Goal entity) {
-        return new GoalDto(entity);
-    }
+	private List<Long> goalSelectionsIds;
+
+	@Override
+	public GoalDto create(Goal entity) {
+		return new GoalDto(entity);
+	}
 }

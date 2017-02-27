@@ -13,19 +13,19 @@ import java.util.List;
 @Setter
 public class Building extends CustomIdGenerationEntity implements Serializable {
 
-    private String name;
+	private String name;
 
-    private Integer minimumFloor;
+	private Integer minimumFloor;
 
-    private Double degree;
+	private Double degree;
 
-    @ManyToOne
-    private Complex complex;
+	@ManyToOne
+	private Complex complex;
 
-    @OneToMany(mappedBy = "building", cascade = {CascadeType.REMOVE, CascadeType.MERGE})
-    @OrderBy("level")
-    private List<Floor> floors = new ArrayList<>();
+	@OneToMany(mappedBy = "building", cascade = {CascadeType.REMOVE, CascadeType.MERGE})
+	@OrderBy("level")
+	private List<Floor> floors = new ArrayList<>();
 
-    @OneToMany(mappedBy = "building", cascade = CascadeType.REMOVE)
-    private List<BuildingConfiguration> buildingConfigurations = new ArrayList<>();
+	@OneToMany(mappedBy = "building", cascade = CascadeType.REMOVE)
+	private List<BuildingConfiguration> buildingConfigurations = new ArrayList<>();
 }

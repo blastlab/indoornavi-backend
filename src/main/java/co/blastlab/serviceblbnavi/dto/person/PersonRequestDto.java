@@ -9,7 +9,8 @@ import javax.validation.constraints.NotNull;
 @Getter
 @Setter
 public class PersonRequestDto extends PersonDto {
-    @NotNull
-    @NotEmpty
-    private String plainPassword;
+
+	@NotNull
+	@NotEmpty
+	private String plainPassword;
 }

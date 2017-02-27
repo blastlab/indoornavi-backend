@@ -16,31 +16,30 @@ import java.util.List;
 @Setter
 public class Floor extends CustomIdGenerationEntity implements Serializable {
 
-    private Integer level;
+	private Integer level;
 
-    private byte[] bitmap;
+	private byte[] bitmap;
 
-    private Integer bitmapWidth;
+	private Integer bitmapWidth;
 
-    private Integer bitmapHeight;
+	private Integer bitmapHeight;
 
-    private Double mToPix;
+	private Double mToPix;
 
-    private Double startZoom;
+	private Double startZoom;
 
-    @ManyToOne
-    private Building building;
+	@ManyToOne
+	private Building building;
 
-    @OneToMany(mappedBy = "floor", cascade = {CascadeType.REMOVE, CascadeType.MERGE})
-    private List<Waypoint> waypoints = new ArrayList<>();
+	@OneToMany(mappedBy = "floor", cascade = {CascadeType.REMOVE, CascadeType.MERGE})
+	private List<Waypoint> waypoints = new ArrayList<>();
 
-    @OneToMany(mappedBy = "floor", cascade = {CascadeType.REMOVE, CascadeType.MERGE})
-    private List<Vertex> vertices = new ArrayList<>();
+	@OneToMany(mappedBy = "floor", cascade = {CascadeType.REMOVE, CascadeType.MERGE})
+	private List<Vertex> vertices = new ArrayList<>();
 
-    @OneToMany(mappedBy = "floor", cascade = {CascadeType.REMOVE, CascadeType.MERGE})
-    private List<Goal> goals = new ArrayList<>();
+	@OneToMany(mappedBy = "floor", cascade = {CascadeType.REMOVE, CascadeType.MERGE})
+	private List<Goal> goals = new ArrayList<>();
 
-    @OneToMany(mappedBy = "floor", cascade = {CascadeType.REMOVE, CascadeType.MERGE})
-    private List<Beacon> beacons = new ArrayList<>();
-
+	@OneToMany(mappedBy = "floor", cascade = {CascadeType.REMOVE, CascadeType.MERGE})
+	private List<Beacon> beacons = new ArrayList<>();
 }

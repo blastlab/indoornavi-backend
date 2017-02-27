@@ -10,6 +10,7 @@ import java.util.List;
 @AllArgsConstructor
 @ToString
 public class SpecificViolation {
-    private String path;
-    private List<String> messages;
+
+	private String path;
+	private List<String> messages;
 }
