@@ -16,19 +16,19 @@ import java.io.Serializable;
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY, setterVisibility = JsonAutoDetect.Visibility.NONE, getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class BuildingConnection extends CustomIdGenerationEntity implements Serializable {
 
-    private Double distance;
+	private Double distance;
 
-    @JsonIgnore
-    @ManyToOne
-    private BuildingExit source;
+	@JsonIgnore
+	@ManyToOne
+	private BuildingExit source;
 
-    @JsonIgnore
-    @ManyToOne
-    private BuildingExit target;
+	@JsonIgnore
+	@ManyToOne
+	private BuildingExit target;
 
-    @Transient
-    private Long sourceId;
+	@Transient
+	private Long sourceId;
 
-    @Transient
-    private Long targetId;
+	@Transient
+	private Long targetId;
 }

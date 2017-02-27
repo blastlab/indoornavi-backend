@@ -19,45 +19,47 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 public class BuildingDto {
-    public BuildingDto(Building building) {
-        this.setId(building.getId());
-        this.setName(building.getName());
-        this.setMinimumFloor(building.getMinimumFloor());
-        this.setDegree(building.getDegree());
-        building.getFloors().forEach((floor -> this.getFloors().add(new FloorDto(floor))));
-        building.getBuildingConfigurations().forEach((buildingConfiguration -> this.getBuildingConfigurationsIds().add(buildingConfiguration.getId())));
-    }
 
-    private Long id;
+	public BuildingDto(Building building) {
+		this.setId(building.getId());
+		this.setName(building.getName());
+		this.setMinimumFloor(building.getMinimumFloor());
+		this.setDegree(building.getDegree());
+		building.getFloors().forEach((floor -> this.getFloors().add(new FloorDto(floor))));
+		building.getBuildingConfigurations().forEach((buildingConfiguration -> this.getBuildingConfigurationsIds().add(buildingConfiguration.getId())));
+	}
 
-    @NotNull
-    @NotEmpty
-    private String name;
+	private Long id;
 
-    @NotNull
-    private Integer minimumFloor;
+	@NotNull
+	@NotEmpty
+	private String name;
 
-    @NotNull
-    @Min(0)
-    @Max(360)
-    private Double degree;
+	@NotNull
+	private Integer minimumFloor;
 
-    @JsonView({View.BuildingInternal.class})
-    private List<FloorDto> floors = new ArrayList<>();
+	@NotNull
+	@Min(0)
+	@Max(360)
+	private Double degree;
 
-    @JsonView({View.BuildingInternal.class})
-    private List<Long> buildingConfigurationsIds = new ArrayList<>();
+	@JsonView({View.BuildingInternal.class})
+	private List<FloorDto> floors = new ArrayList<>();
 
-    @Getter
-    @Setter
-    @NoArgsConstructor
-    public static class New extends BuildingDto {
-        @NotNull
-        private Long complexId;
+	@JsonView({View.BuildingInternal.class})
+	private List<Long> buildingConfigurationsIds = new ArrayList<>();
 
-        public New(Building building) {
-            super(building);
-            this.setComplexId(building.getComplex() != null ? building.getComplex().getId() : null);
-        }
-    }
+	@Getter
+	@Setter
+	@NoArgsConstructor
+	public static class New extends BuildingDto {
+
+		@NotNull
+		private Long complexId;
+
+		public New(Building building) {
+			super(building);
+			this.setComplexId(building.getComplex() != null ? building.getComplex().getId() : null);
+		}
+	}
 }

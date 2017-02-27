@@ -14,20 +14,20 @@ import java.io.Serializable;
 @Setter
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY, setterVisibility = JsonAutoDetect.Visibility.NONE, getterVisibility = JsonAutoDetect.Visibility.NONE)
 @Table(uniqueConstraints =
-    @UniqueConstraint(columnNames = {"version", "building_id"})
+@UniqueConstraint(columnNames = {"version", "building_id"})
 )
 public class BuildingConfiguration extends CustomIdGenerationEntity implements Serializable {
 
-    private Integer version;
+	private Integer version;
 
-    @Lob
-    @JsonIgnore
-    private String configuration;
+	@Lob
+	@JsonIgnore
+	private String configuration;
 
-    @JsonIgnore
-    private String configurationChecksum;
+	@JsonIgnore
+	private String configurationChecksum;
 
-    @JsonIgnore
-    @ManyToOne
-    private Building building;
+	@JsonIgnore
+	@ManyToOne
+	private Building building;
 }

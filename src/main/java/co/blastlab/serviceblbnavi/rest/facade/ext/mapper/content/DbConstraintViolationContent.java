@@ -1,19 +1,17 @@
 package co.blastlab.serviceblbnavi.rest.facade.ext.mapper.content;
 
+public class DbConstraintViolationContent extends ErrorResponseContent {
 
+	private static final String ERROR = "db_constraint_violation";
 
-public class DbConstraintViolationContent extends ErrorResponseContent{
+	private String message;
 
-    private static final String ERROR = "db_constraint_violation";
+	public DbConstraintViolationContent(String message) {
+		this.message = message;
+	}
 
-    private String message;
-
-    public DbConstraintViolationContent(String message) {
-        this.message = message;
-    }
-
-    @Override
-    public String getError() {
-        return ERROR;
-    }
+	@Override
+	public String getError() {
+		return ERROR;
+	}
 }

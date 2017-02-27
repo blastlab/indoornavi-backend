@@ -1,6 +1,6 @@
 {
-  "name": "{name}",
-  "minimumFloor": "{minimumFloor:0}",
-  "complexId": "{complexId}",
-  "degree": "{degree:5}"
+	"name": "{name}",
+	"minimumFloor": "{minimumFloor:0}",
+	"complexId": "{complexId}",
+	"degree": "{degree:5}"
 }

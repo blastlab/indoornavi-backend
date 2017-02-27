@@ -15,18 +15,19 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 public class ComplexDto {
-    public ComplexDto(Complex complex, List<String> permissions) {
-        this.setId(complex.getId());
-        this.setName(complex.getName());
-        this.getPermissions().addAll(permissions);
-    }
 
-    private Long id;
+	public ComplexDto(Complex complex, List<String> permissions) {
+		this.setId(complex.getId());
+		this.setName(complex.getName());
+		this.getPermissions().addAll(permissions);
+	}
 
-    @NotNull
-    @NotEmpty
-    private String name;
+	private Long id;
 
-    @ApiModelProperty(readOnly = true)
-    private List<String> permissions = new ArrayList<>();
+	@NotNull
+	@NotEmpty
+	private String name;
+
+	@ApiModelProperty(readOnly = true)
+	private List<String> permissions = new ArrayList<>();
 }

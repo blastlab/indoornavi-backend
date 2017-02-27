@@ -9,10 +9,11 @@ import javax.ws.rs.FormParam;
 @Getter
 @Setter
 public class ImageUpload {
-    @FormParam("floor")
-    @NotNull
-    private Long floorId;
 
-    @FormParam("image")
-    private byte[] image;
+	@FormParam("floor")
+	@NotNull
+	private Long floorId;
+
+	@FormParam("image")
+	private byte[] image;
 }
