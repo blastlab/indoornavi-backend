@@ -4,30 +4,28 @@ import co.blastlab.serviceblbnavi.rest.facade.ext.mapper.accessory.ConstraintSea
 import co.blastlab.serviceblbnavi.rest.facade.ext.mapper.content.DbConstraintViolationContent;
 
 import javax.ejb.EJBTransactionRolledbackException;
-
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
-
 @Provider
 public class ConstraintViolationMapper implements ExceptionMapper<EJBTransactionRolledbackException> {
 
-    @Override
-    public Response toResponse(EJBTransactionRolledbackException exception) {
+	@Override
+	public Response toResponse(EJBTransactionRolledbackException exception) {
 
-        String constraintName = ConstraintSearcher.retrieveConstraintName(exception);
-        String message;
+		String constraintName = ConstraintSearcher.retrieveConstraintName(exception);
+		String message;
 
-        switch (constraintName){
-            case "unique_minor_major":
-                message = "Minor and major must be unique";
-                break;
-            default:
-                message = "Unknown constraint violation exception";
-        }
+		switch (constraintName) {
+			case "unique_minor_major":
+				message = "Minor and major must be unique";
+				break;
+			default:
+				message = "Unknown constraint violation exception";
+		}
 
-       return Response.status(Response.Status.BAD_REQUEST)
-               .entity(new DbConstraintViolationContent(message)).build();
-    }
+		return Response.status(Response.Status.BAD_REQUEST)
+			.entity(new DbConstraintViolationContent(message)).build();
+	}
 }

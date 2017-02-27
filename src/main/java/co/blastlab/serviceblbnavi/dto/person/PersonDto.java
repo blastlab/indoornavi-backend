@@ -7,6 +7,7 @@ import org.hibernate.validator.constraints.Email;
 @Getter
 @Setter
 abstract class PersonDto {
-    @Email
-    private String email;
+
+	@Email
+	private String email;
 }

@@ -22,130 +22,121 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 
-
 @Stateless
 public class FloorEJB implements FloorFacade {
 
-    @Inject
-    private FloorRepository floorRepository;
+	@Inject
+	private FloorRepository floorRepository;
 
-    @Inject
-    private BuildingRepository buildingRepository;
+	@Inject
+	private BuildingRepository buildingRepository;
 
-    @Inject
-    private PermissionBean permissionBean;
+	@Inject
+	private PermissionBean permissionBean;
 
+	public FloorDto create(FloorDto floor) {
+		Building building = buildingRepository.findBy(floor.getBuildingId());
+		if (building != null) {
+			Floor floorEntity = new Floor();
+			return createOrUpdate(floorEntity, floor, building);
+		}
+		throw new EntityNotFoundException();
+	}
 
-    public FloorDto create(FloorDto floor) {
-        Building building = buildingRepository.findBy(floor.getBuildingId());
-        if (building != null) {
-            Floor floorEntity = new Floor();
-            return createOrUpdate(floorEntity, floor, building);
-        }
-        throw new EntityNotFoundException();
-    }
+	public FloorDto find(Long id) {
+		Floor floor = floorRepository.findBy(id);
+		if (floor != null) {
+			permissionBean.checkPermission(floor, Permission.READ);
+			return new FloorDto(floor);
+		}
+		throw new EntityNotFoundException();
+	}
 
+	public Response delete(Long id) {
+		Floor floor = floorRepository.findBy(id);
+		if (floor != null) {
+			permissionBean.checkPermission(floor, Permission.UPDATE);
+			floorRepository.remove(floor);
+			return Response.ok().build();
+		}
+		throw new EntityNotFoundException();
+	}
 
-    public FloorDto find(Long id) {
-        Floor floor = floorRepository.findBy(id);
-        if (floor != null) {
-            permissionBean.checkPermission(floor, Permission.READ);
-            return new FloorDto(floor);
-        }
-        throw new EntityNotFoundException();
-    }
+	public FloorDto update(FloorDto floor) {
+		Building building = buildingRepository.findBy(floor.getBuildingId());
+		if (building != null) {
+			Floor floorEntity = floorRepository.findBy(floor.getId());
+			return createOrUpdate(floorEntity, floor, building);
+		}
+		throw new EntityNotFoundException();
+	}
 
+	public Response updateFloors(Long buildingId, List<FloorDto> floors) {
+		Building building = buildingRepository.findBy(buildingId);
+		if (building != null) {
+			permissionBean.checkPermission(building, Permission.UPDATE);
+			List<Floor> floorEntities = new ArrayList<>();
+			floors.forEach((floor -> {
+				Floor floorEntity = floorRepository.findBy(floor.getId());
+				if (floorEntity == null) {
+					throw new EntityNotFoundException();
+				}
+				floorEntities.add(floorEntity);
+			}
+			));
 
-    public Response delete(Long id) {
-        Floor floor = floorRepository.findBy(id);
-        if (floor != null) {
-            permissionBean.checkPermission(floor, Permission.UPDATE);
-            floorRepository.remove(floor);
-            return Response.ok().build();
-        }
-        throw new EntityNotFoundException();
-    }
+			floorEntities.forEach((floorEntity -> floorEntity.setBuilding(building)));
+			updateFloorLevels(floorEntities);
+			return Response.ok().build();
+		}
+		throw new EntityNotFoundException();
+	}
 
+	public Response updatemToPix(FloorDto.Extended floor) {
+		Floor floorEntity = floorRepository.findBy(floor.getId());
+		if (floorEntity != null) {
+			permissionBean.checkPermission(floorEntity, Permission.UPDATE);
+			floorEntity.setMToPix(floor.getMToPix());
+			floorRepository.save(floorEntity);
+			return Response.ok().build();
+		}
+		throw new EntityNotFoundException();
+	}
 
-    public FloorDto update(FloorDto floor) {
-        Building building = buildingRepository.findBy(floor.getBuildingId());
-        if (building != null) {
-            Floor floorEntity = floorRepository.findBy(floor.getId());
-            return createOrUpdate(floorEntity, floor, building);
-        }
-        throw new EntityNotFoundException();
-    }
+	public Response uploadImage(@MultipartForm ImageUpload imageUpload) throws IOException {
+		Floor floorEntity = floorRepository.findBy(imageUpload.getFloorId());
+		if (floorEntity == null) {
+			return Response.status(Response.Status.NOT_FOUND).build();
+		}
+		byte[] image = imageUpload.getImage();
+		BufferedImage bufferedImage = ImageIO.read(new ByteArrayInputStream(image));
+		floorEntity.setBitmapHeight(bufferedImage.getHeight());
+		floorEntity.setBitmapWidth(bufferedImage.getWidth());
+		floorEntity.setBitmap(image);
+		return Response.ok().build();
+	}
 
-    public Response updateFloors(Long buildingId, List<FloorDto> floors) {
-        Building building = buildingRepository.findBy(buildingId);
-        if (building != null) {
-            permissionBean.checkPermission(building, Permission.UPDATE);
-            List<Floor> floorEntities = new ArrayList<>() ;
-            floors.forEach((floor-> {
-                    Floor floorEntity = floorRepository.findBy(floor.getId());
-                    if (floorEntity == null) {
-                        throw new EntityNotFoundException();
-                    }
-                    floorEntities.add(floorEntity);
-                }
-            ));
+	public Response downloadImage(Long floorId) {
+		Floor floorEntity = floorRepository.findBy(floorId);
+		if (floorEntity == null || floorEntity.getBitmap() == null) {
+			return Response.status(Response.Status.NOT_FOUND).build();
+		}
+		return Response.ok(new ByteArrayInputStream(Base64.getEncoder().encode(floorEntity.getBitmap()))).build();
+	}
 
-            floorEntities.forEach((floorEntity -> floorEntity.setBuilding(building)));
-            updateFloorLevels(floorEntities);
-            return Response.ok().build();
+	private void updateFloorLevels(List<Floor> floors) {
+		floors.stream().map((f) -> {
+			Floor floor = floorRepository.findBy(f.getId());
+			floor.setLevel(f.getLevel());
+			return floor;
+		}).forEach((floor) -> floorRepository.save(floor));
+	}
 
-        }
-        throw new EntityNotFoundException();
-    }
-
-
-    public Response updatemToPix(FloorDto.Extended floor) {
-        Floor floorEntity = floorRepository.findBy(floor.getId());
-        if (floorEntity != null) {
-            permissionBean.checkPermission(floorEntity, Permission.UPDATE);
-            floorEntity.setMToPix(floor.getMToPix());
-            floorRepository.save(floorEntity);
-            return Response.ok().build();
-        }
-        throw new EntityNotFoundException();
-    }
-
-
-    public Response uploadImage(@MultipartForm ImageUpload imageUpload) throws IOException {
-        Floor floorEntity = floorRepository.findBy(imageUpload.getFloorId());
-        if (floorEntity == null) {
-            return Response.status(Response.Status.NOT_FOUND).build();
-        }
-        byte[] image = imageUpload.getImage();
-        BufferedImage bufferedImage = ImageIO.read(new ByteArrayInputStream(image));
-        floorEntity.setBitmapHeight(bufferedImage.getHeight());
-        floorEntity.setBitmapWidth(bufferedImage.getWidth());
-        floorEntity.setBitmap(image);
-        return Response.ok().build();
-    }
-
-
-    public Response downloadImage(Long floorId) {
-        Floor floorEntity = floorRepository.findBy(floorId);
-        if (floorEntity == null || floorEntity.getBitmap() == null) {
-            return Response.status(Response.Status.NOT_FOUND).build();
-        }
-        return Response.ok(new ByteArrayInputStream(Base64.getEncoder().encode(floorEntity.getBitmap()))).build();
-    }
-
-    private void updateFloorLevels(List<Floor> floors) {
-        floors.stream().map((f) -> {
-            Floor floor = floorRepository.findBy(f.getId());
-            floor.setLevel(f.getLevel());
-            return floor;
-        }).forEach((floor) -> floorRepository.save(floor));
-    }
-
-    private FloorDto createOrUpdate(Floor floorEntity, FloorDto floor, Building building){
-        permissionBean.checkPermission(building, Permission.UPDATE);
-        floorEntity.setLevel(floor.getLevel());
-        floorEntity.setBuilding(building);
-        floorEntity = floorRepository.save(floorEntity);
-        return new FloorDto(floorEntity);
-    }
+	private FloorDto createOrUpdate(Floor floorEntity, FloorDto floor, Building building) {
+		permissionBean.checkPermission(building, Permission.UPDATE);
+		floorEntity.setLevel(floor.getLevel());
+		floorEntity.setBuilding(building);
+		floorEntity = floorRepository.save(floorEntity);
+		return new FloorDto(floorEntity);
+	}
 }

@@ -8,13 +8,12 @@ import javax.persistence.EntityManager;
 
 public class ProductionDBEntityManagerResolver implements EntityManagerResolver {
 
-    @Inject
-    @NaviProduction
-    private EntityManager emProd;
+	@Inject
+	@NaviProduction
+	private EntityManager emProd;
 
-    @Override
-    public EntityManager resolveEntityManager()
-    {
-        return emProd;
-    }
+	@Override
+	public EntityManager resolveEntityManager() {
+		return emProd;
+	}
 }

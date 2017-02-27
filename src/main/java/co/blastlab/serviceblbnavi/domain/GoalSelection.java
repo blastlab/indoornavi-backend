@@ -14,18 +14,19 @@ import java.util.Date;
 @Getter
 @Setter
 public class GoalSelection extends CustomIdGenerationEntity implements Serializable {
-    // TODO: why is it a string?
-    private String device;
 
-    private Double x;
+	// TODO: why is it a string?
+	private String device;
 
-    private Double y;
+	private Double x;
 
-    private Integer floorLevel;
+	private Double y;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date creationDateTimestamp;
+	private Integer floorLevel;
 
-    @ManyToOne
-    private Goal goal;
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date creationDateTimestamp;
+
+	@ManyToOne
+	private Goal goal;
 }

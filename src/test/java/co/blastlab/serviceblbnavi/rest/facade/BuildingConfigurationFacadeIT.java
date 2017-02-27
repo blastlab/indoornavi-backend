@@ -17,17 +17,17 @@ public class BuildingConfigurationFacadeIT extends BaseIT {
 	public void createAndGetBuildingConfiguration() {
 		given()
 			.header("auth_token", AUTH_TOKEN)
-			.pathParam("complexName",COMPLEX_TEST_NAME)
-			.pathParam("buildingName",BUILDING_TEST_NAME)
-			.pathParam("version",VERSION)
+			.pathParam("complexName", COMPLEX_TEST_NAME)
+			.pathParam("buildingName", BUILDING_TEST_NAME)
+			.pathParam("version", VERSION)
 			.when().post(BUILDING_CONFIGURATION_PATH)
 			.then().statusCode(HttpStatus.SC_NO_CONTENT);
 
 		given()
 			.header("auth_token", AUTH_TOKEN)
-			.pathParam("complexName",COMPLEX_TEST_NAME)
-			.pathParam("buildingName",BUILDING_TEST_NAME)
-			.pathParam("version",VERSION)
+			.pathParam("complexName", COMPLEX_TEST_NAME)
+			.pathParam("buildingName", BUILDING_TEST_NAME)
+			.pathParam("version", VERSION)
 			.when().get(BUILDING_CONFIGURATION_PATH)
 			.then().statusCode(HttpStatus.SC_NOT_FOUND);
 	}

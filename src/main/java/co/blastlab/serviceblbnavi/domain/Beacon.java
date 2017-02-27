@@ -13,19 +13,19 @@ import java.io.Serializable;
 @Setter
 public class Beacon extends CustomIdGenerationEntity implements Serializable {
 
-    private String mac;
+	private String mac;
 
-    private Double x;
+	private Double x;
 
-    private Double y;
+	private Double y;
 
-    private Double z;
+	private Double z;
 
-    private Integer minor;
+	private Integer minor;
 
-    private Integer major;
+	private Integer major;
 
-    @ManyToOne
-    @JoinColumn(updatable = false)
-    private Floor floor;
+	@ManyToOne
+	@JoinColumn(updatable = false)
+	private Floor floor;
 }

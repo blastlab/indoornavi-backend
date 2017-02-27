@@ -1,8 +1,8 @@
 {
-  "id": "{id}",
-  "level": "{level}",
-  "bitmapWidth": "{bitmapWidth:6}",
-  "bitmapHeight": "{bitmapHeight:0}",
-  "buildingId": "{buildingId}",
-  "startZoom": "{startZoom:2}"
+	"id": "{id}",
+	"level": "{level}",
+	"bitmapWidth": "{bitmapWidth:6}",
+	"bitmapHeight": "{bitmapHeight:0}",
+	"buildingId": "{buildingId}",
+	"startZoom": "{startZoom:2}"
 }
