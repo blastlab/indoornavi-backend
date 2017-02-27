@@ -17,13 +17,15 @@ public class ConstraintViolationMapper implements ExceptionMapper<EJBTransaction
 		String constraintName = ConstraintSearcher.retrieveConstraintName(exception);
 		String message;
 
-		switch (constraintName) {
-			case "unique_minor_major":
-				message = "Minor and major must be unique";
-				break;
-			default:
-				message = "Unknown constraint violation exception";
-		}
+        switch (constraintName){
+            case "unique_minor_major":
+                message = "Minor and major must be unique";
+                break;
+            case "unique_level_building_id":
+                message = "You can't have more than one floor with the same level";
+                break;default:
+                message = "Unknown constraint violation exception";
+        }
 
 		return Response.status(Response.Status.BAD_REQUEST)
 			.entity(new DbConstraintViolationContent(message)).build();

@@ -16,6 +16,7 @@ import java.util.List;
 @Path("/floor")
 @Api("/floor")
 @TokenAuthorization
+@Consumes("application/json")
 public interface FloorFacade {
 
 	@POST
