@@ -15,56 +15,58 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 public class FloorDto {
-    public FloorDto(Floor floor) {
-        this.setId(floor.getId());
-        this.setLevel(floor.getLevel());
-        this.setBitmapHeight(floor.getBitmapHeight());
-        this.setBitmapWidth(floor.getBitmapWidth());
-        this.setStartZoom(floor.getStartZoom());
-        this.setBuildingId(floor.getBuilding() != null ? floor.getBuilding().getId() : null);
-        floor.getBeacons().forEach((beacon -> this.getBeaconsIds().add(beacon.getId())));
-        floor.getGoals().forEach((goal -> this.getGoalsIds().add(goal.getId())));
-        floor.getVertices().forEach((vertex -> this.getVerticesIds().add(vertex.getId())));
-        floor.getWaypoints().forEach((waypoint -> this.getWaypointsIds().add(waypoint.getId())));
-    }
 
-    // TODO: on every field that is in some metric, should be description metric it uses i.e. bitmapWidth should be described: px
+	public FloorDto(Floor floor) {
+		this.setId(floor.getId());
+		this.setLevel(floor.getLevel());
+		this.setBitmapHeight(floor.getBitmapHeight());
+		this.setBitmapWidth(floor.getBitmapWidth());
+		this.setStartZoom(floor.getStartZoom());
+		this.setBuildingId(floor.getBuilding() != null ? floor.getBuilding().getId() : null);
+		floor.getBeacons().forEach((beacon -> this.getBeaconsIds().add(beacon.getId())));
+		floor.getGoals().forEach((goal -> this.getGoalsIds().add(goal.getId())));
+		floor.getVertices().forEach((vertex -> this.getVerticesIds().add(vertex.getId())));
+		floor.getWaypoints().forEach((waypoint -> this.getWaypointsIds().add(waypoint.getId())));
+	}
 
-    private Long id;
+	// TODO: on every field that is in some metric, should be description metric it uses i.e. bitmapWidth should be described: px
 
-    @NotNull
-    private Integer level;
+	private Long id;
 
-    private Integer bitmapWidth;
+	@NotNull
+	private Integer level;
 
-    private Integer bitmapHeight;
+	private Integer bitmapWidth;
 
-    private Double startZoom;
+	private Integer bitmapHeight;
 
-    @NotNull
-    private Long buildingId;
+	private Double startZoom;
 
-    private List<Long> waypointsIds = new ArrayList<>();
+	@NotNull
+	private Long buildingId;
 
-    private List<Long> verticesIds = new ArrayList<>();
+	private List<Long> waypointsIds = new ArrayList<>();
 
-    private List<Long> goalsIds = new ArrayList<>();
+	private List<Long> verticesIds = new ArrayList<>();
 
-    private List<Long> beaconsIds = new ArrayList<>();
+	private List<Long> goalsIds = new ArrayList<>();
 
-    @Getter
-    @Setter
-    @NoArgsConstructor
-    public static class Extended extends FloorDto {
-        @NotNull
-        @Min(0)
-        // TODO: this field can have more friendly name like: scale?
-        @JsonProperty("mToPix")
-        private Double mToPix;
+	private List<Long> beaconsIds = new ArrayList<>();
 
-        public Extended(Floor floor) {
-            super(floor);
-            this.setMToPix(floor.getMToPix());
-        }
-    }
+	@Getter
+	@Setter
+	@NoArgsConstructor
+	public static class Extended extends FloorDto {
+
+		@NotNull
+		@Min(0)
+		// TODO: this field can have more friendly name like: scale?
+		@JsonProperty("mToPix")
+		private Double mToPix;
+
+		public Extended(Floor floor) {
+			super(floor);
+			this.setMToPix(floor.getMToPix());
+		}
+	}
 }

@@ -12,6 +12,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ViolationResponse {
-    private String error;
-    private List<SpecificViolation> violations;
+
+	private String error;
+	private List<SpecificViolation> violations;
 }

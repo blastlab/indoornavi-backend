@@ -11,11 +11,10 @@ import javax.ws.rs.Path;
 @Api("/waypointVisit")
 public interface WaypointVisitFacade {
 
-    @POST
-    @ApiOperation(value = "create waypoint visit", response = WaypointVisitDto.class)
-    @ApiResponses({
-            @ApiResponse(code = 404, message = "invalid waypoint visit\'s data")
-    })
-    WaypointVisitDto create(@ApiParam(value = "waypoint visit", required = true) @Valid WaypointVisitDto waypointVisit);
-
+	@POST
+	@ApiOperation(value = "create waypoint visit", response = WaypointVisitDto.class)
+	@ApiResponses({
+		@ApiResponse(code = 404, message = "invalid waypoint visit\'s data")
+	})
+	WaypointVisitDto create(@ApiParam(value = "waypoint visit", required = true) @Valid WaypointVisitDto waypointVisit);
 }

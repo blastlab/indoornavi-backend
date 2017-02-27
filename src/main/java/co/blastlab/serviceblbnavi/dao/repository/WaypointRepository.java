@@ -10,7 +10,7 @@ import java.util.List;
 @Repository
 public interface WaypointRepository extends EntityRepository<Waypoint, Long> {
 
-    List<Waypoint> findByFloorAndInactive(Floor floor, Boolean inactive);
+	List<Waypoint> findByFloorAndInactive(Floor floor, Boolean inactive);
 
-    List<Waypoint> findByFloor(Floor floor);
+	List<Waypoint> findByFloor(Floor floor);
 }

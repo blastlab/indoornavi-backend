@@ -13,22 +13,22 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 public class EdgeDto {
 
-    public EdgeDto(Edge edge) {
-        this.setId(edge.getId());
-        this.setWeight(edge.getWeight());
-        this.setSourceId(edge.getSource() != null ? edge.getSource().getId() : null);
-        this.setTargetId(edge.getTarget() != null ? edge.getTarget().getId() : null);
-    }
+	public EdgeDto(Edge edge) {
+		this.setId(edge.getId());
+		this.setWeight(edge.getWeight());
+		this.setSourceId(edge.getSource() != null ? edge.getSource().getId() : null);
+		this.setTargetId(edge.getTarget() != null ? edge.getTarget().getId() : null);
+	}
 
-    private Long id;
+	private Long id;
 
-    @NotNull
-    @Min(0)
-    private Double weight;
+	@NotNull
+	@Min(0)
+	private Double weight;
 
-    @NotNull
-    private Long sourceId;
+	@NotNull
+	private Long sourceId;
 
-    @NotNull
-    private Long targetId;
+	@NotNull
+	private Long targetId;
 }

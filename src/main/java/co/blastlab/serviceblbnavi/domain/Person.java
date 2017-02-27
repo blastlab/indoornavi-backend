@@ -19,30 +19,29 @@ import java.util.List;
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY, setterVisibility = JsonAutoDetect.Visibility.NONE, getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class Person extends CustomIdGenerationEntity implements Serializable {
 
-    public static final String PASSWORD_DIGEST_ALG = "SHA-512";
+	public static final String PASSWORD_DIGEST_ALG = "SHA-512";
 
-    @Column(unique = true)
-    private String email;
+	@Column(unique = true)
+	private String email;
 
-    private String password;
+	private String password;
 
-    private String salt;
+	private String salt;
 
-    private String authToken;
+	private String authToken;
 
-    @OneToMany(mappedBy = "person")
-    private List<ACL_Complex> ACL_Complexes;
+	@OneToMany(mappedBy = "person")
+	private List<ACL_Complex> ACL_Complexes;
 
+	public Person(String email, String plainPassword) {
+		this.email = email;
+		if (plainPassword != null) {
+			salt = PasswordEncoder.getSalt();
+			password = PasswordEncoder.getShaPassword(PASSWORD_DIGEST_ALG, plainPassword, salt);
+		}
+	}
 
-    public Person(String email, String plainPassword) {
-        this.email = email;
-        if (plainPassword != null) {
-            salt = PasswordEncoder.getSalt();
-            password = PasswordEncoder.getShaPassword(PASSWORD_DIGEST_ALG, plainPassword, salt);
-        }
-    }
-
-    public void generateAuthToken() {
-        this.authToken = PasswordEncoder.getAuthToken();
-    }
+	public void generateAuthToken() {
+		this.authToken = PasswordEncoder.getAuthToken();
+	}
 }
