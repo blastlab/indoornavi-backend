@@ -134,7 +134,7 @@ public class PersonFacadeIT extends BaseIT {
 	}
 
 	@Test
-	public void tryToLoginWithNoneexistingPerson() {
+	public void tryToLoginWithNonExistingPerson() {
 		String body = new RequestBodyBuilder("UserRegistration.json")
 			.setParameter("email", NON_EXISTING_PERSON)
 			.build();
@@ -142,7 +142,7 @@ public class PersonFacadeIT extends BaseIT {
 		given()
 			.body(body)
 			.when().put(USER_PATH)
-			.then().statusCode(HttpStatus.SC_NOT_FOUND);
+			.then().statusCode(HttpStatus.SC_UNAUTHORIZED);
 	}
 
 	@Test

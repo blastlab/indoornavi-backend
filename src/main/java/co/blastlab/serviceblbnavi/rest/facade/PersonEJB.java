@@ -11,7 +11,6 @@ import co.blastlab.serviceblbnavi.security.PasswordEncoder;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityExistsException;
-import javax.persistence.EntityNotFoundException;
 
 @Stateless
 public class PersonEJB implements PersonFacade {
@@ -37,7 +36,7 @@ public class PersonEJB implements PersonFacade {
 		Person personEntity = personRepository.findOptionalByEmail(person.getEmail());
 
 		if (personEntity == null) {
-			throw new EntityNotFoundException();
+			throw new PermissionException();
 		}
 		checkPassword(personEntity, person.getPlainPassword());
 		personEntity = generateAuthToken(personEntity);
