@@ -26,6 +26,9 @@ public class VertexFacadeIT extends BaseIT {
 	private static final Double X_CONSTANT_VALUE = 10.0;
 	private static final double Y_CONSTANT_VALUE = 11.0;
 
+	private static final Double X_VALUE_NEW_VERTEX = 15.0;
+	private static final Double Y_VALUE_NEW_VERTEX = 17.0;
+
 	private static final boolean INACTIVE_FALSE = false;
 	private static final boolean INACTIVE_TRUE = true;
 
@@ -68,20 +71,14 @@ public class VertexFacadeIT extends BaseIT {
 		givenUser()
 			.body(body)
 			.when().post(VERTEX_PATH)
-			.then().statusCode(HttpStatus.SC_OK)
-			.body(
-				//"x", equalTo(X_CONSTANT_VALUE),
-				//"y", equalTo(Y_CONSTANT_VALUE),
-				"floorId", equalTo(FLOOR_ID_FOR_CHECK),
-				"inactive", equalTo(INACTIVE_TRUE),
-				"floorDownChangeable", equalTo(IS_FLOOR_DOWN_CHANGEABLE_FALSE),
-				"floorUpChangeable", equalTo(IS_FLOOR_UP_CHANGEABLE_FALSE)
-			);
+			.then().statusCode(HttpStatus.SC_BAD_REQUEST);
 	}
 
 	@Test
-	public void createNewAndFindVertex() {
+	public void findNewlyCreatedVertex() {
 		String body = new RequestBodyBuilder("VertexCreating.json")
+			.setParameter("x", X_VALUE_NEW_VERTEX)
+			.setParameter("y", Y_VALUE_NEW_VERTEX)
 			.setParameter("inactive", INACTIVE_TRUE)
 			.setParameter("isFloorDownChangeable", IS_FLOOR_DOWN_CHANGEABLE_FALSE)
 			.setParameter("isFloorUpChangeable", IS_FLOOR_UP_CHANGEABLE_FALSE)
