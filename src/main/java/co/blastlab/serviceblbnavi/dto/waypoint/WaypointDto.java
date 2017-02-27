@@ -16,52 +16,53 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 public class WaypointDto implements Updatable<WaypointDto, Waypoint> {
-    public WaypointDto(Waypoint waypoint) {
-        this.setId(waypoint.getId());
-        this.setX(waypoint.getX());
-        this.setY(waypoint.getY());
-        this.setName(waypoint.getName());
-        this.setInactive(waypoint.isInactive());
-        this.setDetails(waypoint.getDetails());
-        this.setTimeToCheckout(waypoint.getTimeToCheckout());
-        this.setDistance(waypoint.getDistance());
-        this.setFloorId(waypoint.getFloor() != null ? waypoint.getFloor().getId() : null);
-        waypoint.getWaypointVisits().forEach((waypointVisit -> this.getWaypointVisitsIds().add(waypointVisit.getId())));
-    }
 
-    private Long id;
+	public WaypointDto(Waypoint waypoint) {
+		this.setId(waypoint.getId());
+		this.setX(waypoint.getX());
+		this.setY(waypoint.getY());
+		this.setName(waypoint.getName());
+		this.setInactive(waypoint.isInactive());
+		this.setDetails(waypoint.getDetails());
+		this.setTimeToCheckout(waypoint.getTimeToCheckout());
+		this.setDistance(waypoint.getDistance());
+		this.setFloorId(waypoint.getFloor() != null ? waypoint.getFloor().getId() : null);
+		waypoint.getWaypointVisits().forEach((waypointVisit -> this.getWaypointVisitsIds().add(waypointVisit.getId())));
+	}
 
-    @NotNull
-    @Min(0)
-    private Double x;
+	private Long id;
 
-    @NotNull
-    @Min(0)
-    private Double y;
+	@NotNull
+	@Min(0)
+	private Double x;
 
-    @NotNull
-    @Min(0)
-    private Integer timeToCheckout;
+	@NotNull
+	@Min(0)
+	private Double y;
 
-    @NotNull
-    @Min(0)
-    private Double distance;
+	@NotNull
+	@Min(0)
+	private Integer timeToCheckout;
 
-    private String details;
+	@NotNull
+	@Min(0)
+	private Double distance;
 
-    private boolean inactive;
+	private String details;
 
-    @NotNull
-    private String name;
+	private boolean inactive;
 
-    @NotNull
-    private Long floorId;
+	@NotNull
+	private String name;
 
-    @JsonView({View.WaypointInternal.class})
-    private List<Long> waypointVisitsIds;
+	@NotNull
+	private Long floorId;
 
-    @Override
-    public WaypointDto create(Waypoint entity) {
-        return new WaypointDto(entity);
-    }
+	@JsonView({View.WaypointInternal.class})
+	private List<Long> waypointVisitsIds;
+
+	@Override
+	public WaypointDto create(Waypoint entity) {
+		return new WaypointDto(entity);
+	}
 }

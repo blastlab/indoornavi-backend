@@ -14,8 +14,8 @@ import java.io.Serializable;
 @Setter
 public abstract class CustomIdGenerationEntity implements Serializable {
 
-    @Id
-    @GeneratedValue(generator = "MyIdGenerator")
-    @GenericGenerator(name = "MyIdGenerator", strategy = "co.blastlab.serviceblbnavi.domain.CustomIdGenerator")
-    private Long id;
+	@Id
+	@GeneratedValue(generator = "MyIdGenerator")
+	@GenericGenerator(name = "MyIdGenerator", strategy = "co.blastlab.serviceblbnavi.domain.CustomIdGenerator")
+	private Long id;
 }

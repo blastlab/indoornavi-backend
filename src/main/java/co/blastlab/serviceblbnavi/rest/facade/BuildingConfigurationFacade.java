@@ -1,6 +1,5 @@
 package co.blastlab.serviceblbnavi.rest.facade;
 
-
 import co.blastlab.serviceblbnavi.dto.building.BuildingDto;
 import co.blastlab.serviceblbnavi.rest.facade.ext.filter.TokenAuthorization;
 import com.wordnik.swagger.annotations.*;
@@ -15,34 +14,34 @@ import javax.ws.rs.core.Response;
 @Api("/buildingConfiguration")
 public interface BuildingConfigurationFacade {
 
-    @POST
-    @Path("/{complexName}/{buildingName}/{version: \\d+}")
-    @ApiOperation(value = "creates building configuration")
-    @TokenAuthorization
-    Response create(
-            @PathParam("complexName") @ApiParam(value = "complexName", required = true) String complexName,
-            @PathParam("buildingName") @ApiParam(value = "buildingName", required = true) String buildingName,
-            @PathParam("version") @ApiParam(value = "version", required = true) Integer version);
+	@POST
+	@Path("/{complexName}/{buildingName}/{version: \\d+}")
+	@ApiOperation(value = "creates building configuration")
+	@TokenAuthorization
+	Response create(
+		@PathParam("complexName") @ApiParam(value = "complexName", required = true) String complexName,
+		@PathParam("buildingName") @ApiParam(value = "buildingName", required = true) String buildingName,
+		@PathParam("version") @ApiParam(value = "version", required = true) Integer version);
 
-    @GET
-    @Path("/{complexName}/{buildingName}/{version: \\d+}/")
-    @ApiOperation(value = "finds building's configuration by complex name, building name and version", response = BuildingDto.class)
-    @ApiResponses({
-            @ApiResponse(code = 404, message = "building doesn't exist or has no configuration set")
-    })
-    String getConfigurationByComplexNameAndBuildingName(
-            @PathParam("complexName") @ApiParam(value = "complexName", required = true) String complexName,
-            @PathParam("buildingName") @ApiParam(value = "buildingName", required = true) String buildingName,
-            @PathParam("version") @ApiParam(value = "version", required = true) Integer version);
+	@GET
+	@Path("/{complexName}/{buildingName}/{version: \\d+}/")
+	@ApiOperation(value = "finds building's configuration by complex name, building name and version", response = BuildingDto.class)
+	@ApiResponses({
+		@ApiResponse(code = 404, message = "building doesn't exist or has no configuration set")
+	})
+	String getConfigurationByComplexNameAndBuildingName(
+		@PathParam("complexName") @ApiParam(value = "complexName", required = true) String complexName,
+		@PathParam("buildingName") @ApiParam(value = "buildingName", required = true) String buildingName,
+		@PathParam("version") @ApiParam(value = "version", required = true) Integer version);
 
-    @GET
-    @Path("/{complexName}/{buildingName}/{version: \\d+}/checksum")
-    @ApiOperation(value = "finds building's configuration's checksum by complex name, building name and version")
-    @ApiResponses({
-            @ApiResponse(code = 404, message = "building doesn't exist or has no configuration checksum set")
-    })
-    String getConfigurationChecksumByComplexNameAndBuildingName(
-            @PathParam("complexName") @ApiParam(value = "complexName", required = true) String complexName,
-            @PathParam("buildingName") @ApiParam(value = "buildingName", required = true) String buildingName,
-            @PathParam("version") @ApiParam(value = "version", required = true) Integer version);
+	@GET
+	@Path("/{complexName}/{buildingName}/{version: \\d+}/checksum")
+	@ApiOperation(value = "finds building's configuration's checksum by complex name, building name and version")
+	@ApiResponses({
+		@ApiResponse(code = 404, message = "building doesn't exist or has no configuration checksum set")
+	})
+	String getConfigurationChecksumByComplexNameAndBuildingName(
+		@PathParam("complexName") @ApiParam(value = "complexName", required = true) String complexName,
+		@PathParam("buildingName") @ApiParam(value = "buildingName", required = true) String buildingName,
+		@PathParam("version") @ApiParam(value = "version", required = true) Integer version);
 }

@@ -17,15 +17,14 @@ import java.util.List;
 @Setter
 public class Complex extends CustomIdGenerationEntity implements Serializable {
 
-    @Column(unique = true)
-    private String name;
+	@Column(unique = true)
+	private String name;
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "complex")
-    private List<ACL_Complex> ACL_complexes = new ArrayList<>();
+	@JsonIgnore
+	@OneToMany(mappedBy = "complex")
+	private List<ACL_Complex> ACL_complexes = new ArrayList<>();
 
-    @OneToMany(mappedBy = "complex")
-    @OrderBy("name")
-    private List<Building> buildings = new ArrayList<>();
-
+	@OneToMany(mappedBy = "complex")
+	@OrderBy("name")
+	private List<Building> buildings = new ArrayList<>();
 }

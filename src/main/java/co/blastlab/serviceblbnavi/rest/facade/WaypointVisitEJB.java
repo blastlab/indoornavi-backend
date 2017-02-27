@@ -13,23 +13,22 @@ import javax.persistence.EntityNotFoundException;
 @Stateless
 public class WaypointVisitEJB {
 
-    @Inject
-    private WaypointVisitProductionRepository waypointVisitProductionRepository;
+	@Inject
+	private WaypointVisitProductionRepository waypointVisitProductionRepository;
 
-    @Inject
-    private WaypointRepository waypointRepository;
+	@Inject
+	private WaypointRepository waypointRepository;
 
-    public WaypointVisitDto create(WaypointVisitDto waypointVisit) {
-        Waypoint waypoint = waypointRepository.findBy(waypointVisit.getWaypointId());
-        if (waypoint != null) {
-            WaypointVisit waypointVisitEntity = new WaypointVisit();
-            waypointVisitEntity.setWaypoint(waypoint);
-            waypointVisitEntity.setDevice(waypointVisit.getDevice());
-            waypointVisitEntity.setCreationDateTimestamp(waypointVisit.getTimestamp());
-            waypointVisitProductionRepository.save(waypointVisitEntity);
-            return new WaypointVisitDto(waypointVisitEntity);
-        }
-        throw new EntityNotFoundException();
-    }
-
+	public WaypointVisitDto create(WaypointVisitDto waypointVisit) {
+		Waypoint waypoint = waypointRepository.findBy(waypointVisit.getWaypointId());
+		if (waypoint != null) {
+			WaypointVisit waypointVisitEntity = new WaypointVisit();
+			waypointVisitEntity.setWaypoint(waypoint);
+			waypointVisitEntity.setDevice(waypointVisit.getDevice());
+			waypointVisitEntity.setCreationDateTimestamp(waypointVisit.getTimestamp());
+			waypointVisitProductionRepository.save(waypointVisitEntity);
+			return new WaypointVisitDto(waypointVisitEntity);
+		}
+		throw new EntityNotFoundException();
+	}
 }

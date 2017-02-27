@@ -10,7 +10,7 @@ import java.util.List;
 @Repository
 public interface GoalRepository extends EntityRepository<Goal, Long> {
 
-    List<Goal> findByFloor(Floor floor);
+	List<Goal> findByFloor(Floor floor);
 
-    List<Goal> findByFloorAndInactive(Floor floor, Boolean inactive);
+	List<Goal> findByFloorAndInactive(Floor floor, Boolean inactive);
 }

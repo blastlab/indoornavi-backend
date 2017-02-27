@@ -12,19 +12,20 @@ import java.util.Date;
 @Setter
 @NoArgsConstructor
 public class WaypointVisitDto {
-    public WaypointVisitDto(WaypointVisit waypointVisit) {
-        this.setDevice(waypointVisit.getDevice());
-        this.setTimestamp(waypointVisit.getCreationDateTimestamp());
-        this.setWaypointId(waypointVisit.getWaypoint() != null ? waypointVisit.getWaypoint().getId() : null);
-    }
 
-    @NotNull
-    private String device;
+	public WaypointVisitDto(WaypointVisit waypointVisit) {
+		this.setDevice(waypointVisit.getDevice());
+		this.setTimestamp(waypointVisit.getCreationDateTimestamp());
+		this.setWaypointId(waypointVisit.getWaypoint() != null ? waypointVisit.getWaypoint().getId() : null);
+	}
 
-    // TODO: any other restrictions here? like it can't be in a future or in a past
-    @NotNull
-    private Date timestamp;
+	@NotNull
+	private String device;
 
-    @NotNull
-    private Long waypointId;
+	// TODO: any other restrictions here? like it can't be in a future or in a past
+	@NotNull
+	private Date timestamp;
+
+	@NotNull
+	private Long waypointId;
 }
