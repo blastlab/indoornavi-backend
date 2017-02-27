@@ -19,14 +19,15 @@ public interface BeaconFacade {
     @POST
     @ApiOperation(value = "create beacon", response = BeaconDto.class)
     @ApiResponses({
-            @ApiResponse(code = 404, message = "floor id empty or floor doesn't exist")
+            @ApiResponse(code = 404, message = "beacon id empty or beacon doesn't exist"),
+            @ApiResponse(code = 400, message = "invalid beacon's data (duplicate entry 'minor-major')")
     })
     BeaconDto create(@ApiParam(value = "beacon", required = true) @Valid BeaconDto beacon);
 
     @PUT
     @ApiOperation(value = "update beacon", response = BeaconDto.class)
     @ApiResponses({
-            @ApiResponse(code = 404, message = "floor id or floor empty or doesn't exist")
+            @ApiResponse(code = 404, message = "beacon id or beacon empty or doesn't exist")
     })
     BeaconDto update(@ApiParam(value = "beacon", required = true) @Valid BeaconDto beacon);
 
