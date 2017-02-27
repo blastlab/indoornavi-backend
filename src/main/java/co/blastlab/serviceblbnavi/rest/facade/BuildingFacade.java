@@ -50,7 +50,7 @@ public interface BuildingFacade {
 
     @GET
     @Path("/complex/{id: \\d+}")
-    @ApiOperation(value = "find buildings by complex id")
+    @ApiOperation(value = "find buildings by complex id", response = BuildingDto.class, responseContainer = "List")
     @ApiResponses({
             @ApiResponse(code = 404, message = "complex doesn't exist")
     })
@@ -68,7 +68,7 @@ public interface BuildingFacade {
 
     @GET
     @Path("/{id: \\d+}/config/")
-    @ApiOperation(value = "finds building's configuration by id")
+    @ApiOperation(value = "finds building's configuration by id", response = BuildingDto.class)
     @ApiResponses({
             @ApiResponse(code = 404, message = "building doesn't exist or has no configuration set")
     })
@@ -76,7 +76,7 @@ public interface BuildingFacade {
 
     @GET
     @Path("/{complexName}/{buildingName}/config/")
-    @ApiOperation(value = "finds building's configuration by complex name and building name")
+    @ApiOperation(value = "finds building's configuration by complex name and building name", response = BuildingDto.class)
     @ApiResponses({
             @ApiResponse(code = 404, message = "building doesn't exist or has no configuration set")
     })

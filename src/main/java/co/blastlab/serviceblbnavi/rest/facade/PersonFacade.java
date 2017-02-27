@@ -2,8 +2,8 @@ package co.blastlab.serviceblbnavi.rest.facade;
 
 
 import co.blastlab.serviceblbnavi.dto.person.PersonRequestDto;
-import co.blastlab.serviceblbnavi.rest.facade.ext.filter.TokenAuthorization;
 import co.blastlab.serviceblbnavi.dto.person.PersonResponseDto;
+import co.blastlab.serviceblbnavi.rest.facade.ext.filter.TokenAuthorization;
 import com.wordnik.swagger.annotations.*;
 
 import javax.validation.Valid;
@@ -31,6 +31,7 @@ public interface PersonFacade {
             @ApiResponse(code = 401, message = "invalid login data")
     })
     PersonResponseDto login(@ApiParam(value = "person", required = true) @Valid PersonRequestDto person);
+
 
     @GET
     @Path("/current")
