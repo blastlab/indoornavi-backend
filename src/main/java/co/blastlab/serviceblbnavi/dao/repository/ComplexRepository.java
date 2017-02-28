@@ -9,6 +9,7 @@ import org.apache.deltaspike.data.api.Query;
 import org.apache.deltaspike.data.api.Repository;
 import org.apache.deltaspike.data.api.criteria.CriteriaSupport;
 
+import javax.persistence.NoResultException;
 import java.util.List;
 
 @Repository
@@ -17,9 +18,14 @@ public abstract class ComplexRepository implements EntityRepository<Complex, Lon
 	public abstract Complex findOptionalByName(String name);
 
 	public Complex findByBuildingId(Long id) {
-		return criteria()
-			.join(Complex_.buildings, where(Building.class).eq(Building_.id, id))
-			.getSingleResult();
+		try{
+			return criteria()
+				.join(Complex_.buildings, where(Building.class).eq(Building_.id, id))
+				.getSingleResult();
+		}
+		catch (NoResultException e){
+			return null;
+		}
 	}
 
 	@Query("SELECT c FROM Complex c JOIN c.ACL_complexes aclComplexes where aclComplexes.person.id = ?1")
