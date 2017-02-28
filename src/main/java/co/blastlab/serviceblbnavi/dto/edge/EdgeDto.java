@@ -1,6 +1,7 @@
 package co.blastlab.serviceblbnavi.dto.edge;
 
 import co.blastlab.serviceblbnavi.domain.Edge;
+import com.wordnik.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -24,11 +25,14 @@ public class EdgeDto {
 
 	@NotNull
 	@Min(0)
+	@ApiModelProperty(example = "14.7")
 	private Double weight;
 
 	@NotNull
+	@ApiModelProperty(example = "3")
 	private Long sourceId;
 
+	@ApiModelProperty(example = "6")
 	@NotNull
 	private Long targetId;
 }

@@ -24,7 +24,7 @@ public interface BeaconFacade {
 	@PUT
 	@ApiOperation(value = "update beacon", response = BeaconDto.class)
 	@ApiResponses({
-		@ApiResponse(code = 404, message = "beacon id or beacon empty or doesn't exist"),
+		@ApiResponse(code = 404, message = "beacon id, beacon or floor empty or doesn't exist"),
 		@ApiResponse(code = 400, message = "invalid beacon's data (duplicate entry 'minor-major')")
 	})
 	BeaconDto update(@ApiParam(value = "beacon", required = true) @Valid BeaconDto beacon);
