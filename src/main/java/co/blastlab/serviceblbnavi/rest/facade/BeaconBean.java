@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Stateless
-public class BeaconEJB implements BeaconFacade {
+public class BeaconBean implements BeaconFacade {
 
 	@Inject
 	private BeaconRepository beaconRepository;

@@ -23,7 +23,7 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 @Stateless
-public class BuildingConfigurationBean {
+public class BuildingConfigurationSet {
 
 	public final static Integer DB_VERSION = 2;
 
@@ -117,7 +117,7 @@ public class BuildingConfigurationBean {
 			}
 			return true;
 		} catch (NoSuchAlgorithmException | UnsupportedEncodingException | JsonProcessingException ex) {
-			Logger.getLogger(BuildingConfigurationBean.class.getName()).log(Level.SEVERE, null, ex);
+			Logger.getLogger(BuildingConfigurationSet.class.getName()).log(Level.SEVERE, null, ex);
 			return false;
 		}
 	}

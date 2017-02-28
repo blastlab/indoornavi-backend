@@ -25,7 +25,7 @@ import java.util.Objects;
 import java.util.function.Predicate;
 
 @Stateless
-public class ComplexEJB implements ComplexFacade {
+public class ComplexBean implements ComplexFacade {
 
 	@Inject
 	private ComplexRepository complexRepository;

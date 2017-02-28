@@ -11,7 +11,7 @@ import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
 
 @Stateless
-public class GoalSelectionEJB implements GoalSelectionFacade {
+public class GoalSelectionBean implements GoalSelectionFacade {
 
 	@Inject
 	private GoalSelectionRepository goalSelectionRepository;
