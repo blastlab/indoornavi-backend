@@ -13,7 +13,7 @@ import javax.inject.Inject;
 import javax.persistence.EntityExistsException;
 
 @Stateless
-public class PersonEJB implements PersonFacade {
+public class PersonBean implements PersonFacade {
 
 	@Inject
 	private PersonRepository personRepository;

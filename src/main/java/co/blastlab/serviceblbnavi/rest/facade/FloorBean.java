@@ -23,7 +23,7 @@ import java.util.Base64;
 import java.util.List;
 
 @Stateless
-public class FloorEJB implements FloorFacade {
+public class FloorBean implements FloorFacade {
 
 	@Inject
 	private FloorRepository floorRepository;

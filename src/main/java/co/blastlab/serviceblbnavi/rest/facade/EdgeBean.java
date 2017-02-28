@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Stateless
-public class EdgeEJB implements EdgeFacade {
+public class EdgeBean implements EdgeFacade {
 
 	@Inject
 	private EdgeRepository edgeRepository;
