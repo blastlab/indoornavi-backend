@@ -1,5 +1,6 @@
 package co.blastlab.serviceblbnavi.dto.person;
 
+import com.wordnik.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.validator.constraints.Email;
@@ -9,5 +10,6 @@ import org.hibernate.validator.constraints.Email;
 abstract class PersonDto {
 
 	@Email
+	@ApiModelProperty(example = "user@email.com")
 	private String email;
 }
