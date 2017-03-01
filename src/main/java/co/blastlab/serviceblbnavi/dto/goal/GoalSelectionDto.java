@@ -3,6 +3,7 @@ package co.blastlab.serviceblbnavi.dto.goal;
 import co.blastlab.serviceblbnavi.domain.GoalSelection;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonSetter;
+import com.wordnik.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -35,10 +36,12 @@ public class GoalSelectionDto {
 
 	@NotNull
 	@Min(0)
+	@ApiModelProperty(example = "13")
 	private Double x;
 
 	@NotNull
 	@Min(0)
+	@ApiModelProperty(example = "10")
 	private Double y;
 
 	@NotNull

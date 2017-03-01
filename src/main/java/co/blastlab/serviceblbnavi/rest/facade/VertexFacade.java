@@ -17,14 +17,16 @@ public interface VertexFacade {
 	@POST
 	@ApiOperation(value = "create vertex", response = VertexDto.class)
 	@ApiResponses({
-		@ApiResponse(code = 404, message = "floor id empty or floor doesn't exist")
+		@ApiResponse(code = 404, message = "floor id empty or floor doesn't exist"),
+		@ApiResponse(code = 400, message = "X or Y less than 0")
 	})
 	VertexDto create(@ApiParam(value = "vertex", required = true) @Valid VertexDto vertex);
 
 	@PUT
 	@ApiOperation(value = "update vertex coordinates", response = VertexDto.class)
 	@ApiResponses({
-		@ApiResponse(code = 404, message = "vertex id empty or doesn't exist")
+		@ApiResponse(code = 404, message = "vertex id empty or doesn't exist"),
+		@ApiResponse(code = 400, message = "X or Y less than 0")
 	})
 	VertexDto update(@ApiParam(value = "vertex", required = true) @Valid VertexDto vertex);
 
@@ -38,7 +40,7 @@ public interface VertexFacade {
 
 	@GET
 	@Path("/floor/{id: \\d+}")
-	@ApiOperation(value = "find vertexes for specified floor", response = VertexDto.class, responseContainer = "List")
+	@ApiOperation(value = "find vertices for specified floor", response = VertexDto.class, responseContainer = "List")
 	@ApiResponses({
 		@ApiResponse(code = 404, message = "floor with given id wasn't found")
 	})
