@@ -1,6 +1,7 @@
 package co.blastlab.serviceblbnavi.rest.facade;
 
 import co.blastlab.serviceblbnavi.rest.facade.util.RequestBodyBuilder;
+import com.google.common.collect.ImmutableList;
 import io.restassured.RestAssured;
 import org.apache.http.HttpStatus;
 import org.junit.Test;
@@ -19,6 +20,11 @@ public class PersonFacadeIT extends BaseIT {
 	private static final String EXISTING_EMAIL = "abcd@efg.hij";
 	private static final String EXISTING_PASSWORD = "start123";
 	private static final String FALSE_PASSWORD = "start321";
+
+	@Override
+	public ImmutableList<String> getAdditionalLabels() {
+		return ImmutableList.of();
+	}
 
 	@Test
 	public void newPersonCreate() {
@@ -194,4 +200,6 @@ public class PersonFacadeIT extends BaseIT {
 
 		given().body(body).when().put(USER_PATH).then().statusCode(HttpStatus.SC_BAD_REQUEST);
 	}
+
+
 }
