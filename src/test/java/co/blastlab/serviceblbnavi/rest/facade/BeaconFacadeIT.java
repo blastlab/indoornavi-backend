@@ -2,6 +2,7 @@ package co.blastlab.serviceblbnavi.rest.facade;
 
 import co.blastlab.serviceblbnavi.rest.facade.util.RequestBodyBuilder;
 import co.blastlab.serviceblbnavi.rest.facade.util.violation.ViolationResponse;
+import com.google.common.collect.ImmutableList;
 import org.apache.http.HttpStatus;
 import org.junit.Test;
 
@@ -46,6 +47,11 @@ public class BeaconFacadeIT extends BaseIT {
 	private static final Integer TEST_MAJOR_3 = 4;
 
 	private static final List<Integer> TEST_MAJORS = Arrays.asList(56, 777);
+
+	@Override
+	public ImmutableList<String> getAdditionalLabels() {
+		return ImmutableList.of("Beacon", "Floor", "Building");
+	}
 
 	@Test
 	public void createNewBeacon() {
@@ -194,4 +200,5 @@ public class BeaconFacadeIT extends BaseIT {
 			)
 		);
 	}
+
 }

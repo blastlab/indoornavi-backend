@@ -1,5 +1,6 @@
 package co.blastlab.serviceblbnavi.rest.facade;
 
+import com.google.common.collect.ImmutableList;
 import org.apache.http.HttpStatus;
 import org.junit.Test;
 
@@ -12,6 +13,11 @@ public class BuildingConfigurationFacadeIT extends BaseIT {
 	private static final String BUILDING_TEST_NAME = "GPP";
 	private static final String AUTH_TOKEN = "TokenTEST";
 	private static final Integer VERSION = 2;
+
+	@Override
+	public ImmutableList<String> getAdditionalLabels() {
+		return ImmutableList.of("Building");
+	}
 
 	@Test
 	public void createAndGetBuildingConfiguration() {
@@ -31,4 +37,5 @@ public class BuildingConfigurationFacadeIT extends BaseIT {
 			.when().get(BUILDING_CONFIGURATION_PATH)
 			.then().statusCode(HttpStatus.SC_NOT_FOUND);
 	}
+
 }

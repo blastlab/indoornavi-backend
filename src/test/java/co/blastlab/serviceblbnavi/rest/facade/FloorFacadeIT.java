@@ -2,6 +2,7 @@ package co.blastlab.serviceblbnavi.rest.facade;
 
 import co.blastlab.serviceblbnavi.rest.facade.util.RequestBodyBuilder;
 import co.blastlab.serviceblbnavi.rest.facade.util.violation.ViolationResponse;
+import com.google.common.collect.ImmutableList;
 import org.apache.http.HttpStatus;
 import org.junit.Test;
 
@@ -29,6 +30,11 @@ public class FloorFacadeIT extends BaseIT {
 	private static final Integer BITMAP_WIDTH_FOR_UPDATE = 90;
 
 	private static final Integer BUILDING_ID_FOR_UPDATE = 2;
+
+	@Override
+	public ImmutableList<String> getAdditionalLabels() {
+		return ImmutableList.of("Floor", "Building");
+	}
 
 	@Test
 	public void createNewFloor() {
@@ -213,4 +219,5 @@ public class FloorFacadeIT extends BaseIT {
 			)
 		);
 	}
+
 }
