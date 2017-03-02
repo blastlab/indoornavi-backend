@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Stateless
-public class WaypointEJB extends UpdaterBean<WaypointDto, Waypoint> implements WaypointFacade {
+public class WaypointBean extends UpdaterBean<WaypointDto, Waypoint> implements WaypointFacade {
 
 	@Inject
 	private FloorRepository floorRepository;

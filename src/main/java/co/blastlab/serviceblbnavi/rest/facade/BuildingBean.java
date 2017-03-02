@@ -8,7 +8,7 @@ import co.blastlab.serviceblbnavi.domain.BuildingConfiguration;
 import co.blastlab.serviceblbnavi.domain.Complex;
 import co.blastlab.serviceblbnavi.domain.Permission;
 import co.blastlab.serviceblbnavi.dto.building.BuildingDto;
-import co.blastlab.serviceblbnavi.rest.bean.BuildingConfigurationBean;
+import co.blastlab.serviceblbnavi.rest.bean.BuildingConfigurationSet;
 import co.blastlab.serviceblbnavi.rest.bean.PermissionBean;
 
 import javax.ejb.Stateless;
@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Stateless
-public class BuildingEJB implements BuildingFacade {
+public class BuildingBean implements BuildingFacade {
 
 	@Inject
 	private BuildingRepository buildingRepository;
@@ -35,7 +35,7 @@ public class BuildingEJB implements BuildingFacade {
 	private BuildingConfigurationRepository buildingConfigurationRepository;
 
 	@Inject
-	private BuildingConfigurationBean buildingConfigurationBean;
+	private BuildingConfigurationSet buildingConfigurationSet;
 
 	public BuildingDto create(BuildingDto.New building) {
 		permissionBean.checkPermission(building.getComplexId(), Permission.UPDATE);
@@ -108,7 +108,7 @@ public class BuildingEJB implements BuildingFacade {
 		Building building = buildingRepository.findBy(buildingId);
 		if (building != null) {
 			permissionBean.checkPermission(building, Permission.UPDATE);
-			if (buildingConfigurationBean.saveConfiguration(building)) {
+			if (buildingConfigurationSet.saveConfiguration(building)) {
 				return Response.noContent().build();
 			} else {
 				throw new InternalServerErrorException();
@@ -127,7 +127,7 @@ public class BuildingEJB implements BuildingFacade {
 	}
 
 	public String getConfigurationByComplexNameAndBuildingName(String complexName, String buildingName) {
-		BuildingConfiguration buildingConfiguration = buildingConfigurationBean.findByComplexNameAndBuildingNameAndVersion(complexName, buildingName, 1);
+		BuildingConfiguration buildingConfiguration = buildingConfigurationSet.findByComplexNameAndBuildingNameAndVersion(complexName, buildingName, 1);
 		if (buildingConfiguration != null && buildingConfiguration.getConfiguration() != null) {
 			return buildingConfiguration.getConfiguration();
 		}
@@ -135,7 +135,7 @@ public class BuildingEJB implements BuildingFacade {
 	}
 
 	public String getConfigurationChecksumByComplexNameAndBuildingName(String complexName, String buildingName) {
-		BuildingConfiguration buildingConfiguration = buildingConfigurationBean.findByComplexNameAndBuildingNameAndVersion(complexName, buildingName, 1);
+		BuildingConfiguration buildingConfiguration = buildingConfigurationSet.findByComplexNameAndBuildingNameAndVersion(complexName, buildingName, 1);
 		if (buildingConfiguration != null && buildingConfiguration.getConfigurationChecksum() != null) {
 			return buildingConfiguration.getConfigurationChecksum();
 		}
@@ -143,6 +143,6 @@ public class BuildingEJB implements BuildingFacade {
 	}
 
 	public BuildingDto restoreConfiguration(Long id) {
-		return new BuildingDto(buildingConfigurationBean.restoreConfiguration(id));
+		return new BuildingDto(buildingConfigurationSet.restoreConfiguration(id));
 	}
 }
