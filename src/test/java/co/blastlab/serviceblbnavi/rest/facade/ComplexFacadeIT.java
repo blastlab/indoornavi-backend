@@ -2,6 +2,7 @@ package co.blastlab.serviceblbnavi.rest.facade;
 
 import co.blastlab.serviceblbnavi.rest.facade.util.RequestBodyBuilder;
 import co.blastlab.serviceblbnavi.rest.facade.util.violation.ViolationResponse;
+import com.google.common.collect.ImmutableList;
 import org.apache.http.HttpStatus;
 import org.junit.Test;
 
@@ -19,6 +20,11 @@ public class ComplexFacadeIT extends BaseIT {
 	private static final String EXISTING_NAME = "AABBCC";
 	private static final String TEST_NAME_TO_DELETE = "GPNTDDDDDD";
 	private static final String TEST_NAME_TO_FIND = "DDDDDASD";
+
+	@Override
+	public ImmutableList<String> getAdditionalLabels() {
+		return ImmutableList.of();
+	}
 
 	@Test
 	public void tryToCreateComplexWithoutPermission() {
@@ -155,4 +161,5 @@ public class ComplexFacadeIT extends BaseIT {
 		assertThat(violationResponse.getViolations().size(), is(1));
 		assertThat(violationResponse.getViolations().get(0), validViolation("name", "may not be null"));
 	}
+
 }
