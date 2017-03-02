@@ -17,7 +17,8 @@ public interface VertexFacade {
 	@POST
 	@ApiOperation(value = "create vertex", response = VertexDto.class)
 	@ApiResponses({
-		@ApiResponse(code = 404, message = "floor id emtpy or floor doesn't exist")
+		@ApiResponse(code = 404, message = "floor id emtpy or floor doesn't exist"),
+		@ApiResponse(code = 400, message = "x, y and floor id must be unique")
 	})
 	VertexDto create(@ApiParam(value = "vertex", required = true) @Valid VertexDto vertex);
 

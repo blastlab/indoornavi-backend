@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Stateless
-public class VertexEJB extends UpdaterBean<VertexDto, Vertex> implements VertexFacade {
+public class VertexBean extends UpdaterBean<VertexDto, Vertex> implements VertexFacade {
 
 	@Inject
 	private VertexRepository vertexRepository;

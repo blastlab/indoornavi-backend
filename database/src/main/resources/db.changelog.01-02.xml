@@ -56,4 +56,9 @@
                              constraintName="unique_level_building_id" />
     </changeSet>
 
+	<changeSet id="issue-27" author="jsmolkowska">
+		<addUniqueConstraint tableName="vertex" columnNames="x, y, floor_id"
+		                     constraintName="unique_x_y_floorId" />
+	</changeSet>
+
 </databaseChangeLog>

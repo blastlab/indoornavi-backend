@@ -23,7 +23,11 @@ public class ConstraintViolationMapper implements ExceptionMapper<EJBTransaction
                 break;
             case "unique_level_building_id":
                 message = "You can't have more than one floor with the same level";
-                break;default:
+                break;
+	        case "unique_x_y_floorId":
+		        message = "Fields x, y and floorId must be unique";
+		        break;
+	        default:
                 message = "Unknown constraint violation exception";
         }
 

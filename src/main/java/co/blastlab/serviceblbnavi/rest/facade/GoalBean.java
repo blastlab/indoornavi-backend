@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Stateless
-public class GoalEJB extends UpdaterBean<GoalDto, Goal> implements GoalFacade {
+public class GoalBean extends UpdaterBean<GoalDto, Goal> implements GoalFacade {
 
 	@Inject
 	private PermissionBean permissionBean;
