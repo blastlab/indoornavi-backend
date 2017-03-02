@@ -2,6 +2,7 @@ package co.blastlab.serviceblbnavi.rest.facade;
 
 import co.blastlab.serviceblbnavi.rest.facade.util.RequestBodyBuilder;
 import co.blastlab.serviceblbnavi.rest.facade.util.violation.ViolationResponse;
+import com.google.common.collect.ImmutableList;
 import org.apache.http.HttpStatus;
 import org.junit.Test;
 
@@ -37,6 +38,11 @@ public class VertexFacadeIT extends BaseIT {
 
 	private static final boolean IS_FLOOR_UP_CHANGEABLE_FALSE = false;
 	private static final boolean IS_FLOOR_UP_CHANGEABLE_TRUE = true;
+
+	@Override
+	public ImmutableList<String> getAdditionalLabels() {
+		return ImmutableList.of("Vertex", "Floor", "Building");
+	}
 
 	@Test
 	public void createNewVertex() {
@@ -183,4 +189,5 @@ public class VertexFacadeIT extends BaseIT {
 			)
 		);
 	}
+
 }

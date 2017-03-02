@@ -2,6 +2,7 @@ package co.blastlab.serviceblbnavi.rest.facade;
 
 import co.blastlab.serviceblbnavi.rest.facade.util.RequestBodyBuilder;
 import co.blastlab.serviceblbnavi.rest.facade.util.violation.ViolationResponse;
+import com.google.common.collect.ImmutableList;
 import org.apache.http.HttpStatus;
 import org.junit.Test;
 
@@ -22,6 +23,11 @@ public class BuildingFacadeIT extends BaseIT {
 	private static final String EXISTING_NAME = "AABBCC";
 	private static final String UPDATED_NAME = "AABBCCQQQQQQQ";
 	private static final Integer ID_FOR_BUILDING_CONFIGURATION = 1;
+
+	@Override
+	public ImmutableList<String> getAdditionalLabels() {
+		return ImmutableList.of("Building");
+	}
 
 	@Test
 	public void createNewBuilding() {
@@ -162,4 +168,5 @@ public class BuildingFacadeIT extends BaseIT {
 			)
 		);
 	}
+
 }
