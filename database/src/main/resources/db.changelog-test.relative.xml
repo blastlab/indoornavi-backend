@@ -16,31 +16,31 @@
 	</changeSet>
 
 	<changeSet id="Person" author="mcichosz" context="test" runOnChange="true" labels="Person" runAlways="true">
-		<loadUpdateData tableName="person" file="test/Person.csv" primaryKey="id" />
+		<loadUpdateData tableName="person" file="test/Person.csv" primaryKey="id" relativeToChangelogFile="true"/>
 	</changeSet>
 
 	<changeSet id="Complex" author="mcichosz" context="test" runOnChange="true" labels="Complex" runAlways="true">
-		<loadUpdateData tableName="complex" file="test/Complex.csv" primaryKey="id" />
+		<loadUpdateData tableName="complex" file="test/Complex.csv" primaryKey="id" relativeToChangelogFile="true"/>
 	</changeSet>
 
 	<changeSet id="AclComplex" author="mcichosz" context="test" runOnChange="true" labels="AclComplex" runAlways="true">
-		<loadUpdateData tableName="acl_complex" file="test/acl_complex.csv" primaryKey="id" />
+		<loadUpdateData tableName="acl_complex" file="test/acl_complex.csv" primaryKey="id" relativeToChangelogFile="true"/>
 	</changeSet>
 
 	<changeSet id="Building" author="mcichosz" context="test" runOnChange="true" labels="Building" runAlways="true">
-		<loadUpdateData tableName="building" file="test/Building.csv" primaryKey="id" />
+		<loadUpdateData tableName="building" file="test/Building.csv" primaryKey="id" relativeToChangelogFile="true"/>
 	</changeSet>
 
 	<changeSet id="Floor" author="mcichosz" context="test" runOnChange="true" labels="Floor" runAlways="true">
-		<loadUpdateData tableName="floor" file="test/Floor.csv" primaryKey="id" />
+		<loadUpdateData tableName="floor" file="test/Floor.csv" primaryKey="id" relativeToChangelogFile="true"/>
 	</changeSet>
 
 	<changeSet id="Beacon" author="mcichosz" context="test" runOnChange="true" labels="Beacon" runAlways="true">
-		<loadUpdateData tableName="beacon" file="test/Beacon.csv" primaryKey="id" />
+		<loadUpdateData tableName="beacon" file="test/Beacon.csv" primaryKey="id" relativeToChangelogFile="true"/>
 	</changeSet>
 
 	<changeSet id="Vertex" author="mcichosz" context="test" runOnChange="true" labels="Vertex" runAlways="true">
-		<loadUpdateData tableName="vertex" file="test/Vertex.csv" primaryKey="id" />
+		<loadUpdateData tableName="vertex" file="test/Vertex.csv" primaryKey="id" relativeToChangelogFile="true"/>
 	</changeSet>
 
 </databaseChangeLog>

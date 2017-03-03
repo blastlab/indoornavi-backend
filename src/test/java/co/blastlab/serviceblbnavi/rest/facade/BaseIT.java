@@ -17,13 +17,13 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-abstract class BaseIT extends RestAssuredIT {
+public abstract class BaseIT extends RestAssuredIT {
 
 	static final String VALIDATION_ERROR_NAME = "constraint_violation";
 
-	private final String JDBC_DRIVER_CLASS = "org.mariadb.jdbc.Driver";
-	private final String DATABASE_URL = "jdbc:mysql://localhost:3306/Navi";
-	private final String CHANGELOG_FILE = "database/src/main/resources/db.changelog-test.xml";
+	private static final String JDBC_DRIVER_CLASS = "org.mariadb.jdbc.Driver";
+	private static final String DATABASE_URL = "jdbc:mysql://localhost:3306/Navi";
+	private static final String CHANGELOG_FILE = "database/src/main/resources/db.changelog-test.relative.xml";
 	private final ImmutableList<String> BASIC_LABELS = ImmutableList.of("Clear", "Person", "AclComplex", "Complex");
 
 	RequestSpecification givenUser() {
@@ -31,8 +31,6 @@ abstract class BaseIT extends RestAssuredIT {
 	}
 
 	public abstract ImmutableList<String> getAdditionalLabels();
-
-	// TODO: We probably need to remove some maven and docker configurations, but I am not sure which one should be removed so I leave it for now
 
 	@Before
 	public void setUp() throws LiquibaseException, SQLException, ClassNotFoundException {
