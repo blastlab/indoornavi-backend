@@ -1,6 +1,5 @@
 package co.blastlab.serviceblbnavi.rest.facade;
 
-import co.blastlab.serviceblbnavi.domain.Edge;
 import co.blastlab.serviceblbnavi.dto.edge.EdgeDto;
 import co.blastlab.serviceblbnavi.rest.facade.ext.filter.TokenAuthorization;
 import com.wordnik.swagger.annotations.*;
@@ -18,12 +17,12 @@ public interface EdgeFacade {
 	@POST
 	@ApiOperation(value = "create edges", response = EdgeDto.class, responseContainer = "List")
 	@ApiResponses({
-		@ApiResponse(code = 404, message = "target or source id empty or doesn't exist")
+		@ApiResponse(code = 404, message = "target or source id (vertex) empty or doesn't exist")
 	})
 	List<EdgeDto> create(@ApiParam(value = "edges", required = true) @Valid List<EdgeDto> edges);
 
 	@PUT
-	@ApiOperation(value = "update edges", response = Edge.class, responseContainer = "List")
+	@ApiOperation(value = "update edges' weight", response = EdgeDto.class, responseContainer = "List")
 	List<EdgeDto> update(@ApiParam(value = "edges", required = true) @Valid List<EdgeDto> edges);
 
 	@DELETE
@@ -45,14 +44,14 @@ public interface EdgeFacade {
 
 	@GET
 	@Path("/vertex/{id: \\d+}")
-	@ApiOperation(value = "find edges by vertex id", response = Edge.class, responseContainer = "List")
+	@ApiOperation(value = "find edges by vertex id", response = EdgeDto.class, responseContainer = "List")
 	@ApiResponses({
 		@ApiResponse(code = 404, message = "vertex with given id wasn't found")
 	})
-	List<EdgeDto> findByVertexId(@PathParam("id") @ApiParam(value = "id", required = true) Long vertexId);
+	List<EdgeDto> findByVertexId(@PathParam("id") @ApiParam(value = "vertex id", required = true) Long vertexId);
 
 	@GET
-	@ApiOperation(value = "find edge", response = Edge.class)
+	@ApiOperation(value = "find edge", response = EdgeDto.class)
 	@ApiResponses({
 		@ApiResponse(code = 404, message = "edge with given target and source id doesn't exist")
 	})

@@ -55,7 +55,7 @@ public interface FloorFacade {
 	@ApiResponses({
 		@ApiResponse(code = 404, message = "building id or building empty or doesn't exist")
 	})
-	Response updateFloors(@PathParam("id") Long buildingId, @ApiParam(value = "floors", required = true) @Valid List<FloorDto> floors);
+	Response updateFloors(@PathParam("id") @ApiParam(value = "building id", required = true) Long buildingId, @ApiParam(value = "floors", required = true) @Valid List<FloorDto> floors);
 
 	@PUT
 	@Path("/mToPix")
@@ -67,10 +67,6 @@ public interface FloorFacade {
 
 	@POST
 	@Path("/image")
-	@ApiOperation(value = "upload image of the floor", response = Response.class)
-	@ApiResponses({
-		@ApiResponse(code = 404, message = "floor with given id doesn't exist")
-	})
 	@Consumes(MediaType.MULTIPART_FORM_DATA)
 	Response uploadImage(@Valid @MultipartForm ImageUpload imageUpload) throws IOException;
 
