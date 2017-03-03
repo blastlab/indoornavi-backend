@@ -45,11 +45,9 @@ public class BuildingDto {
 	private Double degree;
 
 	@JsonView({View.BuildingInternal.class})
-	@ApiModelProperty(hidden = true)
 	private List<FloorDto> floors = new ArrayList<>();
 
 	@JsonView({View.BuildingInternal.class})
-	@ApiModelProperty(hidden = true)
 	private List<Long> buildingConfigurationsIds = new ArrayList<>();
 
 	@Getter

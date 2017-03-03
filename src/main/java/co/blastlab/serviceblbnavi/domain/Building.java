@@ -1,6 +1,5 @@
 package co.blastlab.serviceblbnavi.domain;
 
-import com.wordnik.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -25,7 +24,6 @@ public class Building extends CustomIdGenerationEntity implements Serializable {
 
 	@OneToMany(mappedBy = "building", cascade = {CascadeType.REMOVE, CascadeType.MERGE})
 	@OrderBy("level")
-	@ApiModelProperty(hidden = true)
 	private List<Floor> floors = new ArrayList<>();
 
 	@OneToMany(mappedBy = "building", cascade = CascadeType.REMOVE)
