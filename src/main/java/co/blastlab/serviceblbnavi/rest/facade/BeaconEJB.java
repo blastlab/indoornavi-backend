@@ -59,7 +59,7 @@ public class BeaconEJB implements BeaconFacade {
 		Floor floor = floorRepository.findBy(beacon.getFloorId());
 		if (floor != null) {
 			Beacon beaconEntity = beaconRepository.findBy(beacon.getId());
-			if (beaconEntity != null){
+			if (beaconEntity != null) {
 				return createOrUpdate(beaconEntity, beacon, floor);
 			}
 		}
@@ -88,7 +88,6 @@ public class BeaconEJB implements BeaconFacade {
 		beaconEntity.setMac(beacon.getMac());
 		beaconEntity.setMinor(beacon.getMinor());
 		beaconEntity.setMajor(beacon.getMajor());
-//		beaconEntity.setId(null);
 		beaconEntity = beaconRepository.save(beaconEntity);
 		return new BeaconDto(beaconEntity);
 	}

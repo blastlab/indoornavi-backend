@@ -28,6 +28,7 @@ public class GoalSelectionDto {
 		this.setGoalId(goalSelection.getGoal() != null ? goalSelection.getGoal().getId() : null);
 	}
 
+	@ApiModelProperty(example = "1")
 	private Long id;
 
 	@NotNull
@@ -45,6 +46,7 @@ public class GoalSelectionDto {
 	private Double y;
 
 	@NotNull
+	@ApiModelProperty(example = "2")
 	private Integer floorLevel;
 
 	// TODO: any other restrictions here? like it can't be in a future or in a past
@@ -52,6 +54,7 @@ public class GoalSelectionDto {
 	private Date timestamp;
 
 	@NotNull
+	@ApiModelProperty(example = "1")
 	private Long goalId;
 
 	// TODO: Check why is it here
