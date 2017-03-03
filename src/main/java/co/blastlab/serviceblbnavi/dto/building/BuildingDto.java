@@ -4,6 +4,7 @@ import co.blastlab.serviceblbnavi.domain.Building;
 import co.blastlab.serviceblbnavi.dto.floor.FloorDto;
 import co.blastlab.serviceblbnavi.views.View;
 import com.fasterxml.jackson.annotation.JsonView;
+import com.wordnik.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -44,9 +45,11 @@ public class BuildingDto {
 	private Double degree;
 
 	@JsonView({View.BuildingInternal.class})
+	@ApiModelProperty(hidden = true)
 	private List<FloorDto> floors = new ArrayList<>();
 
 	@JsonView({View.BuildingInternal.class})
+	@ApiModelProperty(hidden = true)
 	private List<Long> buildingConfigurationsIds = new ArrayList<>();
 
 	@Getter
@@ -55,6 +58,7 @@ public class BuildingDto {
 	public static class New extends BuildingDto {
 
 		@NotNull
+		@ApiModelProperty(example = "1")
 		private Long complexId;
 
 		public New(Building building) {

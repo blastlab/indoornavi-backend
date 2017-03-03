@@ -73,8 +73,8 @@ public class GoalBean extends UpdaterBean<GoalDto, Goal> implements GoalFacade {
 				newGoalEntity.setY(goal.getY());
 				newGoalEntity.setX(goal.getX());
 				newGoalEntity.setName(goal.getName());
-				newGoalEntity.setFloor(goalEntity.getFloor());
-				goalEntity.setId(null);
+				newGoalEntity.setFloor(floorRepository.findBy(goal.getFloorId()));
+				//goalEntity.setId(null);
 				goalRepository.save(goalEntity);
 				goalRepository.save(newGoalEntity);
 				return goal;
@@ -96,10 +96,12 @@ public class GoalBean extends UpdaterBean<GoalDto, Goal> implements GoalFacade {
 	public List<GoalDto> findByBuilding(Long buildingId) {
 		if (buildingId != null) {
 			Building building = buildingRepository.findBy(buildingId);
-			List<Floor> floors = floorRepository.findByBuilding(building);
-			List<GoalDto> goals = new ArrayList<>();
-			floors.forEach((floor -> goals.addAll(findByFloor(floor.getId()))));
-			return goals;
+			if (building != null) {
+				List<Floor> floors = floorRepository.findByBuilding(building);
+				List<GoalDto> goals = new ArrayList<>();
+				floors.forEach((floor -> goals.addAll(findByFloor(floor.getId()))));
+				return goals;
+			}
 		}
 		throw new EntityNotFoundException();
 	}
@@ -107,11 +109,13 @@ public class GoalBean extends UpdaterBean<GoalDto, Goal> implements GoalFacade {
 	public List<GoalDto> findByFloor(Long floorId) {
 		if (floorId != null) {
 			Floor floor = floorRepository.findBy(floorId);
-			List<Goal> goals = goalRepository.findByFloor(floor);
-			if (goals.size() > 0) {
-				permissionBean.checkPermission(goals.get(0), Permission.READ);
+			if (floor != null) {
+				List<Goal> goals = goalRepository.findByFloor(floor);
+				if (goals.size() > 0) {
+					permissionBean.checkPermission(goals.get(0), Permission.READ);
+				}
+				return convertToDtos(goals);
 			}
-			return convertToDtos(goals);
 		}
 		throw new EntityNotFoundException();
 	}
@@ -119,11 +123,13 @@ public class GoalBean extends UpdaterBean<GoalDto, Goal> implements GoalFacade {
 	public List<GoalDto> findActiveByFloor(Long floorId) {
 		if (floorId != null) {
 			Floor floor = floorRepository.findBy(floorId);
-			List<Goal> goals = goalRepository.findByFloorAndInactive(floor, false);
-			if (goals.size() > 0) {
-				permissionBean.checkPermission(goals.get(0), Permission.READ);
+			if (floor != null) {
+				List<Goal> goals = goalRepository.findByFloorAndInactive(floor, false);
+				if (goals.size() > 0) {
+					permissionBean.checkPermission(goals.get(0), Permission.READ);
+				}
+				return convertToDtos(goals);
 			}
-			return convertToDtos(goals);
 		}
 		throw new EntityNotFoundException();
 	}

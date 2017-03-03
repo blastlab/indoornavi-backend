@@ -14,7 +14,8 @@ public interface WaypointVisitFacade {
 	@POST
 	@ApiOperation(value = "create waypoint visit", response = WaypointVisitDto.class)
 	@ApiResponses({
-		@ApiResponse(code = 404, message = "invalid waypoint visit\'s data")
+		@ApiResponse(code = 404, message = "invalid waypoint visit\'s data"),
+		@ApiResponse(code = 400, message = "waypoint already in use")
 	})
 	WaypointVisitDto create(@ApiParam(value = "waypoint visit", required = true) @Valid WaypointVisitDto waypointVisit);
 }

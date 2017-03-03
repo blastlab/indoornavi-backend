@@ -59,7 +59,9 @@ public class BeaconBean implements BeaconFacade {
 		Floor floor = floorRepository.findBy(beacon.getFloorId());
 		if (floor != null) {
 			Beacon beaconEntity = beaconRepository.findBy(beacon.getId());
-			return createOrUpdate(beaconEntity, beacon, floor);
+			if (beaconEntity != null) {
+				return createOrUpdate(beaconEntity, beacon, floor);
+			}
 		}
 		throw new EntityNotFoundException();
 	}
