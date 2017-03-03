@@ -3,6 +3,7 @@ package co.blastlab.serviceblbnavi.dto.vertex;
 import co.blastlab.serviceblbnavi.domain.Vertex;
 import co.blastlab.serviceblbnavi.rest.facade.ext.Updatable;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.wordnik.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -45,6 +46,7 @@ public class VertexDto implements Updatable<VertexDto, Vertex> {
 		vertex.getTargetEdges().forEach((targetEdge -> this.getTargetEdgesIds().add(targetEdge.getId())));
 	}
 
+	@ApiModelProperty(example = "1")
 	private Long id;
 
 	@NotNull
@@ -59,18 +61,24 @@ public class VertexDto implements Updatable<VertexDto, Vertex> {
 
 	// TODO: this is here just for compatibility with front, address it when front will be ready for changes
 	@JsonProperty("isFloorDownChangeable")
+	@ApiModelProperty(hidden = true)
 	private boolean isFloorDownChangeable;
 
 	@JsonProperty("isFloorUpChangeable")
+	@ApiModelProperty(hidden = true)
 	private boolean isFloorUpChangeable;
 
 	@NotNull
+	@ApiModelProperty(example = "1")
 	private Long floorId;
 
+	@ApiModelProperty(hidden = true)
 	private List<Long> buildingExitsIds = new ArrayList<>();
 
+	@ApiModelProperty(hidden = true)
 	private List<Long> targetEdgesIds = new ArrayList<>();
 
+	@ApiModelProperty(hidden = true)
 	private List<Long> sourceEdgesIds = new ArrayList<>();
 
 	@Override

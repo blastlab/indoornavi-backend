@@ -17,15 +17,16 @@ public interface BeaconFacade {
 	@POST
 	@ApiOperation(value = "create beacon", response = BeaconDto.class)
 	@ApiResponses({
-		@ApiResponse(code = 404, message = "beacon id empty or beacon doesn't exist"),
-		@ApiResponse(code = 400, message = "invalid beacon's data (duplicate entry 'minor-major')")
+		@ApiResponse(code = 404, message = "beacon id, beacon or floor empty or doesn't exist"),
+		@ApiResponse(code = 400, message = "invalid beacon's data (eg duplicate entry 'minor-major')")
 	})
 	BeaconDto create(@ApiParam(value = "beacon", required = true) @Valid BeaconDto beacon);
 
 	@PUT
 	@ApiOperation(value = "update beacon", response = BeaconDto.class)
 	@ApiResponses({
-		@ApiResponse(code = 404, message = "beacon id or beacon empty or doesn't exist")
+		@ApiResponse(code = 404, message = "beacon id, beacon or floor empty or doesn't exist"),
+		@ApiResponse(code = 400, message = "invalid beacon's data (duplicate entry 'minor-major')")
 	})
 	BeaconDto update(@ApiParam(value = "beacon", required = true) @Valid BeaconDto beacon);
 
@@ -35,7 +36,7 @@ public interface BeaconFacade {
 	@ApiResponses({
 		@ApiResponse(code = 404, message = "beacon with given id doesn't exist")
 	})
-	Response delete(@PathParam("id") @ApiParam(value = "id", required = true) Long id);
+	Response delete(@PathParam("id") @ApiParam(value = "beacon id", required = true) Long id);
 
 	@GET
 	@Path("/{id: \\d+}")
@@ -43,7 +44,7 @@ public interface BeaconFacade {
 	@ApiResponses({
 		@ApiResponse(code = 404, message = "beacon with given id wasn't found")
 	})
-	BeaconDto find(@PathParam("id") @ApiParam(value = "id", required = true) Long id);
+	BeaconDto find(@PathParam("id") @ApiParam(value = "beacon id", required = true) Long id);
 
 	@GET
 	@Path("/floor/{id: \\d+}")
@@ -51,5 +52,5 @@ public interface BeaconFacade {
 	@ApiResponses({
 		@ApiResponse(code = 404, message = "floorId empty or floor doesn't exist")
 	})
-	List<BeaconDto> findAll(@PathParam("id") @ApiParam(value = "id", required = true) Long floorId);
+	List<BeaconDto> findAll(@PathParam("id") @ApiParam(value = "floor id", required = true) Long floorId);
 }

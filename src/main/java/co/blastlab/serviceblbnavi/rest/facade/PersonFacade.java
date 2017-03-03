@@ -18,7 +18,8 @@ public interface PersonFacade {
 	@POST
 	@ApiOperation(value = "register", response = PersonResponseDto.class)
 	@ApiResponses({
-		@ApiResponse(code = 409, message = "person with given email exists")
+			@ApiResponse(code = 400, message = "not a well-formed email address"),
+			@ApiResponse(code = 409, message = "person with given email exists")
 	})
 	PersonResponseDto register(@ApiParam(value = "person", required = true) @Valid PersonRequestDto person);
 
