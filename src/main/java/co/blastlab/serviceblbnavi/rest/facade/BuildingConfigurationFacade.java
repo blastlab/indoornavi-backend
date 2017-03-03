@@ -1,6 +1,5 @@
 package co.blastlab.serviceblbnavi.rest.facade;
 
-import co.blastlab.serviceblbnavi.dto.building.BuildingDto;
 import co.blastlab.serviceblbnavi.rest.facade.ext.filter.TokenAuthorization;
 import com.wordnik.swagger.annotations.*;
 
@@ -17,6 +16,9 @@ public interface BuildingConfigurationFacade {
 	@POST
 	@Path("/{complexName}/{buildingName}/{version: \\d+}")
 	@ApiOperation(value = "creates building configuration")
+	@ApiResponses({
+		@ApiResponse(code = 404, message = "Complex doesn't exist or doesn't contain given building")
+	})
 	@TokenAuthorization
 	Response create(
 		@PathParam("complexName") @ApiParam(value = "complexName", required = true) String complexName,
@@ -25,7 +27,7 @@ public interface BuildingConfigurationFacade {
 
 	@GET
 	@Path("/{complexName}/{buildingName}/{version: \\d+}/")
-	@ApiOperation(value = "finds building's configuration by complex name, building name and version", response = BuildingDto.class)
+	@ApiOperation(value = "finds building's configuration by complex name, building name and version", response = String.class)
 	@ApiResponses({
 		@ApiResponse(code = 404, message = "building doesn't exist or has no configuration set")
 	})

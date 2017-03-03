@@ -38,9 +38,9 @@ public class BuildingBean implements BuildingFacade {
 	private BuildingConfigurationSet buildingConfigurationSet;
 
 	public BuildingDto create(BuildingDto.New building) {
-		permissionBean.checkPermission(building.getComplexId(), Permission.UPDATE);
 		Complex complex = complexRepository.findBy(building.getComplexId());
 		if (complex != null) {
+			permissionBean.checkPermission(building.getComplexId(), Permission.UPDATE);
 			Building buildingEntity = new Building();
 			buildingEntity.setComplex(complex);
 			buildingEntity.setName(building.getName());
@@ -93,9 +93,9 @@ public class BuildingBean implements BuildingFacade {
 
 	public List<BuildingDto> findAll(Long complexId) {
 		if (complexId != null) {
-			permissionBean.checkPermission(complexId, Permission.READ);
 			Complex complex = complexRepository.findBy(complexId);
 			if (complex != null) {
+				permissionBean.checkPermission(complexId, Permission.READ);
 				List<BuildingDto> buildings = new ArrayList<>();
 				buildingRepository.findByComplex(complex).forEach((buildingEntity -> buildings.add(new BuildingDto(buildingEntity))));
 				return buildings;

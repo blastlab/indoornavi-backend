@@ -4,6 +4,7 @@ import co.blastlab.serviceblbnavi.domain.Waypoint;
 import co.blastlab.serviceblbnavi.rest.facade.ext.Updatable;
 import co.blastlab.serviceblbnavi.views.View;
 import com.fasterxml.jackson.annotation.JsonView;
+import com.wordnik.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -30,6 +31,7 @@ public class WaypointDto implements Updatable<WaypointDto, Waypoint> {
 		waypoint.getWaypointVisits().forEach((waypointVisit -> this.getWaypointVisitsIds().add(waypointVisit.getId())));
 	}
 
+	@ApiModelProperty(example = "1")
 	private Long id;
 
 	@NotNull
@@ -56,9 +58,11 @@ public class WaypointDto implements Updatable<WaypointDto, Waypoint> {
 	private String name;
 
 	@NotNull
+	@ApiModelProperty(example = "1")
 	private Long floorId;
 
 	@JsonView({View.WaypointInternal.class})
+	@ApiModelProperty(hidden = true)
 	private List<Long> waypointVisitsIds;
 
 	@Override

@@ -86,7 +86,8 @@ public class FloorBean implements FloorFacade {
 			));
 
 			floorEntities.forEach((floorEntity -> floorEntity.setBuilding(building)));
-			updateFloorLevels(floorEntities);
+//			updateFloorLevels(floorEntities);
+			updateFloorLevels(floors);
 			return Response.ok().build();
 		}
 		throw new EntityNotFoundException();
@@ -124,7 +125,7 @@ public class FloorBean implements FloorFacade {
 		return Response.ok(new ByteArrayInputStream(Base64.getEncoder().encode(floorEntity.getBitmap()))).build();
 	}
 
-	private void updateFloorLevels(List<Floor> floors) {
+	private void updateFloorLevels(List<FloorDto> floors) {
 		floors.stream().map((f) -> {
 			Floor floor = floorRepository.findBy(f.getId());
 			floor.setLevel(f.getLevel());

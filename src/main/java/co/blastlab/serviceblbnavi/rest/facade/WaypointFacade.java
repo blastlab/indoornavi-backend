@@ -43,7 +43,7 @@ public interface WaypointFacade {
 	@ApiResponses({
 		@ApiResponse(code = 404, message = "building id was not found")
 	})
-	List<WaypointDto> getActiveWaypointsByFloorId(@ApiParam(value = "id", required = true) @PathParam("id") Long floorId);
+	List<WaypointDto> getActiveWaypointsByFloorId(@ApiParam(value = "floor id", required = true) @PathParam("id") Long floorId);
 
 	@GET
 	@Path("/building/{id: \\d+}")
@@ -51,7 +51,7 @@ public interface WaypointFacade {
 	@ApiResponses({
 		@ApiResponse(code = 404, message = "building id was not found")
 	})
-	List<WaypointDto> getWaypointsByBuildingId(@ApiParam(value = "id", required = true) @PathParam("id") Long buildingId);
+	List<WaypointDto> getWaypointsByBuildingId(@ApiParam(value = "building id", required = true) @PathParam("id") Long buildingId);
 
 	@PUT
 	@Path("/{id: \\d+}/deactivate")
@@ -60,5 +60,5 @@ public interface WaypointFacade {
 	@ApiResponses({
 		@ApiResponse(code = 404, message = "waypoint with given id wasn't found")
 	})
-	WaypointDto deactivate(@ApiParam(value = "id", required = true) @PathParam("id") Long waypointId);
+	WaypointDto deactivate(@ApiParam(value = "waypoint id", required = true) @PathParam("id") Long waypointId);
 }
