@@ -70,6 +70,8 @@ public class VertexFacadeIT extends BaseIT {
 	public void createDuplicateVertex() {
 		String body = new RequestBodyBuilder("VertexCreating.json")
 			.setParameter("inactive", INACTIVE_TRUE)
+			.setParameter("x", 5)
+			.setParameter("y", 5)
 			.setParameter("isFloorDownChangeable", IS_FLOOR_DOWN_CHANGEABLE_FALSE)
 			.setParameter("isFloorUpChangeable", IS_FLOOR_UP_CHANGEABLE_FALSE)
 			.build();

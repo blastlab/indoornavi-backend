@@ -16,6 +16,7 @@ public class ComplexFacadeIT extends BaseIT {
 
 	private static final String COMPLEX_PATH = "/complex";
 	private static final String COMPLEX_PATH_WITH_ID = "/complex/{id}";
+	private static final String COMPLETE_COMPLEX_PATH_WITH_ID = "/complex/complete/{id}";
 	private static final String TEST_NAME = "GPNT";
 	private static final String EXISTING_NAME = "AABBCC";
 	private static final String TEST_NAME_TO_DELETE = "GPNTDDDDDD";
@@ -23,7 +24,34 @@ public class ComplexFacadeIT extends BaseIT {
 
 	@Override
 	public ImmutableList<String> getAdditionalLabels() {
-		return ImmutableList.of();
+		return ImmutableList.of("Building");
+	}
+
+	@Test
+	public void findComplex() {
+		String body = new RequestBodyBuilder("Empty.json").build();
+
+		givenUser()
+			.body(body)
+			.pathParam("id", 2)
+			.when()
+			.get(COMPLEX_PATH_WITH_ID)
+			.then()
+			.statusCode(HttpStatus.SC_OK);
+	}
+
+	@Test
+	public void findCompleteComplex() {
+		String body = new RequestBodyBuilder("Empty.json").build();
+
+		givenUser()
+			.body(body)
+			.pathParam("id", 2)
+			.when()
+			.get(COMPLETE_COMPLEX_PATH_WITH_ID)
+			.then()
+			.statusCode(HttpStatus.SC_OK)
+			.body("buildings.size()", equalTo(2));
 	}
 
 	@Test

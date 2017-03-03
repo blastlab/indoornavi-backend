@@ -68,8 +68,15 @@ public class ComplexBean implements ComplexFacade {
 		throw new EntityNotFoundException();
 	}
 
-	public ComplexDto findComplete(Long id) {
-		return find(id);
+	public ComplexDto.WithBuildings findComplete(Long id) {
+		if (id != null) {
+			List<String> permissions = checkPermissions(id);
+			Complex complexEntity = complexRepository.findBy(id);
+			if (complexEntity != null) {
+				return new ComplexDto.WithBuildings(complexEntity, permissions);
+			}
+		}
+		throw new EntityNotFoundException();
 	}
 
 	public ComplexDto findByBuilding(Long id) {

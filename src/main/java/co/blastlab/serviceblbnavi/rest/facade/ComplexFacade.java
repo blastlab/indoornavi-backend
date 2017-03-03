@@ -59,11 +59,11 @@ public interface ComplexFacade {
 
 	@GET
 	@Path("/complete/{id: \\d+}")
-	@ApiOperation(value = "find complete complex by id", response = ComplexDto.class)
+	@ApiOperation(value = "find complex by id (include buildings)", response = ComplexDto.WithBuildings.class)
 	@ApiResponses({
 		@ApiResponse(code = 404, message = "complex id empty or complex doesn't exist")
 	})
-	ComplexDto findComplete(@ApiParam(value = "id", required = true) @PathParam("id") Long id);
+	ComplexDto.WithBuildings findComplete(@ApiParam(value = "id", required = true) @PathParam("id") Long id);
 
 	@GET
 	@Path("/person/{id: \\d+}")
