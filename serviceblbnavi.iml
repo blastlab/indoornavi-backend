@@ -111,7 +111,7 @@
     <orderEntry type="library" scope="RUNTIME" name="Maven: org.apache.deltaspike.core:deltaspike-core-impl:1.7.1" level="project" />
     <orderEntry type="library" name="Maven: org.apache.deltaspike.modules:deltaspike-data-module-api:1.7.1" level="project" />
     <orderEntry type="library" name="Maven: org.apache.deltaspike.modules:deltaspike-partial-bean-module-api:1.7.1" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: org.apache.deltaspike.modules:deltaspike-data-module-impl:1.7.1" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.deltaspike.modules:deltaspike-data-module-impl:1.7.1" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: org.apache.deltaspike.modules:deltaspike-partial-bean-module-impl:1.7.1" level="project" />
     <orderEntry type="library" name="Maven: org.apache.deltaspike.modules:deltaspike-proxy-module-api:1.7.1" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: org.apache.deltaspike.modules:deltaspike-proxy-module-impl-asm5:1.7.1" level="project" />
