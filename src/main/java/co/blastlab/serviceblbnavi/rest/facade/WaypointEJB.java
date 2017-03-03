@@ -80,7 +80,7 @@ public class WaypointEJB extends UpdaterBean<WaypointDto, Waypoint> implements W
 			Floor floor = floorRepository.findBy(floorId);
 			if (floor != null) {
 				permissionBean.checkPermission(floor, Permission.READ);
-				List<Waypoint> waypoints = waypointRepository.findByFloor(floor);
+				List<Waypoint> waypoints = waypointRepository.findByFloorAndInactive(floor, false);
 				return convertToDtos(waypoints);
 			}
 		}

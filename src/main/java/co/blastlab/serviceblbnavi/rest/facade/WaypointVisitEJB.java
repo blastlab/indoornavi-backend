@@ -11,7 +11,7 @@ import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
 
 @Stateless
-public class WaypointVisitEJB {
+public class WaypointVisitEJB implements WaypointVisitFacade{
 
 	@Inject
 	private WaypointVisitProductionRepository waypointVisitProductionRepository;

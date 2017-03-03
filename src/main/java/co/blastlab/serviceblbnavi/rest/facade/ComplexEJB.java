@@ -137,9 +137,12 @@ public class ComplexEJB implements ComplexFacade {
 	public ComplexDto update(ComplexDto complex) {
 		checkForDuplicateComplex(complex.getName(), (c) -> !Objects.equals(c.getId(), complex.getId()));
 		Complex complexEntity = complexRepository.findBy(complex.getId());
-		complexEntity.setName(complex.getName());
-		complexEntity = complexRepository.save(complexEntity);
-		return new ComplexDto(complexEntity, permissionBean.getPermissions(authorizationBean.getCurrentUser().getId(), complexEntity.getId()));
+		if (complexEntity != null){
+			complexEntity.setName(complex.getName());
+			complexEntity = complexRepository.save(complexEntity);
+			return new ComplexDto(complexEntity, permissionBean.getPermissions(authorizationBean.getCurrentUser().getId(), complexEntity.getId()));
+		}
+		throw new EntityNotFoundException();
 	}
 
 	private void checkForDuplicateComplex(String name, Predicate<Complex> additionalCondition) {

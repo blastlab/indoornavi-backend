@@ -17,6 +17,7 @@ public interface BeaconFacade {
 	@POST
 	@ApiOperation(value = "create beacon", response = BeaconDto.class)
 	@ApiResponses({
+		@ApiResponse(code = 404, message = "beacon id, beacon or floor empty or doesn't exist"),
 		@ApiResponse(code = 400, message = "invalid beacon's data (eg duplicate entry 'minor-major')")
 	})
 	BeaconDto create(@ApiParam(value = "beacon", required = true) @Valid BeaconDto beacon);

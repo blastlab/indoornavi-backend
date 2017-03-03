@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Stateless
-public class BuildingEJB implements BuildingFacade {
+public class    BuildingEJB implements BuildingFacade {
 
 	@Inject
 	private BuildingRepository buildingRepository;

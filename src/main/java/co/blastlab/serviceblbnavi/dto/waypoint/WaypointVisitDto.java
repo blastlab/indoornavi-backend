@@ -1,6 +1,7 @@
 package co.blastlab.serviceblbnavi.dto.waypoint;
 
 import co.blastlab.serviceblbnavi.domain.WaypointVisit;
+import com.wordnik.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -27,5 +28,6 @@ public class WaypointVisitDto {
 	private Date timestamp;
 
 	@NotNull
+	@ApiModelProperty(example = "1")
 	private Long waypointId;
 }
