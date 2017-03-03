@@ -62,7 +62,6 @@ public class WaypointDto implements Updatable<WaypointDto, Waypoint> {
 	private Long floorId;
 
 	@JsonView({View.WaypointInternal.class})
-	@ApiModelProperty(hidden = true)
 	private List<Long> waypointVisitsIds;
 
 	@Override
