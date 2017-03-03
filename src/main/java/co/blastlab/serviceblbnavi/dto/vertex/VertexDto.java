@@ -61,11 +61,9 @@ public class VertexDto implements Updatable<VertexDto, Vertex> {
 
 	// TODO: this is here just for compatibility with front, address it when front will be ready for changes
 	@JsonProperty("isFloorDownChangeable")
-	@ApiModelProperty(hidden = true)
 	private boolean isFloorDownChangeable;
 
 	@JsonProperty("isFloorUpChangeable")
-	@ApiModelProperty(hidden = true)
 	private boolean isFloorUpChangeable;
 
 	@NotNull
