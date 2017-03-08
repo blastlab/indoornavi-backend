@@ -1,7 +1,5 @@
 package co.blastlab.serviceblbnavi.rest.facade;
 
-import co.blastlab.serviceblbnavi.domain.CheckPermission;
-import co.blastlab.serviceblbnavi.domain.NewPermission;
 import co.blastlab.serviceblbnavi.dto.complex.ComplexDto;
 import co.blastlab.serviceblbnavi.rest.facade.ext.filter.TokenAuthorization;
 import com.wordnik.swagger.annotations.*;
@@ -16,12 +14,6 @@ import java.util.List;
 @Api("/complexes")
 @TokenAuthorization
 public interface ComplexFacade {
-
-	@GET
-	@Path("/test")
-	@ApiOperation(value = "test", response = Response.class)
-	@CheckPermission(level = NewPermission.Level.BUILDING, action = NewPermission.Action.EDIT)
-	Response test();
 
 	@POST
 	@ApiOperation(value = "create complex", response = ComplexDto.class)
