@@ -33,11 +33,6 @@ public class ComplexBean implements ComplexFacade {
 	}
 
 	@Override
-	public Response test() {
-		return Response.ok().build();
-	}
-
-	@Override
 	public ComplexDto create(ComplexDto complex) {
 		Complex complexEntity = new Complex();
 		complexEntity.setName(complex.getName());
