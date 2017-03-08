@@ -1,29 +1,40 @@
 package co.blastlab.serviceblbnavi.rest.facade;
 
+import co.blastlab.serviceblbnavi.domain.CheckPermission;
+import co.blastlab.serviceblbnavi.domain.NewPermission;
 import co.blastlab.serviceblbnavi.dto.complex.ComplexDto;
 import co.blastlab.serviceblbnavi.rest.facade.ext.filter.TokenAuthorization;
 import com.wordnik.swagger.annotations.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import java.util.List;
 
-@Path("/complex")
-@Api("/complex")
+@Path("/complexes")
+@Api("/complexes")
 @TokenAuthorization
 public interface ComplexFacade {
+
+	@GET
+	@Path("/test")
+	@ApiOperation(value = "test", response = Response.class)
+	@CheckPermission(level = NewPermission.Level.BUILDING, action = NewPermission.Action.EDIT)
+	Response test();
 
 	@POST
 	@ApiOperation(value = "create complex", response = ComplexDto.class)
 	ComplexDto create(@ApiParam(value = "complex", required = true) @Valid ComplexDto complex);
 
 	@PUT
-	@ApiOperation(value = "update complex by id", response = Response.class)
+	@Path("/{id: \\d+}")
+	@ApiOperation(value = "update complex by id", response = ComplexDto.class)
 	@ApiResponses({
 		@ApiResponse(code = 404, message = "complex id empty or complex doesn't exist")
 	})
-	ComplexDto update(@ApiParam(value = "complex", required = true) @Valid ComplexDto complex);
+	ComplexDto update(@ApiParam(value = "id", required = true) @PathParam("id") @Valid @NotNull Long id,
+	                  @ApiParam(value = "complex", required = true) @Valid ComplexDto complex);
 
 	@DELETE
 	@Path("/{id: \\d+}")
@@ -31,45 +42,49 @@ public interface ComplexFacade {
 	@ApiResponses({
 		@ApiResponse(code = 404, message = "complex id empty or complex doesn't exist")
 	})
-	Response delete(@ApiParam(value = "id", required = true) @PathParam("id") Long id);
+	Response delete(@ApiParam(value = "id", required = true) @PathParam("id") @Valid @NotNull Long id);
 
 	@GET
 	@Path("/{id: \\d+}")
-	@ApiOperation(value = "find complex by id", response = ComplexDto.class)
+	@ApiOperation(value = "get complex by id", response = ComplexDto.class)
 	@ApiResponses({
 		@ApiResponse(code = 404, message = "complex id empty or complex doesn't exist")
 	})
-	ComplexDto find(@ApiParam(value = "id", required = true) @PathParam("id") Long id);
+	ComplexDto find(@ApiParam(value = "id", required = true) @PathParam("id") @Valid @NotNull Long id);
 
 	@GET
-	@Path("/building/{id: \\d+}")
-	@ApiOperation(value = "find complex by building id", response = ComplexDto.class)
-	@ApiResponses({
-		@ApiResponse(code = 404, message = "building id empty or building doesn't exist")
-	})
-	ComplexDto findByBuilding(@ApiParam(value = "id", required = true) @PathParam("id") Long id);
-
-	@GET
-	@Path("/floor/{id: \\d+}")
-	@ApiOperation(value = "find complex by floor id", response = ComplexDto.class)
-	@ApiResponses({
-		@ApiResponse(code = 404, message = "floor id empty or floor doesn't exist")
-	})
-	ComplexDto findByFloor(@ApiParam(value = "id", required = true) @PathParam("id") Long id);
-
-	@GET
-	@Path("/complete/{id: \\d+}")
-	@ApiOperation(value = "find complex by id (include buildings)", response = ComplexDto.WithBuildings.class)
+	@Path("/{id: \\d+}/buildings")
+	@ApiOperation(value = "get complex by id (include buildings)", response = ComplexDto.WithBuildings.class)
 	@ApiResponses({
 		@ApiResponse(code = 404, message = "complex id empty or complex doesn't exist")
 	})
-	ComplexDto.WithBuildings findComplete(@ApiParam(value = "id", required = true) @PathParam("id") Long id);
+	ComplexDto.WithBuildings findWithBuildings(@ApiParam(value = "id", required = true) @PathParam("id") @Valid @NotNull Long id);
 
 	@GET
-	@Path("/person/{id: \\d+}")
-	@ApiOperation(value = "find complexes by person id", response = ComplexDto.class, responseContainer = "List")
-	@ApiResponses({
-		@ApiResponse(code = 404, message = "person id empty, person or complex doesn't exist")
-	})
-	List<ComplexDto> findByPerson(@ApiParam(value = "personId", required = true) @PathParam("id") Long personId);
+	@ApiOperation(value = "get complexes for current user", response = ComplexDto.class, responseContainer = "list")
+	List<ComplexDto> findForCurrentUser();
+
+//	@GET
+//	@Path("/building/{id: \\d+}")
+//	@ApiOperation(value = "find complex by building id", response = ComplexDto.class)
+//	@ApiResponses({
+//		@ApiResponse(code = 404, message = "building id empty or building doesn't exist")
+//	})
+//	ComplexDto findByBuilding(@ApiParam(value = "id", required = true) @PathParam("id") Long id);
+//
+//	@GET
+//	@Path("/floor/{id: \\d+}")
+//	@ApiOperation(value = "find complex by floor id", response = ComplexDto.class)
+//	@ApiResponses({
+//		@ApiResponse(code = 404, message = "floor id empty or floor doesn't exist")
+//	})
+//	ComplexDto findByFloor(@ApiParam(value = "id", required = true) @PathParam("id") Long id);
+//
+//	@GET
+//	@Path("/person/{id: \\d+}")
+//	@ApiOperation(value = "find complexes by person id", response = ComplexDto.class, responseContainer = "List")
+//	@ApiResponses({
+//		@ApiResponse(code = 404, message = "person id empty, person or complex doesn't exist")
+//	})
+//	List<ComplexDto> findByPerson(@ApiParam(value = "personId", required = true) @PathParam("id") Long personId);
 }
