@@ -8,7 +8,6 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
-import java.util.List;
 
 @Path("/complexes")
 @Api("/complexes")
@@ -51,32 +50,4 @@ public interface ComplexFacade {
 		@ApiResponse(code = 404, message = "complex id empty or complex doesn't exist")
 	})
 	ComplexDto.WithBuildings findWithBuildings(@ApiParam(value = "id", required = true) @PathParam("id") @Valid @NotNull Long id);
-
-	@GET
-	@ApiOperation(value = "get complexes for current user", response = ComplexDto.class, responseContainer = "list")
-	List<ComplexDto> findForCurrentUser();
-
-//	@GET
-//	@Path("/building/{id: \\d+}")
-//	@ApiOperation(value = "find complex by building id", response = ComplexDto.class)
-//	@ApiResponses({
-//		@ApiResponse(code = 404, message = "building id empty or building doesn't exist")
-//	})
-//	ComplexDto findByBuilding(@ApiParam(value = "id", required = true) @PathParam("id") Long id);
-//
-//	@GET
-//	@Path("/floor/{id: \\d+}")
-//	@ApiOperation(value = "find complex by floor id", response = ComplexDto.class)
-//	@ApiResponses({
-//		@ApiResponse(code = 404, message = "floor id empty or floor doesn't exist")
-//	})
-//	ComplexDto findByFloor(@ApiParam(value = "id", required = true) @PathParam("id") Long id);
-//
-//	@GET
-//	@Path("/person/{id: \\d+}")
-//	@ApiOperation(value = "find complexes by person id", response = ComplexDto.class, responseContainer = "List")
-//	@ApiResponses({
-//		@ApiResponse(code = 404, message = "person id empty, person or complex doesn't exist")
-//	})
-//	List<ComplexDto> findByPerson(@ApiParam(value = "personId", required = true) @PathParam("id") Long personId);
 }

@@ -9,26 +9,11 @@ services:
       MYSQL_ALLOW_EMPTY_PASSWORD: "true"
       TZ: Europe/Warsaw
 
-  db_prod:
-    build: mariadbProd
-    ports:
-      - '3307:3306'
-    environment:
-      MYSQL_DATABASE: naviProduction
-      MYSQL_ALLOW_EMPTY_PASSWORD: "true"
-      TZ: Europe/Warsaw
-
   liquibase:
     build: .
     volumes:
       - maven_liquibase:/root/.m2
     entrypoint: ["wait-for-it", "db:3306", "-t", "0", "--", "/liquibase/update-database.sh", "-h", "db", "-s", "Navi", "-u", "root", "--test"]
-
-  liquibase_prod:
-    build: .
-    volumes:
-      - maven_liquibase:/root/.m2
-    entrypoint: ["wait-for-it", "db_prod:3306", "-t", "0", "--", "/liquibase/update-database.sh", "-h", "db_prod", "-s", "NaviProduction", "-u", "root", "--test"]
 
 volumes:
   # To prevent fetching all the Maven packages at every run store local repository in persistent named volume.
