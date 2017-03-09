@@ -6,8 +6,10 @@ ENV MARIADB_CONNECTOR_VERSION 1.5.4
 # like pinging other containers
 USER root
 
-RUN yum update -y http://mirror.centos.org/centos/7.3.1611/os/x86_64/Packages/yum-3.4.3-150.el7.centos.noarch.rpm
-RUN yum install -y curl
+#RUN yum clean all
+#RUN yum makecache fast
+#RUN yum update -y http://mirror.centos.org/centos/7.3.1611/os/x86_64/Packages/yum-3.4.3-150.el7.centos.noarch.rpm
+RUN yum --disablerepo=updates install -y curl
 
 RUN curl -sSO https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh \
 	&& chmod +x wait-for-it.sh \

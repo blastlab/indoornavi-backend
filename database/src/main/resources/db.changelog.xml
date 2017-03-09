@@ -28,7 +28,6 @@
 	</changeSet>
 
 	<include file="db.changelog.01.xml"/>
-	<include file="db.changelog.01-02.xml"/>
 	<include file="db.changelog-test.xml"/>
 
 </databaseChangeLog>
