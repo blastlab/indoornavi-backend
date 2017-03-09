@@ -143,31 +143,9 @@
 						<exception-sorter class-name="org.jboss.jca.adapters.jdbc.extensions.mysql.MySQLExceptionSorter"/>
 					</validation>
 				</datasource>
-				<xa-datasource jndi-name="java:/jdbc/NaviProduction" pool-name="NaviProduction" enabled="true" use-ccm="true">
-					<driver>mariadbXA</driver>
-					<xa-datasource-property name="URL">jdbc:mysql://${app.db.host.prod}:3306/NaviProduction</xa-datasource-property>
-					<security>
-						<user-name>root</user-name>
-						<password></password>
-					</security>
-					<xa-pool>
-						<min-pool-size>5</min-pool-size>
-						<max-pool-size>15</max-pool-size>
-						<prefill>true</prefill>
-					</xa-pool>
-					<validation>
-						<valid-connection-checker class-name="org.jboss.jca.adapters.jdbc.extensions.mysql.MySQLValidConnectionChecker"/>
-						<background-validation>false</background-validation>
-						<validate-on-match>true</validate-on-match>
-						<exception-sorter class-name="org.jboss.jca.adapters.jdbc.extensions.mysql.MySQLExceptionSorter"/>
-					</validation>
-				</xa-datasource>
 				<drivers>
 					<driver name="mariadb" module="org.mariadb.jdbc">
 						<xa-datasource-class>org.mariadb.jdbc.Driver</xa-datasource-class>
-					</driver>
-					<driver name="mariadbXA" module="org.mariadb.jdbc:xaMaria">
-						<xa-datasource-class>org.mariadb.jdbc.MySQLDataSource</xa-datasource-class>
 					</driver>
 				</drivers>
 			</datasources>

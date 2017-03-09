@@ -10,33 +10,21 @@ services:
       - ./deployments:/opt/jboss/wildfly/standalone/deployments
     depends_on:
       - db
-      - db_prod
     environment:
       TZ: Europe/Warsaw
       APP_ENVIRONMENT: development
       APP_DB_HOST: db
-      APP_DB_HOST_PROD: db_prod
-    entrypoint: ["wait-for-container-end.sh", "-c", "liquibase", "-c", "liquibase_prod", "--", "/start-server.sh"]
+    entrypoint: ["wait-for-it", "db:3306", "-t", "0", "--", "/start-server.sh"]
 
   db:
     extends:
       file: database/docker-compose.yml
       service: db
 
-  db_prod:
-    extends:
-      file: database/docker-compose.yml
-      service: db_prod
-
   liquibase:
     extends:
       file: database/docker-compose.yml
       service: liquibase
-
-  liquibase_prod:
-    extends:
-      file: database/docker-compose.yml
-      service: liquibase_prod
 
 volumes:
   # For Liquibase container.
