@@ -1,87 +1,71 @@
 package co.blastlab.serviceblbnavi.rest.facade.util;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Table;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
-import java.util.Map;
-import java.util.Scanner;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.List;
 
 public class RequestBodyBuilder {
-
-	private static final Pattern PATTERN = Pattern.compile("\\{(?<name>\\w+)(:(?<def>\\w+))?}");
 
 	private static final String[] AUTO_EXTENSIONS = {"json", "xml", "txt"};
 
 	private final String filename;
 
-	private final Map<String, String> parameters = new HashMap<>();
+	private boolean isArray;
+
+	private final Table<Integer, String, String> parameters = HashBasedTable.create();
 
 	public RequestBodyBuilder(String filename) {
 		this.filename = filename;
 	}
 
-	public RequestBodyBuilder setParameter(String key, String value) {
-		parameters.put(key, value);
+	public RequestBodyBuilder setParameter(String key, Object value, Integer i) {
+		parameters.put(i, key, value.toString());
 		return this;
 	}
 
-	public RequestBodyBuilder setParameter(String key, Long value) {
-		return setParameter(key, value.toString());
-	}
-
-	public RequestBodyBuilder setParameter(String key, Integer value) {
-		return setParameter(key, value.toString());
-	}
-
-	public RequestBodyBuilder setParameter(String key, Double value) {
-		return setParameter(key, value.toString());
-	}
-
 	public RequestBodyBuilder setParameter(String key, Object value) {
-		return setParameter(key, value.toString());
+		return setParameter(key, value, 0);
 	}
 
 	public String build() {
-		String s = readFile();
-		Matcher m = PATTERN.matcher(s);
-
-		StringBuffer sb = new StringBuffer(s.length());
-		while (m.find()) {
-			String name = m.group("name");
-			String def = m.group("def");
-
-			if (parameters.get(name) == null && def == null) {
-				throw new IllegalStateException("There is no set or default value for \"" + name + "\" parameter.");
-			} else if (parameters.get(name) != null) {
-				m.appendReplacement(sb, parameters.get(name));
-			} else {
-				m.appendReplacement(sb, def);
-			}
-		}
-		m.appendTail(sb);
-
-		return sb.toString();
-	}
-
-	private String readFile() {
-		File file = findFile();
-
-		StringBuilder result = new StringBuilder("");
-		try (Scanner scanner = new Scanner(file)) {
-			while (scanner.hasNextLine()) {
-				String line = scanner.nextLine();
-				result.append(line).append("\n");
-			}
-
-			scanner.close();
+		final List<HashMap<String, Object>> jsonObject;
+		try {
+			jsonObject = readFileJson();
+			parameters.rowKeySet().forEach((i) -> {
+				parameters.row(i).keySet().forEach((key) -> {
+					if (jsonObject.get(i).containsKey(key)) {
+						jsonObject.get(i).put(key, parameters.row(i).get(key));
+					}
+				});
+			});
+			ObjectMapper objectMapper = new ObjectMapper();
+			return objectMapper.writeValueAsString(isArray ? jsonObject : jsonObject.get(0));
 		} catch (IOException e) {
 			e.printStackTrace();
+			return null;
 		}
+	}
 
-		return result.toString();
+	private List<HashMap<String, Object>> readFileJson() throws IOException {
+		File file = findFile();
+
+		ObjectMapper objectMapper = new ObjectMapper();
+		JsonNode jsonNode = objectMapper.readTree(file);
+		if (jsonNode.isArray()) {
+			isArray = true;
+			return objectMapper.readValue(file, new TypeReference<List<HashMap<String,Object>>>(){});
+		} else {
+			return ImmutableList.of(objectMapper.readValue(file, new TypeReference<HashMap<String, Object>>() {}));
+		}
 	}
 
 	private File findFile() {

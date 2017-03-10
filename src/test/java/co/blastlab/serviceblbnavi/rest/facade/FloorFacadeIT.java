@@ -124,7 +124,7 @@ public class FloorFacadeIT extends BaseIT {
 	@Test
 	public void updateNonExistingFloors() {
 		String body = new RequestBodyBuilder("FloorsUpdating.json")
-			.setParameter("id_1", "99")
+			.setParameter("id", "99", 0)
 			.build();
 
 		givenUser()
