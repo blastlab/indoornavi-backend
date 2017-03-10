@@ -1,16 +1,12 @@
 package co.blastlab.serviceblbnavi.rest.facade;
 
 import co.blastlab.serviceblbnavi.dto.floor.FloorDto;
-import co.blastlab.serviceblbnavi.dto.floor.ImageUpload;
 import co.blastlab.serviceblbnavi.rest.facade.ext.filter.TokenAuthorization;
 import com.wordnik.swagger.annotations.*;
-import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 
 import javax.validation.Valid;
 import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.io.IOException;
 import java.util.List;
 
 @Path("/floor")
@@ -56,25 +52,4 @@ public interface FloorFacade {
 		@ApiResponse(code = 404, message = "building id or building empty or doesn't exist")
 	})
 	Response updateFloors(@PathParam("id") @ApiParam(value = "building id", required = true) Long buildingId, @ApiParam(value = "floors", required = true) @Valid List<FloorDto> floors);
-
-	@PUT
-	@Path("/mToPix")
-	@ApiOperation(value = "update mToPix", response = Response.class)
-	@ApiResponses({
-		@ApiResponse(code = 404, message = "floor with given id doesn't exist")
-	})
-	Response updatemToPix(@ApiParam(value = "floor", required = true) @Valid FloorDto.Extended floor);
-
-	@POST
-	@Path("/image")
-	@Consumes(MediaType.MULTIPART_FORM_DATA)
-	Response uploadImage(@Valid @MultipartForm ImageUpload imageUpload) throws IOException;
-
-	@GET
-	@Path("/image/{id: \\d+}")
-	@ApiOperation(value = "download image of the floor", response = Response.class)
-	@ApiResponses({
-		@ApiResponse(code = 404, message = "floor with given id doesn't exist or it has no image")
-	})
-	Response downloadImage(@PathParam("id") Long floorId);
 }
