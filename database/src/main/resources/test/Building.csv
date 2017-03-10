@@ -1,4 +1,4 @@
-id,name,minimumFloor,degree,complex_id
-1,AABBCC,0,5,2
-2,AABBCCDDFFFFF,0,6,2
-3,GPP,0,6,3
+id,name,complex_id
+1,AABBCC,2
+2,AABBCCDDFFFFF,2
+3,GPP,3

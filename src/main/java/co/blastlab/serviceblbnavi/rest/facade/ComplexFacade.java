@@ -7,7 +7,6 @@ import com.wordnik.swagger.annotations.*;
 import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
-import java.util.List;
 
 @Path("/complex")
 @Api("/complex")
@@ -64,12 +63,4 @@ public interface ComplexFacade {
 		@ApiResponse(code = 404, message = "complex id empty or complex doesn't exist")
 	})
 	ComplexDto.WithBuildings findComplete(@ApiParam(value = "id", required = true) @PathParam("id") Long id);
-
-	@GET
-	@Path("/person/{id: \\d+}")
-	@ApiOperation(value = "find complexes by person id", response = ComplexDto.class, responseContainer = "List")
-	@ApiResponses({
-		@ApiResponse(code = 404, message = "person id empty, person or complex doesn't exist")
-	})
-	List<ComplexDto> findByPerson(@ApiParam(value = "personId", required = true) @PathParam("id") Long personId);
 }
