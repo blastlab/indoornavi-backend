@@ -9,15 +9,15 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import java.util.List;
 
-@Path("/building")
-@Api("/building")
+@Path("/buildings")
+@Api("/buildings")
 public interface BuildingFacade {
 
 	@POST
 	@TokenAuthorization
 	@ApiOperation(value = "create", response = BuildingDto.New.class)
 	@ApiResponses({
-		@ApiResponse(code = 404, message = "complex id or complex empty or doesn't exist")
+		@ApiResponse(code = 404, message = "complex id doesn't exist or complex empty")
 	})
 	BuildingDto create(@ApiParam(value = "building", required = true) @Valid BuildingDto.New building);
 
