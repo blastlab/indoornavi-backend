@@ -8,6 +8,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
+import java.util.List;
 
 @Path("/complexes")
 @Api("/complexes")
@@ -36,12 +37,11 @@ public interface ComplexFacade {
 	Response delete(@ApiParam(value = "id", required = true) @PathParam("id") @Valid @NotNull Long id);
 
 	@GET
-	@Path("/{id: \\d+}")
-	@ApiOperation(value = "get complex by id", response = ComplexDto.class)
+	@ApiOperation(value = "find all complexes", response = ComplexDto.class, responseContainer = "List")
 	@ApiResponses({
-		@ApiResponse(code = 404, message = "complex id empty or complex doesn't exist")
+		@ApiResponse(code = 404, message = "complexes don't exist")
 	})
-	ComplexDto find(@ApiParam(value = "id", required = true) @PathParam("id") @Valid @NotNull Long id);
+	List<ComplexDto> findAll();
 
 	@GET
 	@Path("/{id: \\d+}/buildings")

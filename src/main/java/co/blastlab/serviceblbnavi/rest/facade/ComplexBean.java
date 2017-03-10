@@ -2,6 +2,7 @@ package co.blastlab.serviceblbnavi.rest.facade;
 
 import co.blastlab.serviceblbnavi.dao.repository.ComplexRepository;
 import co.blastlab.serviceblbnavi.domain.Complex;
+import co.blastlab.serviceblbnavi.dto.building.BuildingDto;
 import co.blastlab.serviceblbnavi.dto.complex.ComplexDto;
 
 import javax.ejb.Stateless;
@@ -10,8 +11,6 @@ import javax.persistence.EntityNotFoundException;
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.function.Predicate;
 
 @Stateless
 public class ComplexBean implements ComplexFacade {
@@ -57,12 +56,11 @@ public class ComplexBean implements ComplexFacade {
 
 
 	@Override
-	public ComplexDto find(Long id) {
-		Complex complexEntity = complexRepository.findBy(id);
-		if (complexEntity != null) {
-			return new ComplexDto(complexEntity);
-		}
-		throw new EntityNotFoundException();
+	public List<ComplexDto> findAll() {
+		List<ComplexDto> complexes = new ArrayList<>();
+		complexRepository.findAll()
+			.forEach(complexEntity -> complexes.add(new ComplexDto(complexEntity)));
+		return complexes;
 	}
 
 
@@ -73,5 +71,5 @@ public class ComplexBean implements ComplexFacade {
 			return new ComplexDto.WithBuildings(complexEntity);
 		}
 		throw new EntityNotFoundException();
-
+	}
 }

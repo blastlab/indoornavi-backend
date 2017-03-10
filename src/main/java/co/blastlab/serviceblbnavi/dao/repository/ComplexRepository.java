@@ -27,10 +27,4 @@ public abstract class ComplexRepository implements EntityRepository<Complex, Lon
 			return null;
 		}
 	}
-
-	@Query("SELECT c FROM Complex c JOIN c.ACL_complexes aclComplexes where aclComplexes.person.id = ?1")
-	public abstract List<Complex> findAllByPerson(Long personId);  //TODO Change @Query to criteria api
-
-	@Query("SELECT c FROM Complex c JOIN c.buildings buildings JOIN buildings.floors floors where floors.id = ?1")
-	public abstract Complex findByFloorId(Long id); //TODO Change @Query to criteria api
 }
