@@ -1,7 +1,7 @@
 package co.blastlab.serviceblbnavi.dto.floor;
 
 import co.blastlab.serviceblbnavi.domain.Floor;
-import com.wordnik.swagger.annotations.ApiModelProperty;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
