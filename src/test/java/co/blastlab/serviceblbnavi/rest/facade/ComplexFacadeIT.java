@@ -17,7 +17,7 @@ public class ComplexFacadeIT extends BaseIT {
 	private static final String COMPLEX_PATH = "/complex";
 	private static final String COMPLEX_PATH_WITH_ID = "/complex/{id}";
 	private static final String COMPLETE_COMPLEX_PATH_WITH_ID = "/complex/complete/{id}";
-	private static final String TEST_NAME = "GPNT";
+	private static final String TEST_NAME = "GPNT.!$@#$%&*()_+";
 	private static final String EXISTING_NAME = "AABBCC";
 	private static final String TEST_NAME_TO_DELETE = "GPNTDDDDDD";
 	private static final String TEST_NAME_TO_FIND = "DDDDDASD";

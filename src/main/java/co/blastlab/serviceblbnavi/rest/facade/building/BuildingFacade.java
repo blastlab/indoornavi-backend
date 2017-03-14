@@ -1,8 +1,8 @@
-package co.blastlab.serviceblbnavi.rest.facade;
+package co.blastlab.serviceblbnavi.rest.facade.building;
 
 import co.blastlab.serviceblbnavi.dto.building.BuildingDto;
 import co.blastlab.serviceblbnavi.rest.facade.ext.filter.TokenAuthorization;
-import com.wordnik.swagger.annotations.*;
+import io.swagger.annotations.*;
 
 import javax.validation.Valid;
 import javax.ws.rs.*;

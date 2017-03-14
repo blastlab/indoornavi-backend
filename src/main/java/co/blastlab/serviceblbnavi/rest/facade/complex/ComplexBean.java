@@ -1,4 +1,4 @@
-package co.blastlab.serviceblbnavi.rest.facade;
+package co.blastlab.serviceblbnavi.rest.facade.complex;
 
 import co.blastlab.serviceblbnavi.dao.repository.ComplexRepository;
 import co.blastlab.serviceblbnavi.domain.Complex;
