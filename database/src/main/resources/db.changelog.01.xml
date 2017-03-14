@@ -41,12 +41,11 @@
 			<column name="creationDate" type="timestamp"/>
 			<column name="modificationDate" type="timestamp"/>
 			<column name="shortId" type="VARCHAR(255)">
-				<constraints nullable="false"/>
+				<constraints nullable="false" unique="true"/>
 			</column>
 			<column name="longId" type="VARCHAR(255)">
-				<constraints nullable="false"/>
+				<constraints nullable="false" unique="true"/>
 			</column>
-			<column name="network" type="VARCHAR(255)"/>
 			<column name="x" type="DOUBLE">
 				<constraints nullable="false"/>
 			</column>
