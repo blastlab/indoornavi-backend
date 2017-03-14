@@ -15,8 +15,6 @@ public class Anchor extends TrackedEntity {
 
 	private String longId;
 
-	private String network;
-
 	private Double x;
 
 	private Double y;
