@@ -1,4 +1,4 @@
-package co.blastlab.serviceblbnavi.rest.facade.flooor;
+package co.blastlab.serviceblbnavi.rest.facade.floor;
 
 import co.blastlab.serviceblbnavi.dto.floor.FloorDto;
 import co.blastlab.serviceblbnavi.rest.facade.ext.filter.TokenAuthorization;

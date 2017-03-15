@@ -15,24 +15,18 @@ import javax.validation.constraints.NotNull;
 public class AnchorDto {
 
 	public AnchorDto(Anchor anchor) {
-		this.id = anchor.getId();
 		this.shortId = anchor.getShortId();
 		this.longId = anchor.getLongId();
 		this.x = anchor.getX();
 		this.y = anchor.getY();
-		if (anchor.getFloor() != null) {
-			this.floorId = anchor.getFloor().getId();
-		}
 	}
 
-	@NotNull
-	@ApiModelProperty(example = "1")
-	private long id;
-
 	@NotEmpty
+	@ApiModelProperty(example = "5F19")
 	private String shortId;
 
 	@NotEmpty
+	@ApiModelProperty(example = "1")
 	private String longId;
 
 	@NotNull
@@ -41,20 +35,31 @@ public class AnchorDto {
 	@NotNull
 	private Double y;
 
-	@ApiModelProperty(example = "1")
-	private Long floorId;
-
-	/*@Getter
+	@Getter
 	@Setter
 	@NoArgsConstructor
-	public static class NewFloor extends AnchorDto {
+	public static class WithFloor extends AnchorDto {
 
 		@ApiModelProperty(example = "1")
 		private Long floorId;
 
-		public NewFloor(Anchor anchor) {
+		public WithFloor(Anchor anchor) {
 			super(anchor);
 			this.setFloorId(anchor.getFloor() != null ? anchor.getFloor().getId() : null);
 		}
-	}*/
+
+		@Getter
+		@Setter
+		@NoArgsConstructor
+		public static class WithId extends WithFloor {
+
+			@ApiModelProperty(example = "1")
+			private Long id;
+
+			public WithId(Anchor anchor) {
+				super(anchor);
+				this.setId(anchor.getId());
+			}
+		}
+	}
 }
