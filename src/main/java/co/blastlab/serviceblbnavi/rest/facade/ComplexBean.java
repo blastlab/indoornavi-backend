@@ -2,7 +2,6 @@ package co.blastlab.serviceblbnavi.rest.facade;
 
 import co.blastlab.serviceblbnavi.dao.repository.ComplexRepository;
 import co.blastlab.serviceblbnavi.domain.Complex;
-import co.blastlab.serviceblbnavi.dto.building.BuildingDto;
 import co.blastlab.serviceblbnavi.dto.complex.ComplexDto;
 
 import javax.ejb.Stateless;
@@ -23,22 +22,21 @@ public class ComplexBean implements ComplexFacade {
 	}
 
 	@Override
-	public ComplexDto create(ComplexDto complex) {
+	public ComplexDto.WithId create(ComplexDto complex) {
 		Complex complexEntity = new Complex();
 		complexEntity.setName(complex.getName());
-		// TODO: we need to add current user as admin of this complex
 		complexEntity = complexRepository.save(complexEntity);
-		return new ComplexDto(complexEntity);
+		return new ComplexDto.WithId(complexEntity);
 	}
 
 
 	@Override
-	public ComplexDto update(Long id, ComplexDto complex) {
-		Complex complexEntity = complexRepository.findBy(complex.getId());
+	public ComplexDto.WithId update(Long id, ComplexDto complex) {
+		Complex complexEntity = complexRepository.findBy(id);
 		if (complexEntity != null){
 			complexEntity.setName(complex.getName());
 			complexEntity = complexRepository.save(complexEntity);
-			return new ComplexDto(complexEntity);
+			return new ComplexDto.WithId(complexEntity);
 		}
 		throw new EntityNotFoundException();
 	}
@@ -56,19 +54,19 @@ public class ComplexBean implements ComplexFacade {
 
 
 	@Override
-	public List<ComplexDto> findAll() {
-		List<ComplexDto> complexes = new ArrayList<>();
+	public List<ComplexDto.WithId> findAll() {
+		List<ComplexDto.WithId> complexes = new ArrayList<>();
 		complexRepository.findAll()
-			.forEach(complexEntity -> complexes.add(new ComplexDto(complexEntity)));
+			.forEach(complexEntity -> complexes.add(new ComplexDto.WithId(complexEntity)));
 		return complexes;
 	}
 
 
 	@Override
-	public ComplexDto.WithBuildings findWithBuildings(Long id) {
+	public ComplexDto.WithId.WithBuildings findWithBuildings(Long id) {
 		Complex complexEntity = complexRepository.findBy(id);
 		if (complexEntity != null) {
-			return new ComplexDto.WithBuildings(complexEntity);
+			return new ComplexDto.WithId.WithBuildings(complexEntity);
 		}
 		throw new EntityNotFoundException();
 	}
