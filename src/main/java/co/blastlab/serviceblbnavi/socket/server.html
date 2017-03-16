@@ -6,15 +6,16 @@
 </head>
 <style>
     #container {
-        width: 1000px;
+        width: 500px;
         height: 500px;
         background: darkgray;
+        position: relative;
     }
 
     .square {
-        width: 10px;
-        height: 10px;
-        position: fixed;
+        width: 5px;
+        height: 5px;
+        position: absolute;
     }
 
     .white {
@@ -38,7 +39,8 @@
 	}
 </style>
 <body>
-<div id="container"></div>
+<div id="container">
+</div>
 </body>
 <script
         src="https://code.jquery.com/jquery-3.1.1.min.js"
@@ -52,12 +54,97 @@
             x: 0,
             y: 0
         };
-        var color = 'white';
+        var coordinates = [
+            {
+            	x: 3,
+                y: 0
+            },
+	        {
+		        x: 3,
+		        y: -1
+	        },
+	        {
+		        x: 3,
+		        y: -2
+	        },
+	        {
+		        x: 3,
+		        y: -3
+	        },
+	        {
+		        x: 4,
+		        y: -3
+	        },
+	        {
+		        x: 5,
+		        y: -3
+	        },
+            {
+		        x: 6,
+		        y: -3
+	        },
+	        {
+		        x: 6,
+		        y: -4
+	        },
+	        {
+		        x: 6,
+		        y: -5
+	        },
+	        {
+		        x: 7,
+		        y: -5
+	        },
+	        {
+		        x: 8,
+		        y: -5
+	        },
+	        {
+		        x: 8,
+		        y: -4
+	        },
+	        {
+		        x: 8,
+		        y: -3
+	        },
+	        {
+		        x: 8,
+		        y: -2
+	        }
 
+
+        ];
+        var getDistances = function(x, y) {
+        	return [
+                {
+                	d1: 1,
+                    d2: 32768,
+                    dist: Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2)) * 100
+                },
+		        {
+			        d1: 1,
+			        d2: 32769,
+			        dist: Math.sqrt(Math.pow(10 - x, 2) + Math.pow(y, 2)) * 100
+		        },
+		        {
+			        d1: 1,
+			        d2: 32770,
+			        dist: Math.sqrt(Math.pow(x, 2) + Math.pow(10 - y, 2)) * 100
+		        }
+            ]
+        };
+
+        var color = 'white';
 
         socket.onopen = function () {
         	console.log('connection opened');
         	isConnectionOpen = true;
+
+        	for(var i = 0; i < coordinates.length; i++) {
+		        for(var j = 0; j < getDistances(coordinates[i].x, coordinates[i].y).length; j++) {
+			        socket.send(JSON.stringify(getDistances(coordinates[i].x, coordinates[i].y)[j]));
+		        }
+	        }
         };
 
         socket.onclose = function() {
@@ -66,9 +153,16 @@
         };
 
         socket.onmessage = function (msg) {
+        	console.log(msg)
             var message = JSON.parse(msg.data);
-            color = message.color;
-            console.log('new color is: ', color)
+//            color = message.color;
+//            console.log('new color is: ', color)
+	        var $el = $('<div class="square red"></div>');
+	        $el.css({
+		        'left': message.x * 150,
+		        'top': message.y * 150
+	        });
+	        $container.append($el);
         };
 
         var $container = $('#container');

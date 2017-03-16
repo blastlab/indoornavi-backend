@@ -6,16 +6,17 @@
 </head>
 <style>
     #container {
-        width: 1000px;
+        width: 500px;
         height: 500px;
         background: grey;
+	    position: relative;
     }
 
     .square {
-        width: 10px;
-        height: 10px;
+        width: 5px;
+        height: 5px;
         background: white;
-        position: fixed;
+        position: absolute;
     }
 
 	#color {
@@ -38,32 +39,32 @@
         crossorigin="anonymous"></script>
 <script>
     $(document).ready(function () {
-        var isConnectionOpen = false;
-        var socket = new WebSocket("ws://localhost:80/coordinates?client");
-        var message = {
-            color: ''
-        };
-        var $container = $('#container');
+	    var $container = $('#container');
 
-        socket.onopen = function () {
-            console.log('connection opened');
-	        isConnectionOpen = true;
-        };
+	    var isConnectionOpen = false;
+	    var socket = new WebSocket("ws://localhost:80/coordinates?client");
+	    var message = {
+		    color: ''
+	    };
+	    socket.onopen = function () {
+		    console.log('connection opened');
+		    isConnectionOpen = true;
+	    };
 
-        socket.onclose = function() {
-        	console.log('connection closed');
-        	isConnectionOpen = false;
-        };
+	    socket.onclose = function() {
+		    console.log('connection closed');
+		    isConnectionOpen = false;
+	    };
 
-        socket.onmessage = function (msg) {
-            var message = JSON.parse(msg.data);
-            var $el = $('<div class="square"></div>');
-            $el.css({
-                'left': message.x,
-                'top': message.y
-            });
-            $container.append($el);
-        };
+	    socket.onmessage = function (msg) {
+		    var message = JSON.parse(msg.data);
+		    var $el = $('<div class="square"></div>');
+		    $el.css({
+			    'left': (message.x < 0 ? -message.x : message.x) / 5,
+			    'top': (message.y < 0 ? -message.y : message.y) / 5
+		    });
+		    $container.append($el);
+	    };
 
         var interval = null;
 	    interval = setInterval(function() {

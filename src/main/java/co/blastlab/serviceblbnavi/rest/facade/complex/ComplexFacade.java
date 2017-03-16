@@ -22,7 +22,7 @@ public interface ComplexFacade {
 	@ApiResponses({
 		@ApiResponse(code = 404, message = "complex id empty or complex doesn't exist")
 	})
-	ComplexDto update(@ApiParam(value = "complex", required = true) @Valid ComplexDto complex);
+	ComplexDto update(@ApiParam(value = "complex", required = true) @Valid ComplexDto.WithId complex);
 
 	@DELETE
 	@Path("/{id: \\d+}")
@@ -58,9 +58,9 @@ public interface ComplexFacade {
 
 	@GET
 	@Path("/complete/{id: \\d+}")
-	@ApiOperation(value = "find complex by id (include buildings)", response = ComplexDto.WithBuildings.class)
+	@ApiOperation(value = "find complex by id (include buildings)", response = ComplexDto.WithId.WithBuildings.class)
 	@ApiResponses({
 		@ApiResponse(code = 404, message = "complex id empty or complex doesn't exist")
 	})
-	ComplexDto.WithBuildings findComplete(@ApiParam(value = "id", required = true) @PathParam("id") Long id);
+	ComplexDto.WithId.WithBuildings findComplete(@ApiParam(value = "id", required = true) @PathParam("id") Long id);
 }

@@ -1,16 +1,21 @@
 package co.blastlab.serviceblbnavi.socket;
 
+import co.blastlab.serviceblbnavi.dao.repository.CoordinatesRepository;
+import co.blastlab.serviceblbnavi.domain.Coordinates;
+import co.blastlab.serviceblbnavi.dto.CoordinatesDto;
+import co.blastlab.serviceblbnavi.dto.DistanceMessage;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import javax.ejb.Singleton;
+import javax.inject.Inject;
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
+import java.awt.*;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
-@Singleton
 @ServerEndpoint("/coordinates")
+@Singleton
 public class WebSocketServer {
 
 	private static Set<Session> clientSessions = Collections.synchronizedSet(new HashSet<Session>());
@@ -19,12 +24,15 @@ public class WebSocketServer {
 	private final static String CLIENT = "client";
 	private final static String SERVER = "server";
 
-//	@Schedule(second = "*/5", minute = "*", hour = "*", persistent = false)
-//	public void getConnectedClients() {
-//		System.out.println("-----------------------------------------");
-//		System.out.println(clientSessions.size());
-//		System.out.println("-----------------------------------------");
-//	}
+	static int getClients() {
+		return clientSessions.size();
+	}
+
+	@Inject
+	private CoordinatesRepository coordinatesRepository;
+
+	@Inject
+	private CoordinatesCalculator coordinatesCalculator;
 
 	@OnOpen
 	public void open(Session session) {
@@ -54,14 +62,29 @@ public class WebSocketServer {
 		if (Objects.equals(session.getQueryString(), CLIENT)) {
 			broadCastMessage(serverSessions, message);
 		} else if (Objects.equals(session.getQueryString(), SERVER)) {
-			broadCastMessage(clientSessions, message);
+			ObjectMapper objectMapper = new ObjectMapper();
+			DistanceMessage distanceMessage = objectMapper.readValue(message, DistanceMessage.class);
+			Optional<Point> coords = coordinatesCalculator.calculateTagPosition(distanceMessage.getD1(), distanceMessage.getD2(), distanceMessage.getDist());
+			System.out.println(String.format("Sending message: %s ", message));
+			if (coords.isPresent()) {
+				Point point = coords.get();
+				CoordinatesDto coordinatesDto = new CoordinatesDto("test", point.getX(), point.getY());
+				Coordinates coordinates = new Coordinates();
+				coordinates.setDevice(coordinatesDto.getDevice());
+				coordinates.setX(coordinatesDto.getX());
+				coordinates.setY(coordinatesDto.getY());
+				coordinatesRepository.save(coordinates);
+				broadCastMessage(clientSessions, objectMapper.writeValueAsString(coordinatesDto));
+			}
 		}
 	}
 
 	private void broadCastMessage(final Set<Session> sessions, final String message) {
 		sessions.forEach(session -> {
 			try {
-				session.getBasicRemote().sendText(message);
+				if (session.isOpen()) {
+					session.getBasicRemote().sendText(message);
+				}
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
