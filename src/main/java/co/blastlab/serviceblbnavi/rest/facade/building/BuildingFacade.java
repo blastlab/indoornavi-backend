@@ -15,11 +15,11 @@ public interface BuildingFacade {
 
 	@POST
 	@TokenAuthorization
-	@ApiOperation(value = "create", response = BuildingDto.New.class)
+	@ApiOperation(value = "create", response = BuildingDto.WithId.class)
 	@ApiResponses({
 		@ApiResponse(code = 404, message = "complex id or complex empty or doesn't exist")
 	})
-	BuildingDto create(@ApiParam(value = "building", required = true) @Valid BuildingDto.New building);
+	BuildingDto create(@ApiParam(value = "building", required = true) @Valid BuildingDto.WithId building);
 
 	@PUT
 	@TokenAuthorization
@@ -27,7 +27,7 @@ public interface BuildingFacade {
 	@ApiResponses({
 		@ApiResponse(code = 404, message = "building doesn't exist or complex doesn't contain given building")
 	})
-	BuildingDto update(@ApiParam(value = "building", required = true) @Valid BuildingDto building);
+	BuildingDto update(@ApiParam(value = "building", required = true) @Valid BuildingDto.WithId building);
 
 	@DELETE
 	@Path("/{id: \\d+}")

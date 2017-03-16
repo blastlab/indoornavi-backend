@@ -39,4 +39,16 @@
 	<changeSet author="kgebert (generated)" id="issue-89-8">
 		<addForeignKeyConstraint baseColumnNames="building_id" baseTableName="Floor" constraintName="FK_5rv574h45qi1a16kefmy9juof" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="Building"/>
 	</changeSet>
+	<changeSet author="kgebert (generated)" id="1489506078970-1">
+		<createTable tableName="Coordinates">
+			<column name="id" type="BIGINT" autoIncrement="true">
+				<constraints nullable="false" primaryKey="true" primaryKeyName="CoordinatesPK" />
+			</column>
+			<column name="creationDate" type="timestamp"/>
+			<column name="modificationDate" type="timestamp"/>
+			<column name="device" type="VARCHAR(255)"/>
+			<column name="x" type="DOUBLE"/>
+			<column name="y" type="DOUBLE"/>
+		</createTable>
+	</changeSet>
 </databaseChangeLog>

@@ -22,7 +22,7 @@ public class BuildingBean implements BuildingFacade {
 	@Inject
 	private ComplexRepository complexRepository;
 
-	public BuildingDto create(BuildingDto.New building) {
+	public BuildingDto create(BuildingDto.WithId building) {
 		Complex complex = complexRepository.findBy(building.getComplexId());
 		if (complex != null) {
 			Building buildingEntity = new Building();
@@ -43,7 +43,7 @@ public class BuildingBean implements BuildingFacade {
 		throw new EntityNotFoundException();
 	}
 
-	public BuildingDto update(BuildingDto building) {
+	public BuildingDto update(BuildingDto.WithId building) {
 		if (building.getId() != null) {
 			Complex complex = complexRepository.findByBuildingId(building.getId());
 			if (complex != null) {

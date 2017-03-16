@@ -36,11 +36,11 @@ public class ComplexBean implements ComplexFacade {
 		throw new EntityNotFoundException();
 	}
 
-	public ComplexDto.WithBuildings findComplete(Long id) {
+	public ComplexDto.WithId.WithBuildings findComplete(Long id) {
 		if (id != null) {
 			Complex complexEntity = complexRepository.findBy(id);
 			if (complexEntity != null) {
-				return new ComplexDto.WithBuildings(complexEntity);
+				return new ComplexDto.WithId.WithBuildings(complexEntity);
 			}
 		}
 		throw new EntityNotFoundException();
@@ -77,7 +77,7 @@ public class ComplexBean implements ComplexFacade {
 		throw new EntityNotFoundException();
 	}
 
-	public ComplexDto update(ComplexDto complex) {
+	public ComplexDto update(ComplexDto.WithId complex) {
 		checkForDuplicateComplex(complex.getName(), (c) -> !Objects.equals(c.getId(), complex.getId()));
 		Complex complexEntity = complexRepository.findBy(complex.getId());
 		if (complexEntity != null){

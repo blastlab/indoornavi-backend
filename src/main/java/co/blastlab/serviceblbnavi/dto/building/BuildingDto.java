@@ -18,31 +18,31 @@ import java.util.List;
 public class BuildingDto {
 
 	public BuildingDto(Building building) {
-		this.setId(building.getId());
 		this.setName(building.getName());
+		this.setComplexId(building.getComplex() != null ? building.getComplex().getId() : null);
 		building.getFloors().forEach((floor -> this.getFloors().add(new FloorDto(floor))));
 	}
-
-	private Long id;
 
 	@NotNull
 	@NotEmpty
 	private String name;
+
+	@NotNull
+	@ApiModelProperty(example = "1")
+	private Long complexId;
 
 	private List<FloorDto> floors = new ArrayList<>();
 
 	@Getter
 	@Setter
 	@NoArgsConstructor
-	public static class New extends BuildingDto {
+	public static class WithId extends BuildingDto {
 
-		@NotNull
-		@ApiModelProperty(example = "1")
-		private Long complexId;
+		private Long id;
 
-		public New(Building building) {
+		public WithId(Building building) {
 			super(building);
-			this.setComplexId(building.getComplex() != null ? building.getComplex().getId() : null);
+			this.setId(building.getId());
 		}
 	}
 }
