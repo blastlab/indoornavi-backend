@@ -33,6 +33,14 @@
 			<column name="building_id" type="BIGINT"/>
 		</createTable>
 	</changeSet>
+	<changeSet author="kgebert (generated)" id="issue-89-7">
+		<addForeignKeyConstraint baseColumnNames="complex_id" baseTableName="Building" constraintName="FK_428m38a3fvrkr0l6lt37nr7sg" deferrable="false"
+		                         initiallyDeferred="false" referencedColumnNames="id" referencedTableName="Complex"/>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="issue-89-8">
+		<addForeignKeyConstraint baseColumnNames="building_id" baseTableName="Floor" constraintName="FK_5rv574h45qi1a16kefmy9juof" deferrable="false"
+		                         initiallyDeferred="false" referencedColumnNames="id" referencedTableName="Building"/>
+	</changeSet>
 	<changeSet author="pkuzmicki (generated)" id="issue-80-1">
 		<createTable tableName="Anchor">
 			<column name="id" type="BIGINT" autoIncrement="true">
@@ -40,10 +48,10 @@
 			</column>
 			<column name="creationDate" type="timestamp"/>
 			<column name="modificationDate" type="timestamp"/>
-			<column name="shortId" type="VARCHAR(255)">
+			<column name="shortId" type="SMALLINT">
 				<constraints nullable="false" unique="true"/>
 			</column>
-			<column name="longId" type="VARCHAR(255)">
+			<column name="longId" type="BIGINT">
 				<constraints nullable="false" unique="true"/>
 			</column>
 			<column name="x" type="DOUBLE">
@@ -54,14 +62,6 @@
 			</column>
 			<column name="floor_id" type="BIGINT"/>
 		</createTable>
-	</changeSet>
-	<changeSet author="kgebert (generated)" id="issue-89-7">
-		<addForeignKeyConstraint baseColumnNames="complex_id" baseTableName="Building" constraintName="FK_428m38a3fvrkr0l6lt37nr7sg" deferrable="false"
-		                         initiallyDeferred="false" referencedColumnNames="id" referencedTableName="Complex"/>
-	</changeSet>
-	<changeSet author="kgebert (generated)" id="issue-89-8">
-		<addForeignKeyConstraint baseColumnNames="building_id" baseTableName="Floor" constraintName="FK_5rv574h45qi1a16kefmy9juof" deferrable="false"
-		                         initiallyDeferred="false" referencedColumnNames="id" referencedTableName="Building"/>
 	</changeSet>
 	<changeSet author="pkuzmicki (generated)" id="issue-80-2">
 		<addForeignKeyConstraint baseColumnNames="floor_id" baseTableName="Anchor" constraintName="FK_gtwmd57hn5sf1q3c7ysdwp2db" deferrable="false"

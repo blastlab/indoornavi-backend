@@ -10,7 +10,4 @@ import java.util.List;
 @Repository
 public interface AnchorRepository extends EntityRepository<Anchor, Long> {
 
-	Anchor findOptionalByLongId(String longId);
-
-	List<Anchor> findByFloor(Floor floor);
 }

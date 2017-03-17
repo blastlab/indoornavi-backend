@@ -22,47 +22,54 @@ public class AnchorBean implements AnchorFacade {
 	@Inject
 	private FloorRepository floorRepository;
 
-	public AnchorDto.WithFloor.WithId create(AnchorDto anchor) {
+	public AnchorDto.WithId create(AnchorDto anchor) {
 		Anchor anchorEntity = new Anchor();
 		anchorEntity.setX(anchor.getX());
 		anchorEntity.setY(anchor.getY());
 		anchorEntity.setLongId(anchor.getLongId());
 		anchorEntity.setShortId(anchor.getShortId());
+
+		if (anchor.getFloorId() != null) {
+			Floor floor = floorRepository.findBy(anchor.getFloorId());
+			if (floor != null) {
+				anchorEntity.setFloor(floor);
+			} else {
+				throw new EntityNotFoundException();
+			}
+		}
+
 		anchorRepository.save(anchorEntity);
-		return new AnchorDto.WithFloor.WithId(anchorEntity);
+		return new AnchorDto.WithId(anchorEntity);
 	}
 
-	public AnchorDto.WithFloor.WithId setFloor(Long id, AnchorDto.WithFloor anchor) {
+	public AnchorDto.WithId update(Long id, AnchorDto anchor) {
 		Anchor anchorEntity = anchorRepository.findBy(id);
 		if (anchorEntity != null) {
 			Floor floor = floorRepository.findBy(anchor.getFloorId());
 			if (floor != null) {
+				anchorEntity.setX(anchor.getX());
+				anchorEntity.setY(anchor.getY());
 				anchorEntity.setFloor(floor);
 				anchorRepository.save(anchorEntity);
-				return new AnchorDto.WithFloor.WithId(anchorEntity);
+				return new AnchorDto.WithId(anchorEntity);
 			}
 		}
 		throw new EntityNotFoundException();
 	}
 
-	public AnchorDto.WithFloor.WithId find(Long id) {
+	public AnchorDto.WithId find(Long id) {
 		Anchor anchorEntity = anchorRepository.findBy(id);
 		if (anchorEntity != null) {
-			return new AnchorDto.WithFloor.WithId(anchorEntity);
+			return new AnchorDto.WithId(anchorEntity);
 		}
 		throw new EntityNotFoundException();
 	}
 
-	public List<AnchorDto.WithFloor.WithId> findByFloor(Long floorId) {
-		if (floorId != null){
-			Floor floor = floorRepository.findBy(floorId);
-			if (floor != null){
-				List<AnchorDto.WithFloor.WithId> anchors = new ArrayList<>();
-				anchorRepository.findByFloor(floor).forEach((anchorEntity -> anchors.add(new AnchorDto.WithFloor.WithId(anchorEntity))));
-				return anchors;
-			}
-		}
-		throw new EntityNotFoundException();
+	public List<AnchorDto.WithId> findAll() {
+		List<AnchorDto.WithId> anchors = new ArrayList<>();
+		anchorRepository.findAll()
+			.forEach(anchorEntity -> anchors.add(new AnchorDto.WithId(anchorEntity)));
+		return anchors;
 	}
 
 	public Response delete(Long id) {

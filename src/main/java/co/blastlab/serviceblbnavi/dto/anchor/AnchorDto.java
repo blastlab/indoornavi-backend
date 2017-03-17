@@ -1,6 +1,7 @@
 package co.blastlab.serviceblbnavi.dto.anchor;
 
 import co.blastlab.serviceblbnavi.domain.Anchor;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,15 +20,16 @@ public class AnchorDto {
 		this.longId = anchor.getLongId();
 		this.x = anchor.getX();
 		this.y = anchor.getY();
+		this.floorId = (anchor.getFloor() == null) ? null : anchor.getFloor().getId();
 	}
 
-	@NotEmpty
-	@ApiModelProperty(example = "5F19")
-	private String shortId;
+	@NotNull
+	@ApiModelProperty(example = "14733")
+	private short shortId;
 
-	@NotEmpty
-	@ApiModelProperty(example = "1")
-	private String longId;
+	@NotNull
+	@ApiModelProperty(example = "8736783474886474673")
+	private long longId;
 
 	@NotNull
 	private Double x;
@@ -35,31 +37,21 @@ public class AnchorDto {
 	@NotNull
 	private Double y;
 
+	@ApiModelProperty(example = "1")
+	private Long floorId;
+
 	@Getter
 	@Setter
 	@NoArgsConstructor
-	public static class WithFloor extends AnchorDto {
+	@ApiModel(value = "AnchorId")
+	public static class WithId extends AnchorDto {
 
 		@ApiModelProperty(example = "1")
-		private Long floorId;
+		private Long id;
 
-		public WithFloor(Anchor anchor) {
+		public WithId(Anchor anchor) {
 			super(anchor);
-			this.setFloorId(anchor.getFloor() != null ? anchor.getFloor().getId() : null);
-		}
-
-		@Getter
-		@Setter
-		@NoArgsConstructor
-		public static class WithId extends WithFloor {
-
-			@ApiModelProperty(example = "1")
-			private Long id;
-
-			public WithId(Anchor anchor) {
-				super(anchor);
-				this.setId(anchor.getId());
-			}
+			this.setId(anchor.getId());
 		}
 	}
 }
