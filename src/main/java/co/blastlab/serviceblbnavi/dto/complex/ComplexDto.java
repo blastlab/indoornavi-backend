@@ -2,6 +2,8 @@ package co.blastlab.serviceblbnavi.dto.complex;
 
 import co.blastlab.serviceblbnavi.domain.Complex;
 import co.blastlab.serviceblbnavi.dto.building.BuildingDto;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,26 +20,41 @@ import java.util.List;
 @AllArgsConstructor
 public class ComplexDto {
 
-	public ComplexDto(Complex complex) {
-		this.setId(complex.getId());
-		this.setName(complex.getName());
-	}
-
-	private Long id;
-
 	@NotNull
 	@NotEmpty
 	private String name;
 
+	public ComplexDto(Complex complex) {
+		this.setName(complex.getName());
+	}
+
+
 	@Getter
 	@Setter
 	@NoArgsConstructor
-	public static class WithBuildings extends ComplexDto {
-		private List<BuildingDto> buildings = new ArrayList<>();
+	@ApiModel(value = "ComplexId") /* Konieczne ze względu na działanie Swaggera. Bez tej adnotacji model klasy ComplexDto.WithId.class był nadpisywany
+	    przez model klasy BuildingDto.WithId.class, co było widoczne w pliku swagger.json */
+	public static class WithId extends ComplexDto {
 
-		public WithBuildings(Complex complex) {
+		@ApiModelProperty(example = "1")
+		private Long id;
+
+		public WithId(Complex complex) {
 			super(complex);
-			complex.getBuildings().forEach(building -> this.getBuildings().add(new BuildingDto(building)));
+			this.setId(complex.getId());
+		}
+
+
+		@Getter
+		@Setter
+		@NoArgsConstructor
+		public static class WithBuildings extends WithId {
+			private List<BuildingDto> buildings = new ArrayList<>();
+
+			public WithBuildings(Complex complex) {
+				super(complex);
+				complex.getBuildings().forEach(building -> this.getBuildings().add(new BuildingDto(building)));
+			}
 		}
 	}
 }
