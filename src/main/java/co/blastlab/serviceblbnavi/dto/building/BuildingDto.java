@@ -3,7 +3,7 @@ package co.blastlab.serviceblbnavi.dto.building;
 import co.blastlab.serviceblbnavi.domain.Building;
 import co.blastlab.serviceblbnavi.dto.floor.FloorDto;
 import io.swagger.annotations.ApiModel;
-import com.wordnik.swagger.annotations.ApiModelProperty;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 import org.hibernate.validator.constraints.NotEmpty;
 
