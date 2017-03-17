@@ -10,8 +10,7 @@ import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
 import javax.ws.rs.core.Response;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Optional;
 
 @Stateless
 public class BuildingBean implements BuildingFacade {
@@ -22,40 +21,29 @@ public class BuildingBean implements BuildingFacade {
 	@Inject
 	private ComplexRepository complexRepository;
 
-	public BuildingDto create(BuildingDto.New building) {
+	public BuildingDto.WithId create(BuildingDto building) {
 		Complex complex = complexRepository.findBy(building.getComplexId());
 		if (complex != null) {
 			Building buildingEntity = new Building();
 			buildingEntity.setComplex(complex);
 			buildingEntity.setName(building.getName());
 			buildingEntity = buildingRepository.save(buildingEntity);
-			return new BuildingDto(buildingEntity);
+			return new BuildingDto.WithId(buildingEntity);
 		}
 		throw new EntityNotFoundException();
 	}
 
-	public BuildingDto find(Long id) {
-		Building buildingEntity = buildingRepository.findBy(id);
-
-		if (buildingEntity != null) {
-			return new BuildingDto(buildingEntity);
-		}
-		throw new EntityNotFoundException();
-	}
-
-	public BuildingDto update(BuildingDto building) {
-		if (building.getId() != null) {
-			Complex complex = complexRepository.findByBuildingId(building.getId());
-			if (complex != null) {
-				Building buildingEntity = buildingRepository.findBy(building.getId());
+	public BuildingDto.WithId update(Long id, BuildingDto building) {
+			Optional<Complex> complex = complexRepository.findByBuildingId(id);
+			if (complex.isPresent()) {
+				Building buildingEntity = buildingRepository.findBy(id);
 				if (buildingEntity != null) {
-					buildingEntity.setComplex(complex);
+					buildingEntity.setComplex(complex.get());
 					buildingEntity.setName(building.getName());
 					buildingEntity = buildingRepository.save(buildingEntity);
-					return new BuildingDto(buildingEntity);
+					return new BuildingDto.WithId(buildingEntity);
 				}
 			}
-		}
 		throw new EntityNotFoundException();
 	}
 
@@ -68,16 +56,12 @@ public class BuildingBean implements BuildingFacade {
 		throw new EntityNotFoundException();
 	}
 
-	public List<BuildingDto> findAll(Long complexId) {
-		if (complexId != null) {
-			Complex complex = complexRepository.findBy(complexId);
-			if (complex != null) {
-				List<BuildingDto> buildings = new ArrayList<>();
-				buildingRepository.findByComplex(complex).forEach((buildingEntity -> buildings.add(new BuildingDto(buildingEntity))));
-				return buildings;
-			}
+	public BuildingDto.WithId find(Long id) {
+		Building buildingEntity = buildingRepository.findBy(id);
+
+		if (buildingEntity != null) {
+			return new BuildingDto.WithId(buildingEntity);
 		}
 		throw new EntityNotFoundException();
 	}
-
 }
