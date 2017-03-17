@@ -1,6 +1,4 @@
 {
-	"id": "{id}",
 	"name": "{name}",
-	"minimumFloor": "{minimumFloor:0}",
-	"degree": "{degree:5}"
+	"complexId": "{complexId}"
 }

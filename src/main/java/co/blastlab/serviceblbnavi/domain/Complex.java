@@ -3,6 +3,7 @@ package co.blastlab.serviceblbnavi.domain;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
 import java.util.ArrayList;
@@ -15,6 +16,6 @@ public class Complex extends TrackedEntity {
 
 	private String name;
 
-	@OneToMany(mappedBy = "complex")
+	@OneToMany(mappedBy = "complex", cascade = {CascadeType.REMOVE, CascadeType.MERGE})
 	private List<Building> buildings = new ArrayList<>();
 }

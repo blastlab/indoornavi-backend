@@ -6,92 +6,68 @@ import co.blastlab.serviceblbnavi.dto.complex.ComplexDto;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
-import javax.persistence.EntityExistsException;
 import javax.persistence.EntityNotFoundException;
 import javax.ws.rs.core.Response;
-import java.util.Objects;
-import java.util.function.Predicate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Stateless
 public class ComplexBean implements ComplexFacade {
 
-	@Inject
-	private ComplexRepository complexRepository;
+	private final ComplexRepository complexRepository;
 
-	public ComplexDto create(ComplexDto complex) {
-		checkForDuplicateComplex(complex.getName(), (c) -> true);
+	@Inject
+	public ComplexBean(ComplexRepository complexRepository) {
+		this.complexRepository = complexRepository;
+	}
+
+	@Override
+	public ComplexDto.WithId create(ComplexDto complex) {
 		Complex complexEntity = new Complex();
 		complexEntity.setName(complex.getName());
-		complexEntity = complexRepository.saveAndFlush(complexEntity);
-		return new ComplexDto(complexEntity);
+		complexEntity = complexRepository.save(complexEntity);
+		return new ComplexDto.WithId(complexEntity);
 	}
 
-	public ComplexDto find(Long id) {
-		if (id != null) {
-			Complex complexEntity = complexRepository.findBy(id);
-			if (complexEntity != null) {
-				return new ComplexDto(complexEntity);
-			}
-		}
-		throw new EntityNotFoundException();
-	}
 
-	public ComplexDto.WithBuildings findComplete(Long id) {
-		if (id != null) {
-			Complex complexEntity = complexRepository.findBy(id);
-			if (complexEntity != null) {
-				return new ComplexDto.WithBuildings(complexEntity);
-			}
-		}
-		throw new EntityNotFoundException();
-	}
-
-	public ComplexDto findByBuilding(Long id) {
-		if (id != null) {
-			Complex complexEntity = complexRepository.findByBuildingId(id);
-			if (complexEntity != null) {
-				return new ComplexDto(complexEntity);
-			}
-		}
-		throw new EntityNotFoundException();
-	}
-
-	public ComplexDto findByFloor(Long id) {
-		if (id != null) {
-			Complex complexEntity = complexRepository.findByFloorId(id);
-			if (complexEntity != null) {
-				return new ComplexDto(complexEntity);
-			}
-		}
-		throw new EntityNotFoundException();
-	}
-
-	public Response delete(Long id) {
-		if (id != null) {
-			Complex complex = complexRepository.findBy(id);
-			if (complex != null) {
-				complexRepository.remove(complex);
-				return Response.ok().build();
-			}
-		}
-		throw new EntityNotFoundException();
-	}
-
-	public ComplexDto update(ComplexDto complex) {
-		checkForDuplicateComplex(complex.getName(), (c) -> !Objects.equals(c.getId(), complex.getId()));
-		Complex complexEntity = complexRepository.findBy(complex.getId());
+	@Override
+	public ComplexDto.WithId update(Long id, ComplexDto complex) {
+		Complex complexEntity = complexRepository.findBy(id);
 		if (complexEntity != null){
 			complexEntity.setName(complex.getName());
 			complexEntity = complexRepository.save(complexEntity);
-			return new ComplexDto(complexEntity);
+			return new ComplexDto.WithId(complexEntity);
 		}
 		throw new EntityNotFoundException();
 	}
 
-	private void checkForDuplicateComplex(String name, Predicate<Complex> additionalCondition) {
-		Complex complexEntity = complexRepository.findOptionalByName(name);
-		if (complexEntity != null && additionalCondition.test(complexEntity)) {
-			throw new EntityExistsException();
+
+	@Override
+	public Response delete(Long id) {
+		Complex complex = complexRepository.findBy(id);
+		if (complex != null) {
+			complexRepository.remove(complex);
+			return Response.ok().build();
 		}
+		throw new EntityNotFoundException();
+	}
+
+
+	@Override
+	public List<ComplexDto.WithId> findAll() {
+		List<ComplexDto.WithId> complexes = new ArrayList<>();
+		complexRepository.findAll()
+			.forEach(complexEntity -> complexes.add(new ComplexDto.WithId(complexEntity)));
+		return complexes;
+	}
+
+
+	@Override
+	public ComplexDto.WithId.WithBuildings findWithBuildings(Long id) {
+		Complex complexEntity = complexRepository.findBy(id);
+		if (complexEntity != null) {
+			return new ComplexDto.WithId.WithBuildings(complexEntity);
+		}
+		throw new EntityNotFoundException();
 	}
 }

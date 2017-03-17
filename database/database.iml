@@ -13,5 +13,9 @@
     <orderEntry type="library" name="Maven: us.fatehi:schemacrawler:12.06.03" level="project" />
     <orderEntry type="library" name="Maven: us.fatehi:schemacrawler-mysql:12.06.03" level="project" />
     <orderEntry type="library" name="Maven: mysql:mysql-connector-java:5.1.35" level="project" />
+    <orderEntry type="library" name="Maven: org.liquibase:liquibase-core:3.3.2" level="project" />
+    <orderEntry type="library" name="Maven: us.fatehi:schemacrawler:12.06.03" level="project" />
+    <orderEntry type="library" name="Maven: us.fatehi:schemacrawler-mysql:12.06.03" level="project" />
+    <orderEntry type="library" name="Maven: mysql:mysql-connector-java:5.1.35" level="project" />
   </component>
 </module>
