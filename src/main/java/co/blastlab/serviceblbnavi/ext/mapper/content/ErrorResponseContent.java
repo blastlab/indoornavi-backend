@@ -1,4 +1,4 @@
-package co.blastlab.serviceblbnavi.rest.facade.ext.mapper.content;
+package co.blastlab.serviceblbnavi.ext.mapper.content;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;

@@ -1,6 +1,6 @@
-package co.blastlab.serviceblbnavi.rest.facade.ext.mapper;
+package co.blastlab.serviceblbnavi.ext.mapper;
 
-import co.blastlab.serviceblbnavi.rest.facade.ext.mapper.content.MessageErrorResponseContent;
+import co.blastlab.serviceblbnavi.ext.mapper.content.MessageErrorResponseContent;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
