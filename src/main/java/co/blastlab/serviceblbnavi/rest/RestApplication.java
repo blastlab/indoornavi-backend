@@ -13,7 +13,6 @@ public class RestApplication extends Application {
 	public static final String BASE_PATH = "/rest/v1";
 
 	public RestApplication() {
-//		Json.mapper().registerModule(new JaxbAnnotationModule());
 		Json.mapper().disable(MapperFeature.DEFAULT_VIEW_INCLUSION);
 
 		BeanConfig beanConfig = new BeanConfig();

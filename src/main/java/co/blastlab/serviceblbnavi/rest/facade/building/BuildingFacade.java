@@ -1,7 +1,7 @@
 package co.blastlab.serviceblbnavi.rest.facade.building;
 
 import co.blastlab.serviceblbnavi.dto.building.BuildingDto;
-import co.blastlab.serviceblbnavi.rest.facade.ext.filter.TokenAuthorization;
+import co.blastlab.serviceblbnavi.ext.filter.TokenAuthorization;
 import io.swagger.annotations.*;
 
 import javax.validation.Valid;

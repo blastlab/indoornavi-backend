@@ -1,4 +1,4 @@
-package co.blastlab.serviceblbnavi.rest.facade.ext.mapper.accessory;
+package co.blastlab.serviceblbnavi.ext.mapper.accessory;
 
 import org.hibernate.exception.ConstraintViolationException;
 

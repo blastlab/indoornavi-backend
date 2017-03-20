@@ -1,4 +1,4 @@
-package co.blastlab.serviceblbnavi.dao.exception;
+package co.blastlab.serviceblbnavi.ext.exception;
 
 import javax.ejb.ApplicationException;
 

@@ -1,7 +1,7 @@
-package co.blastlab.serviceblbnavi.rest.facade.ext.mapper;
+package co.blastlab.serviceblbnavi.ext.mapper;
 
-import co.blastlab.serviceblbnavi.rest.facade.ext.mapper.accessory.ConstraintSearcher;
-import co.blastlab.serviceblbnavi.rest.facade.ext.mapper.content.DbConstraintViolationContent;
+import co.blastlab.serviceblbnavi.ext.mapper.accessory.ConstraintSearcher;
+import co.blastlab.serviceblbnavi.ext.mapper.content.DbConstraintViolationContent;
 
 import javax.ejb.EJBTransactionRolledbackException;
 import javax.ws.rs.core.Response;
