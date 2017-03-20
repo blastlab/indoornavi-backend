@@ -1,4 +1,4 @@
-package co.blastlab.serviceblbnavi.rest.facade.ext.exception;
+package co.blastlab.serviceblbnavi.ext.exception;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;

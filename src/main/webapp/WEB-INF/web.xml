@@ -26,7 +26,7 @@
 	</login-config>
 	<filter>
 		<filter-name>CorsFilter</filter-name>
-		<filter-class>co.blastlab.serviceblbnavi.rest.facade.ext.filter.CORSFilter</filter-class>
+		<filter-class>co.blastlab.serviceblbnavi.ext.filter.CORSFilter</filter-class>
 	</filter>
 	<filter-mapping>
 		<filter-name>CorsFilter</filter-name>
