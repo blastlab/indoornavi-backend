@@ -4,6 +4,7 @@
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.3.xsd">
 
 	<changeSet id="Clear" author="kgebert" context="test" runOnChange="true" labels="Clear" runAlways="true">
+		<delete tableName="anchor"/>
 		<delete tableName="floor"/>
 		<delete tableName="building"/>
 		<delete tableName="complex"/>
@@ -19,6 +20,10 @@
 
 	<changeSet id="Floor" author="mcichosz" context="test" runOnChange="true" labels="Floor" runAlways="true">
 		<loadUpdateData tableName="floor" file="test/Floor.csv" primaryKey="id" relativeToChangelogFile="true"/>
+	</changeSet>
+
+	<changeSet id="Anchor" author="pkuzmicki" context="test" runOnChange="true" labels="Anchor" runAlways="true">
+		<loadUpdateData tableName="anchor" file="test/Anchor.csv" primaryKey="id" relativeToChangelogFile="true"/>
 	</changeSet>
 
 </databaseChangeLog>
