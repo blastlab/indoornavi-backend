@@ -1,6 +1,7 @@
 package co.blastlab.serviceblbnavi.ext.mapper.content;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
@@ -13,12 +14,13 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+@NoArgsConstructor
+@Getter
 public class ConstraintViolationListErrorResponseContent extends ErrorResponseContent {
 
 	private static final String ERROR_NAME = "constraint_violation";
 
-	@Getter
-	private final List<Violation> violations = new ArrayList<>();
+	private List<Violation> violations = new ArrayList<>();
 
 	public ConstraintViolationListErrorResponseContent(ConstraintViolationException exception) {
 		obtainViolationsFromException(exception);
@@ -50,13 +52,13 @@ public class ConstraintViolationListErrorResponseContent extends ErrorResponseCo
 		return ERROR_NAME;
 	}
 
-	public static class Violation {
+	private static class Violation {
 
 		@Getter
-		private final String path;
+		private String path;
 
 		@Getter
-		private final List<String> messages = new ArrayList<>();
+		private List<String> messages = new ArrayList<>();
 
 		private Violation(String path) {
 			this.path = path;

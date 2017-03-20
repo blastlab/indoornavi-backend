@@ -12,6 +12,10 @@ public class ValidationMapper implements ExceptionMapper<ConstraintViolationExce
 
 	@Override
 	public Response toResponse(ConstraintViolationException exception) {
+//		return Response
+//			.status(Response.Status.BAD_REQUEST)
+//			.entity("{\"error\": \"test\"}")
+//			.build();
 		return Response
 			.status(Response.Status.BAD_REQUEST)
 			.entity(new ConstraintViolationListErrorResponseContent(exception))
