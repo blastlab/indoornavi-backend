@@ -1,4 +1,4 @@
-package co.blastlab.serviceblbnavi.rest.facade.ext.mapper;
+package co.blastlab.serviceblbnavi.ext.mapper;
 
 import javax.persistence.EntityExistsException;
 import javax.persistence.EntityNotFoundException;

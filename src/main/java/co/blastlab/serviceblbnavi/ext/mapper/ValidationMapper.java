@@ -1,6 +1,6 @@
-package co.blastlab.serviceblbnavi.rest.facade.ext.mapper;
+package co.blastlab.serviceblbnavi.ext.mapper;
 
-import co.blastlab.serviceblbnavi.rest.facade.ext.mapper.content.ConstraintViolationListErrorResponseContent;
+import co.blastlab.serviceblbnavi.ext.mapper.content.ConstraintViolationListErrorResponseContent;
 
 import javax.validation.ConstraintViolationException;
 import javax.ws.rs.core.Response;

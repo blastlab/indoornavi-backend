@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package co.blastlab.serviceblbnavi.rest.facade.ext.filter;
+package co.blastlab.serviceblbnavi.ext.filter;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
