@@ -1,4 +1,4 @@
-package co.blastlab.serviceblbnavi.rest.facade.ext.filter;
+package co.blastlab.serviceblbnavi.ext.filter;
 
 import javax.ws.rs.NameBinding;
 import java.lang.annotation.ElementType;
