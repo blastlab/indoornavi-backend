@@ -8,13 +8,18 @@ import lombok.Setter;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
+import javax.ejb.Singleton;
 import java.awt.*;
 import java.util.*;
 import java.util.List;
 
+@Singleton
 public class CoordinatesCalculator {
 	// <tagId, anchorId, measure>
 	private Table<Integer, Integer, Measure> measureTable = HashBasedTable.create();
+
+	// 30 minutes
+	private final static long OLD_MEASURE_IN_MILISECONDS = 1_800_000;
 
 	private FakeDb db = new FakeDb();
 
@@ -47,20 +52,16 @@ public class CoordinatesCalculator {
 		Collections.sort(sortedIntersectionPointsDistance);
 		Double thres = sortedIntersectionPointsDistance.get(connectedAnchors.size() - 1);
 
-		int x = 0;
-		int y = 0;
-		int j = 0;
-		for(int ip = 0; ip < intersectionPoints.size(); ++ip)
+		int x = 0, y = 0, j = 0;
+		for (int ip = 0; ip < intersectionPoints.size(); ++ip)
 		{
-			if (intersectionPointsDistance.get(ip) > thres)
-				continue;
-			else
-			{
+			if (intersectionPointsDistance.get(ip) <= thres) {
 				x += intersectionPoints.get(ip).getX();
 				y += intersectionPoints.get(ip).getY();
 				++j;
 			}
 		}
+		// TODO: uśrednienie na podstawie poprzedniej wartości taga x,y
 		x /= j;
 		y /= j;
 
@@ -68,8 +69,19 @@ public class CoordinatesCalculator {
 		return Optional.of(new Point(x, y));
 	}
 
-	protected void cleanMeasureTable() {
-		// TODO: remove old measures
+	/**
+	 * Remove from measure table measures older than 30 minutes
+	 */
+	public void cleanMeasureTable() {
+		long now = new Date().getTime();
+
+		Iterator<Table.Cell<Integer, Integer, Measure>> iterator = measureTable.cellSet().iterator();
+
+		iterator.forEachRemaining(cell -> {
+			if (now - OLD_MEASURE_IN_MILISECONDS < cell.getValue().getTimestamp()) {
+				iterator.remove();
+			}
+		});
 	}
 
 	/**
@@ -102,6 +114,7 @@ public class CoordinatesCalculator {
 		return null;
 	}
 
+	// TODO: uśrednienie dystansów
 	private void setConnection(int tagId, int anchorId, double distance) {
 		measureTable.put(tagId, anchorId, new Measure(distance, new Date().getTime()));
 	}
@@ -150,7 +163,7 @@ public class CoordinatesCalculator {
 	@Getter
 	@Setter
 	@AllArgsConstructor
-	private class Measure {
+	private static class Measure {
 		double distance;
 		long timestamp;
 	}

@@ -4,6 +4,8 @@ import co.blastlab.serviceblbnavi.dao.repository.CoordinatesRepository;
 import co.blastlab.serviceblbnavi.domain.Coordinates;
 import co.blastlab.serviceblbnavi.dto.CoordinatesDto;
 import co.blastlab.serviceblbnavi.dto.DistanceMessage;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.ejb.Singleton;
@@ -13,6 +15,7 @@ import javax.websocket.server.ServerEndpoint;
 import java.awt.*;
 import java.io.IOException;
 import java.util.*;
+import java.util.List;
 
 @ServerEndpoint("/coordinates")
 @Singleton
@@ -54,7 +57,7 @@ public class WebSocketServer {
 
 	@OnError
 	public void onError(Throwable error) {
-		System.out.print("ERROR");
+		error.printStackTrace();
 	}
 
 	@OnMessage
@@ -63,19 +66,25 @@ public class WebSocketServer {
 			broadCastMessage(serverSessions, message);
 		} else if (Objects.equals(session.getQueryString(), SERVER)) {
 			ObjectMapper objectMapper = new ObjectMapper();
-			DistanceMessage distanceMessage = objectMapper.readValue(message, DistanceMessage.class);
-			Optional<Point> coords = coordinatesCalculator.calculateTagPosition(distanceMessage.getD1(), distanceMessage.getD2(), distanceMessage.getDist());
-			System.out.println(String.format("Sending message: %s ", message));
-			if (coords.isPresent()) {
-				Point point = coords.get();
-				CoordinatesDto coordinatesDto = new CoordinatesDto("test", point.getX(), point.getY());
-				Coordinates coordinates = new Coordinates();
-				coordinates.setDevice(coordinatesDto.getDevice());
-				coordinates.setX(coordinatesDto.getX());
-				coordinates.setY(coordinatesDto.getY());
-				coordinatesRepository.save(coordinates);
-				broadCastMessage(clientSessions, objectMapper.writeValueAsString(coordinatesDto));
-			}
+			List<DistanceMessage> distanceMessages = objectMapper.readValue(message, new TypeReference<List<DistanceMessage>>(){});
+			distanceMessages.forEach(distanceMessage -> {
+				Optional<Point> coords = coordinatesCalculator.calculateTagPosition(distanceMessage.getD1(), distanceMessage.getD2(), distanceMessage.getDist());
+				System.out.println(String.format("Sending message: %s ", message));
+				if (coords.isPresent()) {
+					Point point = coords.get();
+					CoordinatesDto coordinatesDto = new CoordinatesDto("test", point.getX(), point.getY());
+					Coordinates coordinates = new Coordinates();
+					coordinates.setDevice(coordinatesDto.getDevice());
+					coordinates.setX(coordinatesDto.getX());
+					coordinates.setY(coordinatesDto.getY());
+					coordinatesRepository.save(coordinates);
+					try {
+						broadCastMessage(clientSessions, objectMapper.writeValueAsString(coordinatesDto));
+					} catch (JsonProcessingException e) {
+						e.printStackTrace();
+					}
+				}
+			});
 		}
 	}
 
