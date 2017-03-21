@@ -48,7 +48,8 @@
 			</column>
 			<column name="creationDate" type="timestamp"/>
 			<column name="modificationDate" type="timestamp"/>
-			<column name="shortId" type="SMALLINT">
+			<column name="name" type="VARCHAR(255)"/>
+			<column name="shortId" type="INT">
 				<constraints nullable="false" unique="true"/>
 			</column>
 			<column name="longId" type="BIGINT">

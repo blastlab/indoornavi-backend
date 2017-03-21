@@ -25,7 +25,7 @@ public class AnchorDto {
 
 	@NotNull
 	@ApiModelProperty(example = "14733")
-	private short shortId;
+	private int shortId;
 
 	@NotNull
 	@ApiModelProperty(example = "8736783474886474673")
