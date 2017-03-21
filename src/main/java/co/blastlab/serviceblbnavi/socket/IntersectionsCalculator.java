@@ -41,10 +41,15 @@ class IntersectionsCalculator {
 			double K = Math.sqrt(kk) / 4; // pole trojkata
 			x = (int)(firstAnchor.getX() + secondAnchor.getX() + (secondAnchor.getX()-firstAnchor.getX())*(firstAnchorDistance * firstAnchorDistance - secondAnchorDistance * secondAnchorDistance) /L2) / 2;
 			y = (int)(firstAnchor.getY() + secondAnchor.getY() + (secondAnchor.getY()-firstAnchor.getY())*(firstAnchorDistance * firstAnchorDistance - secondAnchorDistance * secondAnchorDistance) /L2) / 2;
-			res.add(new Point((int)(x + 2 * (secondAnchor.getY() - firstAnchor.getY()) * K / L2),
-				(int)(y - 2 * (secondAnchor.getX() - firstAnchor.getX()) * K / L2)));
-			res.add(new Point((int)(x - 2 * (secondAnchor.getY() - firstAnchor.getY()) * K / L2),
-				(int)(y + 2 * (secondAnchor.getX() - firstAnchor.getX()) * K / L2)));
+
+			res.add(new Point(
+				(int)(x + 2 * (secondAnchor.getY() - firstAnchor.getY()) * K / L2),
+				(int)(y - 2 * (secondAnchor.getX() - firstAnchor.getX()) * K / L2))
+			);
+			res.add(new Point(
+				(int)(x - 2 * (secondAnchor.getY() - firstAnchor.getY()) * K / L2),
+				(int)(y + 2 * (secondAnchor.getX() - firstAnchor.getX()) * K / L2))
+			);
 		}
 		return res;
 	}
@@ -60,4 +65,5 @@ class IntersectionsCalculator {
 			}
 		return Arrays.asList(IPdistance);
 	}
+
 }

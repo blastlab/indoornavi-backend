@@ -6,8 +6,8 @@
 </head>
 <style>
     #container {
-        width: 500px;
-        height: 500px;
+        width: 1500px;
+        height: 1500px;
         background: grey;
 	    position: relative;
     }
@@ -21,6 +21,10 @@
 
 	#color {
 		display: none;
+	}
+
+	.red {
+		background-color: red;
 	}
 </style>
 <body>
@@ -56,15 +60,64 @@
 		    isConnectionOpen = false;
 	    };
 
+	    function getColor(RGB, colorInt) {
+	    	var color;
+	    	if (colorInt <= 16) {
+	    		color = '0' + colorInt.toString(16);
+		    } else {
+	    		color = colorInt.toString(16)
+		    }
+	    	if (RGB == 0) {
+	    		return '#0000' + color
+		    } else if (RGB == 1) {
+	    		return '#00' + color + 'ff';
+		    } else if (RGB == 2) {
+	    		return '#' + color + 'ffff';
+		    }
+	    }
+
+	    var colorInt = 0;
+	    var RGB = 0;
 	    socket.onmessage = function (msg) {
 		    var message = JSON.parse(msg.data);
 		    var $el = $('<div class="square"></div>');
+		    var color = getColor(RGB, colorInt);
+		    console.log(color);
 		    $el.css({
-			    'left': (message.x < 0 ? -message.x : message.x) / 5,
-			    'top': (message.y < 0 ? -message.y : message.y) / 5
+			    'left': 250 + message.x,
+			    'top': 400 + message.y,
+			    'background-color': color
 		    });
 		    $container.append($el);
+		    colorInt += 3;
+		    if (colorInt > 255) {
+			    RGB++;
+			    colorInt = 0;
+		    }
 	    };
+
+	    var anchors = [
+	    	{
+		        x: 0,
+			    y: 0
+	        },
+		    {
+		    	x: 785,
+			    y: 0
+		    },
+		    {
+		    	x: 485,
+			    y: 397
+		    }
+	    ];
+	    for (var j = 0; j < anchors.length; j++) {
+		    var $el = $('<div class="square red"></div>');
+		    $el.css({
+			    'left': 250+ anchors[j].x,
+			    'top': 400 + anchors[j].y
+		    });
+		    $container.append($el);
+	    }
 
         var interval = null;
 	    interval = setInterval(function() {
