@@ -1,13 +1,18 @@
 package co.blastlab.serviceblbnavi.rest.facade;
 
 import co.blastlab.serviceblbnavi.rest.facade.util.RequestBodyBuilder;
+import co.blastlab.serviceblbnavi.rest.facade.util.violation.ViolationResponse;
 import com.google.common.collect.ImmutableList;
 import org.apache.http.HttpStatus;
 import org.junit.Test;
 
 import java.util.Arrays;
 
+import static co.blastlab.serviceblbnavi.rest.facade.util.violation.ViolationMatcher.validViolation;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.core.Is.is;
 
 public class AnchorFacadeIT extends BaseIT {
 
@@ -16,11 +21,11 @@ public class AnchorFacadeIT extends BaseIT {
 
 	private static final Float X = 3.14159f;
 	private static final Float Y = 2.71828f;
-	private static final int EXISTING_FLOOR = 4;
-	private static final int ANCHOR_ID_NONEXISTING = 567;
+	private static final int FLOOR_EXISTING = 4;
+	private static final int ANCHOR_ID_NONEXISTING = 666;
 	private static final int ANCHOR_ID_FOR_UPDATE = 1;
-	private static final int ANCHOR_SHORT_ID_FOR_UPDATE = 14355;
-	private static final int ANCHOR_LONG_ID_FOR_UPDATE = 34324342;
+	private static final int ANCHOR_SHORT_ID_EXISTING = 16384;
+	private static final int ANCHOR_LONG_ID_EXISTING = 16777216;
 
 	@Override
 	public ImmutableList<String> getAdditionalLabels() {
@@ -50,14 +55,12 @@ public class AnchorFacadeIT extends BaseIT {
 
 	@Test
 	public void createNewAnchorWithFloor() {
-		int floorId = 4;
-
 		String body = new RequestBodyBuilder("AnchorCreating.json")
 			.setParameter("shortId", 9306)
 			.setParameter("longId", 9753571457L)
 			.setParameter("x", X)
 			.setParameter("y", Y)
-			.setParameter("floorId", floorId)
+			.setParameter("floorId", FLOOR_EXISTING)
 			.build();
 
 		givenUser()
@@ -69,7 +72,7 @@ public class AnchorFacadeIT extends BaseIT {
 				"longId", equalTo(9753571457L),
 				"x", equalTo(X),
 				"y", equalTo(Y),
-				"floorId", equalTo(EXISTING_FLOOR)
+				"floorId", equalTo(FLOOR_EXISTING)
 			);
 	}
 
@@ -96,7 +99,7 @@ public class AnchorFacadeIT extends BaseIT {
 		String body = new RequestBodyBuilder("AnchorUpdating.json")
 			.setParameter("x", X)
 			.setParameter("y", Y)
-			.setParameter("floorId", EXISTING_FLOOR)
+			.setParameter("floorId", FLOOR_EXISTING)
 			.build();
 
 		givenUser()
@@ -105,11 +108,11 @@ public class AnchorFacadeIT extends BaseIT {
 			.when().put(ANCHOR_PATH_WITH_ID)
 			.then().statusCode(HttpStatus.SC_OK)
 			.body(
-				"shortId", equalTo(ANCHOR_SHORT_ID_FOR_UPDATE),
-				"longId", equalTo(ANCHOR_LONG_ID_FOR_UPDATE),
+				"shortId", equalTo(ANCHOR_SHORT_ID_EXISTING),
+				"longId", equalTo(ANCHOR_LONG_ID_EXISTING),
 				"x", equalTo(X),
 				"y", equalTo(Y),
-				"floorId", equalTo(EXISTING_FLOOR)
+				"floorId", equalTo(FLOOR_EXISTING)
 			);
 	}
 
@@ -118,7 +121,7 @@ public class AnchorFacadeIT extends BaseIT {
 		String body = new RequestBodyBuilder("AnchorUpdating.json")
 			.setParameter("x", X)
 			.setParameter("y", Y)
-			.setParameter("floorId", EXISTING_FLOOR)
+			.setParameter("floorId", FLOOR_EXISTING)
 			.build();
 
 		givenUser()
@@ -145,16 +148,59 @@ public class AnchorFacadeIT extends BaseIT {
 	}
 
 	@Test
-	public void findAllComplexes(){
+	public void findAllAnchors() {
 		givenUser()
 			.when().get(ANCHOR_PATH)
 			.then().statusCode(HttpStatus.SC_OK)
 			.body(
 				"id", equalTo(Arrays.asList(1, 2)),
-				"shortId", equalTo(Arrays.asList(14355, 23622)),
-				"longId", equalTo(Arrays.asList(34324342, 93170459)),
+				"shortId", equalTo(Arrays.asList(ANCHOR_SHORT_ID_EXISTING, 23622)),
+				"longId", equalTo(Arrays.asList(ANCHOR_LONG_ID_EXISTING, 93170459)),
 				"x", equalTo(Arrays.asList(1.618f, 2.39996f)),
 				"y", equalTo(Arrays.asList(0.577f, 1.64493f))
 			);
+	}
+
+	@Test
+	public void shouldValidateEmptyBodyWhenCreatingAnchor() {
+		ViolationResponse violationResponse = givenUser()
+			.body(new RequestBodyBuilder("Empty.json").build())
+			.when()
+			.post(ANCHOR_PATH)
+			.then()
+			.statusCode(HttpStatus.SC_BAD_REQUEST)
+			.extract()
+			.as(ViolationResponse.class);
+
+		assertThat(violationResponse.getError(), is(VALIDATION_ERROR_NAME));
+		assertThat(violationResponse.getViolations().size(), is(2));
+		assertThat(violationResponse.getViolations(),
+			containsInAnyOrder(
+				validViolation("x", "may not be null"),
+				validViolation("y", "may not be null")
+			)
+		);
+	}
+
+	@Test
+	public void shouldValidateEmptyBodyWhenUpdatingAnchor() {
+		ViolationResponse violationResponse = givenUser()
+			.pathParam("id", 1)
+			.body(new RequestBodyBuilder("Empty.json").build())
+			.when()
+			.put(ANCHOR_PATH_WITH_ID)
+			.then()
+			.statusCode(HttpStatus.SC_BAD_REQUEST)
+			.extract()
+			.as(ViolationResponse.class);
+
+		assertThat(violationResponse.getError(), is(VALIDATION_ERROR_NAME));
+		assertThat(violationResponse.getViolations().size(), is(2));
+		assertThat(violationResponse.getViolations(),
+			containsInAnyOrder(
+				validViolation("x", "may not be null"),
+				validViolation("y", "may not be null")
+			)
+		);
 	}
 }

@@ -11,7 +11,7 @@ import javax.persistence.ManyToOne;
 @Setter
 public class Anchor extends TrackedEntity {
 
-	private short shortId;
+	private int shortId;
 
 	private long longId;
 
