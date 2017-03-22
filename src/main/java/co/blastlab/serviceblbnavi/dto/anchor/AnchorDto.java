@@ -16,12 +16,16 @@ import javax.validation.constraints.NotNull;
 public class AnchorDto {
 
 	public AnchorDto(Anchor anchor) {
+		this.name = anchor.getName();
 		this.shortId = anchor.getShortId();
 		this.longId = anchor.getLongId();
 		this.x = anchor.getX();
 		this.y = anchor.getY();
 		this.floorId = (anchor.getFloor() == null) ? null : anchor.getFloor().getId();
 	}
+
+	@ApiModelProperty(example = "Name")
+	private String name;
 
 	@NotNull
 	@ApiModelProperty(example = "14733")
