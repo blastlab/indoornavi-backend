@@ -3,6 +3,7 @@ package co.blastlab.serviceblbnavi.rest.facade.complex;
 import co.blastlab.serviceblbnavi.dao.repository.ComplexRepository;
 import co.blastlab.serviceblbnavi.domain.Complex;
 import co.blastlab.serviceblbnavi.dto.complex.ComplexDto;
+import org.apache.http.HttpStatus;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
@@ -47,7 +48,7 @@ public class ComplexBean implements ComplexFacade {
 		Complex complex = complexRepository.findBy(id);
 		if (complex != null) {
 			complexRepository.remove(complex);
-			return Response.ok().build();
+			return Response.status(HttpStatus.SC_NO_CONTENT).build();
 		}
 		throw new EntityNotFoundException();
 	}
