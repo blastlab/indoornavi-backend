@@ -12,7 +12,7 @@ import javax.ws.rs.ext.Provider;
 public class ConstraintViolationMapper implements ExceptionMapper<EJBTransactionRolledbackException> {
 
 	@Override
-	public Response toResponse(EJBTransactionRolledbackException exception) {
+	public Response toResponse(EJBTransactionRolledbackException exception) {  //EJBTransactionRolledbackException
 
 		String constraintName = ConstraintSearcher.retrieveConstraintName(exception);
 		String message;
@@ -21,7 +21,7 @@ public class ConstraintViolationMapper implements ExceptionMapper<EJBTransaction
             case "unique_minor_major":
                 message = "Minor and major must be unique";
                 break;
-            case "unique_level_building_id":
+	        case "unique_level_building_id":
                 message = "You can't have more than one floor with the same level";
                 break;
 	        case "unique_x_y_floorId":
