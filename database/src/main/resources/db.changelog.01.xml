@@ -68,4 +68,7 @@
 		<addForeignKeyConstraint baseColumnNames="floor_id" baseTableName="Anchor" constraintName="FK_gtwmd57hn5sf1q3c7ysdwp2db" deferrable="false"
 		                         initiallyDeferred="false" referencedColumnNames="id" referencedTableName="Floor"/>
 	</changeSet>
+	<changeSet author="pkuzmicki (generated)" id="issue-80-3">
+		<addUniqueConstraint columnNames="shortId, longId" constraintName="unique_shortId_longId" tableName="Anchor"/>
+	</changeSet>
 </databaseChangeLog>

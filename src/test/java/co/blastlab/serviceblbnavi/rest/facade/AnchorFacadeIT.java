@@ -6,6 +6,7 @@ import com.google.common.collect.ImmutableList;
 import org.apache.http.HttpStatus;
 import org.junit.Test;
 
+import javax.lang.model.element.Name;
 import java.util.Arrays;
 
 import static co.blastlab.serviceblbnavi.rest.facade.util.violation.ViolationMatcher.validViolation;
@@ -21,6 +22,7 @@ public class AnchorFacadeIT extends BaseIT {
 
 	private static final Float X = 3.14159f;
 	private static final Float Y = 2.71828f;
+	private static final String NAME = "Name";
 	private static final int FLOOR_EXISTING = 4;
 	private static final int ANCHOR_ID_NONEXISTING = 666;
 	private static final int ANCHOR_ID_FOR_UPDATE = 1;
@@ -35,6 +37,7 @@ public class AnchorFacadeIT extends BaseIT {
 	@Test
 	public void createNewAnchorWithoutFloor() {
 		String body = new RequestBodyBuilder("AnchorWithoutFloorCreating.json")
+			.setParameter("name", NAME)
 			.setParameter("shortId", 1345)
 			.setParameter("longId", 1456543366)
 			.setParameter("x", X)
@@ -46,6 +49,7 @@ public class AnchorFacadeIT extends BaseIT {
 			.when().post(ANCHOR_PATH)
 			.then().statusCode(HttpStatus.SC_OK)
 			.body(
+				"name", equalTo(NAME),
 				"shortId", equalTo(1345),
 				"longId", equalTo(1456543366),
 				"x", equalTo(X),
@@ -56,6 +60,7 @@ public class AnchorFacadeIT extends BaseIT {
 	@Test
 	public void createNewAnchorWithFloor() {
 		String body = new RequestBodyBuilder("AnchorCreating.json")
+			.setParameter("name", NAME)
 			.setParameter("shortId", 9306)
 			.setParameter("longId", 9753571457L)
 			.setParameter("x", X)
@@ -68,6 +73,7 @@ public class AnchorFacadeIT extends BaseIT {
 			.when().post(ANCHOR_PATH)
 			.then().statusCode(HttpStatus.SC_OK)
 			.body(
+				"name", equalTo(NAME),
 				"shortId", equalTo(9306),
 				"longId", equalTo(9753571457L),
 				"x", equalTo(X),
@@ -81,6 +87,7 @@ public class AnchorFacadeIT extends BaseIT {
 		int nonexistingFloorId = 456;
 
 		String body = new RequestBodyBuilder("AnchorCreating.json")
+			.setParameter("name", NAME)
 			.setParameter("shortId", 7178)
 			.setParameter("longId", 887880950L)
 			.setParameter("x", X)
@@ -97,6 +104,7 @@ public class AnchorFacadeIT extends BaseIT {
 	@Test
 	public void updateExistingAnchor() {
 		String body = new RequestBodyBuilder("AnchorUpdating.json")
+			.setParameter("name", NAME)
 			.setParameter("x", X)
 			.setParameter("y", Y)
 			.setParameter("floorId", FLOOR_EXISTING)
@@ -108,6 +116,7 @@ public class AnchorFacadeIT extends BaseIT {
 			.when().put(ANCHOR_PATH_WITH_ID)
 			.then().statusCode(HttpStatus.SC_OK)
 			.body(
+				"name", equalTo(NAME),
 				"shortId", equalTo(ANCHOR_SHORT_ID_EXISTING),
 				"longId", equalTo(ANCHOR_LONG_ID_EXISTING),
 				"x", equalTo(X),
@@ -119,6 +128,7 @@ public class AnchorFacadeIT extends BaseIT {
 	@Test
 	public void updateNonexistingAnchor() {
 		String body = new RequestBodyBuilder("AnchorUpdating.json")
+			.setParameter("name", NAME)
 			.setParameter("x", X)
 			.setParameter("y", Y)
 			.setParameter("floorId", FLOOR_EXISTING)
@@ -154,6 +164,7 @@ public class AnchorFacadeIT extends BaseIT {
 			.then().statusCode(HttpStatus.SC_OK)
 			.body(
 				"id", equalTo(Arrays.asList(1, 2)),
+				"name", equalTo(Arrays.asList("Name1", "Name2")),
 				"shortId", equalTo(Arrays.asList(ANCHOR_SHORT_ID_EXISTING, 23622)),
 				"longId", equalTo(Arrays.asList(ANCHOR_LONG_ID_EXISTING, 93170459)),
 				"x", equalTo(Arrays.asList(1.618f, 2.39996f)),
@@ -202,5 +213,21 @@ public class AnchorFacadeIT extends BaseIT {
 				validViolation("y", "may not be null")
 			)
 		);
+	}
+
+	@Test
+	public void shouldNotCreateNewAnchorWithDuplicatedShortAndLongId() {
+		String body = new RequestBodyBuilder("AnchorCreating.json")
+			.setParameter("shortId", ANCHOR_SHORT_ID_EXISTING)
+			.setParameter("longId", ANCHOR_LONG_ID_EXISTING)
+			.setParameter("x", X)
+			.setParameter("y", Y)
+			.setParameter("floorId", FLOOR_EXISTING)
+			.build();
+
+		givenUser()
+			.body(body)
+			.when().post(ANCHOR_PATH)
+			.then().statusCode(HttpStatus.SC_INTERNAL_SERVER_ERROR); //HttpStatus is 500 because now constraintViolationMapper doesn't work the way we want 22.03
 	}
 }
