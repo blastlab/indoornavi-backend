@@ -11,7 +11,7 @@ import org.junit.Test;
 import java.util.Arrays;
 import java.util.Collections;
 
-import static co.blastlab.serviceblbnavi.rest.facade.util.building.BuildingMatcher.buildingDtoCustomMatcher;
+import static co.blastlab.serviceblbnavi.rest.facade.util.matcher.BuildingMatcher.buildingDtoCustomMatcher;
 import static co.blastlab.serviceblbnavi.rest.facade.util.violation.ViolationMatcher.validViolation;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -24,17 +24,16 @@ public class ComplexFacadeIT extends BaseIT {
 	private static final String COMPLEX_PATH_WITH_ID = "/complexes/{id}";
 	private static final String COMPLEX_PATH_WITH_ID_AND_BUILDINGS = "/complexes/{id}/buildings";
 
-	private static final String NAME_COMPLEX =  "Komplex Matarnia ążśźęćółń ĄŻŚŹĘĆŃÓŁ `~!@#%^&*()-_=+{}[]:;'|><,.?";
-	// TODO: we need check name with signs: $"\
+	private static final String NAME_COMPLEX =  "Komplex Matarnia ążśźęćółń ĄŻŚŹĘĆŃÓŁ $ \" \\ `~!@#%^&*()-_=+{}[]:;'|><,.?";
 	private static final String EXISTING_NAME = "AABBCC";
 
 	@Override
-	public ImmutableList<String> getAdditionalLabels() {
+	public ImmutableList<String> getAdditionalLabels(){
 		return ImmutableList.of("Building");
 	}
 
 	@Test
-	public void createNewComplex() {
+	public void createNewComplex(){
 		String body = new RequestBodyBuilder("ComplexCreating.json")
 			.setParameter("name", NAME_COMPLEX)
 			.build();
@@ -49,7 +48,7 @@ public class ComplexFacadeIT extends BaseIT {
 	}
 
 	@Test
-	public void shouldCreateComplexWithExistingName() {
+	public void shouldCreateComplexWithExistingName(){
 		String body = new RequestBodyBuilder("ComplexCreating.json")
 			.setParameter("name", EXISTING_NAME)
 			.build();
@@ -94,38 +93,40 @@ public class ComplexFacadeIT extends BaseIT {
 			.when().put(COMPLEX_PATH_WITH_ID)
 			.then().statusCode(HttpStatus.SC_OK)
 			.body(
+				"id", equalTo(idUpdatedComplexWithoutBuilding),
 				"name", equalTo(NAME_COMPLEX)
 			);
 	}
 
 	@Test
 	public void shouldUpdateComplexWithExistingName(){
-		Integer idUpdatedComplexHavingBuilding = 2;
+		Integer idComplexHavingBuildings = 2;
 		String body = new RequestBodyBuilder("ComplexUpdating.json")
-			.setParameter("id", idUpdatedComplexHavingBuilding)
+			.setParameter("id", idComplexHavingBuildings)
 			.setParameter("name", EXISTING_NAME)
 			.build();
 
 		givenUser()
-			.pathParam("id", idUpdatedComplexHavingBuilding)
+			.pathParam("id", idComplexHavingBuildings)
 			.body(body)
 			.when().put(COMPLEX_PATH_WITH_ID)
 			.then().statusCode(HttpStatus.SC_OK)
 			.body(
+				"id", equalTo(idComplexHavingBuildings),
 				"name", equalTo(EXISTING_NAME)
 			);
 	}
 
 	@Test
 	public void shouldNotUpdateComplexWithEmptyName(){
-		Integer updatedComplexId = 1;
+		Integer idComplex = 1;
 		String body = new RequestBodyBuilder("ComplexUpdating.json")
-			.setParameter("id", updatedComplexId)
+			.setParameter("id", idComplex)
 			.setParameter("name", "")
 			.build();
 
 		ViolationResponse violationResponse = givenUser()
-			.pathParam("id", updatedComplexId)
+			.pathParam("id", idComplex)
 			.body(body)
 			.when().put(COMPLEX_PATH_WITH_ID)
 			.then().statusCode(HttpStatus.SC_BAD_REQUEST)
@@ -138,15 +139,16 @@ public class ComplexFacadeIT extends BaseIT {
 	}
 
 	@Test
-	public void deleteComplex() {
+	public void deleteComplex(){
+		Integer idComplexWithoutBuildings = 1;
 		givenUser()
-			.pathParam("id", 1)
+			.pathParam("id", idComplexWithoutBuildings)
 			.when().delete(COMPLEX_PATH_WITH_ID)
-			.then().statusCode(HttpStatus.SC_OK);
+			.then().statusCode(HttpStatus.SC_NO_CONTENT);
 	}
 
 	@Test
-	public void shouldNotDeleteComplexWithNonexistingComplexId() {
+	public void shouldNotDeleteComplexWithNonexistingComplexId(){
 		Integer nonexistingComplexId = 9999;
 		givenUser()
 			.pathParam("id", nonexistingComplexId)
@@ -155,12 +157,12 @@ public class ComplexFacadeIT extends BaseIT {
 	}
 
 	@Test
-	public void shouldDeleteComplexHavingBuilding(){ //TODO: we should write integration test checking deleting complex removing building (cascade relation)
+	public void shouldDeleteComplexHavingBuildings(){ //TODO: we should write integration test checking deleting complex removing its buildings (cascade relation)
 		Integer idComplexWithBuildings = 2;
 		givenUser()
 			.pathParam("id",idComplexWithBuildings)
 			.when().delete(COMPLEX_PATH_WITH_ID)
-			.then().statusCode(HttpStatus.SC_OK);
+			.then().statusCode(HttpStatus.SC_NO_CONTENT);
 	}
 
 	@Test
@@ -176,47 +178,47 @@ public class ComplexFacadeIT extends BaseIT {
 
 	@Test
 	public void findComplexAndItsBuildings(){
-		Integer complexIdWithBuildings = 2;
-		ComplexDto.WithId.WithBuildings complexWithBuildings = givenUser()
-			.pathParam("id", complexIdWithBuildings)
+		Integer idComplexWithBuildings = 2;
+		ComplexDto.WithBuildings complexWithBuildings = givenUser()
+			.pathParam("id", idComplexWithBuildings)
 			.when().get(COMPLEX_PATH_WITH_ID_AND_BUILDINGS)
 			.then().statusCode(HttpStatus.SC_OK)
 			.extract()
-			.as(ComplexDto.WithId.WithBuildings.class);
+			.as(ComplexDto.WithBuildings.class);
 
 		assertThat(complexWithBuildings.getId(), equalTo(2L));
 		assertThat(complexWithBuildings.getName(), equalTo("AABBCCDD"));
 		assertThat(complexWithBuildings.getBuildings(), containsInAnyOrder(
-			buildingDtoCustomMatcher(new BuildingDto("AABBCC", 2L)),
-			buildingDtoCustomMatcher(new BuildingDto("AABBCCDDFFFFF", 2L))
+			buildingDtoCustomMatcher(new BuildingDto(1L,"AABBCC", 2L)),
+			buildingDtoCustomMatcher(new BuildingDto(2L,"AABBCCDDFFFFF", 2L))
 		));
 	}
 
 	@Test
 	public void shouldFindComplexWithoutBuildings(){
-		Integer complexIdWithoutBuildings = 1;
+		Integer idComplexWithoutBuildings = 1;
 		givenUser()
-			.pathParam("id", complexIdWithoutBuildings)
+			.pathParam("id", idComplexWithoutBuildings)
 			.when().get(COMPLEX_PATH_WITH_ID_AND_BUILDINGS)
 			.then().statusCode(HttpStatus.SC_OK)
 			.body(
-				"id", equalTo(complexIdWithoutBuildings),
+				"id", equalTo(idComplexWithoutBuildings),
 				"name", equalTo("AABBCC"),
 				"buildings", equalTo(Collections.emptyList())
 			);
 	}
 
 	@Test
-	public void shouldNotFindBuildingsForNonexistingComplexId(){
-		Integer nonexistingComplexId = 9999;
+	public void shouldNotFindComplexAndItsBuildingsForNonexistingComplex(){
+		Integer nonexistingIdComplex = 9999;
 		givenUser()
-			.pathParam("id", nonexistingComplexId)
+			.pathParam("id", nonexistingIdComplex)
 			.when().get(COMPLEX_PATH_WITH_ID_AND_BUILDINGS)
 			.then().statusCode(HttpStatus.SC_NOT_FOUND);
 	}
 
 	@Test
-	public void shouldValidateEmptyBodyWhenCreatingComplex() {
+	public void shouldValidateEmptyBodyWhenCreatingComplex(){
 		String body = new RequestBodyBuilder("Empty.json")
 			.build();
 
@@ -233,7 +235,7 @@ public class ComplexFacadeIT extends BaseIT {
 	}
 
 	@Test
-	public void shouldValidateEmptyBodyWhenUpdatingComplex() {
+	public void shouldValidateEmptyBodyWhenUpdatingComplex(){
 		String body = new RequestBodyBuilder("Empty.json")
 			.build();
 

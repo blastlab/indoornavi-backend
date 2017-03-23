@@ -15,20 +15,20 @@ import javax.ws.rs.core.Response;
 public interface FloorFacade {
 
 	@POST
-	@ApiOperation(value = "create floor", response = FloorDto.WithId.class)
+	@ApiOperation(value = "create floor", response = FloorDto.class)
 	@ApiResponses({
 		@ApiResponse(code = 404, message = "building id doesn't exist or building id empty"),
 		@ApiResponse(code = 400, message = "level and building id must be unique")
 	})
-	FloorDto.WithId create(@ApiParam(value = "floor", required = true) @Valid FloorDto floor);
+	FloorDto create(@ApiParam(value = "floor", required = true) @Valid FloorDto floor);
 
 	@PUT
 	@Path("/{id: \\d+}")
-	@ApiOperation(value = "update floor", response = FloorDto.WithId.class)
+	@ApiOperation(value = "update floor", response = FloorDto.class)
 	@ApiResponses({
 		@ApiResponse(code = 404, message = "building id doesn't exist or building id empty")
 	})
-	FloorDto.WithId update(@ApiParam(value = "id", required = true) @PathParam("id") @Valid @NotNull Long id,
+	FloorDto update(@ApiParam(value = "id", required = true) @PathParam("id") @Valid @NotNull Long id,
 	                       @ApiParam(value = "floor", required = true) @Valid FloorDto floor);
 
 	@DELETE

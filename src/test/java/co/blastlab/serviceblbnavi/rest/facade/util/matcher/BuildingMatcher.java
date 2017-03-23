@@ -1,4 +1,4 @@
-package co.blastlab.serviceblbnavi.rest.facade.util.building;
+package co.blastlab.serviceblbnavi.rest.facade.util.matcher;
 
 import co.blastlab.serviceblbnavi.dto.building.BuildingDto;
 import org.hamcrest.CustomMatcher;
@@ -14,9 +14,9 @@ public class BuildingMatcher {
 			public boolean matches(Object o) {
 				assertThat(o, instanceOf(BuildingDto.class));
 				BuildingDto buildingDto = (BuildingDto)o;
-				return
-					buildingDto.getName().matches(building.getName()) &&
-					buildingDto.getComplexId().equals(building.getComplexId());
+
+				return buildingDto.getId().equals(building.getId()) && buildingDto.getName().matches(building.getName()) &&
+					   buildingDto.getComplexId().equals(building.getComplexId());
 			}
 		};
 	}

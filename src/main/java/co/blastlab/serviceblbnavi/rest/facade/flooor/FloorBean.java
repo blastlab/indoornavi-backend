@@ -20,7 +20,7 @@ public class FloorBean implements FloorFacade {
 	@Inject
 	private BuildingRepository buildingRepository;
 
-	public FloorDto.WithId create(FloorDto floor) {
+	public FloorDto create(FloorDto floor) {
 		Building building = buildingRepository.findBy(floor.getBuildingId());
 		if (building != null) {
 			Floor floorEntity = new Floor();
@@ -28,19 +28,19 @@ public class FloorBean implements FloorFacade {
 			floorEntity.setName(floor.getName());
 			floorEntity.setBuilding(building);
 			floorEntity = floorRepository.save(floorEntity);
-			return new FloorDto.WithId(floorEntity);
+			return new FloorDto(floorEntity);
 		}
 		throw new EntityNotFoundException();
 	}
 
-	public FloorDto.WithId update(Long id, FloorDto floor) {
+	public FloorDto update(Long id, FloorDto floor) {
 		Building building = buildingRepository.findBy(id);
 		if(building != null){
 			Floor floorEntity = floorRepository.findBy(id);
 			floorEntity.setLevel(floor.getLevel());
 			floorEntity.setName(floor.getName());
 			floorEntity = floorRepository.save(floorEntity);
-			return new FloorDto.WithId(floorEntity);
+			return new FloorDto(floorEntity);
 		}
 		throw new EntityNotFoundException();
 	}

@@ -16,35 +16,39 @@ import java.util.List;
 public interface ComplexFacade {
 
 	@POST
-	@ApiOperation(value = "create complex", response = ComplexDto.WithId.class)
-	ComplexDto.WithId create(@ApiParam(value = "complex", required = true) @Valid ComplexDto complex);
+	@ApiOperation(value = "create complex", response = ComplexDto.class)
+	@ApiResponses({
+		@ApiResponse(code = 400, message = "complex name is empty")
+	})
+	ComplexDto create(@ApiParam(value = "complex", required = true) @Valid ComplexDto complex);
 
 	@PUT
 	@Path("/{id: \\d+}")
-	@ApiOperation(value = "update complex by id", notes = "update complex by idss", response = ComplexDto.WithId.class)
+	@ApiOperation(value = "update complex by id", notes = "update complex by id", response = ComplexDto.class)
 	@ApiResponses({
 		@ApiResponse(code = 404, message = "complex id empty or complex doesn't exist")
 	})
-	ComplexDto.WithId update(@ApiParam(value = "id", required = true) @PathParam("id") @Valid @NotNull Long id,
+	ComplexDto update(@ApiParam(value = "id", required = true) @PathParam("id") @Valid @NotNull Long id,
 	                         @ApiParam(value = "complex", required = true) @Valid ComplexDto complex);
 
 	@DELETE
 	@Path("/{id: \\d+}")
 	@ApiOperation(value = "delete complex by id", response = Response.class)
 	@ApiResponses({
-		@ApiResponse(code = 404, message = "complex id empty or complex doesn't exist")
+		@ApiResponse(code = 404, message = "complex id empty or complex doesn't exist"),
+		@ApiResponse(code = 204, message = "deleted successfully but there is no new information to return")
 	})
 	Response delete(@ApiParam(value = "id", required = true) @PathParam("id") @Valid @NotNull Long id);
 
 	@GET
-	@ApiOperation(value = "find all complexes", response = ComplexDto.WithId.class, responseContainer = "List")
-	List<ComplexDto.WithId> findAll();
+	@ApiOperation(value = "find all complexes", response = ComplexDto.class, responseContainer = "List")
+	List<ComplexDto> findAll();
 
 	@GET
 	@Path("/{id: \\d+}/buildings")
-	@ApiOperation(value = "get complex by id (include buildings)", response = ComplexDto.WithId.WithBuildings.class)
+	@ApiOperation(value = "get complex by id (include buildings)", response = ComplexDto.WithBuildings.class)
 	@ApiResponses({
 		@ApiResponse(code = 404, message = "complex id empty or complex doesn't exist")
 	})
-	ComplexDto.WithId.WithBuildings findWithBuildings(@ApiParam(value = "id", required = true) @PathParam("id") @Valid @NotNull Long id);
+	ComplexDto.WithBuildings findWithBuildings(@ApiParam(value = "id", required = true) @PathParam("id") @Valid @NotNull Long id);
 }
