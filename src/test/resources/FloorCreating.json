@@ -1,7 +1,5 @@
 {
-	"level": "{level}",
-	"bitmapWidth": "{bitmapWidth:6}",
-	"bitmapHeight": "{bitmapHeight:0}",
-	"buildingId": "{buildingId:2}",
-	"startZoom": "{startZoom:2}"
+	"level": 0,
+	"name": "",
+	"buildingId": 2
 }
