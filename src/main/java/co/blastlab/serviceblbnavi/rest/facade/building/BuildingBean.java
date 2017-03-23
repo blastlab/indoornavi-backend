@@ -21,29 +21,29 @@ public class BuildingBean implements BuildingFacade {
 	@Inject
 	private ComplexRepository complexRepository;
 
-	public BuildingDto.WithId create(BuildingDto building) {
+	public BuildingDto create(BuildingDto building) {
 		Complex complex = complexRepository.findBy(building.getComplexId());
 		if (complex != null) {
 			Building buildingEntity = new Building();
 			buildingEntity.setComplex(complex);
 			buildingEntity.setName(building.getName());
 			buildingEntity = buildingRepository.save(buildingEntity);
-			return new BuildingDto.WithId(buildingEntity);
+			return new BuildingDto(buildingEntity);
 		}
 		throw new EntityNotFoundException();
 	}
 
-	public BuildingDto.WithId update(Long id, BuildingDto building) {
-			Optional<Complex> complex = complexRepository.findByBuildingId(id);
-			if (complex.isPresent()) {
-				Building buildingEntity = buildingRepository.findBy(id);
-				if (buildingEntity != null) {
-					buildingEntity.setComplex(complex.get());
-					buildingEntity.setName(building.getName());
-					buildingEntity = buildingRepository.save(buildingEntity);
-					return new BuildingDto.WithId(buildingEntity);
-				}
+	public BuildingDto update(Long id, BuildingDto building) {
+		Optional<Complex> complex = complexRepository.findByBuildingId(id);
+		if (complex.isPresent()) {
+			Building buildingEntity = buildingRepository.findBy(id);
+			if (buildingEntity != null) {
+				buildingEntity.setComplex(complex.get());
+				buildingEntity.setName(building.getName());
+				buildingEntity = buildingRepository.save(buildingEntity);
+				return new BuildingDto(buildingEntity);
 			}
+		}
 		throw new EntityNotFoundException();
 	}
 
@@ -56,11 +56,11 @@ public class BuildingBean implements BuildingFacade {
 		throw new EntityNotFoundException();
 	}
 
-	public BuildingDto.WithId find(Long id) {
+	public BuildingDto.WithFloors find(Long id) {
 		Building buildingEntity = buildingRepository.findBy(id);
 
 		if (buildingEntity != null) {
-			return new BuildingDto.WithId(buildingEntity);
+			return new BuildingDto.WithFloors(buildingEntity);
 		}
 		throw new EntityNotFoundException();
 	}

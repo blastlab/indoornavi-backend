@@ -23,21 +23,21 @@ public class ComplexBean implements ComplexFacade {
 	}
 
 	@Override
-	public ComplexDto.WithId create(ComplexDto complex) {
+	public ComplexDto create(ComplexDto complex) {
 		Complex complexEntity = new Complex();
 		complexEntity.setName(complex.getName());
 		complexEntity = complexRepository.save(complexEntity);
-		return new ComplexDto.WithId(complexEntity);
+		return new ComplexDto(complexEntity);
 	}
 
 
 	@Override
-	public ComplexDto.WithId update(Long id, ComplexDto complex) {
+	public ComplexDto update(Long id, ComplexDto complex) {
 		Complex complexEntity = complexRepository.findBy(id);
 		if (complexEntity != null){
 			complexEntity.setName(complex.getName());
 			complexEntity = complexRepository.save(complexEntity);
-			return new ComplexDto.WithId(complexEntity);
+			return new ComplexDto(complexEntity);
 		}
 		throw new EntityNotFoundException();
 	}
@@ -55,19 +55,22 @@ public class ComplexBean implements ComplexFacade {
 
 
 	@Override
-	public List<ComplexDto.WithId> findAll() {
-		List<ComplexDto.WithId> complexes = new ArrayList<>();
+	public List<ComplexDto> findAll() {
+		List<ComplexDto> complexes = new ArrayList<>();
 		complexRepository.findAll()
-			.forEach(complexEntity -> complexes.add(new ComplexDto.WithId(complexEntity)));
-		return complexes;
+			.forEach(complexEntity -> complexes.add(new ComplexDto(complexEntity)));
+		if (!(complexes.isEmpty())) {
+			return complexes;
+		}
+		throw new EntityNotFoundException();
 	}
 
 
 	@Override
-	public ComplexDto.WithId.WithBuildings findWithBuildings(Long id) {
+	public ComplexDto.WithBuildings findWithBuildings(Long id) {
 		Complex complexEntity = complexRepository.findBy(id);
 		if (complexEntity != null) {
-			return new ComplexDto.WithId.WithBuildings(complexEntity);
+			return new ComplexDto.WithBuildings(complexEntity);
 		}
 		throw new EntityNotFoundException();
 	}
