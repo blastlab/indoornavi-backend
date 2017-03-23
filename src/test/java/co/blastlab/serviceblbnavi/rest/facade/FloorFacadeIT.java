@@ -1,35 +1,20 @@
 package co.blastlab.serviceblbnavi.rest.facade;
 
 import co.blastlab.serviceblbnavi.rest.facade.util.RequestBodyBuilder;
-import co.blastlab.serviceblbnavi.rest.facade.util.violation.ViolationResponse;
 import com.google.common.collect.ImmutableList;
 import org.apache.http.HttpStatus;
 import org.junit.Test;
 
-import static co.blastlab.serviceblbnavi.rest.facade.util.violation.ViolationMatcher.validViolation;
-import static io.restassured.RestAssured.given;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.core.Is.is;
 
 public class FloorFacadeIT extends BaseIT {
 
-	private static final String FLOOR_PATH = "/floor";
-	private static final String FLOOR_PATH_WITH_ID = "/floor/{id}";
-	private static final String SCALE_PATH = "/floor/mToPix";
+	private static final String FLOOR_PATH = "/floors";
+	private static final String FLOOR_PATH_WITH_ID = "/floors/{id}";
 
-	private static final Integer TEST_LEVEL = 4;
-	private static final Integer TEST_LEVEL_2 = 2;
+	private static final String NAME_FLOOR = "Piętro ążśźęćółń ĄŻŚŹĘĆŃÓŁ `~!@#%^&*()-_=+{}[]:;'|><,.?"; //ToDo: we need check name with signs: $"\
 
 	private static final Integer ID_FOR_DELETE = 1;
-	private static final Integer ID_FOR_FAIL_DELETE = 999;
-	private static final Integer ID_FOR_UPDATE = 2;
-
-	private static final Integer BITMAP_HEIGHT_FOR_UPDATE = 90;
-	private static final Integer BITMAP_WIDTH_FOR_UPDATE = 90;
-
-	private static final Integer BUILDING_ID_FOR_UPDATE = 2;
 
 	@Override
 	public ImmutableList<String> getAdditionalLabels() {
@@ -39,7 +24,7 @@ public class FloorFacadeIT extends BaseIT {
 	@Test
 	public void createNewFloor() {
 		String body = new RequestBodyBuilder("FloorCreating.json")
-			.setParameter("level", TEST_LEVEL)
+			.setParameter("name", NAME_FLOOR)
 			.build();
 
 		givenUser()
@@ -47,33 +32,43 @@ public class FloorFacadeIT extends BaseIT {
 			.when().post(FLOOR_PATH)
 			.then().statusCode(HttpStatus.SC_OK)
 			.body(
-				"level", equalTo(TEST_LEVEL)
+				"level", equalTo(0),
+				"name", equalTo(NAME_FLOOR),
+				"buildingId", equalTo(2)
 			);
 	}
 
 	@Test
-	public void createNewAndFindFloor() {
+	public void shouldCreateNewFloorWithoutName() {
 		String body = new RequestBodyBuilder("FloorCreating.json")
-			.setParameter("level", TEST_LEVEL_2)
+			.setParameter("name", "")
 			.build();
 
-		Integer response = givenUser()
+		givenUser()
 			.body(body)
 			.when().post(FLOOR_PATH)
 			.then().statusCode(HttpStatus.SC_OK)
 			.body(
-				"level", equalTo(TEST_LEVEL_2)
-			)
-			.extract().response().path("id");
-
-		givenUser()
-			.pathParam("id", response)
-			.when().get(FLOOR_PATH_WITH_ID)
-			.then().statusCode(HttpStatus.SC_OK)
-			.body(
-				"level", equalTo(TEST_LEVEL_2)
+				"level", equalTo(0),
+				"name", equalTo(""),
+				"buildingId", equalTo(2)
 			);
 	}
+
+	@Test
+	public void shouldNotCreateNewFloorWithExistingLevelAndBuildingId(){
+		String body = new RequestBodyBuilder("FloorCreating.json")
+			.setParameter("name", "")
+			.setParameter("level", 5)
+			.build();
+
+		givenUser()
+			.body(body)
+			.when().post(FLOOR_PATH)
+			.then().statusCode(HttpStatus.SC_OK);
+		//skończyć
+	}
+
 
 	@Test
 	public void deleteFloor() {
@@ -84,11 +79,15 @@ public class FloorFacadeIT extends BaseIT {
 	}
 
 	@Test
-	public void failInDeletingFloor() {
-		given().pathParam("id", ID_FOR_DELETE)
+	public void shouldNotDeleteNonexitstingFloor(){
+		Integer nonexistingFloorId = 9999;
+		givenUser()
+			.pathParam("id", nonexistingFloorId)
 			.when().delete(FLOOR_PATH_WITH_ID)
-			.then().statusCode(HttpStatus.SC_UNAUTHORIZED);
+			.then().statusCode(HttpStatus.SC_NOT_FOUND);
 	}
+
+/*
 
 	@Test
 	public void updateExistingFloor() {
@@ -133,8 +132,8 @@ public class FloorFacadeIT extends BaseIT {
 			.when().put(FLOOR_PATH_WITH_ID)
 			.then().statusCode(HttpStatus.SC_NOT_FOUND);
 	}
-
-	@Test
+*/
+	/*@Test
 	public void shouldValidateEmptyBodyWhenCreatingFloor() {
 		ViolationResponse violationResponse = givenUser()
 			.body(new RequestBodyBuilder("Empty.json").build())
@@ -218,6 +217,6 @@ public class FloorFacadeIT extends BaseIT {
 				validViolation("buildingId", "may not be null")
 			)
 		);
-	}
+	}*/
 
 }
