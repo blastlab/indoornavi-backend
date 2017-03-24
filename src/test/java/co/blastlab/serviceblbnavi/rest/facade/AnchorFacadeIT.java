@@ -22,7 +22,7 @@ public class AnchorFacadeIT extends BaseIT {
 
 	private static final Float X = 3.14159f;
 	private static final Float Y = 2.71828f;
-	private static final String NAME = "Name";
+	private static final String NAME = "Anker ążśźęćółń ĄŻŚŹĘĆŃÓŁ `~!@#%^&*()-_=+{}[]:;'|><,.?";
 	private static final int FLOOR_EXISTING = 4;
 	private static final int ANCHOR_ID_NONEXISTING = 666;
 	private static final int ANCHOR_ID_FOR_UPDATE = 1;
@@ -31,7 +31,7 @@ public class AnchorFacadeIT extends BaseIT {
 
 	@Override
 	public ImmutableList<String> getAdditionalLabels() {
-		return ImmutableList.of("Anchor", "Floor", "Building");
+		return ImmutableList.of("Anchor", "Floor", "building");
 	}
 
 	@Test
@@ -126,7 +126,7 @@ public class AnchorFacadeIT extends BaseIT {
 	}
 
 	@Test
-	public void updateNonexistingAnchor() {
+	public void shouldNotUpdateNonexistingAnchor() {
 		String body = new RequestBodyBuilder("AnchorUpdating.json")
 			.setParameter("name", NAME)
 			.setParameter("x", X)
@@ -142,11 +142,79 @@ public class AnchorFacadeIT extends BaseIT {
 	}
 
 	@Test
+	public void shouldUpdateAnchorWithoutFloorId() {
+		String body = new RequestBodyBuilder("AnchorWithoutFloorUpdating.json")
+			.setParameter("name", NAME)
+			.setParameter("x", X)
+			.setParameter("y", Y)
+			.build();
+
+		givenUser()
+			.pathParam("id", ANCHOR_ID_FOR_UPDATE)
+			.body(body)
+			.when().put(ANCHOR_PATH_WITH_ID)
+			.then().statusCode(HttpStatus.SC_OK)
+			.body(
+				"name", equalTo(NAME),
+				"shortId", equalTo(ANCHOR_SHORT_ID_EXISTING),
+				"longId", equalTo(ANCHOR_LONG_ID_EXISTING),
+				"x", equalTo(X),
+				"y", equalTo(Y),
+				"floorId", equalTo(null)
+			);
+	}
+
+	@Test
+	public void shouldUpdateAnchorWithoutName() {
+		String body = new RequestBodyBuilder("AnchorWithoutNameUpdating.json")
+			.setParameter("floorId", FLOOR_EXISTING)
+			.setParameter("x", X)
+			.setParameter("y", Y)
+			.build();
+
+		givenUser()
+			.pathParam("id", ANCHOR_ID_FOR_UPDATE)
+			.body(body)
+			.when().put(ANCHOR_PATH_WITH_ID)
+			.then().statusCode(HttpStatus.SC_OK)
+			.body(
+				"name", equalTo(null),
+				"shortId", equalTo(ANCHOR_SHORT_ID_EXISTING),
+				"longId", equalTo(ANCHOR_LONG_ID_EXISTING),
+				"x", equalTo(X),
+				"y", equalTo(Y),
+				"floorId", equalTo(FLOOR_EXISTING)
+			);
+	}
+
+	@Test
+	public void shouldUpdateAnchorOnlyCoords() {
+		String body = new RequestBodyBuilder("AnchorOnlyCoordinatesUpdating.json")
+			.setParameter("x", X)
+			.setParameter("y", Y)
+			.build();
+
+		givenUser()
+			.pathParam("id", ANCHOR_ID_FOR_UPDATE)
+			.body(body)
+			.when().put(ANCHOR_PATH_WITH_ID)
+			.then().statusCode(HttpStatus.SC_OK)
+			.body(
+				"name", equalTo(null),
+				"shortId", equalTo(ANCHOR_SHORT_ID_EXISTING),
+				"longId", equalTo(ANCHOR_LONG_ID_EXISTING),
+				"x", equalTo(X),
+				"y", equalTo(Y),
+				"floorId", equalTo(null)
+			);
+	}
+
+	@Test
 	public void deleteAnchor() {
 		givenUser()
 			.pathParam("id", 1)
 			.when().delete(ANCHOR_PATH_WITH_ID)
-			.then().statusCode(HttpStatus.SC_OK);
+			.then().statusCode(HttpStatus.SC_NO_CONTENT);
 	}
 
 	@Test
@@ -218,6 +286,7 @@ public class AnchorFacadeIT extends BaseIT {
 	@Test
 	public void shouldNotCreateNewAnchorWithDuplicatedShortAndLongId() {
 		String body = new RequestBodyBuilder("AnchorCreating.json")
+			.setParameter("name", NAME)
 			.setParameter("shortId", ANCHOR_SHORT_ID_EXISTING)
 			.setParameter("longId", ANCHOR_LONG_ID_EXISTING)
 			.setParameter("x", X)
