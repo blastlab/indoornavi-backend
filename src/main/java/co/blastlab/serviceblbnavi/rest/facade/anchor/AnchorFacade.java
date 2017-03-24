@@ -13,30 +13,31 @@ import java.util.List;
 public interface AnchorFacade {
 
 	@POST
-	@ApiOperation(value = "create", response = AnchorDto.WithId.class)
+	@ApiOperation(value = "create", response = AnchorDto.class)
 	@ApiResponses({
 		@ApiResponse(code = 404, message = "Floor with given id does not exist")
 	})
-	AnchorDto.WithId create(@ApiParam(value = "anchor", required = true) @Valid AnchorDto anchor);
+	AnchorDto create(@ApiParam(value = "anchor", required = true) @Valid AnchorDto anchor);
 
 	@PUT
 	@Path("/{id: \\d+}")
-	@ApiOperation(value = "set floor for anchor", response = AnchorDto.WithId.class)
+	@ApiOperation(value = "set floor for anchor", response = AnchorDto.class)
 	@ApiResponses({
 		@ApiResponse(code = 404, message = "Floor or anchor with given id does not exist")
 	})
-	AnchorDto.WithId update(@ApiParam(value = "id", required = true) @PathParam("id") Long id,
+	AnchorDto update(@ApiParam(value = "id", required = true) @PathParam("id") Long id,
 	                        @ApiParam(value = "anchor", required = true) @Valid AnchorDto anchor);
 
 	@GET
-	@ApiOperation(value = "find all anchors", response = AnchorDto.WithId.class)
-	List<AnchorDto.WithId> findAll();
+	@ApiOperation(value = "find all anchors", response = AnchorDto.class)
+	List<AnchorDto> findAll();
 
 	@DELETE
 	@Path("/{id: \\d+}")
 	@ApiOperation(value = "delete anchor by id", response = Response.class)
 	@ApiResponses({
-		@ApiResponse(code = 404, message = "anchor id empty or anchor doesn't exist")
+		@ApiResponse(code = 404, message = "anchor id empty or anchor doesn't exist"),
+		@ApiResponse(code = 204, message = "deleted successfully but there is no new information to return")
 	})
 	Response delete(@ApiParam(value = "id", required = true) @PathParam("id") Long id);
 }

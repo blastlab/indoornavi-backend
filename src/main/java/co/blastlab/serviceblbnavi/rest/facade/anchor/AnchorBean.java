@@ -5,6 +5,7 @@ import co.blastlab.serviceblbnavi.dao.repository.FloorRepository;
 import co.blastlab.serviceblbnavi.domain.Anchor;
 import co.blastlab.serviceblbnavi.domain.Floor;
 import co.blastlab.serviceblbnavi.dto.anchor.AnchorDto;
+import org.apache.http.HttpStatus;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
@@ -21,7 +22,7 @@ public class AnchorBean implements AnchorFacade {
 	@Inject
 	private FloorRepository floorRepository;
 
-	public AnchorDto.WithId create(AnchorDto anchor) {
+	public AnchorDto create(AnchorDto anchor) {
 		Anchor anchorEntity = new Anchor();
 		anchorEntity.setName(anchor.getName());
 		anchorEntity.setX(anchor.getX());
@@ -39,37 +40,41 @@ public class AnchorBean implements AnchorFacade {
 		}
 
 		anchorRepository.save(anchorEntity);
-		return new AnchorDto.WithId(anchorEntity);
+		return new AnchorDto(anchorEntity);
 	}
 
-	public AnchorDto.WithId update(Long id, AnchorDto anchor) {
+	public AnchorDto update(Long id, AnchorDto anchor) {
 		Anchor anchorEntity = anchorRepository.findBy(id);
 		if (anchorEntity != null) {
-			Floor floor = floorRepository.findBy(anchor.getFloorId());
-			if (floor != null) {
-				anchorEntity.setName(anchor.getName());
-				anchorEntity.setX(anchor.getX());
-				anchorEntity.setY(anchor.getY());
-				anchorEntity.setFloor(floor);
-				anchorRepository.save(anchorEntity);
-				return new AnchorDto.WithId(anchorEntity);
+
+			anchorEntity.setName(anchor.getName());
+			anchorEntity.setX(anchor.getX());
+			anchorEntity.setY(anchor.getY());
+
+			if (anchor.getFloorId() != null){
+				Floor floor = floorRepository.findBy(anchor.getFloorId());
+				if (floor != null) {
+					anchorEntity.setFloor(floor);
+				}
 			}
+			anchorRepository.save(anchorEntity);
+			return new AnchorDto(anchorEntity);
 		}
 		throw new EntityNotFoundException();
 	}
 
-	public AnchorDto.WithId find(Long id) {
+	public AnchorDto find(Long id) {
 		Anchor anchorEntity = anchorRepository.findBy(id);
 		if (anchorEntity != null) {
-			return new AnchorDto.WithId(anchorEntity);
+			return new AnchorDto(anchorEntity);
 		}
 		throw new EntityNotFoundException();
 	}
 
-	public List<AnchorDto.WithId> findAll() {
-		List<AnchorDto.WithId> anchors = new ArrayList<>();
+	public List<AnchorDto> findAll() {
+		List<AnchorDto> anchors = new ArrayList<>();
 		anchorRepository.findAll()
-			.forEach(anchorEntity -> anchors.add(new AnchorDto.WithId(anchorEntity)));
+			.forEach(anchorEntity -> anchors.add(new AnchorDto(anchorEntity)));
 		return anchors;
 	}
 
@@ -78,8 +83,7 @@ public class AnchorBean implements AnchorFacade {
 			Anchor anchor = anchorRepository.findBy(id);
 			if (anchor != null) {
 				anchorRepository.remove(anchor);
-				return Response.ok().build();
-			}
+				return Response.status(HttpStatus.SC_NO_CONTENT).build();			}
 		}
 		throw new EntityNotFoundException();
 	}
