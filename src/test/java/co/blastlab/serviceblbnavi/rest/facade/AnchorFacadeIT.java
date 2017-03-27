@@ -26,8 +26,11 @@ public class AnchorFacadeIT extends BaseIT {
 	private static final int FLOOR_EXISTING = 4;
 	private static final int ANCHOR_ID_NONEXISTING = 666;
 	private static final int ANCHOR_ID_FOR_UPDATE = 1;
+	private static final String ANCHOR_NAME_EXISTING = "Name1";
 	private static final int ANCHOR_SHORT_ID_EXISTING = 16384;
 	private static final int ANCHOR_LONG_ID_EXISTING = 16777216;
+	private static final int ANCHOR_SHORT_ID_CREATING = 1345;
+	private static final long ANCHOR_LONG_ID_CREATING = 9753571457L;
 
 	@Override
 	public ImmutableList<String> getAdditionalLabels() {
@@ -38,8 +41,8 @@ public class AnchorFacadeIT extends BaseIT {
 	public void createNewAnchorWithoutFloor() {
 		String body = new RequestBodyBuilder("AnchorWithoutFloorCreating.json")
 			.setParameter("name", NAME)
-			.setParameter("shortId", 1345)
-			.setParameter("longId", 1456543366)
+			.setParameter("shortId", ANCHOR_SHORT_ID_CREATING)
+			.setParameter("longId", ANCHOR_LONG_ID_CREATING)
 			.setParameter("x", X)
 			.setParameter("y", Y)
 			.build();
@@ -50,8 +53,8 @@ public class AnchorFacadeIT extends BaseIT {
 			.then().statusCode(HttpStatus.SC_OK)
 			.body(
 				"name", equalTo(NAME),
-				"shortId", equalTo(1345),
-				"longId", equalTo(1456543366),
+				"shortId", equalTo(ANCHOR_SHORT_ID_CREATING),
+				"longId", equalTo(ANCHOR_LONG_ID_CREATING),
 				"x", equalTo(X),
 				"y", equalTo(Y)
 			);
@@ -61,8 +64,8 @@ public class AnchorFacadeIT extends BaseIT {
 	public void createNewAnchorWithFloor() {
 		String body = new RequestBodyBuilder("AnchorCreating.json")
 			.setParameter("name", NAME)
-			.setParameter("shortId", 9306)
-			.setParameter("longId", 9753571457L)
+			.setParameter("shortId", ANCHOR_SHORT_ID_CREATING)
+			.setParameter("longId", ANCHOR_LONG_ID_CREATING)
 			.setParameter("x", X)
 			.setParameter("y", Y)
 			.setParameter("floorId", FLOOR_EXISTING)
@@ -74,8 +77,8 @@ public class AnchorFacadeIT extends BaseIT {
 			.then().statusCode(HttpStatus.SC_OK)
 			.body(
 				"name", equalTo(NAME),
-				"shortId", equalTo(9306),
-				"longId", equalTo(9753571457L),
+				"shortId", equalTo(ANCHOR_SHORT_ID_CREATING),
+				"longId", equalTo(ANCHOR_LONG_ID_CREATING),
 				"x", equalTo(X),
 				"y", equalTo(Y),
 				"floorId", equalTo(FLOOR_EXISTING)
@@ -84,12 +87,12 @@ public class AnchorFacadeIT extends BaseIT {
 
 	@Test
 	public void shouldNotCreateAnchorWithNonexistingFloor() {
-		int nonexistingFloorId = 456;
+		int nonexistingFloorId = 666;
 
 		String body = new RequestBodyBuilder("AnchorCreating.json")
 			.setParameter("name", NAME)
-			.setParameter("shortId", 7178)
-			.setParameter("longId", 887880950L)
+			.setParameter("shortId", ANCHOR_SHORT_ID_CREATING)
+			.setParameter("longId", ANCHOR_LONG_ID_CREATING)
 			.setParameter("x", X)
 			.setParameter("y", Y)
 			.setParameter("floorId", nonexistingFloorId)
@@ -178,7 +181,7 @@ public class AnchorFacadeIT extends BaseIT {
 			.when().put(ANCHOR_PATH_WITH_ID)
 			.then().statusCode(HttpStatus.SC_OK)
 			.body(
-				"name", equalTo(null),
+				"name", equalTo(ANCHOR_NAME_EXISTING),
 				"shortId", equalTo(ANCHOR_SHORT_ID_EXISTING),
 				"longId", equalTo(ANCHOR_LONG_ID_EXISTING),
 				"x", equalTo(X),
@@ -200,7 +203,7 @@ public class AnchorFacadeIT extends BaseIT {
 			.when().put(ANCHOR_PATH_WITH_ID)
 			.then().statusCode(HttpStatus.SC_OK)
 			.body(
-				"name", equalTo(null),
+				"name", equalTo(ANCHOR_NAME_EXISTING),
 				"shortId", equalTo(ANCHOR_SHORT_ID_EXISTING),
 				"longId", equalTo(ANCHOR_LONG_ID_EXISTING),
 				"x", equalTo(X),

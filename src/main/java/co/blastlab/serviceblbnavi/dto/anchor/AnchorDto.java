@@ -21,7 +21,6 @@ public class AnchorDto {
 		this.x = anchor.getX();
 		this.y = anchor.getY();
 		this.floorId = (anchor.getFloor() == null) ? null : anchor.getFloor().getId();
-//		this.name = (anchor.getName() == null) ? null : anchor.getName();
 		this.name = anchor.getName();
 		this.id = anchor.getId();
 	}

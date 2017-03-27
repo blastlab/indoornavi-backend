@@ -27,8 +27,8 @@ public class AnchorBean implements AnchorFacade {
 		anchorEntity.setName(anchor.getName());
 		anchorEntity.setX(anchor.getX());
 		anchorEntity.setY(anchor.getY());
-		anchorEntity.setLongId(anchor.getLongId());
 		anchorEntity.setShortId(anchor.getShortId());
+		anchorEntity.setLongId(anchor.getLongId());
 
 		if (anchor.getFloorId() != null) {
 			Floor floor = floorRepository.findBy(anchor.getFloorId());
@@ -46,26 +46,20 @@ public class AnchorBean implements AnchorFacade {
 	public AnchorDto update(Long id, AnchorDto anchor) {
 		Anchor anchorEntity = anchorRepository.findBy(id);
 		if (anchorEntity != null) {
-
-			anchorEntity.setName(anchor.getName());
 			anchorEntity.setX(anchor.getX());
 			anchorEntity.setY(anchor.getY());
 
-			if (anchor.getFloorId() != null){
+			if (anchor.getName() != null) {
+				anchorEntity.setName(anchor.getName());
+			}
+
+			if (anchor.getFloorId() != null) {
 				Floor floor = floorRepository.findBy(anchor.getFloorId());
 				if (floor != null) {
 					anchorEntity.setFloor(floor);
 				}
 			}
 			anchorRepository.save(anchorEntity);
-			return new AnchorDto(anchorEntity);
-		}
-		throw new EntityNotFoundException();
-	}
-
-	public AnchorDto find(Long id) {
-		Anchor anchorEntity = anchorRepository.findBy(id);
-		if (anchorEntity != null) {
 			return new AnchorDto(anchorEntity);
 		}
 		throw new EntityNotFoundException();
@@ -83,7 +77,8 @@ public class AnchorBean implements AnchorFacade {
 			Anchor anchor = anchorRepository.findBy(id);
 			if (anchor != null) {
 				anchorRepository.remove(anchor);
-				return Response.status(HttpStatus.SC_NO_CONTENT).build();			}
+				return Response.status(HttpStatus.SC_NO_CONTENT).build();
+			}
 		}
 		throw new EntityNotFoundException();
 	}
