@@ -4,7 +4,7 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.5"
          xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
 
-	<display-name>HealthMeter</display-name>
+	<display-name>IndoorNavi</display-name>
 
 	<security-constraint>
 		<web-resource-collection>
@@ -13,17 +13,7 @@
 			<url-pattern>/rest/v1/swagger.json</url-pattern>
 			<http-method>GET</http-method>
 		</web-resource-collection>
-		<auth-constraint>
-			<role-name>Manager</role-name>
-		</auth-constraint>
 	</security-constraint>
-	<security-role>
-		<role-name>Manager</role-name>
-	</security-role>
-	<login-config>
-		<auth-method>BASIC</auth-method>
-		<realm-name>ApplicationRealm</realm-name>
-	</login-config>
 	<filter>
 		<filter-name>CorsFilter</filter-name>
 		<filter-class>co.blastlab.serviceblbnavi.ext.filter.CORSFilter</filter-class>
