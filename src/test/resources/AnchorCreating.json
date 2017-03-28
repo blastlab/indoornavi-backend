@@ -1,8 +1,8 @@
 {
-	"name": "{name}",
-	"shortId": "{shortId}",
-	"longId": "{longId}",
-	"x": "{x}",
-	"y": "{y}",
-	"floorId": "{floorId}"
+	"name": "",
+	"shortId": "",
+	"longId": "",
+	"x": "",
+	"y": "",
+	"floorId": ""
 }

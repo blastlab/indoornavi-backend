@@ -3,6 +3,7 @@ package co.blastlab.serviceblbnavi.dto.anchor;
 import co.blastlab.serviceblbnavi.domain.Anchor;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -13,6 +14,7 @@ import javax.validation.constraints.NotNull;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 public class AnchorDto {
 
 	public AnchorDto(Anchor anchor) {
@@ -30,11 +32,11 @@ public class AnchorDto {
 
 	@NotNull
 	@ApiModelProperty(example = "14733")
-	private int shortId;
+	private Integer shortId;
 
 	@NotNull
 	@ApiModelProperty(example = "87367834748864600")
-	private long longId;
+	private Long longId;
 
 	@NotNull
 	private Double x;

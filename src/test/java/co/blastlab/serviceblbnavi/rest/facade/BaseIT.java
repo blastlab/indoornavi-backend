@@ -20,6 +20,7 @@ import java.sql.SQLException;
 public abstract class BaseIT extends RestAssuredIT {
 
 	static final String VALIDATION_ERROR_NAME = "constraint_violation";
+	static final String DB_VALIDATION_ERROR_NAME = "db_constraint_violation";
 
 	private static final String JDBC_DRIVER_CLASS = "org.mariadb.jdbc.Driver";
 	private static final String DATABASE_URL = "jdbc:mysql://localhost:3306/Navi";

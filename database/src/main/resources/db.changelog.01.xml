@@ -50,10 +50,10 @@
 			<column name="modificationDate" type="timestamp"/>
 			<column name="name" type="VARCHAR(255)"/>
 			<column name="shortId" type="INT">
-				<constraints nullable="false" unique="true"/>
+				<constraints nullable="false"/>
 			</column>
 			<column name="longId" type="BIGINT">
-				<constraints nullable="false" unique="true"/>
+				<constraints nullable="false"/>
 			</column>
 			<column name="x" type="DOUBLE">
 				<constraints nullable="false"/>
@@ -69,6 +69,9 @@
 		                         initiallyDeferred="false" referencedColumnNames="id" referencedTableName="Floor"/>
 	</changeSet>
 	<changeSet author="pkuzmicki (generated)" id="issue-80-3">
-		<addUniqueConstraint columnNames="shortId, longId" constraintName="unique_shortId_longId" tableName="Anchor"/>
+		<addUniqueConstraint columnNames="shortId" constraintName="unique_shortId" tableName="Anchor"/>
+	</changeSet>
+	<changeSet author="pkuzmicki (generated)" id="issue-80-4">
+		<addUniqueConstraint columnNames="longId" constraintName="unique_longId" tableName="Anchor"/>
 	</changeSet>
 </databaseChangeLog>
