@@ -48,16 +48,17 @@ public class AnchorBean implements AnchorFacade {
 		if (anchorEntity != null) {
 			anchorEntity.setX(anchor.getX());
 			anchorEntity.setY(anchor.getY());
-
-			if (anchor.getName() != null) {
-				anchorEntity.setName(anchor.getName());
-			}
+			anchorEntity.setName(anchor.getName());
 
 			if (anchor.getFloorId() != null) {
 				Floor floor = floorRepository.findBy(anchor.getFloorId());
 				if (floor != null) {
 					anchorEntity.setFloor(floor);
+				} else {
+					throw new EntityNotFoundException();
 				}
+			} else {
+				anchorEntity.setFloor(null);
 			}
 			anchorRepository.save(anchorEntity);
 			return new AnchorDto(anchorEntity);

@@ -19,9 +19,9 @@ public class Anchor extends TrackedEntity {
 
 	private String name;
 
-	private int shortId;
+	private Integer shortId;
 
-	private long longId;
+	private Long longId;
 
 	private Double x;
 
