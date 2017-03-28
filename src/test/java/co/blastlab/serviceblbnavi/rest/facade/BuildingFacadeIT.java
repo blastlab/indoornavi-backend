@@ -174,7 +174,7 @@ public class BuildingFacadeIT extends BaseIT {
 	}
 
 	@Test
-	public void shouldNotFindBuildingByNonexitstingId() {
+	public void shouldNotFindBuildingByNonexistingId() {
 		Integer NonexitstingIdBuildingId = 9999;
 		givenUser()
 			.pathParam("id", NonexitstingIdBuildingId)
