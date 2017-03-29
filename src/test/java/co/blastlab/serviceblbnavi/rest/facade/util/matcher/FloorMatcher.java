@@ -14,8 +14,8 @@ public class FloorMatcher {
 				assertThat(o, instanceOf(FloorDto.class));
 				FloorDto floorDto = (FloorDto)o;
 
-				return floorDto.getId().equals(floor.getId()) && floorDto.getLevel().equals(floor.getLevel()) &&
-					   floorDto.getName().matches(floor.getName()) && floorDto.getBuildingId().equals(floor.getBuildingId());
+				return floorDto.getId().equals(floor.getId()) && floorDto.getLevel().equals(floor.getLevel())
+					   && floorDto.getName().matches(floor.getName()) && floorDto.getBuildingId().equals(floor.getBuildingId());
 			}
 		};
 	}

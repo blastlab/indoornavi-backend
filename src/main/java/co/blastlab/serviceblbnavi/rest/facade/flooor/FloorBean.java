@@ -5,6 +5,7 @@ import co.blastlab.serviceblbnavi.dao.repository.FloorRepository;
 import co.blastlab.serviceblbnavi.domain.Building;
 import co.blastlab.serviceblbnavi.domain.Floor;
 import co.blastlab.serviceblbnavi.dto.floor.FloorDto;
+import org.apache.http.HttpStatus;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
@@ -20,6 +21,7 @@ public class FloorBean implements FloorFacade {
 	@Inject
 	private BuildingRepository buildingRepository;
 
+	@Override
 	public FloorDto create(FloorDto floor) {
 		Building building = buildingRepository.findBy(floor.getBuildingId());
 		if (building != null) {
@@ -33,23 +35,27 @@ public class FloorBean implements FloorFacade {
 		throw new EntityNotFoundException();
 	}
 
+	@Override
 	public FloorDto update(Long id, FloorDto floor) {
-		Building building = buildingRepository.findBy(id);
+		Building building = buildingRepository.findBy(floor.getBuildingId());
 		if(building != null){
 			Floor floorEntity = floorRepository.findBy(id);
-			floorEntity.setLevel(floor.getLevel());
-			floorEntity.setName(floor.getName());
-			floorEntity = floorRepository.save(floorEntity);
-			return new FloorDto(floorEntity);
+			if (floorEntity != null) {
+				floorEntity.setLevel(floor.getLevel());
+				floorEntity.setName(floor.getName());
+				floorEntity = floorRepository.save(floorEntity);
+				return new FloorDto(floorEntity);
+			}
 		}
 		throw new EntityNotFoundException();
 	}
 
+	@Override
 	public Response delete(Long id) {
 		Floor floor = floorRepository.findBy(id);
 		if (floor != null) {
 			floorRepository.remove(floor);
-			return Response.ok().build();
+			return Response.status(HttpStatus.SC_NO_CONTENT).build();
 		}
 		throw new EntityNotFoundException();
 	}

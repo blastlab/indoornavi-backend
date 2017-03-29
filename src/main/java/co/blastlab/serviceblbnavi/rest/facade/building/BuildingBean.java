@@ -5,6 +5,7 @@ import co.blastlab.serviceblbnavi.dao.repository.ComplexRepository;
 import co.blastlab.serviceblbnavi.domain.Building;
 import co.blastlab.serviceblbnavi.domain.Complex;
 import co.blastlab.serviceblbnavi.dto.building.BuildingDto;
+import org.apache.http.HttpStatus;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
@@ -21,6 +22,7 @@ public class BuildingBean implements BuildingFacade {
 	@Inject
 	private ComplexRepository complexRepository;
 
+	@Override
 	public BuildingDto create(BuildingDto building) {
 		Complex complex = complexRepository.findBy(building.getComplexId());
 		if (complex != null) {
@@ -33,6 +35,7 @@ public class BuildingBean implements BuildingFacade {
 		throw new EntityNotFoundException();
 	}
 
+	@Override
 	public BuildingDto update(Long id, BuildingDto building) {
 		Optional<Complex> complex = complexRepository.findByBuildingId(id);
 		if (complex.isPresent()) {
@@ -47,15 +50,17 @@ public class BuildingBean implements BuildingFacade {
 		throw new EntityNotFoundException();
 	}
 
+	@Override
 	public Response delete(Long id) {
 		Building building = buildingRepository.findBy(id);
 		if (building != null) {
 			buildingRepository.remove(building);
-			return Response.ok().build();
+			return Response.status(HttpStatus.SC_NO_CONTENT).build();
 		}
 		throw new EntityNotFoundException();
 	}
 
+	@Override
 	public BuildingDto.WithFloors find(Long id) {
 		Building buildingEntity = buildingRepository.findBy(id);
 

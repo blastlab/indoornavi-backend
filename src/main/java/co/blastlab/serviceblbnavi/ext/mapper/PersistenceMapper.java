@@ -10,7 +10,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
-import static co.blastlab.serviceblbnavi.ext.mapper.accessory.ConstraintSearcher.retrieveConstraintName;
+import static co.blastlab.serviceblbnavi.ext.mapper.accessory.MessageConstraintSeacher.retrieveMessageByConstraintName;
 
 @Provider
 public class PersistenceMapper implements ExceptionMapper<PersistenceException> {
@@ -33,21 +33,5 @@ public class PersistenceMapper implements ExceptionMapper<PersistenceException> 
 		}
 
 		return Response.status(status).entity("").build();
-	}
-
-
-	private static String retrieveMessageByConstraintName(PersistenceException exception){
-		String constraintName = retrieveConstraintName(exception);
-		String message;
-
-		switch (constraintName){
-			case "unique_level_building_id":
-				message = "You can't have more than one floor with the same level";
-				break;
-			default:
-				message = "Unknown constraint violation exception";
-		}
-
-		return message;
 	}
 }

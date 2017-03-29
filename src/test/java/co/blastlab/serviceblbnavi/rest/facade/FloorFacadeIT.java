@@ -1,6 +1,7 @@
 package co.blastlab.serviceblbnavi.rest.facade;
 
 import co.blastlab.serviceblbnavi.rest.facade.util.RequestBodyBuilder;
+import co.blastlab.serviceblbnavi.rest.facade.util.violation.DbViolationResponse;
 import co.blastlab.serviceblbnavi.rest.facade.util.violation.ViolationResponse;
 import com.google.common.collect.ImmutableList;
 import org.apache.http.HttpStatus;
@@ -15,7 +16,7 @@ public class FloorFacadeIT extends BaseIT {
 	private static final String FLOOR_PATH = "/floors";
 	private static final String FLOOR_PATH_WITH_ID = "/floors/{id}";
 
-	private static final String NAME_FLOOR = "Piętro ążśźęćółń ĄŻŚŹĘĆŃÓŁ `~!@#%^&*()-_=+{}[]:;'|><,.?"; //ToDo: we need check name with signs: $"\
+	private static final String NAME_FLOOR = "Piętro $ \" \\ ążśźęćółń ĄŻŚŹĘĆŃÓŁ `~!@#%^&*()-_=+{}[]:;'|><,.?";
 
 	@Override
 	public ImmutableList<String> getAdditionalLabels() {
@@ -24,7 +25,8 @@ public class FloorFacadeIT extends BaseIT {
 
 	@Test
 	public void createNewFloor() {
-		String body = new RequestBodyBuilder("FloorCreating.json")
+		String body = new RequestBodyBuilder("Floor.json")
+			.setParameter("level", 0)
 			.setParameter("name", NAME_FLOOR)
 			.build();
 
@@ -41,7 +43,8 @@ public class FloorFacadeIT extends BaseIT {
 
 	@Test
 	public void shouldCreateNewFloorWithoutName() {
-		String body = new RequestBodyBuilder("FloorCreating.json")
+		String body = new RequestBodyBuilder("Floor.json")
+			.setParameter("level", -1)
 			.setParameter("name", "")
 			.build();
 
@@ -50,7 +53,7 @@ public class FloorFacadeIT extends BaseIT {
 			.when().post(FLOOR_PATH)
 			.then().statusCode(HttpStatus.SC_OK)
 			.body(
-				"level", equalTo(0),
+				"level", equalTo(-1),
 				"name", equalTo(""),
 				"buildingId", equalTo(2)
 			);
@@ -58,24 +61,42 @@ public class FloorFacadeIT extends BaseIT {
 
 	@Test
 	public void shouldNotCreateNewFloorWithExistingLevelAndBuildingId(){
-		String body = new RequestBodyBuilder("FloorCreating.json")
+		String body = new RequestBodyBuilder("Floor.json")
 			.setParameter("name", "")
-			.setParameter("level", 5)
+			.setParameter("level", 3)
+			.build();
+
+		DbViolationResponse dbViolationResponse = givenUser()
+			.body(body)
+			.when().post(FLOOR_PATH)
+			.then().statusCode(HttpStatus.SC_BAD_REQUEST)
+			.extract()
+			.as(DbViolationResponse.class);
+		assertThat(dbViolationResponse.getError(), is(DB_VALIDATION_ERROR_NAME));
+		assertThat(dbViolationResponse.getMessage(), is("You can't have more than one floor with the same level"));
+	}
+
+	@Test
+	public void shouldNotCreateNewFloorWithNonexistingBuildingId(){
+		Integer nonexistingFloorId = 9999;
+		String body = new RequestBodyBuilder("Floor.json")
+			.setParameter("name", "")
+			.setParameter("level", 0)
+			.setParameter("buildingId", nonexistingFloorId)
 			.build();
 
 		givenUser()
 			.body(body)
 			.when().post(FLOOR_PATH)
-			.then().statusCode(HttpStatus.SC_OK);
-		//skończyć
+			.then().statusCode(HttpStatus.SC_NOT_FOUND);
 	}
 
 	@Test
 	public void updateFloor(){
 		Integer negativeLevel = -1;
-		Integer floorIdWithoutName = 1;
+		Integer floorIdWithoutName = 2;
 
-		String body = new RequestBodyBuilder("FloorUpdating.json")
+		String body = new RequestBodyBuilder("Floor.json")
 			.setParameter("name", NAME_FLOOR)
 			.setParameter("level", negativeLevel)
 			.build();
@@ -98,23 +119,26 @@ public class FloorFacadeIT extends BaseIT {
 		Integer floorId = 2;
 		Integer existingLevel = 1;
 
-		String body = new RequestBodyBuilder("FloorUpdating.json")
+		String body = new RequestBodyBuilder("Floor.json")
 			.setParameter("level", existingLevel)
 			.build();
 
-		givenUser()
+		DbViolationResponse dbViolationResponse = givenUser()
 			.pathParam("id", floorId)
 			.body(body)
 			.when().put(FLOOR_PATH_WITH_ID)
-			.then().statusCode(HttpStatus.SC_BAD_REQUEST);
-		//skończyć
+			.then().statusCode(HttpStatus.SC_BAD_REQUEST)
+			.extract()
+			.as(DbViolationResponse.class);
+		assertThat(dbViolationResponse.getError(), is(DB_VALIDATION_ERROR_NAME));
+		assertThat(dbViolationResponse.getMessage(), is("You can't have more than one floor with the same level"));
 	}
 
 	@Test
 	public void shouldRemoveNameDuringUpdateFloor(){
 		Integer idFloorWithName = 1;
 
-		String body = new RequestBodyBuilder("FloorUpdating.json")
+		String body = new RequestBodyBuilder("Floor.json")
 			.setParameter("name", "")
 			.build();
 
@@ -132,15 +156,13 @@ public class FloorFacadeIT extends BaseIT {
 	}
 
 	@Test
-	public void shouldNotUpdateNonexistingFloor(){
+	public void shouldNotUpdateFloorWithNonexistingFloorId(){
 		Integer nonexistingFloorId = 9999;
-
 		givenUser()
 			.pathParam("id", nonexistingFloorId)
-			.body(new RequestBodyBuilder("FloorUpdating.json").build())
+			.body(new RequestBodyBuilder("Floor.json").build())
 			.when().put(FLOOR_PATH_WITH_ID)
 			.then().statusCode(HttpStatus.SC_NOT_FOUND);
-
 	}
 
 	@Test
@@ -149,7 +171,7 @@ public class FloorFacadeIT extends BaseIT {
  		givenUser()
 			.pathParam("id", deletedFloorId)
 			.when().delete(FLOOR_PATH_WITH_ID)
-			.then().statusCode(HttpStatus.SC_OK);
+			.then().statusCode(HttpStatus.SC_NO_CONTENT);
 	}
 
 	@Test
