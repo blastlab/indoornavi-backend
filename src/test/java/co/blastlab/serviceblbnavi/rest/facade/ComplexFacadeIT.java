@@ -34,7 +34,7 @@ public class ComplexFacadeIT extends BaseIT {
 
 	@Test
 	public void createNewComplex(){
-		String body = new RequestBodyBuilder("ComplexCreating.json")
+		String body = new RequestBodyBuilder("Complex.json")
 			.setParameter("name", NAME_COMPLEX)
 			.build();
 
@@ -49,7 +49,7 @@ public class ComplexFacadeIT extends BaseIT {
 
 	@Test
 	public void shouldCreateComplexWithExistingName(){
-		String body = new RequestBodyBuilder("ComplexCreating.json")
+		String body = new RequestBodyBuilder("Complex.json")
 			.setParameter("name", EXISTING_NAME)
 			.build();
 
@@ -64,7 +64,7 @@ public class ComplexFacadeIT extends BaseIT {
 
 	@Test
 	public void shouldNotCreateComplexWithEmptyName(){
-		String body = new RequestBodyBuilder("ComplexCreating.json")
+		String body = new RequestBodyBuilder("Complex.json")
 			.setParameter("name", "")
 			.build();
 
@@ -83,7 +83,7 @@ public class ComplexFacadeIT extends BaseIT {
 	@Test
 	public void updateComplex(){
 		Integer idUpdatedComplexWithoutBuilding = 1;
-		String body = new RequestBodyBuilder("ComplexUpdating.json")
+		String body = new RequestBodyBuilder("Complex.json")
 			.setParameter("name", NAME_COMPLEX)
 			.build();
 
@@ -101,7 +101,7 @@ public class ComplexFacadeIT extends BaseIT {
 	@Test
 	public void shouldUpdateComplexWithExistingName(){
 		Integer idComplexHavingBuildings = 2;
-		String body = new RequestBodyBuilder("ComplexUpdating.json")
+		String body = new RequestBodyBuilder("Complex.json")
 			.setParameter("id", idComplexHavingBuildings)
 			.setParameter("name", EXISTING_NAME)
 			.build();
@@ -120,7 +120,7 @@ public class ComplexFacadeIT extends BaseIT {
 	@Test
 	public void shouldNotUpdateComplexWithEmptyName(){
 		Integer idComplex = 1;
-		String body = new RequestBodyBuilder("ComplexUpdating.json")
+		String body = new RequestBodyBuilder("Complex.json")
 			.setParameter("id", idComplex)
 			.setParameter("name", "")
 			.build();

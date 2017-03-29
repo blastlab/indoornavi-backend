@@ -59,10 +59,7 @@ public class ComplexBean implements ComplexFacade {
 		List<ComplexDto> complexes = new ArrayList<>();
 		complexRepository.findAll()
 			.forEach(complexEntity -> complexes.add(new ComplexDto(complexEntity)));
-		if (!(complexes.isEmpty())) {
-			return complexes;
-		}
-		throw new EntityNotFoundException();
+		return complexes;
 	}
 
 

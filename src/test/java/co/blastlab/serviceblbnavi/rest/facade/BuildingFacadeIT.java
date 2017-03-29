@@ -33,7 +33,7 @@ public class BuildingFacadeIT extends BaseIT {
 	@Test
 	public void createNewBuilding(){
 		Integer complexId = 1;
-		String body = new RequestBodyBuilder("BuildingCreating.json")
+		String body = new RequestBodyBuilder("Building.json")
 			.setParameter("name", NAME_BUILDING)
 			.setParameter("complexId", complexId)
 			.build();
@@ -51,7 +51,7 @@ public class BuildingFacadeIT extends BaseIT {
 	@Test
 	public void shouldCreateNewBuildingWithExistingName(){
 		Integer complexId = 2;
-		String body = new RequestBodyBuilder("BuildingCreating.json")
+		String body = new RequestBodyBuilder("Building.json")
 			.setParameter("name", EXISTING_NAME_BUILDING)
 			.setParameter("complexId", complexId)
 			.build();
@@ -68,7 +68,7 @@ public class BuildingFacadeIT extends BaseIT {
 
 	@Test
 	public void shouldNotCreateBuildingWithEmptyName(){
-		String body = new RequestBodyBuilder("BuildingCreating.json")
+		String body = new RequestBodyBuilder("Building.json")
 			.setParameter("name", "")
 			.setParameter("complexId", 2)
 			.build();
@@ -89,7 +89,7 @@ public class BuildingFacadeIT extends BaseIT {
 	public void updateBuilding(){
 		Integer complexId = 2;
 		Integer buildingId = 1;
-		String body = new RequestBodyBuilder("BuildingUpdating.json")
+		String body = new RequestBodyBuilder("Building.json")
 			.setParameter("complexId", complexId)
 			.setParameter("name", NAME_BUILDING)
 			.build();
@@ -110,7 +110,7 @@ public class BuildingFacadeIT extends BaseIT {
 	public void shouldUpdateBuildingWithExistingName(){
 		Integer complexId = 2;
 		Integer buildingId = 2;
-		String body = new RequestBodyBuilder("BuildingUpdating.json")
+		String body = new RequestBodyBuilder("Building.json")
 			.setParameter("complexId", complexId)
 			.setParameter("name", EXISTING_NAME_BUILDING)
 			.build();
@@ -130,7 +130,7 @@ public class BuildingFacadeIT extends BaseIT {
 	public void shouldNotUpdateBuildingWithEmptyName(){
 		Integer complexId = 2;
 		Integer buildingId = 2;
-		String body = new RequestBodyBuilder("BuildingUpdating.json")
+		String body = new RequestBodyBuilder("Building.json")
 			.setParameter("complexId", complexId)
 			.setParameter("name", "")
 			.build();
