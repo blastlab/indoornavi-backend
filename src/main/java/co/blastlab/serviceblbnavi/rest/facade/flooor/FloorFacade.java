@@ -35,7 +35,8 @@ public interface FloorFacade {
 	@Path("/{id: \\d+}")
 	@ApiOperation(value = "delete floor by id", response = Response.class)
 	@ApiResponses({
-		@ApiResponse(code = 404, message = "floor with given id doesn't exist")
+		@ApiResponse(code = 404, message = "floor with given id doesn't exist"),
+		@ApiResponse(code = 204, message = "deleted successfully but there is no new information to return")
 	})
 	Response delete(@PathParam("id") @ApiParam(value = "floor id", required = true) @Valid @NotNull Long id);
 }

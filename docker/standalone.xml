@@ -122,7 +122,7 @@
 		<subsystem xmlns="urn:jboss:domain:bean-validation:1.0"/>
 		<subsystem xmlns="urn:jboss:domain:datasources:4.0">
 			<datasources>
-				<datasource jndi-name="java:/jdbc/Navi" pool-name="Navi" enabled="true" use-ccm="true">
+				<datasource jta="true" jndi-name="java:/jdbc/Navi" pool-name="Navi" enabled="true" use-ccm="true">
 					<connection-url>jdbc:mysql://${app.db.host}:3306/Navi</connection-url>
 					<driver>mariadb</driver>
 					<security>
