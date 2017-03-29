@@ -5,51 +5,38 @@ import co.blastlab.serviceblbnavi.ext.filter.TokenAuthorization;
 import io.swagger.annotations.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
-import java.util.List;
 
-@Path("/floor")
-@Api("/floor")
+@Path("/floors")
+@Api("/floors")
 @TokenAuthorization
-@Consumes("application/json")
 public interface FloorFacade {
 
 	@POST
 	@ApiOperation(value = "create floor", response = FloorDto.class)
 	@ApiResponses({
-		@ApiResponse(code = 404, message = "building id empty or building doesn't exist")
+		@ApiResponse(code = 404, message = "building id doesn't exist or building id empty"),
+		@ApiResponse(code = 400, message = "level and building id must be unique")
 	})
 	FloorDto create(@ApiParam(value = "floor", required = true) @Valid FloorDto floor);
 
 	@PUT
+	@Path("/{id: \\d+}")
 	@ApiOperation(value = "update floor", response = FloorDto.class)
 	@ApiResponses({
-		@ApiResponse(code = 404, message = "building id or building empty or doesn't exist")
+		@ApiResponse(code = 404, message = "building id doesn't exist or building id empty")
 	})
-	FloorDto update(@ApiParam(value = "floor", required = true) @Valid FloorDto floor);
+	FloorDto update(@ApiParam(value = "id", required = true) @PathParam("id") @Valid @NotNull Long id,
+	                       @ApiParam(value = "floor", required = true) @Valid FloorDto floor);
 
 	@DELETE
 	@Path("/{id: \\d+}")
-	@ApiOperation(value = "delete floor", response = Response.class)
+	@ApiOperation(value = "delete floor by id", response = Response.class)
 	@ApiResponses({
-		@ApiResponse(code = 404, message = "floor with given id doesn't exist")
+		@ApiResponse(code = 404, message = "floor with given id doesn't exist"),
+		@ApiResponse(code = 204, message = "deleted successfully but there is no new information to return")
 	})
-	Response delete(@PathParam("id") @ApiParam(value = "id", required = true) Long id);
-
-	@GET
-	@Path("/{id: \\d+}")
-	@ApiOperation(value = "find floor", response = FloorDto.class)
-	@ApiResponses({
-		@ApiResponse(code = 404, message = "floor with given id wasn't found")
-	})
-	FloorDto find(@PathParam("id") @ApiParam(value = "id", required = true) Long id);
-
-	@PUT
-	@Path("/{id: \\d+}")
-	@ApiOperation(value = "update floors", response = Response.class)
-	@ApiResponses({
-		@ApiResponse(code = 404, message = "building id or building empty or doesn't exist")
-	})
-	Response updateFloors(@PathParam("id") @ApiParam(value = "building id", required = true) Long buildingId, @ApiParam(value = "floors", required = true) @Valid List<FloorDto> floors);
+	Response delete(@PathParam("id") @ApiParam(value = "floor id", required = true) @Valid @NotNull Long id);
 }

@@ -79,4 +79,13 @@
 			<column name="verified" type="boolean"/>
 		</addColumn>
 	</changeSet>
+	<changeSet author="jsmol (generated)" id="issue-100-1">
+		<addColumn tableName="Floor">
+			<column name="name" type="varchar(255)"/>
+		</addColumn>
+	</changeSet>
+	<changeSet author="jsmol (generated)" id="issue-100-2">
+		<addUniqueConstraint columnNames="level, building_id" constraintName="unique_level_building_id" tableName="Floor"/>
+	</changeSet>
+
 </databaseChangeLog>
