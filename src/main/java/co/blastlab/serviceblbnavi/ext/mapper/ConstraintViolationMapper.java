@@ -27,6 +27,9 @@ public class ConstraintViolationMapper implements ExceptionMapper<EJBTransaction
 	        case "unique_x_y_floorId":
 		        message = "Fields x, y and floorId must be unique";
 		        break;
+	        case "unique_shortId_longId":
+		        message = "Anchor must have unique shortId and longId.";
+		        break;
 	        default:
                 message = "Unknown constraint violation exception";
         }

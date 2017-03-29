@@ -1,4 +1,4 @@
-package co.blastlab.serviceblbnavi.rest.facade.flooor;
+package co.blastlab.serviceblbnavi.rest.facade.floor;
 
 import co.blastlab.serviceblbnavi.dao.repository.BuildingRepository;
 import co.blastlab.serviceblbnavi.dao.repository.FloorRepository;
