@@ -6,8 +6,11 @@ import org.apache.deltaspike.data.api.EntityRepository;
 import org.apache.deltaspike.data.api.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface AnchorRepository extends EntityRepository<Anchor, Long> {
+
+	Optional<Anchor> findById(Long id);
 
 }
