@@ -55,12 +55,8 @@
 			<column name="longId" type="BIGINT">
 				<constraints nullable="false"/>
 			</column>
-			<column name="x" type="DOUBLE">
-				<constraints nullable="false"/>
-			</column>
-			<column name="y" type="DOUBLE">
-				<constraints nullable="false"/>
-			</column>
+			<column name="x" type="DOUBLE"/>
+			<column name="y" type="DOUBLE"/>
 			<column name="floor_id" type="BIGINT"/>
 		</createTable>
 	</changeSet>

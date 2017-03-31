@@ -38,10 +38,8 @@ public class AnchorDto {
 	@ApiModelProperty(example = "87367834748864600")
 	private Long longId;
 
-	@NotNull
 	private Double x;
 
-	@NotNull
 	private Double y;
 
 	@ApiModelProperty(example = "1")

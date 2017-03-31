@@ -24,10 +24,10 @@ public class BuildingBean implements BuildingFacade {
 
 	@Override
 	public BuildingDto create(BuildingDto building) {
-		Complex complex = complexRepository.findBy(building.getComplexId());
-		if (complex != null) {
+		Optional<Complex> complex = complexRepository.findById(building.getComplexId());
+		if (complex.isPresent()) {
 			Building buildingEntity = new Building();
-			buildingEntity.setComplex(complex);
+			buildingEntity.setComplex(complex.get());
 			buildingEntity.setName(building.getName());
 			buildingEntity = buildingRepository.save(buildingEntity);
 			return new BuildingDto(buildingEntity);
@@ -39,12 +39,12 @@ public class BuildingBean implements BuildingFacade {
 	public BuildingDto update(Long id, BuildingDto building) {
 		Optional<Complex> complex = complexRepository.findByBuildingId(id);
 		if (complex.isPresent()) {
-			Building buildingEntity = buildingRepository.findBy(id);
-			if (buildingEntity != null) {
-				buildingEntity.setComplex(complex.get());
-				buildingEntity.setName(building.getName());
-				buildingEntity = buildingRepository.save(buildingEntity);
-				return new BuildingDto(buildingEntity);
+			Optional<Building> buildingEntity = buildingRepository.findById(id);
+			if (buildingEntity.isPresent()) {
+				buildingEntity.get().setComplex(complex.get());
+				buildingEntity.get().setName(building.getName());
+				Building buildingDb = buildingRepository.save(buildingEntity.get());
+				return new BuildingDto(buildingDb);
 			}
 		}
 		throw new EntityNotFoundException();
@@ -52,9 +52,9 @@ public class BuildingBean implements BuildingFacade {
 
 	@Override
 	public Response delete(Long id) {
-		Building building = buildingRepository.findBy(id);
-		if (building != null) {
-			buildingRepository.remove(building);
+		Optional<Building> building = buildingRepository.findById(id);
+		if (building.isPresent()) {
+			buildingRepository.remove(building.get());
 			return Response.status(HttpStatus.SC_NO_CONTENT).build();
 		}
 		throw new EntityNotFoundException();
@@ -62,10 +62,9 @@ public class BuildingBean implements BuildingFacade {
 
 	@Override
 	public BuildingDto.WithFloors find(Long id) {
-		Building buildingEntity = buildingRepository.findBy(id);
-
-		if (buildingEntity != null) {
-			return new BuildingDto.WithFloors(buildingEntity);
+		Optional<Building> buildingEntity = buildingRepository.findById(id);
+		if (buildingEntity.isPresent()) {
+			return new BuildingDto.WithFloors(buildingEntity.get());
 		}
 		throw new EntityNotFoundException();
 	}

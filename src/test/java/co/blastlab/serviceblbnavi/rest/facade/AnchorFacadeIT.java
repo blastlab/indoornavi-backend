@@ -338,13 +338,11 @@ public class AnchorFacadeIT extends BaseIT {
 			.as(ViolationResponse.class);
 
 		assertThat(violationResponse.getError(), is(VALIDATION_ERROR_NAME));
-		assertThat(violationResponse.getViolations().size(), is(4));
+		assertThat(violationResponse.getViolations().size(), is(2));
 		assertThat(violationResponse.getViolations(),
 			containsInAnyOrder(
 				validViolation("shortId", "may not be null"),
-				validViolation("longId", "may not be null"),
-				validViolation("x", "may not be null"),
-				validViolation("y", "may not be null")
+				validViolation("longId", "may not be null")
 			)
 		);
 	}
@@ -362,13 +360,11 @@ public class AnchorFacadeIT extends BaseIT {
 			.as(ViolationResponse.class);
 
 		assertThat(violationResponse.getError(), is(VALIDATION_ERROR_NAME));
-		assertThat(violationResponse.getViolations().size(), is(4));
+		assertThat(violationResponse.getViolations().size(), is(2));
 		assertThat(violationResponse.getViolations(),
 			containsInAnyOrder(
 				validViolation("shortId", "may not be null"),
-				validViolation("longId", "may not be null"),
-				validViolation("x", "may not be null"),
-				validViolation("y", "may not be null")
+				validViolation("longId", "may not be null")
 			)
 		);
 	}

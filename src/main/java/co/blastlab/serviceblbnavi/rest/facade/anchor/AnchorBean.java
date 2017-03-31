@@ -31,9 +31,9 @@ public class AnchorBean implements AnchorFacade {
 		anchorEntity.setLongId(anchor.getLongId());
 
 		if (anchor.getFloorId() != null) {
-			Floor floor = floorRepository.findBy(anchor.getFloorId());
-			if (floor != null) {
-				anchorEntity.setFloor(floor);
+			Optional<Floor> floor = floorRepository.findById(anchor.getFloorId());
+			if (floor.isPresent()) {
+				anchorEntity.setFloor(floor.get());
 			} else {
 				throw new EntityNotFoundException();
 			}
@@ -44,24 +44,24 @@ public class AnchorBean implements AnchorFacade {
 	}
 
 	public AnchorDto update(Long id, AnchorDto anchor) {
-		Anchor anchorEntity = anchorRepository.findBy(id);
-		if (anchorEntity != null) {
-			anchorEntity.setX(anchor.getX());
-			anchorEntity.setY(anchor.getY());
-			anchorEntity.setName(anchor.getName());
+		Optional<Anchor> anchorEntity = anchorRepository.findById(id);
+		if (anchorEntity.isPresent()) {
+			anchorEntity.get().setX(anchor.getX());
+			anchorEntity.get().setY(anchor.getY());
+			anchorEntity.get().setName(anchor.getName());
 
 			if (anchor.getFloorId() != null) {
-				Floor floor = floorRepository.findBy(anchor.getFloorId());
-				if (floor != null) {
-					anchorEntity.setFloor(floor);
+				Optional<Floor> floor = floorRepository.findById(anchor.getFloorId());
+				if (floor.isPresent()) {
+					anchorEntity.get().setFloor(floor.get());
 				} else {
 					throw new EntityNotFoundException();
 				}
 			} else {
-				anchorEntity.setFloor(null);
+				anchorEntity.get().setFloor(null);
 			}
-			anchorRepository.save(anchorEntity);
-			return new AnchorDto(anchorEntity);
+			anchorRepository.save(anchorEntity.get());
+			return new AnchorDto(anchorEntity.get());
 		}
 		throw new EntityNotFoundException();
 	}
@@ -75,9 +75,9 @@ public class AnchorBean implements AnchorFacade {
 
 	public Response delete(Long id) {
 		if (id != null) {
-			Anchor anchor = anchorRepository.findBy(id);
-			if (anchor != null) {
-				anchorRepository.remove(anchor);
+			Optional<Anchor> anchor = anchorRepository.findById(id);
+			if (anchor.isPresent()) {
+				anchorRepository.remove(anchor.get());
 				return Response.status(HttpStatus.SC_NO_CONTENT).build();
 			}
 		}
