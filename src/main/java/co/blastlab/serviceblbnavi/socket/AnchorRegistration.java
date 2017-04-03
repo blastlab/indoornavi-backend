@@ -2,17 +2,15 @@ package co.blastlab.serviceblbnavi.socket;
 
 import co.blastlab.serviceblbnavi.dao.repository.AnchorRepository;
 import co.blastlab.serviceblbnavi.domain.Anchor;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import co.blastlab.serviceblbnavi.dto.anchor.AnchorDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.io.IOException;
+import java.util.*;
 
 @ApplicationScoped
 @ServerEndpoint("/anchors/registration")
@@ -40,13 +38,23 @@ public class AnchorRegistration extends WebSocketServerAbstract {
 	}
 
 	@OnMessage
-	public void handleMessage(String message, Session session) throws JsonProcessingException {
+	public void handleMessage(String message, Session session) throws IOException {
+		ObjectMapper objectMapper = new ObjectMapper();
 		if (isClientSession(session)) {
-			List<Anchor> anchorList = anchorRepository.findByVerified(true);
-			ObjectMapper objectMapper = new ObjectMapper();
-			broadCastMessage(clientSessions, objectMapper.writeValueAsString(anchorList));
+			List<AnchorDto> anchors = new ArrayList<>();
+			anchorRepository.findAll().forEach(anchor -> anchors.add(new AnchorDto(anchor)));
+			broadCastMessage(clientSessions, objectMapper.writeValueAsString(anchors));
 		} else if (isServerSession(session)) {
-			// register new anchor and broadcast message to clients
+			AnchorDto anchorDto = objectMapper.readValue(message, AnchorDto.class);
+			Anchor anchorEntity = new Anchor();
+			anchorEntity.setShortId(anchorDto.getShortId());
+			anchorEntity.setLongId(anchorDto.getLongId());
+			// TODO: remove when Paweł fix this
+			anchorEntity.setX(anchorDto.getX());
+			anchorEntity.setY(anchorDto.getY());
+			anchorEntity.setVerified(false);
+			anchorEntity = anchorRepository.save(anchorEntity);
+			broadCastMessage(clientSessions, objectMapper.writeValueAsString(Collections.singletonList(new AnchorDto(anchorEntity))));
 		}
 	}
 
