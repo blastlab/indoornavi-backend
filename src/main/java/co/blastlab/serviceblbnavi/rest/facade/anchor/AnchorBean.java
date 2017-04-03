@@ -74,13 +74,12 @@ public class AnchorBean implements AnchorFacade {
 	}
 
 	public Response delete(Long id) {
-		if (id != null) {
-			Optional<Anchor> anchor = anchorRepository.findById(id);
-			if (anchor.isPresent()) {
-				anchorRepository.remove(anchor.get());
-				return Response.status(HttpStatus.SC_NO_CONTENT).build();
-			}
+		Optional<Anchor> anchor = anchorRepository.findById(id);
+		if (anchor.isPresent()) {
+			anchorRepository.remove(anchor.get());
+			return Response.status(HttpStatus.SC_NO_CONTENT).build();
 		}
+
 		throw new EntityNotFoundException();
 	}
 }
