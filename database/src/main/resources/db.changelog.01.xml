@@ -56,10 +56,8 @@
 				<constraints nullable="false"/>
 			</column>
 			<column name="x" type="DOUBLE">
-				<constraints nullable="false"/>
 			</column>
 			<column name="y" type="DOUBLE">
-				<constraints nullable="false"/>
 			</column>
 			<column name="floor_id" type="BIGINT"/>
 		</createTable>

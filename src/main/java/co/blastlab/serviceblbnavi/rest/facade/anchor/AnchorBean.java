@@ -11,7 +11,8 @@ import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
 import javax.ws.rs.core.Response;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Stateless
 public class AnchorBean implements AnchorFacade {
@@ -49,6 +50,9 @@ public class AnchorBean implements AnchorFacade {
 			anchorEntity.setX(anchor.getX());
 			anchorEntity.setY(anchor.getY());
 			anchorEntity.setName(anchor.getName());
+			anchorEntity.setVerified(anchor.getVerified());
+			anchorEntity.setLongId(anchor.getLongId());
+			anchorEntity.setShortId(anchor.getShortId());
 
 			if (anchor.getFloorId() != null) {
 				Floor floor = floorRepository.findBy(anchor.getFloorId());

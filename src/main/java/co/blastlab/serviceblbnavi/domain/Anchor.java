@@ -26,7 +26,7 @@ public class Anchor extends TrackedEntity {
 
 	private Double y;
 
-	private Boolean verified;
+	private Boolean verified = false;
 
 	@ManyToOne
 	private Floor floor;
