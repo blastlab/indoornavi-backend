@@ -2,7 +2,6 @@ package co.blastlab.serviceblbnavi.dto.building;
 
 import co.blastlab.serviceblbnavi.domain.Building;
 import co.blastlab.serviceblbnavi.dto.floor.FloorDto;
-import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -18,6 +17,9 @@ import java.util.List;
 @ToString
 public class BuildingDto {
 
+	@ApiModelProperty(example = "1", readOnly = true)
+	private Long id;
+
 	@NotNull
 	@NotEmpty
 	private String name;
@@ -27,6 +29,7 @@ public class BuildingDto {
 	private Long complexId;
 
 	public BuildingDto(Building building) {
+		this.setId(building.getId());
 		this.setName(building.getName());
 		this.setComplexId(building.getComplex() != null ? building.getComplex().getId() : null);
 	}
@@ -35,28 +38,12 @@ public class BuildingDto {
 	@Getter
 	@Setter
 	@NoArgsConstructor
-	@ApiModel(value = "BuildingId")
-	public static class WithId extends BuildingDto {
+	public static class WithFloors extends BuildingDto {
+		private List<FloorDto> floors = new ArrayList<>();
 
-		@ApiModelProperty(example = "1")
-		private Long id;
-
-		public WithId(Building building) {
+		public WithFloors(Building building) {
 			super(building);
-			this.setId(building.getId());
-		}
-
-
-		@Getter
-		@Setter
-		@NoArgsConstructor
-		public static class WithFloors extends WithId {
-			private List<FloorDto> floors = new ArrayList<>();
-
-			public WithFloors(Building building) {
-				super(building);
-				building.getFloors().forEach(floor -> this.getFloors().add(new FloorDto(floor)));
-			}
+			building.getFloors().forEach(floor -> this.getFloors().add(new FloorDto(floor)));
 		}
 	}
 }
