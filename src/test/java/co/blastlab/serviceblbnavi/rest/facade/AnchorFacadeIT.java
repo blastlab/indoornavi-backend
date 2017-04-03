@@ -63,12 +63,13 @@ public class AnchorFacadeIT extends BaseIT {
 
 	@Test
 	public void shouldCreateNewAnchorWithoutFloor() {
-		String body = new RequestBodyBuilder("AnchorWithoutFloorCreating.json")
+		String body = new RequestBodyBuilder("AnchorCreating.json")
 			.setParameter("name", NAME)
 			.setParameter("shortId", ANCHOR_SHORT_ID_CREATING)
 			.setParameter("longId", ANCHOR_LONG_ID_CREATING)
 			.setParameter("x", X)
 			.setParameter("y", Y)
+			.setParameter("floorId", null)
 			.build();
 
 		givenUser()
@@ -271,12 +272,13 @@ public class AnchorFacadeIT extends BaseIT {
 
 	@Test
 	public void shouldRemoveFloorIdAndNameWhileUpdatingAnchor() {
-		String body = new RequestBodyBuilder("AnchorWithoutFloorUpdating.json")
+		String body = new RequestBodyBuilder("AnchorUpdating.json")
 			.setParameter("name", "")
 			.setParameter("shortId", ANCHOR_SHORT_ID_EXISTING)
 			.setParameter("longId", ANCHOR_LONG_ID_EXISTING)
 			.setParameter("x", X)
-			.setParameter("y", Y) //TODO set parameter floorId to null. It is possible in swagger but not in integration test.
+			.setParameter("y", Y)
+			.setParameter("floorId", null)
 			.build();
 
 		givenUser()
