@@ -38,7 +38,7 @@ public class AnchorFacadeIT extends BaseIT {
 
 	@Test
 	public void createNewAnchor() {
-		String body = new RequestBodyBuilder("AnchorCreating.json")
+		String body = new RequestBodyBuilder("Anchor.json")
 			.setParameter("name", NAME)
 			.setParameter("shortId", ANCHOR_SHORT_ID_CREATING)
 			.setParameter("longId", ANCHOR_LONG_ID_CREATING)
@@ -63,7 +63,7 @@ public class AnchorFacadeIT extends BaseIT {
 
 	@Test
 	public void shouldCreateNewAnchorWithoutFloor() {
-		String body = new RequestBodyBuilder("AnchorWithoutFloorCreating.json")
+		String body = new RequestBodyBuilder("Anchor.json")
 			.setParameter("name", NAME)
 			.setParameter("shortId", ANCHOR_SHORT_ID_CREATING)
 			.setParameter("longId", ANCHOR_LONG_ID_CREATING)
@@ -87,7 +87,7 @@ public class AnchorFacadeIT extends BaseIT {
 
 	@Test
 	public void shouldCreateNewAnchorWithoutName() {
-		String body = new RequestBodyBuilder("AnchorCreating.json")
+		String body = new RequestBodyBuilder("Anchor.json")
 			.setParameter("shortId", ANCHOR_SHORT_ID_CREATING)
 			.setParameter("longId", ANCHOR_LONG_ID_CREATING)
 			.setParameter("x", X)
@@ -110,8 +110,79 @@ public class AnchorFacadeIT extends BaseIT {
 	}
 
 	@Test
+	public void shouldCreateAnchorWithoutX() {
+		String body = new RequestBodyBuilder("Anchor.json")
+			.setParameter("name", NAME)
+			.setParameter("shortId", ANCHOR_SHORT_ID_CREATING)
+			.setParameter("longId", ANCHOR_LONG_ID_CREATING)
+			.setParameter("y", Y)
+			.setParameter("floorId", FLOOR_EXISTING)
+			.build();
+
+		givenUser()
+			.body(body)
+			.when().post(ANCHOR_PATH)
+			.then().statusCode(HttpStatus.SC_OK)
+			.body(
+				"name", equalTo(NAME),
+				"shortId", equalTo(ANCHOR_SHORT_ID_CREATING),
+				"longId", equalTo(ANCHOR_LONG_ID_CREATING),
+				"x", equalTo(null),
+				"y", equalTo(Y),
+				"floorId", equalTo(FLOOR_EXISTING)
+			);
+	}
+
+	@Test
+	public void shouldCreateAnchorWithoutY() {
+		String body = new RequestBodyBuilder("Anchor.json")
+			.setParameter("name", NAME)
+			.setParameter("shortId", ANCHOR_SHORT_ID_CREATING)
+			.setParameter("longId", ANCHOR_LONG_ID_CREATING)
+			.setParameter("x", X)
+			.setParameter("floorId", FLOOR_EXISTING)
+			.build();
+
+		givenUser()
+			.body(body)
+			.when().post(ANCHOR_PATH)
+			.then().statusCode(HttpStatus.SC_OK)
+			.body(
+				"name", equalTo(NAME),
+				"shortId", equalTo(ANCHOR_SHORT_ID_CREATING),
+				"longId", equalTo(ANCHOR_LONG_ID_CREATING),
+				"x", equalTo(X),
+				"y", equalTo(null),
+				"floorId", equalTo(FLOOR_EXISTING)
+			);
+	}
+
+	@Test
+	public void shouldCreateAnchorWithoutXAndY() {
+		String body = new RequestBodyBuilder("Anchor.json")
+			.setParameter("name", NAME)
+			.setParameter("shortId", ANCHOR_SHORT_ID_CREATING)
+			.setParameter("longId", ANCHOR_LONG_ID_CREATING)
+			.setParameter("floorId", FLOOR_EXISTING)
+			.build();
+
+		givenUser()
+			.body(body)
+			.when().post(ANCHOR_PATH)
+			.then().statusCode(HttpStatus.SC_OK)
+			.body(
+				"name", equalTo(NAME),
+				"shortId", equalTo(ANCHOR_SHORT_ID_CREATING),
+				"longId", equalTo(ANCHOR_LONG_ID_CREATING),
+				"x", equalTo(null),
+				"y", equalTo(null),
+				"floorId", equalTo(FLOOR_EXISTING)
+			);
+	}
+
+	@Test
 	public void shouldCreateNewAnchorWithoutNameAndFloor() {
-		String body = new RequestBodyBuilder("AnchorCreating.json")
+		String body = new RequestBodyBuilder("Anchor.json")
 			.setParameter("shortId", ANCHOR_SHORT_ID_CREATING)
 			.setParameter("longId", ANCHOR_LONG_ID_CREATING)
 			.setParameter("x", X)
@@ -136,7 +207,7 @@ public class AnchorFacadeIT extends BaseIT {
 	public void shouldNotCreateAnchorWithNonexistingFloor() {
 		int nonexistingFloorId = 666;
 
-		String body = new RequestBodyBuilder("AnchorCreating.json")
+		String body = new RequestBodyBuilder("Anchor.json")
 			.setParameter("name", NAME)
 			.setParameter("shortId", ANCHOR_SHORT_ID_CREATING)
 			.setParameter("longId", ANCHOR_LONG_ID_CREATING)
@@ -153,7 +224,7 @@ public class AnchorFacadeIT extends BaseIT {
 
 	@Test
 	public void shouldNotCreateNewAnchorWithDuplicatedLongId() {
-		String body = new RequestBodyBuilder("AnchorCreating.json")
+		String body = new RequestBodyBuilder("Anchor.json")
 			.setParameter("name", NAME)
 			.setParameter("shortId", ANCHOR_SHORT_ID_CREATING)
 			.setParameter("longId", ANCHOR_LONG_ID_EXISTING)
@@ -177,7 +248,7 @@ public class AnchorFacadeIT extends BaseIT {
 
 	@Test
 	public void shouldNotCreateNewAnchorWithDuplicatedShortId() {
-		String body = new RequestBodyBuilder("AnchorCreating.json")
+		String body = new RequestBodyBuilder("Anchor.json")
 			.setParameter("name", NAME)
 			.setParameter("shortId", ANCHOR_SHORT_ID_EXISTING)
 			.setParameter("longId", ANCHOR_LONG_ID_CREATING)
@@ -201,7 +272,7 @@ public class AnchorFacadeIT extends BaseIT {
 
 	@Test
 	public void updateAnchor() {
-		String body = new RequestBodyBuilder("AnchorUpdating.json")
+		String body = new RequestBodyBuilder("Anchor.json")
 			.setParameter("name", NAME)
 			.setParameter("x", X)
 			.setParameter("y", Y)
@@ -227,7 +298,7 @@ public class AnchorFacadeIT extends BaseIT {
 
 	@Test
 	public void shouldNotUpdateNonexistingAnchor() {
-		String body = new RequestBodyBuilder("AnchorUpdating.json")
+		String body = new RequestBodyBuilder("Anchor.json")
 			.setParameter("name", NAME)
 			.setParameter("x", X)
 			.setParameter("y", Y)
@@ -245,7 +316,7 @@ public class AnchorFacadeIT extends BaseIT {
 
 	@Test
 	public void shouldAddFloorIdAndNameWhileUpdatingAnchor() {
-		String body = new RequestBodyBuilder("AnchorUpdating.json")
+		String body = new RequestBodyBuilder("Anchor.json")
 			.setParameter("name", NAME)
 			.setParameter("shortId", ANCHOR_SHORT_ID_EXISTING)
 			.setParameter("longId", ANCHOR_LONG_ID_EXISTING)
@@ -271,7 +342,7 @@ public class AnchorFacadeIT extends BaseIT {
 
 	@Test
 	public void shouldRemoveFloorIdAndNameWhileUpdatingAnchor() {
-		String body = new RequestBodyBuilder("AnchorWithoutFloorUpdating.json")
+		String body = new RequestBodyBuilder("Anchor.json")
 			.setParameter("name", "")
 			.setParameter("shortId", ANCHOR_SHORT_ID_EXISTING)
 			.setParameter("longId", ANCHOR_LONG_ID_EXISTING)
