@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
+import java.util.function.Supplier;
 
 public class RequestBodyBuilder {
 
@@ -21,14 +22,18 @@ public class RequestBodyBuilder {
 
 	private boolean isArray;
 
-	private final Table<Integer, String, String> parameters = HashBasedTable.create();
+	private final Table<Integer, String, Supplier<Object>> parameters = HashBasedTable.create();
 
 	public RequestBodyBuilder(String filename) {
 		this.filename = filename;
 	}
 
 	public RequestBodyBuilder setParameter(String key, Object value, Integer i) {
-		parameters.put(i, key, value.toString());
+		if (value == null) {
+			parameters.put(i, key, () -> value);
+		} else {
+			parameters.put(i, key, value::toString);
+		}
 		return this;
 	}
 
@@ -43,7 +48,7 @@ public class RequestBodyBuilder {
 			parameters.rowKeySet().forEach((i) -> {
 				parameters.row(i).keySet().forEach((key) -> {
 					if (jsonObject.get(i).containsKey(key)) {
-						jsonObject.get(i).put(key, parameters.row(i).get(key));
+						jsonObject.get(i).put(key, parameters.row(i).get(key).get());
 					}
 				});
 			});
