@@ -7,7 +7,6 @@ import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
-import javax.validation.constraints.NotNull;
 
 @Entity
 @Getter
@@ -26,6 +25,8 @@ public class Anchor extends TrackedEntity {
 	private Double x;
 
 	private Double y;
+
+	private Boolean verified = false;
 
 	@ManyToOne
 	private Floor floor;
