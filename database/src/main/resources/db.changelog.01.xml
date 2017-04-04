@@ -66,6 +66,11 @@
 	<changeSet author="pkuzmicki (generated)" id="issue-80-4">
 		<addUniqueConstraint columnNames="longId" constraintName="unique_longId" tableName="Anchor"/>
 	</changeSet>
+	<changeSet author="kgebert (generated)" id="issue-102-1">
+		<addColumn tableName="Anchor">
+			<column name="verified" type="boolean"/>
+		</addColumn>
+	</changeSet>
 	<changeSet author="jsmol (generated)" id="issue-100-1">
 		<addColumn tableName="Floor">
 			<column name="name" type="varchar(255)"/>

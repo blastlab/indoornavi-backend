@@ -3,8 +3,9 @@ package co.blastlab.serviceblbnavi.domain;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.ManyToOne;
 
 @Entity
 @Getter
@@ -22,6 +23,8 @@ public class Anchor extends TrackedEntity {
 	private Double x;
 
 	private Double y;
+
+	private Boolean verified = false;
 
 	@ManyToOne
 	private Floor floor;
