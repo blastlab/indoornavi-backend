@@ -13,6 +13,8 @@ import java.util.Optional;
 @Repository
 public abstract class ComplexRepository implements EntityRepository<Complex, Long>, CriteriaSupport<Complex> {
 
+	public abstract Optional<Complex> findById(Long id);
+
 	public Optional<Complex> findByBuildingId(Long id) {
 		return Optional.ofNullable(
 			criteria()

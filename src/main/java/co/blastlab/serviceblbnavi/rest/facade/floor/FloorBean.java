@@ -11,6 +11,7 @@ import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
 import javax.ws.rs.core.Response;
+import java.util.Optional;
 
 @Stateless
 public class FloorBean implements FloorFacade {
@@ -23,12 +24,12 @@ public class FloorBean implements FloorFacade {
 
 	@Override
 	public FloorDto create(FloorDto floor) {
-		Building building = buildingRepository.findBy(floor.getBuildingId());
-		if (building != null) {
+		Optional<Building> building = buildingRepository.findById(floor.getBuildingId());
+		if (building.isPresent()) {
 			Floor floorEntity = new Floor();
 			floorEntity.setLevel(floor.getLevel());
 			floorEntity.setName(floor.getName());
-			floorEntity.setBuilding(building);
+			floorEntity.setBuilding(building.get());
 			floorEntity = floorRepository.save(floorEntity);
 			return new FloorDto(floorEntity);
 		}
@@ -37,14 +38,14 @@ public class FloorBean implements FloorFacade {
 
 	@Override
 	public FloorDto update(Long id, FloorDto floor) {
-		Building building = buildingRepository.findBy(floor.getBuildingId());
-		if(building != null){
-			Floor floorEntity = floorRepository.findBy(id);
-			if (floorEntity != null) {
-				floorEntity.setLevel(floor.getLevel());
-				floorEntity.setName(floor.getName());
-				floorEntity = floorRepository.save(floorEntity);
-				return new FloorDto(floorEntity);
+		Optional<Building> building = buildingRepository.findById(floor.getBuildingId());
+		if(building.isPresent()){
+			Optional<Floor> floorEntity = floorRepository.findById(id);
+			if (floorEntity.isPresent()) {
+				floorEntity.get().setLevel(floor.getLevel());
+				floorEntity.get().setName(floor.getName());
+				Floor floorDb = floorRepository.save(floorEntity.get());
+				return new FloorDto(floorDb);
 			}
 		}
 		throw new EntityNotFoundException();
@@ -52,9 +53,9 @@ public class FloorBean implements FloorFacade {
 
 	@Override
 	public Response delete(Long id) {
-		Floor floor = floorRepository.findBy(id);
-		if (floor != null) {
-			floorRepository.remove(floor);
+		Optional<Floor> floor = floorRepository.findById(id);
+		if (floor.isPresent()) {
+			floorRepository.remove(floor.get());
 			return Response.status(HttpStatus.SC_NO_CONTENT).build();
 		}
 		throw new EntityNotFoundException();
