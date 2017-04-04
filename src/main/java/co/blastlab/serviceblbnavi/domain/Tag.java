@@ -8,9 +8,6 @@ import javax.persistence.Entity;
 @Entity
 @Getter
 @Setter
-public class Anchor extends Device {
+public class Tag extends Device {
 
-	private Double x;
-
-	private Double y;
 }

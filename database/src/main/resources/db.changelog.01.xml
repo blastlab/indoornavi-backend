@@ -82,5 +82,76 @@
 	<changeSet author="jsmol (generated)" id="issue-100-2">
 		<addUniqueConstraint columnNames="level, building_id" constraintName="unique_level_building_id" tableName="Floor"/>
 	</changeSet>
-
+	<changeSet author="jsmol (generated)" id="issue-81-1">
+		<createTable tableName="Device">
+			<column name="id" type="BIGINT" autoIncrement="true">
+				<constraints nullable="false" primaryKey="true" primaryKeyName="DevicePK"/>
+			</column>
+			<column name="creationDate" type="timestamp"/>
+			<column name="modificationDate" type="timestamp"/>
+			<column name="longId" type="BIGINT"/>
+			<column name="name" type="VARCHAR(255)"/>
+			<column name="shortId" type="INT"/>
+			<column name="floor_id" type="BIGINT"/>
+		</createTable>
+	</changeSet>
+	<changeSet author="jsmol (generated)" id="issue-81-2">
+		<addUniqueConstraint columnNames="longId" constraintName="unique_longId" tableName="Device"/>
+	</changeSet>
+	<changeSet author="jsmol (generated)" id="issue81-3">
+		<addUniqueConstraint columnNames="shortId" constraintName="unique_shortId" tableName="Device"/>
+	</changeSet>
+	<changeSet author="jsmol (generated)" id="issue-81-4">
+		<createTable tableName="Tag">
+			<column name="id" type="BIGINT" autoIncrement="true">
+				<constraints nullable="false" primaryKey="true" primaryKeyName="TagPK"/>
+			</column>
+		</createTable>
+	</changeSet>
+	<changeSet author="jsmol (generated)" id="issue-81-5">
+		<addForeignKeyConstraint baseColumnNames="id" baseTableName="Tag" constraintName="FK_6yv7s5k85a0emvco4ikb6t5ps" deferrable="false"
+		                         initiallyDeferred="false" referencedColumnNames="id" referencedTableName="Device"/>
+	</changeSet>
+	<changeSet author="jsmol (generated)" id="issue-81-6">
+		<addForeignKeyConstraint baseColumnNames="id" baseTableName="Anchor" constraintName="FK_9d0jmo49iq4b14x2b91ob0w2f" deferrable="false"
+		                         initiallyDeferred="false" referencedColumnNames="id" referencedTableName="Device"/>
+	</changeSet>
+	<changeSet author="jsmol (generated)" id="issue-81-7">
+		<addForeignKeyConstraint baseColumnNames="floor_id" baseTableName="Device" constraintName="FK_gp6ktayfrcytao4bqq8vd4yms" deferrable="false"
+		                         initiallyDeferred="false" referencedColumnNames="id" referencedTableName="Floor"/>
+	</changeSet>
+	<changeSet author="jsmol (generated)" id="issue-81-8">
+		<dropForeignKeyConstraint baseTableName="anchor" constraintName="FK_gtwmd57hn5sf1q3c7ysdwp2db"/>
+	</changeSet>
+	<changeSet author="jsmol (generated)" id="issue-81-9">
+		<dropUniqueConstraint constraintName="unique_longId" tableName="anchor"/>
+	</changeSet>
+	<changeSet author="jsmol (generated)" id="issue-81-10">
+		<dropUniqueConstraint constraintName="unique_shortId" tableName="anchor"/>
+	</changeSet>
+	<changeSet author="jsmol (generated)" id="issue-81-11">
+		<dropColumn columnName="creationDate" tableName="anchor"/>
+	</changeSet>
+	<changeSet author="jsmol (generated)" id="issue-81-12">
+		<dropColumn columnName="modificationDate" tableName="anchor"/>
+	</changeSet>
+	<changeSet author="jsmol (generated)" id="issue-81-13">
+		<dropColumn columnName="shortId" tableName="anchor"/>
+	</changeSet>
+	<changeSet author="jsmol (generated)" id="issue-81-14">
+		<dropColumn columnName="longId" tableName="anchor"/>
+	</changeSet>
+	<changeSet author="jsmol (generated)" id="issue-81-15">
+		<dropColumn columnName="name" tableName="anchor"/>
+	</changeSet>
+	<changeSet author="jsmol (generated)" id="issue-81-16">
+		<dropColumn columnName="floor_id" tableName="anchor"/>
+	</changeSet>
+	<changeSet author="jsmol (generated)" id="issue-81-17">
+		<dropNotNullConstraint columnDataType="double" columnName="x" tableName="Anchor"/>
+	</changeSet>
+	<changeSet author="jsmol (generated)" id="issue-81-18">
+		<dropNotNullConstraint columnDataType="double" columnName="y" tableName="Anchor"/>
+	</changeSet>
+	
 </databaseChangeLog>
