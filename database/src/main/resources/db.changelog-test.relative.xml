@@ -23,7 +23,9 @@
 	</changeSet>
 
 	<changeSet id="Anchor" author="pkuzmicki" context="test" runOnChange="true" labels="Anchor" runAlways="true">
-		<loadUpdateData tableName="anchor" file="test/Anchor.csv" primaryKey="id" relativeToChangelogFile="true"/>
+		<loadUpdateData tableName="anchor" file="test/Anchor.csv" primaryKey="id" relativeToChangelogFile="true">
+			<column name="verified" type="boolean" />
+		</loadUpdateData>
 	</changeSet>
 
 </databaseChangeLog>

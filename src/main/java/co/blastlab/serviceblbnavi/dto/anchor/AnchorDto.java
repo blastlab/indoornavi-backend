@@ -1,13 +1,11 @@
 package co.blastlab.serviceblbnavi.dto.anchor;
 
 import co.blastlab.serviceblbnavi.domain.Anchor;
-import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.NotNull;
 
@@ -25,6 +23,7 @@ public class AnchorDto {
 		this.floorId = (anchor.getFloor() == null) ? null : anchor.getFloor().getId();
 		this.name = anchor.getName();
 		this.id = anchor.getId();
+		this.verified = anchor.getVerified();
 	}
 
 	@ApiModelProperty(example = "1", readOnly = true)
@@ -47,4 +46,6 @@ public class AnchorDto {
 
 	@ApiModelProperty(example = "Name")
 	private String name;
+
+	private Boolean verified;
 }
