@@ -15,10 +15,10 @@ public class Anchor extends TrackedEntity {
 	private String name;
 
 	@Column(unique=true)
-	private Integer shortId;
+	private int shortId;
 
 	@Column(unique=true)
-	private Long longId;
+	private long longId;
 
 	private Double x;
 

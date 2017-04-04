@@ -40,19 +40,21 @@ public class AnchorBean implements AnchorFacade {
 	}
 
 	public AnchorDto update(Long id, AnchorDto anchor) {
-		Optional<Anchor> anchorEntity = anchorRepository.findById(id);
-		if (anchorEntity.isPresent()) {
-			anchorEntity.get().setX(anchor.getX());
-			anchorEntity.get().setY(anchor.getY());
-			anchorEntity.get().setName(anchor.getName());
+		Optional<Anchor> anchorOptional = anchorRepository.findById(id);
+		if (anchorOptional.isPresent()) {
+			Anchor anchorEntity = anchorOptional.get();
+			anchorEntity.setX(anchor.getX());
+			anchorEntity.setY(anchor.getY());
+			anchorEntity.setName(anchor.getName());
+			anchorEntity.setVerified(anchor.getVerified());
 
 			if (anchor.getFloorId() != null) {
-				setFloor(anchor, anchorEntity.get());
+				setFloor(anchor, anchorEntity);
 			} else {
-				anchorEntity.get().setFloor(null);
+				anchorEntity.setFloor(null);
 			}
-			anchorRepository.save(anchorEntity.get());
-			return new AnchorDto(anchorEntity.get());
+			anchorRepository.save(anchorEntity);
+			return new AnchorDto(anchorEntity);
 		}
 		throw new EntityNotFoundException();
 	}
