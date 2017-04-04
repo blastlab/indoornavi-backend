@@ -11,7 +11,8 @@ import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
 import javax.ws.rs.core.Response;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Stateless
 public class AnchorBean implements AnchorFacade {
@@ -22,13 +23,14 @@ public class AnchorBean implements AnchorFacade {
 	@Inject
 	private FloorRepository floorRepository;
 
+	@Override
 	public AnchorDto create(AnchorDto anchor) {
 		Anchor anchorEntity = new Anchor();
+		anchorEntity.setShortId(anchor.getShortId());
+		anchorEntity.setLongId(anchor.getLongId());
 		anchorEntity.setName(anchor.getName());
 		anchorEntity.setX(anchor.getX());
 		anchorEntity.setY(anchor.getY());
-		anchorEntity.setShortId(anchor.getShortId());
-		anchorEntity.setLongId(anchor.getLongId());
 
 		if (anchor.getFloorId() != null) {
 			Floor floor = floorRepository.findBy(anchor.getFloorId());
@@ -39,10 +41,11 @@ public class AnchorBean implements AnchorFacade {
 			}
 		}
 
-		anchorRepository.save(anchorEntity);
+		anchorEntity = anchorRepository.save(anchorEntity);
 		return new AnchorDto(anchorEntity);
 	}
 
+	@Override
 	public AnchorDto update(Long id, AnchorDto anchor) {
 		Anchor anchorEntity = anchorRepository.findBy(id);
 		if (anchorEntity != null) {
@@ -66,6 +69,7 @@ public class AnchorBean implements AnchorFacade {
 		throw new EntityNotFoundException();
 	}
 
+	@Override
 	public List<AnchorDto> findAll() {
 		List<AnchorDto> anchors = new ArrayList<>();
 		anchorRepository.findAll()
@@ -73,6 +77,7 @@ public class AnchorBean implements AnchorFacade {
 		return anchors;
 	}
 
+	@Override
 	public Response delete(Long id) {
 		if (id != null) {
 			Anchor anchor = anchorRepository.findBy(id);

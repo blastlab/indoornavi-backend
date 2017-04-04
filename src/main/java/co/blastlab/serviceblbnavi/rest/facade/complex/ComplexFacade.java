@@ -18,7 +18,7 @@ public interface ComplexFacade {
 	@POST
 	@ApiOperation(value = "create complex", response = ComplexDto.class)
 	@ApiResponses({
-		@ApiResponse(code = 400, message = "complex name is empty")
+		@ApiResponse(code = 400, message = "Complex name is empty")
 	})
 	ComplexDto create(@ApiParam(value = "complex", required = true) @Valid ComplexDto complex);
 
@@ -26,7 +26,7 @@ public interface ComplexFacade {
 	@Path("/{id: \\d+}")
 	@ApiOperation(value = "update complex by id", notes = "update complex by id", response = ComplexDto.class)
 	@ApiResponses({
-		@ApiResponse(code = 404, message = "complex id empty or complex doesn't exist")
+		@ApiResponse(code = 404, message = "Complex id empty or complex does not exist")
 	})
 	ComplexDto update(@ApiParam(value = "id", required = true) @PathParam("id") @Valid @NotNull Long id,
 	                         @ApiParam(value = "complex", required = true) @Valid ComplexDto complex);
@@ -35,8 +35,8 @@ public interface ComplexFacade {
 	@Path("/{id: \\d+}")
 	@ApiOperation(value = "delete complex by id", response = Response.class)
 	@ApiResponses({
-		@ApiResponse(code = 404, message = "complex id empty or complex doesn't exist"),
-		@ApiResponse(code = 204, message = "deleted successfully but there is no new information to return")
+		@ApiResponse(code = 404, message = "Complex id empty or complex does not exist"),
+		@ApiResponse(code = 204, message = "Deleted successfully but there is no new information to return")
 	})
 	Response delete(@ApiParam(value = "id", required = true) @PathParam("id") @Valid @NotNull Long id);
 
@@ -48,7 +48,7 @@ public interface ComplexFacade {
 	@Path("/{id: \\d+}/buildings")
 	@ApiOperation(value = "get complex by id (include buildings)", response = ComplexDto.WithBuildings.class)
 	@ApiResponses({
-		@ApiResponse(code = 404, message = "complex id empty or complex doesn't exist")
+		@ApiResponse(code = 404, message = "Complex id empty or complex does not exist")
 	})
 	ComplexDto.WithBuildings findWithBuildings(@ApiParam(value = "id", required = true) @PathParam("id") @Valid @NotNull Long id);
 }

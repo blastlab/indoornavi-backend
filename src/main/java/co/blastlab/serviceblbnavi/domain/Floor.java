@@ -23,6 +23,7 @@ public class Floor extends TrackedEntity {
 	private Building building;
 
 	@OneToMany(mappedBy = "floor")
-	private List<Anchor> anchors = new ArrayList<>();
+	@OrderBy("name")
+	private List<Device> devices = new ArrayList<>();
 
 }

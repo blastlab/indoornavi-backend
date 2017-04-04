@@ -4,6 +4,7 @@ import co.blastlab.serviceblbnavi.dto.anchor.AnchorDto;
 import io.swagger.annotations.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import java.util.List;
@@ -13,7 +14,7 @@ import java.util.List;
 public interface AnchorFacade {
 
 	@POST
-	@ApiOperation(value = "create", response = AnchorDto.class)
+	@ApiOperation(value = "create anchor", response = AnchorDto.class)
 	@ApiResponses({
 		@ApiResponse(code = 404, message = "Floor with given id does not exist")
 	})
@@ -21,23 +22,23 @@ public interface AnchorFacade {
 
 	@PUT
 	@Path("/{id: \\d+}")
-	@ApiOperation(value = "set floor for anchor", response = AnchorDto.class)
+	@ApiOperation(value = "update anchor by id", response = AnchorDto.class)
 	@ApiResponses({
 		@ApiResponse(code = 404, message = "Floor or anchor with given id does not exist")
 	})
-	AnchorDto update(@ApiParam(value = "id", required = true) @PathParam("id") Long id,
-	                        @ApiParam(value = "anchor", required = true) @Valid AnchorDto anchor);
-
-	@GET
-	@ApiOperation(value = "find all anchors", response = AnchorDto.class)
-	List<AnchorDto> findAll();
+	AnchorDto update(@ApiParam(value = "id", required = true) @PathParam("id") @Valid @NotNull Long id,
+	                 @ApiParam(value = "anchor", required = true) @Valid AnchorDto anchor);
 
 	@DELETE
 	@Path("/{id: \\d+}")
 	@ApiOperation(value = "delete anchor by id", response = Response.class)
 	@ApiResponses({
-		@ApiResponse(code = 404, message = "anchor id empty or anchor doesn't exist"),
-		@ApiResponse(code = 204, message = "deleted successfully but there is no new information to return")
+		@ApiResponse(code = 404, message = "Anchor id empty or anchor doesn not exist"),
+		@ApiResponse(code = 204, message = "Deleted successfully but there is no new information to return")
 	})
-	Response delete(@ApiParam(value = "id", required = true) @PathParam("id") Long id);
+	Response delete(@ApiParam(value = "id", required = true) @PathParam("id") @Valid @NotNull Long id);
+
+	@GET
+	@ApiOperation(value = "find all anchors", response = AnchorDto.class, responseContainer = "List")
+	List<AnchorDto> findAll();
 }
