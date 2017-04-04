@@ -49,16 +49,10 @@
 			<column name="creationDate" type="timestamp"/>
 			<column name="modificationDate" type="timestamp"/>
 			<column name="name" type="VARCHAR(255)"/>
-			<column name="shortId" type="INT">
-				<constraints nullable="false"/>
-			</column>
-			<column name="longId" type="BIGINT">
-				<constraints nullable="false"/>
-			</column>
-			<column name="x" type="DOUBLE">
-			</column>
-			<column name="y" type="DOUBLE">
-			</column>
+			<column name="shortId" type="INT"/>
+			<column name="longId" type="BIGINT"/>
+			<column name="x" type="DOUBLE"/>
+			<column name="y" type="DOUBLE"/>
 			<column name="floor_id" type="BIGINT"/>
 		</createTable>
 	</changeSet>
