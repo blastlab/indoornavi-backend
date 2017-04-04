@@ -31,14 +31,8 @@ public class AnchorBean implements AnchorFacade {
 		anchorEntity.setLongId(anchor.getLongId());
 
 		if (anchor.getFloorId() != null) {
-			Optional<Floor> floor = floorRepository.findById(anchor.getFloorId());
-			if (floor.isPresent()) {
-				anchorEntity.setFloor(floor.get());
-			} else {
-				throw new EntityNotFoundException();
-			}
+			setFloor(anchor, anchorEntity);
 		}
-
 		anchorRepository.save(anchorEntity);
 		return new AnchorDto(anchorEntity);
 	}
@@ -51,12 +45,7 @@ public class AnchorBean implements AnchorFacade {
 			anchorEntity.get().setName(anchor.getName());
 
 			if (anchor.getFloorId() != null) {
-				Optional<Floor> floor = floorRepository.findById(anchor.getFloorId());
-				if (floor.isPresent()) {
-					anchorEntity.get().setFloor(floor.get());
-				} else {
-					throw new EntityNotFoundException();
-				}
+				setFloor(anchor, anchorEntity.get());
 			} else {
 				anchorEntity.get().setFloor(null);
 			}
@@ -79,7 +68,15 @@ public class AnchorBean implements AnchorFacade {
 			anchorRepository.remove(anchor.get());
 			return Response.status(HttpStatus.SC_NO_CONTENT).build();
 		}
-
 		throw new EntityNotFoundException();
+	}
+
+	private void setFloor(AnchorDto anchor, Anchor anchorEntity) {
+		Optional<Floor> floor = floorRepository.findById(anchor.getFloorId());
+		if (floor.isPresent()) {
+			anchorEntity.setFloor(floor.get());
+		} else {
+			throw new EntityNotFoundException();
+		}
 	}
 }
