@@ -30,6 +30,7 @@ public class AnchorFacadeIT extends BaseIT {
 	private static final int ANCHOR_LONG_ID_EXISTING = 16777216;
 	private static final int ANCHOR_SHORT_ID_CREATING = 1345;
 	private static final long ANCHOR_LONG_ID_CREATING = 9753571457L;
+	private static final boolean ANCHOR_NOT_VERIFIED = false;
 
 	@Override
 	public ImmutableList<String> getAdditionalLabels() {
@@ -38,13 +39,14 @@ public class AnchorFacadeIT extends BaseIT {
 
 	@Test
 	public void createNewAnchor() {
-		String body = new RequestBodyBuilder("AnchorCreating.json")
+		String body = new RequestBodyBuilder("Anchor.json")
 			.setParameter("name", NAME)
 			.setParameter("shortId", ANCHOR_SHORT_ID_CREATING)
 			.setParameter("longId", ANCHOR_LONG_ID_CREATING)
 			.setParameter("x", X)
 			.setParameter("y", Y)
 			.setParameter("floorId", FLOOR_EXISTING)
+			.setParameter("verified", ANCHOR_NOT_VERIFIED)
 			.build();
 
 		givenUser()
@@ -57,19 +59,21 @@ public class AnchorFacadeIT extends BaseIT {
 				"longId", equalTo(ANCHOR_LONG_ID_CREATING),
 				"x", equalTo(X),
 				"y", equalTo(Y),
-				"floorId", equalTo(FLOOR_EXISTING)
+				"floorId", equalTo(FLOOR_EXISTING),
+				"verified", equalTo(ANCHOR_NOT_VERIFIED)
 			);
 	}
 
 	@Test
 	public void shouldCreateNewAnchorWithoutFloor() {
-		String body = new RequestBodyBuilder("AnchorCreating.json")
+		String body = new RequestBodyBuilder("Anchor.json")
 			.setParameter("name", NAME)
 			.setParameter("shortId", ANCHOR_SHORT_ID_CREATING)
 			.setParameter("longId", ANCHOR_LONG_ID_CREATING)
 			.setParameter("x", X)
 			.setParameter("y", Y)
 			.setParameter("floorId", null)
+			.setParameter("verified", ANCHOR_NOT_VERIFIED)
 			.build();
 
 		givenUser()
@@ -82,18 +86,20 @@ public class AnchorFacadeIT extends BaseIT {
 				"longId", equalTo(ANCHOR_LONG_ID_CREATING),
 				"x", equalTo(X),
 				"y", equalTo(Y),
-				"floorId", equalTo(null)
+				"floorId", equalTo(null),
+				"verified", equalTo(ANCHOR_NOT_VERIFIED)
 			);
 	}
 
 	@Test
 	public void shouldCreateNewAnchorWithoutName() {
-		String body = new RequestBodyBuilder("AnchorCreating.json")
+		String body = new RequestBodyBuilder("Anchor.json")
 			.setParameter("shortId", ANCHOR_SHORT_ID_CREATING)
 			.setParameter("longId", ANCHOR_LONG_ID_CREATING)
 			.setParameter("x", X)
 			.setParameter("y", Y)
 			.setParameter("floorId", FLOOR_EXISTING)
+			.setParameter("verified", ANCHOR_NOT_VERIFIED)
 			.build();
 
 		givenUser()
@@ -106,17 +112,19 @@ public class AnchorFacadeIT extends BaseIT {
 				"longId", equalTo(ANCHOR_LONG_ID_CREATING),
 				"x", equalTo(X),
 				"y", equalTo(Y),
-				"floorId", equalTo(FLOOR_EXISTING)
+				"floorId", equalTo(FLOOR_EXISTING),
+				"verified", equalTo(ANCHOR_NOT_VERIFIED)
 			);
 	}
 
 	@Test
 	public void shouldCreateNewAnchorWithoutNameAndFloor() {
-		String body = new RequestBodyBuilder("AnchorCreating.json")
+		String body = new RequestBodyBuilder("Anchor.json")
 			.setParameter("shortId", ANCHOR_SHORT_ID_CREATING)
 			.setParameter("longId", ANCHOR_LONG_ID_CREATING)
 			.setParameter("x", X)
 			.setParameter("y", Y)
+			.setParameter("verified", ANCHOR_NOT_VERIFIED)
 			.build();
 
 		givenUser()
@@ -129,7 +137,8 @@ public class AnchorFacadeIT extends BaseIT {
 				"longId", equalTo(ANCHOR_LONG_ID_CREATING),
 				"x", equalTo(X),
 				"y", equalTo(Y),
-				"floorId", equalTo(null)
+				"floorId", equalTo(null),
+				"verified", equalTo(ANCHOR_NOT_VERIFIED)
 			);
 	}
 
@@ -137,13 +146,14 @@ public class AnchorFacadeIT extends BaseIT {
 	public void shouldNotCreateAnchorWithNonexistingFloor() {
 		int nonexistingFloorId = 666;
 
-		String body = new RequestBodyBuilder("AnchorCreating.json")
+		String body = new RequestBodyBuilder("Anchor.json")
 			.setParameter("name", NAME)
 			.setParameter("shortId", ANCHOR_SHORT_ID_CREATING)
 			.setParameter("longId", ANCHOR_LONG_ID_CREATING)
 			.setParameter("x", X)
 			.setParameter("y", Y)
 			.setParameter("floorId", nonexistingFloorId)
+			.setParameter("verified", ANCHOR_NOT_VERIFIED)
 			.build();
 
 		givenUser()
@@ -154,13 +164,14 @@ public class AnchorFacadeIT extends BaseIT {
 
 	@Test
 	public void shouldNotCreateNewAnchorWithDuplicatedLongId() {
-		String body = new RequestBodyBuilder("AnchorCreating.json")
+		String body = new RequestBodyBuilder("Anchor.json")
 			.setParameter("name", NAME)
 			.setParameter("shortId", ANCHOR_SHORT_ID_CREATING)
 			.setParameter("longId", ANCHOR_LONG_ID_EXISTING)
 			.setParameter("x", X)
 			.setParameter("y", Y)
 			.setParameter("floorId", FLOOR_EXISTING)
+			.setParameter("verified", ANCHOR_NOT_VERIFIED)
 			.build();
 
 		DbViolationResponse violationResponse = givenUser()
@@ -178,13 +189,14 @@ public class AnchorFacadeIT extends BaseIT {
 
 	@Test
 	public void shouldNotCreateNewAnchorWithDuplicatedShortId() {
-		String body = new RequestBodyBuilder("AnchorCreating.json")
+		String body = new RequestBodyBuilder("Anchor.json")
 			.setParameter("name", NAME)
 			.setParameter("shortId", ANCHOR_SHORT_ID_EXISTING)
 			.setParameter("longId", ANCHOR_LONG_ID_CREATING)
 			.setParameter("x", X)
 			.setParameter("y", Y)
 			.setParameter("floorId", FLOOR_EXISTING)
+			.setParameter("verified", ANCHOR_NOT_VERIFIED)
 			.build();
 
 		DbViolationResponse violationResponse = givenUser()
@@ -202,13 +214,14 @@ public class AnchorFacadeIT extends BaseIT {
 
 	@Test
 	public void updateAnchor() {
-		String body = new RequestBodyBuilder("AnchorUpdating.json")
+		String body = new RequestBodyBuilder("Anchor.json")
 			.setParameter("name", NAME)
 			.setParameter("x", X)
 			.setParameter("y", Y)
 			.setParameter("shortId", ANCHOR_SHORT_ID_EXISTING)
 			.setParameter("longId", ANCHOR_LONG_ID_EXISTING)
 			.setParameter("floorId", FLOOR_EXISTING)
+			.setParameter("verified", ANCHOR_NOT_VERIFIED)
 			.build();
 
 		givenUser()
@@ -222,19 +235,21 @@ public class AnchorFacadeIT extends BaseIT {
 				"longId", equalTo(ANCHOR_LONG_ID_EXISTING),
 				"x", equalTo(X),
 				"y", equalTo(Y),
-				"floorId", equalTo(FLOOR_EXISTING)
+				"floorId", equalTo(FLOOR_EXISTING),
+				"verified", equalTo(ANCHOR_NOT_VERIFIED)
 			);
 	}
 
 	@Test
 	public void shouldNotUpdateNonexistingAnchor() {
-		String body = new RequestBodyBuilder("AnchorUpdating.json")
+		String body = new RequestBodyBuilder("Anchor.json")
 			.setParameter("name", NAME)
 			.setParameter("x", X)
 			.setParameter("y", Y)
 			.setParameter("shortId", ANCHOR_SHORT_ID_EXISTING)
 			.setParameter("longId", ANCHOR_LONG_ID_EXISTING)
 			.setParameter("floorId", FLOOR_EXISTING)
+			.setParameter("verified", ANCHOR_NOT_VERIFIED)
 			.build();
 
 		givenUser()
@@ -246,13 +261,14 @@ public class AnchorFacadeIT extends BaseIT {
 
 	@Test
 	public void shouldAddFloorIdAndNameWhileUpdatingAnchor() {
-		String body = new RequestBodyBuilder("AnchorUpdating.json")
+		String body = new RequestBodyBuilder("Anchor.json")
 			.setParameter("name", NAME)
 			.setParameter("shortId", ANCHOR_SHORT_ID_EXISTING)
 			.setParameter("longId", ANCHOR_LONG_ID_EXISTING)
 			.setParameter("x", X)
 			.setParameter("y", Y)
 			.setParameter("floorId", FLOOR_EXISTING)
+			.setParameter("verified", ANCHOR_NOT_VERIFIED)
 			.build();
 
 		givenUser()
@@ -266,19 +282,21 @@ public class AnchorFacadeIT extends BaseIT {
 				"longId", equalTo(ANCHOR_LONG_ID_EXISTING),
 				"x", equalTo(X),
 				"y", equalTo(Y),
-				"floorId", equalTo(FLOOR_EXISTING)
+				"floorId", equalTo(FLOOR_EXISTING),
+				"verified", equalTo(ANCHOR_NOT_VERIFIED)
 			);
 	}
 
 	@Test
 	public void shouldRemoveFloorIdAndNameWhileUpdatingAnchor() {
-		String body = new RequestBodyBuilder("AnchorUpdating.json")
+		String body = new RequestBodyBuilder("Anchor.json")
 			.setParameter("name", "")
 			.setParameter("shortId", ANCHOR_SHORT_ID_EXISTING)
 			.setParameter("longId", ANCHOR_LONG_ID_EXISTING)
 			.setParameter("x", X)
 			.setParameter("y", Y)
 			.setParameter("floorId", null)
+			.setParameter("verified", ANCHOR_NOT_VERIFIED)
 			.build();
 
 		givenUser()
@@ -292,8 +310,9 @@ public class AnchorFacadeIT extends BaseIT {
 				"longId", equalTo(ANCHOR_LONG_ID_EXISTING),
 				"x", equalTo(X),
 				"y", equalTo(Y),
-				"floorId", equalTo(null)
-			);
+				"floorId", equalTo(null),
+				"verified", equalTo(ANCHOR_NOT_VERIFIED)
+				);
 	}
 
 	@Test
@@ -324,7 +343,8 @@ public class AnchorFacadeIT extends BaseIT {
 				"longId", equalTo(Arrays.asList(ANCHOR_LONG_ID_EXISTING, 93170459)),
 				"x", equalTo(Arrays.asList(1.618f, 2.39996f)),
 				"y", equalTo(Arrays.asList(0.577f, 1.64493f)),
-				"floorId", equalTo(Arrays.asList(null, null))
+				"floorId", equalTo(Arrays.asList(null, null)),
+				"verified", equalTo(Arrays.asList(true, false))
 			);
 	}
 
@@ -340,13 +360,12 @@ public class AnchorFacadeIT extends BaseIT {
 			.as(ViolationResponse.class);
 
 		assertThat(violationResponse.getError(), is(VALIDATION_ERROR_NAME));
-		assertThat(violationResponse.getViolations().size(), is(4));
+		assertThat(violationResponse.getViolations().size(), is(3));
 		assertThat(violationResponse.getViolations(),
 			containsInAnyOrder(
 				validViolation("shortId", "may not be null"),
 				validViolation("longId", "may not be null"),
-				validViolation("x", "may not be null"),
-				validViolation("y", "may not be null")
+				validViolation("verified", "may not be null")
 			)
 		);
 	}
@@ -364,13 +383,12 @@ public class AnchorFacadeIT extends BaseIT {
 			.as(ViolationResponse.class);
 
 		assertThat(violationResponse.getError(), is(VALIDATION_ERROR_NAME));
-		assertThat(violationResponse.getViolations().size(), is(4));
+		assertThat(violationResponse.getViolations().size(), is(3));
 		assertThat(violationResponse.getViolations(),
 			containsInAnyOrder(
 				validViolation("shortId", "may not be null"),
 				validViolation("longId", "may not be null"),
-				validViolation("x", "may not be null"),
-				validViolation("y", "may not be null")
+				validViolation("verified", "may not be null")
 			)
 		);
 	}

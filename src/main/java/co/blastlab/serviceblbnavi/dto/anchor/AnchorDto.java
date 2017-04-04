@@ -47,5 +47,7 @@ public class AnchorDto {
 	@ApiModelProperty(example = "Name")
 	private String name;
 
+	@NotNull
+	@ApiModelProperty(example = "false")
 	private Boolean verified;
 }
