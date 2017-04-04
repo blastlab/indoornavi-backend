@@ -49,18 +49,10 @@
 			<column name="creationDate" type="timestamp"/>
 			<column name="modificationDate" type="timestamp"/>
 			<column name="name" type="VARCHAR(255)"/>
-			<column name="shortId" type="INT">
-				<constraints nullable="false"/>
-			</column>
-			<column name="longId" type="BIGINT">
-				<constraints nullable="false"/>
-			</column>
-			<column name="x" type="DOUBLE">
-				<constraints nullable="false"/>
-			</column>
-			<column name="y" type="DOUBLE">
-				<constraints nullable="false"/>
-			</column>
+			<column name="shortId" type="INT"/>
+			<column name="longId" type="BIGINT"/>
+			<column name="x" type="DOUBLE"/>
+			<column name="y" type="DOUBLE"/>
 			<column name="floor_id" type="BIGINT"/>
 		</createTable>
 	</changeSet>
@@ -73,6 +65,11 @@
 	</changeSet>
 	<changeSet author="pkuzmicki (generated)" id="issue-80-4">
 		<addUniqueConstraint columnNames="longId" constraintName="unique_longId" tableName="Anchor"/>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="issue-102-1">
+		<addColumn tableName="Anchor">
+			<column name="verified" type="boolean"/>
+		</addColumn>
 	</changeSet>
 	<changeSet author="jsmol (generated)" id="issue-100-1">
 		<addColumn tableName="Floor">
