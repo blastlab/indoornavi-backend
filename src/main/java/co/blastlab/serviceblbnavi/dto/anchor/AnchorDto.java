@@ -18,13 +18,8 @@ public class AnchorDto extends DeviceDto {
 	private Double y;
 
 	public AnchorDto(Anchor anchor) {
-		this.setId(anchor.getId());
-		this.setShortId(anchor.getShortId());
-		this.setLongId(anchor.getLongId());
-		this.setName(anchor.getName());
-		this.setFloorId(anchor.getFloor() != null ? anchor.getFloor().getId() : null);
+		super(anchor);
 		this.setX(anchor.getX());
 		this.setY(anchor.getY());
-		this.setVerified(anchor.getVerified());
 	}
 }

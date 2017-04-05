@@ -2,9 +2,9 @@ package co.blastlab.serviceblbnavi.rest.facade.tag;
 
 import co.blastlab.serviceblbnavi.dao.repository.FloorRepository;
 import co.blastlab.serviceblbnavi.dao.repository.TagRepository;
-import co.blastlab.serviceblbnavi.domain.Floor;
 import co.blastlab.serviceblbnavi.domain.Tag;
 import co.blastlab.serviceblbnavi.dto.tag.TagDto;
+import co.blastlab.serviceblbnavi.rest.facade.device.DeviceBean;
 import org.apache.http.HttpStatus;
 
 import javax.ejb.Stateless;
@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Stateless
-public class TagBean implements TagFacade {
+public class TagBean extends DeviceBean implements TagFacade {
 
 	@Inject
 	private TagRepository tagRepository;
@@ -33,7 +33,7 @@ public class TagBean implements TagFacade {
 		tagEntity.setVerified(tag.getVerified());
 
 		if (tag.getFloorId() != null) {
-			setFloor(tag, tagEntity);
+			super.setFloor(tag, tagEntity);
 		}
 		tagEntity = tagRepository.save(tagEntity);
 		return new TagDto(tagEntity);
@@ -48,7 +48,7 @@ public class TagBean implements TagFacade {
 			tagEntity.setVerified(tag.getVerified());
 
 			if (tag.getFloorId() != null) {
-				setFloor(tag, tagEntity);
+				super.setFloor(tag, tagEntity);
 			} else {
 				tagEntity.setFloor(null);
 			}
@@ -74,14 +74,5 @@ public class TagBean implements TagFacade {
 			return Response.status(HttpStatus.SC_NO_CONTENT).build();
 		}
 		throw new EntityNotFoundException();
-	}
-
-	private void setFloor(TagDto tag, Tag tagEntity) {
-		Optional<Floor> floor = floorRepository.findById(tag.getFloorId());
-		if (floor.isPresent()) {
-			tagEntity.setFloor(floor.get());
-		} else {
-			throw new EntityNotFoundException();
-		}
 	}
 }
