@@ -3,8 +3,8 @@ package co.blastlab.serviceblbnavi.rest.facade.anchor;
 import co.blastlab.serviceblbnavi.dao.repository.AnchorRepository;
 import co.blastlab.serviceblbnavi.dao.repository.FloorRepository;
 import co.blastlab.serviceblbnavi.domain.Anchor;
-import co.blastlab.serviceblbnavi.domain.Floor;
 import co.blastlab.serviceblbnavi.dto.anchor.AnchorDto;
+import co.blastlab.serviceblbnavi.rest.facade.device.DeviceBean;
 import org.apache.http.HttpStatus;
 
 import javax.ejb.Stateless;
@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Stateless
-public class AnchorBean implements AnchorFacade {
+public class AnchorBean extends DeviceBean implements AnchorFacade {
 
 	@Inject
 	private AnchorRepository anchorRepository;
@@ -26,14 +26,14 @@ public class AnchorBean implements AnchorFacade {
 
 	public AnchorDto create(AnchorDto anchor) {
 		Anchor anchorEntity = new Anchor();
+		anchorEntity.setShortId(anchor.getShortId());
+		anchorEntity.setLongId(anchor.getLongId());
 		anchorEntity.setName(anchor.getName());
 		anchorEntity.setX(anchor.getX());
 		anchorEntity.setY(anchor.getY());
-		anchorEntity.setShortId(anchor.getShortId());
-		anchorEntity.setLongId(anchor.getLongId());
 
 		if (anchor.getFloorId() != null) {
-			setFloor(anchor, anchorEntity);
+			super.setFloor(anchor, anchorEntity);
 		}
 		anchorRepository.save(anchorEntity);
 		return new AnchorDto(anchorEntity);
@@ -49,7 +49,7 @@ public class AnchorBean implements AnchorFacade {
 			anchorEntity.setVerified(anchor.getVerified());
 
 			if (anchor.getFloorId() != null) {
-				setFloor(anchor, anchorEntity);
+				super.setFloor(anchor, anchorEntity);
 			} else {
 				anchorEntity.setFloor(null);
 			}
@@ -73,14 +73,5 @@ public class AnchorBean implements AnchorFacade {
 			return Response.status(HttpStatus.SC_NO_CONTENT).build();
 		}
 		throw new EntityNotFoundException();
-	}
-
-	private void setFloor(AnchorDto anchor, Anchor anchorEntity) {
-		Optional<Floor> floor = floorRepository.findById(anchor.getFloorId());
-		if (floor.isPresent()) {
-			anchorEntity.setFloor(floor.get());
-		} else {
-			throw new EntityNotFoundException();
-		}
 	}
 }

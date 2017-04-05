@@ -13,7 +13,7 @@ import java.util.Date;
 @Getter
 @Setter
 @EntityListeners(AuditEntityListener.class)
-class TrackedEntity {
+abstract class TrackedEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;

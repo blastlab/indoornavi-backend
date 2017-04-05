@@ -17,8 +17,8 @@ public interface FloorFacade {
 	@POST
 	@ApiOperation(value = "create floor", response = FloorDto.class)
 	@ApiResponses({
-		@ApiResponse(code = 404, message = "building id doesn't exist or building id empty"),
-		@ApiResponse(code = 400, message = "level and building id must be unique")
+		@ApiResponse(code = 404, message = "Building id does not exist or building id empty"),
+		@ApiResponse(code = 400, message = "Level and building id must be unique")
 	})
 	FloorDto create(@ApiParam(value = "floor", required = true) @Valid FloorDto floor);
 
@@ -26,7 +26,7 @@ public interface FloorFacade {
 	@Path("/{id: \\d+}")
 	@ApiOperation(value = "update floor", response = FloorDto.class)
 	@ApiResponses({
-		@ApiResponse(code = 404, message = "building id doesn't exist or building id empty")
+		@ApiResponse(code = 404, message = "Building id does not exist or building id empty")
 	})
 	FloorDto update(@ApiParam(value = "id", required = true) @PathParam("id") @Valid @NotNull Long id,
 	                       @ApiParam(value = "floor", required = true) @Valid FloorDto floor);
@@ -35,8 +35,8 @@ public interface FloorFacade {
 	@Path("/{id: \\d+}")
 	@ApiOperation(value = "delete floor by id", response = Response.class)
 	@ApiResponses({
-		@ApiResponse(code = 404, message = "floor with given id doesn't exist"),
-		@ApiResponse(code = 204, message = "deleted successfully but there is no new information to return")
+		@ApiResponse(code = 404, message = "Floor with given id does not exist"),
+		@ApiResponse(code = 204, message = "Deleted successfully but there is no new information to return")
 	})
 	Response delete(@PathParam("id") @ApiParam(value = "floor id", required = true) @Valid @NotNull Long id);
 }
