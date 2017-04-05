@@ -8,6 +8,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
+import java.util.List;
 
 @Path("/floors")
 @Api("/floors")
@@ -30,6 +31,15 @@ public interface FloorFacade {
 	})
 	FloorDto update(@ApiParam(value = "id", required = true) @PathParam("id") @Valid @NotNull Long id,
 	                       @ApiParam(value = "floor", required = true) @Valid FloorDto floor);
+
+	@PUT
+	@Path("/")
+	@ApiOperation(value = "update floors levels", response = FloorDto.class, responseContainer = "list")
+	@ApiResponses({
+		@ApiResponse(code = 400, message = "validation failed"),
+		@ApiResponse(code = 404, message = "one of the floors doesn't exist")
+	})
+	List<FloorDto> updateLevels(@ApiParam(value = "floors", required = true) @Valid List<FloorDto> floors) throws Exception;
 
 	@DELETE
 	@Path("/{id: \\d+}")
