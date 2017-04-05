@@ -5,29 +5,16 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
 
 @Entity
 @Getter
 @Setter
-public class Anchor extends TrackedEntity {
-
-	private String name;
-
-	@Column(unique=true)
-	private int shortId;
-
-	@Column(unique=true)
-	private long longId;
+public class Anchor extends Device {
 
 	private Double x;
 
 	private Double y;
-
-	private Boolean verified = false;
-
-	@ManyToOne
-	private Floor floor;
 
 	@PostPersist
 	@PostUpdate
