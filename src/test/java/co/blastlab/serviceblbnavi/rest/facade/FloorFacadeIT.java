@@ -73,7 +73,7 @@ public class FloorFacadeIT extends BaseIT {
 			.extract()
 			.as(DbViolationResponse.class);
 		assertThat(dbViolationResponse.getError(), is(DB_VALIDATION_ERROR_NAME));
-		assertThat(dbViolationResponse.getMessage(), is("You can't have more than one floor with the same level"));
+		assertThat(dbViolationResponse.getMessage(), is("You can not have more than one floor with the same level"));
 	}
 
 	@Test
@@ -131,7 +131,7 @@ public class FloorFacadeIT extends BaseIT {
 			.extract()
 			.as(DbViolationResponse.class);
 		assertThat(dbViolationResponse.getError(), is(DB_VALIDATION_ERROR_NAME));
-		assertThat(dbViolationResponse.getMessage(), is("You can't have more than one floor with the same level"));
+		assertThat(dbViolationResponse.getMessage(), is("You can not have more than one floor with the same level"));
 	}
 
 	@Test
