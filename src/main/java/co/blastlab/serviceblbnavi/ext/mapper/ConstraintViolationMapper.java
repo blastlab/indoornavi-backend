@@ -1,5 +1,6 @@
 package co.blastlab.serviceblbnavi.ext.mapper;
 
+import co.blastlab.serviceblbnavi.ext.mapper.accessory.MessagePack;
 import co.blastlab.serviceblbnavi.ext.mapper.content.DbConstraintViolationContent;
 
 import javax.ejb.EJBTransactionRolledbackException;
@@ -15,9 +16,9 @@ public class ConstraintViolationMapper implements ExceptionMapper<EJBTransaction
 	@Override
 	public Response toResponse(EJBTransactionRolledbackException exception) {
 
-		String message = retrieveMessageByConstraintName(exception);
+		MessagePack messagePack = retrieveMessageByConstraintName(exception);
 
 		return Response.status(Response.Status.BAD_REQUEST)
-			.entity(new DbConstraintViolationContent(message)).build();
+			.entity(new DbConstraintViolationContent(messagePack)).build();
 	}
 }

@@ -17,6 +17,8 @@ public class FloorFacadeIT extends BaseIT {
 	private static final String FLOOR_PATH_WITH_ID = "/floors/{id}";
 
 	private static final String NAME_FLOOR = "Piętro $ \" \\ ążśźęćółń ĄŻŚŹĘĆŃÓŁ `~!@#%^&*()-_=+{}[]:;'|><,.?";
+	private static final String CONSTRAINT_MESSAGE_001 = "You can not have more than one floor with the same level";
+	private static final String CONSTRAINT_CODE_001 = "DB_001";
 
 	@Override
 	public ImmutableList<String> getAdditionalLabels() {
@@ -73,7 +75,8 @@ public class FloorFacadeIT extends BaseIT {
 			.extract()
 			.as(DbViolationResponse.class);
 		assertThat(dbViolationResponse.getError(), is(DB_VALIDATION_ERROR_NAME));
-		assertThat(dbViolationResponse.getMessage(), is("You can not have more than one floor with the same level"));
+		assertThat(dbViolationResponse.getMessage(), is(CONSTRAINT_MESSAGE_001));
+		assertThat(dbViolationResponse.getCode(), is(CONSTRAINT_CODE_001));
 	}
 
 	@Test
@@ -131,7 +134,8 @@ public class FloorFacadeIT extends BaseIT {
 			.extract()
 			.as(DbViolationResponse.class);
 		assertThat(dbViolationResponse.getError(), is(DB_VALIDATION_ERROR_NAME));
-		assertThat(dbViolationResponse.getMessage(), is("You can not have more than one floor with the same level"));
+		assertThat(dbViolationResponse.getMessage(), is(CONSTRAINT_MESSAGE_001));
+		assertThat(dbViolationResponse.getCode(), is(CONSTRAINT_CODE_001));
 	}
 
 	@Test

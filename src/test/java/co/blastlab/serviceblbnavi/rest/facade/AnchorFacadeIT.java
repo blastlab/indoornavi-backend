@@ -9,6 +9,7 @@ import org.junit.Test;
 
 import java.util.Arrays;
 
+import static co.blastlab.serviceblbnavi.rest.facade.TagFacadeIT.*;
 import static co.blastlab.serviceblbnavi.rest.facade.util.violation.ViolationMatcher.validViolation;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -152,15 +153,16 @@ public class AnchorFacadeIT extends BaseIT {
 			.setParameter("verified", ANCHOR_NOT_VERIFIED)
 			.build();
 
-		DbViolationResponse violationResponse = givenUser()
+		DbViolationResponse dbViolationResponse = givenUser()
 			.body(body)
 			.when().post(ANCHOR_PATH)
 			.then().statusCode(HttpStatus.SC_BAD_REQUEST)
 			.extract()
 			.as(DbViolationResponse.class);
 
-		assertThat(violationResponse.getError(), is(DB_VALIDATION_ERROR_NAME));
-		assertThat(violationResponse.getMessage(), is("Device with given longId already exists"));
+		assertThat(dbViolationResponse.getError(), is(DB_VALIDATION_ERROR_NAME));
+		assertThat(dbViolationResponse.getMessage(), is(CONSTRAINT_MESSAGE_003));
+		assertThat(dbViolationResponse.getCode(), is(CONSTRAINT_CODE_003));
 	}
 
 	@Test
@@ -168,22 +170,23 @@ public class AnchorFacadeIT extends BaseIT {
 		String body = new RequestBodyBuilder("Anchor.json")
 			.setParameter("shortId", ANCHOR_SHORT_ID_EXISTING)
 			.setParameter("longId", ANCHOR_LONG_ID_CREATING)
-			.setParameter("name", NAME)
+			.setParameter("name", "")
 			.setParameter("floorId", FLOOR_EXISTING)
 			.setParameter("x", X)
 			.setParameter("y", Y)
 			.setParameter("verified", ANCHOR_NOT_VERIFIED)
 			.build();
 
-		DbViolationResponse violationResponse = givenUser()
+		DbViolationResponse dbViolationResponse = givenUser()
 			.body(body)
 			.when().post(ANCHOR_PATH)
 			.then().statusCode(HttpStatus.SC_BAD_REQUEST)
 			.extract()
 			.as(DbViolationResponse.class);
 
-		assertThat(violationResponse.getError(), is(DB_VALIDATION_ERROR_NAME));
-		assertThat(violationResponse.getMessage(), is("Device with given shortId already exists"));
+		assertThat(dbViolationResponse.getError(), is(DB_VALIDATION_ERROR_NAME));
+		assertThat(dbViolationResponse.getMessage(), is(CONSTRAINT_MESSAGE_002));
+		assertThat(dbViolationResponse.getCode(), is(CONSTRAINT_CODE_002));
 	}
 
 	@Test

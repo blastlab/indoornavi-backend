@@ -3,24 +3,24 @@ package co.blastlab.serviceblbnavi.ext.mapper.accessory;
 
 public class MessageConstraintSeacher {
 
-	public static String retrieveMessageByConstraintName(Throwable exception){
+	public static MessagePack retrieveMessageByConstraintName(Throwable exception){
 		String constraintName = ConstraintSearcher.retrieveConstraintName(exception);
-		String message;
+		MessagePack code;
 
 		switch (constraintName){
 			case "unique_level_building_id":
-				message = "You can not have more than one floor with the same level";
+				code = MessagePack.DB_001;
 				break;
 			case "unique_shortId":
-				message = "Device with given shortId already exists";
+				code = MessagePack.DB_002;
 				break;
 			case "unique_longId":
-				message = "Device with given longId already exists";
+				code = MessagePack.DB_003;
 				break;
 			default:
-				message = "Unknown constraint violation exception";
+				code = MessagePack.DB_000;
 		}
 
-		return message;
+		return code;
 	}
 }
