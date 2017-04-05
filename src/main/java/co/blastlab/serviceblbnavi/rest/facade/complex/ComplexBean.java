@@ -11,6 +11,7 @@ import javax.persistence.EntityNotFoundException;
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Stateless
 public class ComplexBean implements ComplexFacade {
@@ -33,11 +34,11 @@ public class ComplexBean implements ComplexFacade {
 
 	@Override
 	public ComplexDto update(Long id, ComplexDto complex) {
-		Complex complexEntity = complexRepository.findBy(id);
-		if (complexEntity != null){
-			complexEntity.setName(complex.getName());
-			complexEntity = complexRepository.save(complexEntity);
-			return new ComplexDto(complexEntity);
+		Optional<Complex> complexEntity = complexRepository.findById(id);
+		if (complexEntity.isPresent()){
+			complexEntity.get().setName(complex.getName());
+			Complex complexDb = complexRepository.save(complexEntity.get());
+			return new ComplexDto(complexDb);
 		}
 		throw new EntityNotFoundException();
 	}
@@ -45,9 +46,9 @@ public class ComplexBean implements ComplexFacade {
 
 	@Override
 	public Response delete(Long id) {
-		Complex complex = complexRepository.findBy(id);
-		if (complex != null) {
-			complexRepository.remove(complex);
+		Optional<Complex> complex = complexRepository.findById(id);
+		if (complex.isPresent()) {
+			complexRepository.remove(complex.get());
 			return Response.status(HttpStatus.SC_NO_CONTENT).build();
 		}
 		throw new EntityNotFoundException();
@@ -65,9 +66,9 @@ public class ComplexBean implements ComplexFacade {
 
 	@Override
 	public ComplexDto.WithBuildings findWithBuildings(Long id) {
-		Complex complexEntity = complexRepository.findBy(id);
-		if (complexEntity != null) {
-			return new ComplexDto.WithBuildings(complexEntity);
+		Optional<Complex> complexEntity = complexRepository.findById(id);
+		if (complexEntity.isPresent()) {
+			return new ComplexDto.WithBuildings(complexEntity.get());
 		}
 		throw new EntityNotFoundException();
 	}
