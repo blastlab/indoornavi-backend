@@ -36,8 +36,8 @@ public interface FloorFacade {
 	@Path("/")
 	@ApiOperation(value = "update floors levels", response = FloorDto.class, responseContainer = "list")
 	@ApiResponses({
-		@ApiResponse(code = 400, message = "validation failed"),
-		@ApiResponse(code = 404, message = "one of the floors doesn't exist")
+		@ApiResponse(code = 400, message = "Validation failed"),
+		@ApiResponse(code = 404, message = "One of the floors does not exist")
 	})
 	List<FloorDto> updateLevels(@ApiParam(value = "floors", required = true) @Valid List<FloorDto> floors) throws Exception;
 
