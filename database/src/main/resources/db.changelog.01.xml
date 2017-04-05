@@ -150,5 +150,13 @@
 	<changeSet author="jsmol (generated)" id="issue-81-18">
 		<dropNotNullConstraint columnDataType="double" columnName="y" tableName="Anchor"/>
 	</changeSet>
-	
+	<changeSet author="jsmol (generated)" id="issue-81-19">
+		<addColumn tableName="Device">
+			<column name="verified" type="boolean"/>
+		</addColumn>
+	</changeSet>
+	<changeSet author="jsmol (generated)" id="issue-81-20">
+		<dropColumn columnName="verified" tableName="anchor"/>
+	</changeSet>
+
 </databaseChangeLog>

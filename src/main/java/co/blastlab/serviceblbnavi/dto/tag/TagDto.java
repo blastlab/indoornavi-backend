@@ -17,5 +17,6 @@ public class TagDto extends DeviceDto {
 		this.setLongId(tag.getLongId());
 		this.setName(tag.getName());
 		this.setFloorId(tag.getFloor() != null ?  tag.getFloor().getId() : null);
+		this.setVerified(tag.getVerified());
 	}
 }

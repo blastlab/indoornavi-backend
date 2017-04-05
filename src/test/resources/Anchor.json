@@ -1,9 +1,9 @@
 {
+	"shortId": 44384,
+	"longId": 16777216,
 	"name": "",
-	"shortId": "",
-	"longId": "",
-	"x": "",
-	"y": "",
-	"floorId": "",
-	"verified": ""
+	"floorId": null,
+	"x": null,
+	"y": null,
+	"verified": false
 }

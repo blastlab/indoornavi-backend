@@ -9,7 +9,7 @@ public class MessageConstraintSeacher {
 
 		switch (constraintName){
 			case "unique_level_building_id":
-				message = "You can't have more than one floor with the same level";
+				message = "You can not have more than one floor with the same level";
 				break;
 			case "unique_shortId":
 				message = "Device with given shortId already exists";

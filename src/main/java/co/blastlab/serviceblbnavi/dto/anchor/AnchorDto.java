@@ -2,24 +2,20 @@ package co.blastlab.serviceblbnavi.dto.anchor;
 
 import co.blastlab.serviceblbnavi.domain.Anchor;
 import co.blastlab.serviceblbnavi.dto.device.DeviceDto;
-import lombok.*;
-
-import javax.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
 public class AnchorDto extends DeviceDto {
 
 	private Double x;
 
 	private Double y;
-
-	@NotNull
-	@ApiModelProperty(example = "false")
-	private Boolean verified;
 
 	public AnchorDto(Anchor anchor) {
 		this.setId(anchor.getId());
@@ -29,6 +25,6 @@ public class AnchorDto extends DeviceDto {
 		this.setFloorId(anchor.getFloor() != null ? anchor.getFloor().getId() : null);
 		this.setX(anchor.getX());
 		this.setY(anchor.getY());
-		this.verified = anchor.getVerified();
+		this.setVerified(anchor.getVerified());
 	}
 }

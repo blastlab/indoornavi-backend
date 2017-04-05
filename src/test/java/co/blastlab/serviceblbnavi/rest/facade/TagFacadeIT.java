@@ -5,7 +5,6 @@ import co.blastlab.serviceblbnavi.rest.facade.util.violation.DbViolationResponse
 import co.blastlab.serviceblbnavi.rest.facade.util.violation.ViolationResponse;
 import com.google.common.collect.ImmutableList;
 import org.apache.http.HttpStatus;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -26,9 +25,11 @@ public class TagFacadeIT extends BaseIT {
 	private static final long LONG_ID_CREATING = 10535714511L;
 
 	private static final int SHORT_ID_FOR_TAG_ID_4 = 10151;
-	private static final long LONG_ID_FOR_TAG_ID_4 = 151232323L;
+	private static final int LONG_ID_FOR_TAG_ID_4 = 151232323;
 	private static final int FLOOR_FOR_TAG_ID_4 = 2;
 	private static final int TAG_ID_4 = 4;
+	private static final boolean VERIFIED_FALSE = false;
+	private static final boolean VERIFIED_TRUE = true;
 
 	@Override
 	public ImmutableList<String> getAdditionalLabels() {
@@ -42,6 +43,7 @@ public class TagFacadeIT extends BaseIT {
 			.setParameter("longId", LONG_ID_CREATING)
 			.setParameter("name", NAME_CREATING)
 			.setParameter("floorId", FLOOR_FOR_TAG_ID_4)
+			.setParameter("verified", VERIFIED_FALSE)
 			.build();
 
 		givenUser()
@@ -52,11 +54,11 @@ public class TagFacadeIT extends BaseIT {
 				"shortId", equalTo(SHORT_ID_CREATING),
 				"longId", equalTo(LONG_ID_CREATING),
 				"name", equalTo(NAME_CREATING),
-				"floorId", equalTo(FLOOR_FOR_TAG_ID_4)
+				"floorId", equalTo(FLOOR_FOR_TAG_ID_4),
+				"verified", equalTo(VERIFIED_FALSE)
 			);
 	}
 
-	@Ignore
 	@Test
 	public void shouldCreateTagWithoutNameAndFloor() {
 		String body = new RequestBodyBuilder("Tag.json")
@@ -64,6 +66,7 @@ public class TagFacadeIT extends BaseIT {
 			.setParameter("longId", LONG_ID_CREATING)
 			.setParameter("name", "")
 			.setParameter("floorId", null)
+			.setParameter("verified", VERIFIED_FALSE)
 			.build();
 
 		givenUser()
@@ -74,7 +77,8 @@ public class TagFacadeIT extends BaseIT {
 				"shortId", equalTo(SHORT_ID_CREATING),
 				"longId", equalTo(LONG_ID_CREATING),
 				"name", equalTo(""),
-				"floorId", equalTo(null)
+				"floorId", equalTo(null),
+				"verified", equalTo(VERIFIED_FALSE)
 			);
 	}
 
@@ -84,7 +88,6 @@ public class TagFacadeIT extends BaseIT {
 		String body = new RequestBodyBuilder("Tag.json")
 			.setParameter("shortId", SHORT_ID_CREATING)
 			.setParameter("longId", LONG_ID_CREATING)
-			.setParameter("name", NAME_CREATING)
 			.setParameter("floorId", nonexistingFloorId)
 			.build();
 
@@ -138,6 +141,7 @@ public class TagFacadeIT extends BaseIT {
 		String body = new RequestBodyBuilder("Tag.json")
 			.setParameter("name", NAME_CREATING)
 			.setParameter("floorId", existingFloorId)
+			.setParameter("verified", VERIFIED_TRUE)
 			.build();
 
 		givenUser()
@@ -149,8 +153,29 @@ public class TagFacadeIT extends BaseIT {
 				"shortId", equalTo(SHORT_ID_FOR_TAG_ID_4),
 				"longId", equalTo(151232323),
 				"name", equalTo(NAME_CREATING),
-				"floorId", equalTo(existingFloorId)
+				"floorId", equalTo(existingFloorId),
+				"verified", equalTo(VERIFIED_TRUE)
 			);
+	}
+
+	@Test
+	public void shouldNotUpdateNonexistingTag(){
+		Integer nonexistingTagId = 9999;
+		givenUser()
+			.pathParam("id", nonexistingTagId)
+			.body(new RequestBodyBuilder("Tag.json").build())
+			.when().put(TAG_PATH_WITH_ID)
+			.then().statusCode(HttpStatus.SC_NOT_FOUND);
+	}
+
+	@Test
+	public void shouldNotUpdateExistingAnchor(){
+		Integer existingAnchorId = 1;
+		givenUser()
+			.pathParam("id", existingAnchorId)
+			.body(new RequestBodyBuilder("Tag.json").build())
+			.when().put(TAG_PATH_WITH_ID)
+			.then().statusCode(HttpStatus.SC_NOT_FOUND);
 	}
 
 	@Test
@@ -170,11 +195,11 @@ public class TagFacadeIT extends BaseIT {
 				"shortId", equalTo(10404),
 				"longId", equalTo(45454545),
 				"name", equalTo(NAME_CREATING),
-				"floorId", equalTo(2)
+				"floorId", equalTo(2),
+				"verified", equalTo(VERIFIED_FALSE)
 			);
 	}
 
-	@Ignore //TODO:
 	@Test
 	public void shouldRemoveFloorIdAndNameWhileUpdatingTag() {
 		Integer updatedTagId = 4;
@@ -192,7 +217,8 @@ public class TagFacadeIT extends BaseIT {
 				"shortId", equalTo(SHORT_ID_FOR_TAG_ID_4),
 				"longId", equalTo(LONG_ID_FOR_TAG_ID_4),
 				"name", equalTo(""),
-				"floorId", equalTo(null)
+				"floorId", equalTo(null),
+				"verified", equalTo(VERIFIED_FALSE)
 			);
 	}
 
@@ -207,26 +233,6 @@ public class TagFacadeIT extends BaseIT {
 		givenUser()
 			.pathParam("id", TAG_ID_4)
 			.body(body)
-			.when().put(TAG_PATH_WITH_ID)
-			.then().statusCode(HttpStatus.SC_NOT_FOUND);
-	}
-
-	@Test
-	public void shouldNotUpdateNonexistingTag(){
-		Integer nonexistingTagId = 9999;
-		givenUser()
-			.pathParam("id", nonexistingTagId)
-			.body(new RequestBodyBuilder("Tag.json").build())
-			.when().put(TAG_PATH_WITH_ID)
-			.then().statusCode(HttpStatus.SC_NOT_FOUND);
-	}
-
-	@Test
-	public void shouldNotUpdateExistingAnchor(){
-		Integer existingAnchorId = 1;
-		givenUser()
-			.pathParam("id", existingAnchorId)
-			.body(new RequestBodyBuilder("Tag.json").build())
 			.when().put(TAG_PATH_WITH_ID)
 			.then().statusCode(HttpStatus.SC_NOT_FOUND);
 	}
@@ -267,7 +273,8 @@ public class TagFacadeIT extends BaseIT {
 			"shortId", equalTo(Arrays.asList(SHORT_ID_FOR_TAG_ID_4, 10404, 102102, 103103)),
 			"longId", equalTo(Arrays.asList(Integer.valueOf(Long.toString(LONG_ID_FOR_TAG_ID_4)), 45454545, 102102102, 103103103)),
 			"name", equalTo(Arrays.asList("TagName", "", "Tag102", "")),
-			"floorId", equalTo(Arrays.asList(2, null, null, 3))
+			"floorId", equalTo(Arrays.asList(2, null, null, 3)),
+			"verified", equalTo(Arrays.asList(true, false, false, false))
 		);
 	}
 
@@ -281,11 +288,12 @@ public class TagFacadeIT extends BaseIT {
 			.as(ViolationResponse.class);
 
 		assertThat(violationResponse.getError(), is(VALIDATION_ERROR_NAME));
-		assertThat(violationResponse.getViolations().size(), is(2));
+		assertThat(violationResponse.getViolations().size(), is(3));
 		assertThat(violationResponse.getViolations(),
 			containsInAnyOrder(
 				validViolation("shortId", "may not be null"),
-				validViolation("longId", "may not be null")
+				validViolation("longId", "may not be null"),
+				validViolation("verified", "may not be null")
 			)
 		);
 	}
@@ -301,11 +309,12 @@ public class TagFacadeIT extends BaseIT {
 			.as(ViolationResponse.class);
 
 		assertThat(violationResponse.getError(), is(VALIDATION_ERROR_NAME));
-		assertThat(violationResponse.getViolations().size(), is(2));
+		assertThat(violationResponse.getViolations().size(), is(3));
 		assertThat(violationResponse.getViolations(),
 			containsInAnyOrder(
 				validViolation("shortId", "may not be null"),
-				validViolation("longId", "may not be null")
+				validViolation("longId", "may not be null"),
+				validViolation("verified", "may not be null")
 			)
 		);
 	}
