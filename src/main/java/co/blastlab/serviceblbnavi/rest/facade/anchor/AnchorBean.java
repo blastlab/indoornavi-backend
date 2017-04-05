@@ -13,6 +13,7 @@ import javax.persistence.EntityNotFoundException;
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Stateless
 public class AnchorBean implements AnchorFacade {
@@ -32,35 +33,23 @@ public class AnchorBean implements AnchorFacade {
 		anchorEntity.setLongId(anchor.getLongId());
 
 		if (anchor.getFloorId() != null) {
-			Floor floor = floorRepository.findBy(anchor.getFloorId());
-			if (floor != null) {
-				anchorEntity.setFloor(floor);
-			} else {
-				throw new EntityNotFoundException();
-			}
+			setFloor(anchor, anchorEntity);
 		}
-
 		anchorRepository.save(anchorEntity);
 		return new AnchorDto(anchorEntity);
 	}
 
 	public AnchorDto update(Long id, AnchorDto anchor) {
-		Anchor anchorEntity = anchorRepository.findBy(id);
-		if (anchorEntity != null) {
+		Optional<Anchor> anchorOptional = anchorRepository.findById(id);
+		if (anchorOptional.isPresent()) {
+			Anchor anchorEntity = anchorOptional.get();
 			anchorEntity.setX(anchor.getX());
 			anchorEntity.setY(anchor.getY());
 			anchorEntity.setName(anchor.getName());
 			anchorEntity.setVerified(anchor.getVerified());
-			anchorEntity.setLongId(anchor.getLongId());
-			anchorEntity.setShortId(anchor.getShortId());
 
 			if (anchor.getFloorId() != null) {
-				Floor floor = floorRepository.findBy(anchor.getFloorId());
-				if (floor != null) {
-					anchorEntity.setFloor(floor);
-				} else {
-					throw new EntityNotFoundException();
-				}
+				setFloor(anchor, anchorEntity);
 			} else {
 				anchorEntity.setFloor(null);
 			}
@@ -78,13 +67,20 @@ public class AnchorBean implements AnchorFacade {
 	}
 
 	public Response delete(Long id) {
-		if (id != null) {
-			Anchor anchor = anchorRepository.findBy(id);
-			if (anchor != null) {
-				anchorRepository.remove(anchor);
-				return Response.status(HttpStatus.SC_NO_CONTENT).build();
-			}
+		Optional<Anchor> anchor = anchorRepository.findById(id);
+		if (anchor.isPresent()) {
+			anchorRepository.remove(anchor.get());
+			return Response.status(HttpStatus.SC_NO_CONTENT).build();
 		}
 		throw new EntityNotFoundException();
+	}
+
+	private void setFloor(AnchorDto anchor, Anchor anchorEntity) {
+		Optional<Floor> floor = floorRepository.findById(anchor.getFloorId());
+		if (floor.isPresent()) {
+			anchorEntity.setFloor(floor.get());
+		} else {
+			throw new EntityNotFoundException();
+		}
 	}
 }
