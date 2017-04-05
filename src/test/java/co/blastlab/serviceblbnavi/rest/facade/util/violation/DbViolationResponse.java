@@ -13,4 +13,5 @@ public class DbViolationResponse {
 
 	private String error;
 	private String message;
+	private String code;
 }

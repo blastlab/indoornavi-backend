@@ -31,6 +31,11 @@ public class TagFacadeIT extends BaseIT {
 	private static final boolean VERIFIED_FALSE = false;
 	private static final boolean VERIFIED_TRUE = true;
 
+	static final String CONSTRAINT_MESSAGE_002 = "Device with given shortId already exists";
+	static final String CONSTRAINT_CODE_002 = "DB_002";
+	static final String CONSTRAINT_MESSAGE_003 = "Device with given longId already exists";
+	static final String CONSTRAINT_CODE_003 = "DB_003";
+
 	@Override
 	public ImmutableList<String> getAdditionalLabels() {
 		return ImmutableList.of("Tag", "Device", "Floor", "Building");
@@ -102,7 +107,7 @@ public class TagFacadeIT extends BaseIT {
 		String body = new RequestBodyBuilder("Tag.json")
 			.setParameter("shortId", SHORT_ID_CREATING)
 			.setParameter("longId", LONG_ID_FOR_TAG_ID_4)
-			.setParameter("floorId", 3)
+			.setParameter("floorId", 2)
 			.build();
 
 		DbViolationResponse dbViolationResponse = givenUser()
@@ -113,7 +118,8 @@ public class TagFacadeIT extends BaseIT {
 			.as(DbViolationResponse.class);
 
 		assertThat(dbViolationResponse.getError(), is(DB_VALIDATION_ERROR_NAME));
-		assertThat(dbViolationResponse.getMessage(), is("Device with given longId already exists"));
+		assertThat(dbViolationResponse.getMessage(), is(CONSTRAINT_MESSAGE_003));
+		assertThat(dbViolationResponse.getCode(), is(CONSTRAINT_CODE_003));
 	}
 
 	@Test
@@ -121,7 +127,7 @@ public class TagFacadeIT extends BaseIT {
 		String body = new RequestBodyBuilder("Tag.json")
 			.setParameter("shortId", SHORT_ID_FOR_TAG_ID_4)
 			.setParameter("longId", LONG_ID_CREATING)
-			.setParameter("floorId", 3)
+			.setParameter("floorId", 1)
 			.build();
 
 		DbViolationResponse dbViolationResponse = givenUser()
@@ -132,7 +138,8 @@ public class TagFacadeIT extends BaseIT {
 			.as(DbViolationResponse.class);
 
 		assertThat(dbViolationResponse.getError(), is(DB_VALIDATION_ERROR_NAME));
-		assertThat(dbViolationResponse.getMessage(), is("Device with given shortId already exists"));
+		assertThat(dbViolationResponse.getMessage(), is(CONSTRAINT_MESSAGE_002));
+		assertThat(dbViolationResponse.getCode(), is(CONSTRAINT_CODE_002));
 	}
 
 	@Test

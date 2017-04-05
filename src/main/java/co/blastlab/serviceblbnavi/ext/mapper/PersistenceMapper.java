@@ -1,5 +1,6 @@
 package co.blastlab.serviceblbnavi.ext.mapper;
 
+import co.blastlab.serviceblbnavi.ext.mapper.accessory.MessagePack;
 import co.blastlab.serviceblbnavi.ext.mapper.content.DbConstraintViolationContent;
 import org.hibernate.exception.ConstraintViolationException;
 
@@ -25,9 +26,9 @@ public class PersistenceMapper implements ExceptionMapper<PersistenceException> 
 			status = Response.Status.CONFLICT;
 		}  else if (exception.getCause() instanceof ConstraintViolationException){
 			status = Response.Status.BAD_REQUEST;
-			String message = retrieveMessageByConstraintName(exception);
+			MessagePack messagePack = retrieveMessageByConstraintName(exception);
 
-			return Response.status(status).entity(new DbConstraintViolationContent(message)).build();
+			return Response.status(status).entity(new DbConstraintViolationContent(messagePack)).build();
 		} else {
 			status = Response.Status.INTERNAL_SERVER_ERROR;
 		}
