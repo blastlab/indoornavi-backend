@@ -25,13 +25,13 @@
 	</changeSet>
 
 	<changeSet id="Device" author="jsmol" context="test" runOnChange="true" labels="Device" runAlways="true">
-		<loadUpdateData tableName="device" file="test/Device.csv" primaryKey="id"/>
+		<loadUpdateData tableName="device" file="test/Device.csv" primaryKey="id">
+			<column name="verified" type="boolean" />
+		</loadUpdateData>
 	</changeSet>
 
 	<changeSet id="Anchor" author="pkuzmicki" context="test" runOnChange="true" labels="Anchor" runAlways="true">
-		<loadUpdateData tableName="anchor" file="test/Anchor.csv" primaryKey="id">
-			<column name="verified" type="boolean" />
-		</loadUpdateData>
+		<loadUpdateData tableName="anchor" file="test/Anchor.csv" primaryKey="id"/>
 	</changeSet>
 
 	<changeSet id="Tag" author="jsmol" context="test" runOnChange="true" labels="Tag" runAlways="true">

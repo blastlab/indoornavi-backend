@@ -2,5 +2,6 @@
 	"shortId": 10151,
 	"longId": 151232323,
 	"name": "",
-	"floorId": null
+	"floorId": null,
+	"verified": false
 }

@@ -13,6 +13,7 @@ import javax.persistence.EntityNotFoundException;
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Stateless
 public class TagBean implements TagFacade {
@@ -29,35 +30,28 @@ public class TagBean implements TagFacade {
 		tagEntity.setShortId(tag.getShortId());
 		tagEntity.setLongId(tag.getLongId());
 		tagEntity.setName(tag.getName());
-		if (tag.getFloorId() != null) {
-			Floor floor = floorRepository.findBy(tag.getFloorId());
-			if (floor != null) {
-				tagEntity.setFloor(floor);
-			} else {
-				throw new EntityNotFoundException();
-			}
-		}
+		tagEntity.setVerified(tag.getVerified());
 
+		if (tag.getFloorId() != null) {
+			setFloor(tag, tagEntity);
+		}
 		tagEntity = tagRepository.save(tagEntity);
 		return new TagDto(tagEntity);
 	}
 
 	@Override
 	public TagDto update(Long id, TagDto tag) {
-		Tag tagEntity = tagRepository.findBy(id);
-		if (tagEntity != null){
+		Optional<Tag> tagOptional = tagRepository.findById(id);
+		if (tagOptional.isPresent()){
+			Tag tagEntity = tagOptional.get();
 			tagEntity.setName(tag.getName());
+			tagEntity.setVerified(tag.getVerified());
+
 			if (tag.getFloorId() != null) {
-				Floor floor = floorRepository.findBy(tag.getFloorId());
-				if (floor != null) {
-					tagEntity.setFloor(floor);
-				} else {
-					throw new EntityNotFoundException();
-				}
+				setFloor(tag, tagEntity);
 			} else {
 				tagEntity.setFloor(null);
 			}
-
 			tagRepository.save(tagEntity);
 			return new TagDto(tagEntity);
 		}
@@ -74,13 +68,20 @@ public class TagBean implements TagFacade {
 
 	@Override
 	public Response delete(Long id) {
-		if (id != null) {
-			Tag tag = tagRepository.findBy(id);
-			if (tag != null) {
-				tagRepository.remove(tag);
-				return Response.status(HttpStatus.SC_NO_CONTENT).build();
-			}
+		Optional<Tag> tag = tagRepository.findById(id);
+		if (tag.isPresent()) {
+			tagRepository.remove(tag.get());
+			return Response.status(HttpStatus.SC_NO_CONTENT).build();
 		}
 		throw new EntityNotFoundException();
+	}
+
+	private void setFloor(TagDto tag, Tag tagEntity) {
+		Optional<Floor> floor = floorRepository.findById(tag.getFloorId());
+		if (floor.isPresent()) {
+			tagEntity.setFloor(floor.get());
+		} else {
+			throw new EntityNotFoundException();
+		}
 	}
 }

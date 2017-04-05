@@ -13,6 +13,4 @@ public class Anchor extends Device {
 	private Double x;
 
 	private Double y;
-
-	private Boolean verified = false;
 }

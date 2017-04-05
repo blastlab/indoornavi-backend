@@ -5,7 +5,6 @@ import co.blastlab.serviceblbnavi.rest.facade.util.violation.DbViolationResponse
 import co.blastlab.serviceblbnavi.rest.facade.util.violation.ViolationResponse;
 import com.google.common.collect.ImmutableList;
 import org.apache.http.HttpStatus;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -31,7 +30,9 @@ public class AnchorFacadeIT extends BaseIT {
 	private static final int ANCHOR_LONG_ID_EXISTING = 16777216;
 	private static final int ANCHOR_SHORT_ID_CREATING = 1345;
 	private static final long ANCHOR_LONG_ID_CREATING = 9753571457L;
+
 	private static final boolean ANCHOR_NOT_VERIFIED = false;
+	private static final boolean ANCHOR_VERIFIED = true;
 
 	@Override
 	public ImmutableList<String> getAdditionalLabels() {
@@ -66,14 +67,13 @@ public class AnchorFacadeIT extends BaseIT {
 			);
 	}
 
-	@Ignore  //TODO: Problem with RequestBodyBuilder. This case works correctly in Swagger.
 	@Test
 	public void shouldCreateNewAnchorWithoutNameAndFloorIdAndCoordinates() {
 		String body = new RequestBodyBuilder("Anchor.json")
 			.setParameter("shortId", ANCHOR_SHORT_ID_CREATING)
 			.setParameter("longId", ANCHOR_LONG_ID_CREATING)
-			.setParameter("floorId", null)
 			.setParameter("name", "")
+			.setParameter("floorId", null)
 			.setParameter("x", null)
 			.setParameter("y", null)
 			.setParameter("verified", ANCHOR_NOT_VERIFIED)
@@ -84,7 +84,6 @@ public class AnchorFacadeIT extends BaseIT {
 			.when().post(ANCHOR_PATH)
 			.then().statusCode(HttpStatus.SC_OK)
 			.body(
-				"name", equalTo(NAME),
 				"shortId", equalTo(ANCHOR_SHORT_ID_CREATING),
 				"longId", equalTo(ANCHOR_LONG_ID_CREATING),
 				"name", equalTo(""),
@@ -102,32 +101,6 @@ public class AnchorFacadeIT extends BaseIT {
 			.setParameter("longId", ANCHOR_LONG_ID_CREATING)
 			.setParameter("name", "")
 			.setParameter("floorId", FLOOR_EXISTING)
-			.setParameter("x", X)
-			.setParameter("y", Y)
-			.setParameter("verified", ANCHOR_NOT_VERIFIED)
-			.build();
-
-		givenUser()
-			.body(body)
-			.when().post(ANCHOR_PATH)
-			.then().statusCode(HttpStatus.SC_OK)
-			.body(
-				"shortId", equalTo(ANCHOR_SHORT_ID_CREATING),
-				"longId", equalTo(ANCHOR_LONG_ID_CREATING),
-				"name", equalTo(""),
-				"floorId", equalTo(FLOOR_EXISTING),
-				"x", equalTo(X),
-				"y", equalTo(Y),
-				"verified", equalTo(ANCHOR_NOT_VERIFIED)
-			);
-	}
-
-	@Test
-	public void shouldCreateNewAnchorWithoutNameAndFloor() {
-		String body = new RequestBodyBuilder("Anchor.json")
-			.setParameter("shortId", ANCHOR_SHORT_ID_CREATING)
-			.setParameter("longId", ANCHOR_LONG_ID_CREATING)
-			.setParameter("floorId", null)
 			.setParameter("x", X)
 			.setParameter("y", Y)
 			.setParameter("verified", ANCHOR_NOT_VERIFIED)
@@ -222,7 +195,7 @@ public class AnchorFacadeIT extends BaseIT {
 			.setParameter("floorId", FLOOR_EXISTING)
 			.setParameter("x", X)
 			.setParameter("y", Y)
-			.setParameter("verified", ANCHOR_NOT_VERIFIED)
+			.setParameter("verified", ANCHOR_VERIFIED)
 			.build();
 
 		givenUser()
@@ -237,131 +210,12 @@ public class AnchorFacadeIT extends BaseIT {
 				"floorId", equalTo(FLOOR_EXISTING),
 				"x", equalTo(X),
 				"y", equalTo(Y),
-				"verified", equalTo(ANCHOR_NOT_VERIFIED)
+				"verified", equalTo(ANCHOR_VERIFIED)
 			);
 	}
 
 	@Test
 	public void shouldNotUpdateNonexistingAnchor() {
-		String body = new RequestBodyBuilder("AnchorUpdating.json")
-			.setParameter("name", NAME)
-			.setParameter("x", X)
-			.setParameter("y", Y)
-			.setParameter("shortId", ANCHOR_SHORT_ID_EXISTING)
-			.setParameter("longId", ANCHOR_LONG_ID_EXISTING)
-			.setParameter("floorId", FLOOR_EXISTING)
-			.setParameter("verified", ANCHOR_NOT_VERIFIED)
-			.build();
-
-		givenUser()
-			.pathParam("id", ANCHOR_ID_NONEXISTING)
-			.body(body)
-			.when().put(ANCHOR_PATH_WITH_ID)
-			.then().statusCode(HttpStatus.SC_NOT_FOUND);
-	}
-
-	@Test
-	public void shouldAddFloorIdAndNameAndCoordinatesWhileUpdatingAnchor() {
-		Integer updatedAnchorId = 2;
-		String body = new RequestBodyBuilder("Anchor.json")
-			.setParameter("name", NAME)
-			.setParameter("floorId", FLOOR_EXISTING)
-			.setParameter("x", X)
-			.setParameter("y", Y)
-			.setParameter("verified", ANCHOR_NOT_VERIFIED)
-			.build();
-
-		givenUser()
-			.pathParam("id", 2)
-			.body(body)
-			.when().put(ANCHOR_PATH_WITH_ID)
-			.then().statusCode(HttpStatus.SC_OK)
-			.body(
-				"shortId", equalTo(40622),
-				"longId", equalTo(93170459),
-				"name", equalTo(NAME),
-				"floorId", equalTo(FLOOR_EXISTING),
-				"x", equalTo(X),
-				"y", equalTo(Y),
-				"verified", equalTo(ANCHOR_NOT_VERIFIED)
-			);
-	}
-
-
-
-	@Test
-	public void shouldAddFloorIdAndNameAndCoordinatesWhileUpdatingAnchor() {
-		Integer updatedAnchorId = 2;
-		String body = new RequestBodyBuilder("Anchor.json")
-			.setParameter("name", NAME)
-			.setParameter("floorId", FLOOR_EXISTING)
-			.setParameter("x", X)
-			.setParameter("y", Y)
-			.setParameter("verified", ANCHOR_NOT_VERIFIED)
-			.build();
-
-		givenUser()
-			.pathParam("id", 2)
-			.body(body)
-			.when().put(ANCHOR_PATH_WITH_ID)
-			.then().statusCode(HttpStatus.SC_OK)
-			.body(
-				"shortId", equalTo(40622),
-				"longId", equalTo(93170459),
-				"name", equalTo(NAME),
-				"floorId", equalTo(FLOOR_EXISTING),
-				"x", equalTo(X),
-				"y", equalTo(Y),
-				"verified", equalTo(ANCHOR_NOT_VERIFIED)
-			);
-	}
-
-	@Ignore
-	@Test
-	public void shouldRemoveFloorIdAndNameAndCoordinatesWhileUpdatingAnchor() {
-		String body = new RequestBodyBuilder("Anchor.json")
-			.setParameter("shortId", ANCHOR_SHORT_ID_EXISTING)
-			.setParameter("longId", ANCHOR_LONG_ID_EXISTING)
-			.setParameter("name", "")
-			.setParameter("floorId", null)
-			.setParameter("x", null)
-			.setParameter("y", null) //TODO set parameter floorId to null. It is possible in swagger but not in integration test.
-			.setParameter("verified", ANCHOR_NOT_VERIFIED)
-			.build();
-
-		givenUser()
-			.pathParam("id", ANCHOR_ID_FOR_UPDATE)
-			.body(body)
-			.when().put(ANCHOR_PATH_WITH_ID)
-			.then().statusCode(HttpStatus.SC_OK)
-			.body(
-				"shortId", equalTo(ANCHOR_SHORT_ID_EXISTING),
-				"longId", equalTo(ANCHOR_LONG_ID_EXISTING),
-				"name", equalTo(""),
-				"floorId", equalTo(null),
-				"x", equalTo(X),
-				"y", equalTo(Y),
-				"verified", equalTo(ANCHOR_NOT_VERIFIED)
-			);
-	}
-
-	@Test
-	public void shouldNotAddNonexistingFloorIdWhileUpdatingAnchor() {
-		Integer nonexistingFloorId = 9999;
-		String body = new RequestBodyBuilder("Anchor.json")
-			.setParameter("floorId", nonexistingFloorId)
-			.build();
-
-		givenUser()
-			.pathParam("id", ANCHOR_ID_FOR_UPDATE)
-			.body(body)
-			.when().put(ANCHOR_PATH_WITH_ID)
-			.then().statusCode(HttpStatus.SC_NOT_FOUND);
-
-	}
-
-	@Test
-	public void shouldNotUpdateNonexistingAnchor() {
 		String body = new RequestBodyBuilder("Anchor.json")
 			.setParameter("shortId", ANCHOR_SHORT_ID_EXISTING)
 			.setParameter("longId", ANCHOR_LONG_ID_EXISTING)
@@ -369,6 +223,7 @@ public class AnchorFacadeIT extends BaseIT {
 			.setParameter("floorId", FLOOR_EXISTING)
 			.setParameter("x", X)
 			.setParameter("y", Y)
+			.setParameter("verified", ANCHOR_NOT_VERIFIED)
 			.build();
 
 		givenUser()
@@ -386,6 +241,76 @@ public class AnchorFacadeIT extends BaseIT {
 			.body(new RequestBodyBuilder("Anchor.json").build())
 			.when().put(ANCHOR_PATH_WITH_ID)
 			.then().statusCode(HttpStatus.SC_NOT_FOUND);
+	}
+
+	@Test
+	public void shouldAddFloorIdAndNameAndCoordinatesWhileUpdatingAnchor() {
+		Integer updatedAnchorId = 2;
+		String body = new RequestBodyBuilder("Anchor.json")
+			.setParameter("name", NAME)
+			.setParameter("floorId", FLOOR_EXISTING)
+			.setParameter("x", X)
+			.setParameter("y", Y)
+			.setParameter("verified", ANCHOR_NOT_VERIFIED)
+			.build();
+
+		givenUser()
+			.pathParam("id", 2)
+			.body(body)
+			.when().put(ANCHOR_PATH_WITH_ID)
+			.then().statusCode(HttpStatus.SC_OK)
+			.body(
+				"shortId", equalTo(40622),
+				"longId", equalTo(93170459),
+				"name", equalTo(NAME),
+				"floorId", equalTo(FLOOR_EXISTING),
+				"x", equalTo(X),
+				"y", equalTo(Y),
+				"verified", equalTo(ANCHOR_NOT_VERIFIED)
+			);
+	}
+
+	@Test
+	public void shouldRemoveFloorIdAndNameAndCoordinatesWhileUpdatingAnchor() {
+		String body = new RequestBodyBuilder("Anchor.json")
+			.setParameter("shortId", ANCHOR_SHORT_ID_EXISTING)
+			.setParameter("longId", ANCHOR_LONG_ID_EXISTING)
+			.setParameter("name", "")
+			.setParameter("floorId", null)
+			.setParameter("x", null)
+			.setParameter("y", null)
+			.setParameter("verified", ANCHOR_NOT_VERIFIED)
+			.build();
+
+		givenUser()
+			.pathParam("id", ANCHOR_ID_FOR_UPDATE)
+			.body(body)
+			.when().put(ANCHOR_PATH_WITH_ID)
+			.then().statusCode(HttpStatus.SC_OK)
+			.body(
+				"shortId", equalTo(ANCHOR_SHORT_ID_EXISTING),
+				"longId", equalTo(ANCHOR_LONG_ID_EXISTING),
+				"name", equalTo(""),
+				"floorId", equalTo(null),
+				"x", equalTo(null),
+				"y", equalTo(null),
+				"verified", equalTo(ANCHOR_NOT_VERIFIED)
+			);
+	}
+
+	@Test
+	public void shouldNotAddNonexistingFloorIdWhileUpdatingAnchor() {
+		Integer nonexistingFloorId = 9999;
+		String body = new RequestBodyBuilder("Anchor.json")
+			.setParameter("floorId", nonexistingFloorId)
+			.build();
+
+		givenUser()
+			.pathParam("id", ANCHOR_ID_FOR_UPDATE)
+			.body(body)
+			.when().put(ANCHOR_PATH_WITH_ID)
+			.then().statusCode(HttpStatus.SC_NOT_FOUND);
+
 	}
 
 	@Test
@@ -423,7 +348,7 @@ public class AnchorFacadeIT extends BaseIT {
 				"shortId", equalTo(Arrays.asList(ANCHOR_SHORT_ID_EXISTING, 40622, 55101)),
 				"longId", equalTo(Arrays.asList(ANCHOR_LONG_ID_EXISTING, 93170459, 931701001)),
 				"name", equalTo(Arrays.asList("AnchorName", "", "")),
-				"floorId", equalTo(Arrays.asList(null, null, 2)),
+				"floorId", equalTo(Arrays.asList(2, null, 2)),
 				"x", equalTo(Arrays.asList(1.618f, null, 2.39101f)),
 				"y", equalTo(Arrays.asList(0.577f, null, 1.64101f)),
 				"verified", equalTo(Arrays.asList(true, false, false))

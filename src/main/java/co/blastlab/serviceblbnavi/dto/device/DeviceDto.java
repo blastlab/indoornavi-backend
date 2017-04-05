@@ -32,11 +32,16 @@ public class DeviceDto {
 	@ApiModelProperty(example = "1")
 	private Long floorId;
 
+	@NotNull
+	@ApiModelProperty(example = "false")
+	private Boolean verified;
+
 	public DeviceDto(Device device) {
 		this.setId(device.getId());
 		this.setShortId(device.getShortId());
 		this.setLongId(device.getLongId());
 		this.setName(device.getName());
 		this.setFloorId(device.getFloor() != null ? device.getFloor().getId() : null);
+		this.setVerified(device.getVerified());
 	}
 }

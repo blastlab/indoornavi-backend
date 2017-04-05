@@ -21,4 +21,6 @@ public abstract class Device extends TrackedEntity {
 
 	@ManyToOne
 	private Floor floor;
+
+	private Boolean verified = false;
 }
