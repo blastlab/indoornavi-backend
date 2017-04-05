@@ -1,11 +1,11 @@
 package co.blastlab.serviceblbnavi.domain;
 
+import co.blastlab.serviceblbnavi.socket.AnchorRegistration;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 
 @Entity
 @Getter
@@ -28,4 +28,10 @@ public class Anchor extends TrackedEntity {
 
 	@ManyToOne
 	private Floor floor;
+
+	@PostPersist
+	@PostUpdate
+	private void broadcast() throws JsonProcessingException {
+		AnchorRegistration.broadcastNewAnchor(this);
+	}
 }
