@@ -158,5 +158,21 @@
 	<changeSet author="jsmol (generated)" id="issue-81-20">
 		<dropColumn columnName="verified" tableName="anchor"/>
 	</changeSet>
-
+	<changeSet author="jsmol (generated)" id="issue-111-1">
+		<createTable tableName="Image">
+			<column name="id" type="BIGINT" autoIncrement="true">
+				<constraints nullable="false" primaryKey="true" primaryKeyName="ImagePK"/>
+			</column>
+			<column name="creationDate" type="timestamp"/>
+			<column name="modificationDate" type="timestamp"/>
+			<column name="bitmap" type="BLOB"/>
+			<column name="bitmapHeight" type="INT"/>
+			<column name="bitmapWidth" type="INT"/>
+			<column name="floor_id" type="BIGINT"/>
+		</createTable>
+	</changeSet>
+	<changeSet author="jsmol (generated)" id="issue-111-2">
+		<addForeignKeyConstraint baseColumnNames="floor_id" baseTableName="Image" constraintName="FK_3m9vugkgfmxx2ulfe0jb6gdye" deferrable="false"
+		                         initiallyDeferred="false" referencedColumnNames="id" referencedTableName="Floor"/>
+	</changeSet>
 </databaseChangeLog>
