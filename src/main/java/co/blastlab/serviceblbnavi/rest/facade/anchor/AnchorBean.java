@@ -47,6 +47,8 @@ public class AnchorBean extends DeviceBean implements AnchorFacade {
 			anchorEntity.setY(anchor.getY());
 			anchorEntity.setName(anchor.getName());
 			anchorEntity.setVerified(anchor.getVerified());
+			anchorEntity.setLongId(anchor.getLongId());
+			anchorEntity.setShortId(anchor.getShortId());
 
 			if (anchor.getFloorId() != null) {
 				super.setFloor(anchor, anchorEntity);
