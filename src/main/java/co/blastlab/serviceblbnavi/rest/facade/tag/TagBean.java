@@ -44,6 +44,8 @@ public class TagBean extends DeviceBean implements TagFacade {
 		Optional<Tag> tagOptional = tagRepository.findById(id);
 		if (tagOptional.isPresent()){
 			Tag tagEntity = tagOptional.get();
+			tagEntity.setShortId(tag.getShortId());
+			tagEntity.setLongId(tag.getLongId());
 			tagEntity.setName(tag.getName());
 			tagEntity.setVerified(tag.getVerified());
 
