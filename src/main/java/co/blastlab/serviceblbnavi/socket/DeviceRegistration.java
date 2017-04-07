@@ -1,8 +1,12 @@
 package co.blastlab.serviceblbnavi.socket;
 
 import co.blastlab.serviceblbnavi.dao.repository.AnchorRepository;
+import co.blastlab.serviceblbnavi.dao.repository.DeviceRepository;
+import co.blastlab.serviceblbnavi.dao.repository.TagRepository;
 import co.blastlab.serviceblbnavi.domain.Anchor;
-import co.blastlab.serviceblbnavi.dto.anchor.AnchorDto;
+import co.blastlab.serviceblbnavi.domain.Device;
+import co.blastlab.serviceblbnavi.domain.Tag;
+import co.blastlab.serviceblbnavi.dto.device.DeviceDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -14,8 +18,8 @@ import java.io.IOException;
 import java.util.*;
 
 @ApplicationScoped
-@ServerEndpoint("/anchors/registration")
-public class AnchorRegistration {
+@ServerEndpoint("/devices/registration")
+public class DeviceRegistration {
 
 	private static Set<Session> anchorSessions = Collections.synchronizedSet(new HashSet<Session>());
 	private static Set<Session> tagSessions = Collections.synchronizedSet(new HashSet<Session>());
@@ -24,26 +28,41 @@ public class AnchorRegistration {
 	@Inject
 	private AnchorRepository anchorRepository;
 
-	public static void broadcastNewAnchor(Anchor anchor) throws JsonProcessingException {
+	@Inject
+	private TagRepository tagRepository;
+
+	@Inject
+	private DeviceRepository deviceRepository;
+
+	public static void broadcastDevice(Device device) throws JsonProcessingException {
 		ObjectMapper objectMapper = new ObjectMapper();
-		broadCastMessage(anchorSessions, objectMapper.writeValueAsString(Collections.singletonList(new AnchorDto(anchor))));
+		if (device instanceof Anchor) {
+			broadCastMessage(anchorSessions, objectMapper.writeValueAsString(Collections.singletonList(new DeviceDto(device))));
+		} else {
+			broadCastMessage(tagSessions, objectMapper.writeValueAsString(Collections.singletonList(new DeviceDto(device))));
+		}
 	}
 
 	@OnOpen
 	public void registerSession(Session session) throws JsonProcessingException {
 		String queryString = session.getQueryString();
+		List<DeviceDto> devices = new ArrayList<>();
 		ObjectMapper objectMapper = new ObjectMapper();
+
 		if (SessionType.SINK.getName().equals(queryString)) {
 			sinkSessions.add(session);
 		} else if (SessionType.ANCHOR.getName().equals(queryString)) {
-			anchorSessions.add(session);
-			List<AnchorDto> anchors = new ArrayList<>();
 			anchorRepository.findAll().forEach((anchor) -> {
-				anchors.add(new AnchorDto(anchor));
+				devices.add(new DeviceDto(anchor));
 			});
-			broadCastMessage(anchorSessions, objectMapper.writeValueAsString(anchors));
+			anchorSessions.add(session);
+			broadCastMessage(anchorSessions, objectMapper.writeValueAsString(devices));
 		} else if (SessionType.TAG.getName().equals(queryString)) {
+			tagRepository.findAll().forEach((tag) -> {
+				devices.add(new DeviceDto(tag));
+			});
 			tagSessions.add(session);
+			broadCastMessage(tagSessions, objectMapper.writeValueAsString(devices));
 		}
 	}
 
@@ -68,16 +87,23 @@ public class AnchorRegistration {
 	public void handleMessage(String message, Session session) throws IOException {
 		ObjectMapper objectMapper = new ObjectMapper();
 		if (Objects.equals(session.getQueryString(), SessionType.SINK.getName())) {
-			AnchorDto anchorDto = objectMapper.readValue(message, AnchorDto.class);
-			Anchor anchorEntity = new Anchor();
-			anchorEntity.setShortId(anchorDto.getShortId());
-			anchorEntity.setLongId(anchorDto.getLongId());
-			// TODO: remove when Paweł fix this
-			anchorEntity.setX(anchorDto.getX());
-			anchorEntity.setY(anchorDto.getY());
-			anchorEntity.setVerified(false);
-			anchorEntity = anchorRepository.save(anchorEntity);
-			broadCastMessage(anchorSessions, objectMapper.writeValueAsString(Collections.singletonList(new AnchorDto(anchorEntity))));
+			DeviceDto deviceDto = objectMapper.readValue(message, DeviceDto.class);
+			Device deviceEntity;
+			if (deviceDto.getShortId() <= Short.MAX_VALUE) {
+				deviceEntity = new Tag();
+			} else {
+				deviceEntity = new Anchor();
+			}
+			deviceEntity.setShortId(deviceDto.getShortId());
+			deviceEntity.setLongId(deviceDto.getLongId());
+			deviceEntity.setVerified(false);
+//			if (deviceDto.getShortId() <= Short.MAX_VALUE) {
+//				deviceEntity = new Tag();
+//			} else {
+//				deviceEntity = new Anchor();
+//			}
+			deviceEntity = deviceRepository.save(deviceEntity);
+			broadCastMessage(anchorSessions, objectMapper.writeValueAsString(Collections.singletonList(new DeviceDto(deviceEntity))));
 		}
 	}
 
