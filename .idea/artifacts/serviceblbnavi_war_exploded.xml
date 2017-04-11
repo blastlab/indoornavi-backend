@@ -40,6 +40,9 @@
           <element id="library" level="project" name="Maven: org.mariadb.jdbc:mariadb-java-client:1.1.7" />
           <element id="library" level="project" name="Maven: net.java.dev.jna:jna:3.3.0" />
           <element id="library" level="project" name="Maven: net.java.dev.jna:jna:platform:3.3.0" />
+          <element id="library" level="project" name="Maven: com.sun.jersey.contribs:jersey-multipart:1.19.3" />
+          <element id="library" level="project" name="Maven: org.jvnet.mimepull:mimepull:1.9.3" />
+          <element id="library" level="project" name="Maven: com.sun.jersey:jersey-core:1.19.3" />
         </element>
       </element>
       <element id="directory" name="META-INF">
