@@ -5,17 +5,11 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.validation.constraints.NotNull;
 import javax.ws.rs.FormParam;
 
 @Getter
 @Setter
 public class ImageUpload {
-
-	@FormParam("floor")
-	@NotNull
-	@ApiModelProperty(example = "1")
-	private Long floorId;
 
 	@FormParam("image")
 	@ApiModelProperty(hidden = true)
