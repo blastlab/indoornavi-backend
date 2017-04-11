@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.util.Base64;
 import java.util.Optional;
 
-import static co.blastlab.serviceblbnavi.ext.mapper.accessory.FileMessagePack.FILE_001;
 import static co.blastlab.serviceblbnavi.ext.mapper.accessory.FileMessagePack.FILE_002;
 import static co.blastlab.serviceblbnavi.rest.RestApplication.MAX_FILE_SIZE_LIMIT_IN_BYTES;
 
@@ -39,18 +38,17 @@ public class ImageBean implements ImageFacade {
 		if (floorOptional.isPresent()){
 			Image imageEntity = imageRepository.findBy(floorId);
 			if (imageEntity == null){
-				if (!(isProperFileExtension(imageUpload))){
-					return Response.status(HttpStatus.SC_BAD_REQUEST).entity(new FileViolationContent(FILE_001)).build();
-				}
-				if (!(isProperFileSize(imageUpload))){
+				imageEntity = new Image();
+				byte[] image = imageUpload.getImage();
+
+				if (image.length > MAX_FILE_SIZE_LIMIT_IN_BYTES){
 					return Response.status(HttpStatus.SC_BAD_REQUEST).entity(new FileViolationContent(FILE_002)).build();
 				}
 
-				imageEntity = new Image();
-				byte[] image = imageUpload.getImage();
 				BufferedImage bufferedImage = ImageIO.read(new ByteArrayInputStream(image));
 				imageEntity.setBitmapHeight(bufferedImage.getHeight());
 				imageEntity.setBitmapWidth(bufferedImage.getWidth());
+
 				imageEntity.setBitmap(image);
 				return Response.ok().build();
 			}
@@ -66,17 +64,5 @@ public class ImageBean implements ImageFacade {
 			return Response.ok(new ByteArrayInputStream(Base64.getEncoder().encode(imageOptional.get().getBitmap()))).build();
 		}
 		throw new EntityNotFoundException();
-	}
-
-	private static boolean isProperFileExtension(ImageUpload imageUpload){
-		String type = imageUpload.getFileDetail().getType();
-		if (!(type.equals("image/jpeg")) && !(type.equals("image/png"))){
-			return false;
-		}
-		return true;
-	}
-
-	private static boolean isProperFileSize(ImageUpload imageUpload){
-		return imageUpload.getFileDetail().getSize() <= MAX_FILE_SIZE_LIMIT_IN_BYTES;
 	}
 }
