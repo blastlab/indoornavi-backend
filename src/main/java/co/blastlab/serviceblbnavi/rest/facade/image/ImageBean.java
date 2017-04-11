@@ -34,10 +34,10 @@ public class ImageBean implements ImageFacade {
 	private FloorRepository floorRepository;
 
 	@Override
-	public Response uploadImage(@MultipartForm ImageUpload imageUpload) throws IOException {
-		Optional<Floor> floorOptional = floorRepository.findById(imageUpload.getFloorId());
+	public Response uploadImage(Long floorId , @MultipartForm ImageUpload imageUpload) throws IOException {
+		Optional<Floor> floorOptional = floorRepository.findById(floorId);
 		if (floorOptional.isPresent()){
-			Image imageEntity = imageRepository.findBy(imageUpload.getFloorId());
+			Image imageEntity = imageRepository.findBy(floorId);
 			if (imageEntity == null){
 				if (!(isProperFileExtension(imageUpload))){
 					return Response.status(HttpStatus.SC_BAD_REQUEST).entity(new FileViolationContent(FILE_001)).build();
