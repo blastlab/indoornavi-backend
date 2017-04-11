@@ -233,16 +233,14 @@ public class FloorFacadeIT extends BaseIT {
 				.setParameter("level", 0, 1)
 				.build()
 			)
-			.when()
-			.put(FLOOR_PATH)
-			.then()
-			.statusCode(HttpStatus.SC_OK)
+			.when().put(FLOOR_PATH)
+			.then().statusCode(HttpStatus.SC_OK)
 			.extract()
 			.as(FloorDto[].class);
 
 		assertThat(Arrays.asList(floors), containsInAnyOrder(
-			floorDtoCustomMatcher(new FloorDto(4L, 1, "", 1L)),
-			floorDtoCustomMatcher(new FloorDto(5L, 0, "", 1L))
+			floorDtoCustomMatcher(new FloorDto(4L, 1, "", 1L, null)),
+			floorDtoCustomMatcher(new FloorDto(5L, 0, "", 1L, null))
 		));
 	}
 
