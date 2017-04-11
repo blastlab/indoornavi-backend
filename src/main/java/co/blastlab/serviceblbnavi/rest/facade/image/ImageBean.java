@@ -50,7 +50,7 @@ public class ImageBean implements ImageFacade {
 				imageEntity.setBitmapWidth(bufferedImage.getWidth());
 				imageEntity.setBitmap(image);
 				imageRepository.save(imageEntity);
-
+				floorOptional.get().setImage(imageEntity);
 				return Response.ok().build();
 			}
 			return Response.status(HttpStatus.SC_CONFLICT).build();  //istnieje obrazek o takim floorId (409)
