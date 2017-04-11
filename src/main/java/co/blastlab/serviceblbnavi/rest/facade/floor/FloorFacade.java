@@ -15,6 +15,11 @@ import java.util.List;
 @TokenAuthorization
 public interface FloorFacade {
 
+	@GET
+	@Path("/{id: \\d+}")
+	@ApiOperation(value = "get specific floor", response = FloorDto.class)
+	FloorDto get(@PathParam("id") @Valid @NotNull Long id);
+
 	@POST
 	@ApiOperation(value = "create floor", response = FloorDto.class)
 	@ApiResponses({
