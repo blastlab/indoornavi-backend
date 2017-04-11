@@ -48,8 +48,9 @@ public class ImageBean implements ImageFacade {
 				BufferedImage bufferedImage = ImageIO.read(new ByteArrayInputStream(image));
 				imageEntity.setBitmapHeight(bufferedImage.getHeight());
 				imageEntity.setBitmapWidth(bufferedImage.getWidth());
-
 				imageEntity.setBitmap(image);
+				imageRepository.save(imageEntity);
+
 				return Response.ok().build();
 			}
 			return Response.status(HttpStatus.SC_CONFLICT).build();  //istnieje obrazek o takim floorId (409)

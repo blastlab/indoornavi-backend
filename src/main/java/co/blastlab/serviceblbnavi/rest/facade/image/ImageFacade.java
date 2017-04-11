@@ -14,7 +14,6 @@ import java.io.IOException;
 
 @Path("/images")
 @Api("/images")
-
 @TokenAuthorization
 public interface ImageFacade {
 

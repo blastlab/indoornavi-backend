@@ -28,7 +28,7 @@ public class Floor extends TrackedEntity {
 	@OrderBy("name")
 	private List<Device> devices = new ArrayList<>();
 
-	@OneToOne(mappedBy = "floor", cascade = {CascadeType.REMOVE, CascadeType.MERGE})
+	@OneToOne
 	private Image image;
 
 }
