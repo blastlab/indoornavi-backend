@@ -11,6 +11,8 @@ import javax.ws.rs.core.Application;
 public class RestApplication extends Application {
 
 	public static final String BASE_PATH = "/rest/v1";
+	public static int MAX_FILE_SIZE_LIMIT_IN_BYTES = 2097152;
+	public static int MAX_FILE_SIZE_LIMIT_IN_MEGABYTES = 2;
 
 	public RestApplication() {
 		Json.mapper().disable(MapperFeature.DEFAULT_VIEW_INCLUSION);
