@@ -175,4 +175,19 @@
 		<addForeignKeyConstraint baseColumnNames="floor_id" baseTableName="Image" constraintName="FK_3m9vugkgfmxx2ulfe0jb6gdye" deferrable="false"
 		                         initiallyDeferred="false" referencedColumnNames="id" referencedTableName="Floor"/>
 	</changeSet>
+	<changeSet author="jsmol (generated)" id="issue-111-3">
+		<addColumn tableName="Floor">
+			<column name="image_id" type="bigint"/>
+		</addColumn>
+	</changeSet>
+	<changeSet author="jsmol (generated)" id="issue-111-4">
+		<addForeignKeyConstraint baseColumnNames="image_id" baseTableName="Floor" constraintName="FK_6u98qhbox47qemgykogk61gt" deferrable="false"
+		                         initiallyDeferred="false" referencedColumnNames="id" referencedTableName="Image"/>
+	</changeSet>
+	<changeSet author="jsmol (generated)" id="issue-111-5">
+		<dropForeignKeyConstraint baseTableName="image" constraintName="FK_3m9vugkgfmxx2ulfe0jb6gdye"/>
+	</changeSet>
+	<changeSet author="jsmol (generated)" id="issue-111-6">
+		<dropColumn columnName="floor_id" tableName="image"/>
+	</changeSet>
 </databaseChangeLog>
