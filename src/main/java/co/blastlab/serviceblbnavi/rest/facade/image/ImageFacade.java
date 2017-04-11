@@ -1,4 +1,4 @@
-package co.blastlab.serviceblbnavi.rest.image;
+package co.blastlab.serviceblbnavi.rest.facade.image;
 
 import co.blastlab.serviceblbnavi.dto.floor.ImageUpload;
 import co.blastlab.serviceblbnavi.ext.filter.TokenAuthorization;
@@ -25,7 +25,9 @@ public interface ImageFacade {
 	@ApiResponses({
 		@ApiResponse(code = 404, message = "Floor with given id does not exist")
 	})
-	Response uploadImage(@Valid @MultipartForm ImageUpload imageUpload) throws IOException;
+	Response uploadImage(@MultipartForm @Valid ImageUpload imageUpload//, @MultipartForm
+	                    // @ApiParam  ( value = "attachmentparam", type=MediaType.APPLICATION_OCTET_STREAM) Attachment attachment
+	) throws IOException;
 
 	@GET
 	@Path("/{id: \\d+}")
