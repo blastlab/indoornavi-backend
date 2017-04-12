@@ -4,6 +4,7 @@ import co.blastlab.serviceblbnavi.dao.repository.FloorRepository;
 import co.blastlab.serviceblbnavi.dao.repository.ImageRepository;
 import co.blastlab.serviceblbnavi.domain.Floor;
 import co.blastlab.serviceblbnavi.domain.Image;
+import co.blastlab.serviceblbnavi.dto.floor.FloorDto;
 import co.blastlab.serviceblbnavi.dto.floor.ImageUpload;
 import co.blastlab.serviceblbnavi.ext.mapper.content.FileViolationContent;
 import org.apache.commons.io.IOUtils;
@@ -41,6 +42,7 @@ public class ImageBean implements ImageFacade {
 		if (floorOptional.isPresent()) {
 			Image imageEntity = imageRepository.findBy(floorId);
 			if (imageEntity == null) {
+				Floor floorEntity = floorOptional.get();
 				imageEntity = new Image();
 				byte[] image = imageUpload.getImage();
 
@@ -53,8 +55,8 @@ public class ImageBean implements ImageFacade {
 				imageEntity.setBitmapWidth(bufferedImage.getWidth());
 				imageEntity.setBitmap(image);
 				imageRepository.save(imageEntity);
-				floorOptional.get().setImage(imageEntity);
-				return Response.ok().build();
+				floorEntity.setImage(imageEntity);
+				return Response.ok(new FloorDto(floorEntity)).build();
 			}
 			return Response.status(HttpStatus.SC_CONFLICT).build();
 		}
