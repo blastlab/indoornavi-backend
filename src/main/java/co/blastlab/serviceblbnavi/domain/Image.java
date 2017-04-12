@@ -3,10 +3,7 @@ package co.blastlab.serviceblbnavi.domain;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.Lob;
-import javax.persistence.OneToOne;
+import javax.persistence.*;
 
 @Entity
 @Getter
@@ -14,6 +11,8 @@ import javax.persistence.OneToOne;
 public class Image extends TrackedEntity {
 
 	@Lob
+	@Column(columnDefinition="mediumblob")
+	@Basic(fetch=FetchType.LAZY)
 	private byte[] bitmap;
 
 	private Integer bitmapWidth;

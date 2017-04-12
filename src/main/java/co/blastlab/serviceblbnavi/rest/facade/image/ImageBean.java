@@ -6,7 +6,9 @@ import co.blastlab.serviceblbnavi.domain.Floor;
 import co.blastlab.serviceblbnavi.domain.Image;
 import co.blastlab.serviceblbnavi.dto.floor.ImageUpload;
 import co.blastlab.serviceblbnavi.ext.mapper.content.FileViolationContent;
+import co.blastlab.serviceblbnavi.properties.Properties;
 import org.apache.commons.io.IOUtils;
+import org.apache.deltaspike.core.api.config.ConfigProperty;
 import org.apache.http.HttpStatus;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 
@@ -24,7 +26,6 @@ import java.io.IOException;
 import java.util.Optional;
 
 import static co.blastlab.serviceblbnavi.ext.mapper.accessory.FileMessagePack.FILE_002;
-import static co.blastlab.serviceblbnavi.rest.RestApplication.MAX_FILE_SIZE_LIMIT_IN_BYTES;
 
 @Stateless
 public class ImageBean implements ImageFacade {
@@ -35,6 +36,15 @@ public class ImageBean implements ImageFacade {
 	@Inject
 	private FloorRepository floorRepository;
 
+	@Inject
+	@ConfigProperty(name = "max.file.size")
+	private Integer maxFileSize;
+
+	@Inject
+	@ConfigProperty(name = "allowed.types")
+	private String allowedTypes;
+
+
 	@Override
 	public Response uploadImage(Long floorId, @MultipartForm ImageUpload imageUpload) throws IOException {
 		Optional<Floor> floorOptional = floorRepository.findById(floorId);
@@ -44,7 +54,7 @@ public class ImageBean implements ImageFacade {
 				imageEntity = new Image();
 				byte[] image = imageUpload.getImage();
 
-				if (image.length > MAX_FILE_SIZE_LIMIT_IN_BYTES) {
+				if (isProperSize(image)) {
 					return Response.status(HttpStatus.SC_BAD_REQUEST).entity(new FileViolationContent(FILE_002)).build();
 				}
 
@@ -78,5 +88,16 @@ public class ImageBean implements ImageFacade {
 			return Response.ok(stream, MediaType.APPLICATION_OCTET_STREAM).build();
 		}
 		throw new EntityNotFoundException();
+	}
+
+	@Override
+	public Properties retrievePropertiesOfImages() {
+
+		return new Properties(this.maxFileSize, this.allowedTypes.split(";"));
+	}
+
+	private static boolean isProperSize(byte[] image){
+		Properties properties = new Properties();
+		return image.length <= properties.getMaxFileSize();
 	}
 }
