@@ -190,4 +190,7 @@
 	<changeSet author="jsmol (generated)" id="issue-111-6">
 		<dropColumn columnName="floor_id" tableName="image"/>
 	</changeSet>
+	<changeSet author="kgebert" id="issue-111-7">
+		<modifyDataType tableName="image" columnName="bitmap" newDataType="mediumblob" />
+	</changeSet>
 </databaseChangeLog>
