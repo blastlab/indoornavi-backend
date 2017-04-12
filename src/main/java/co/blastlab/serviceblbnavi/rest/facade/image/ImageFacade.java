@@ -20,6 +20,7 @@ public interface ImageFacade {
 	@POST
 	@Path("/{floorId: \\d+}")
 	@Consumes(MediaType.MULTIPART_FORM_DATA)
+	@Produces("application/json")
 	@ApiOperation(value = "upload image of the floor", response = Response.class)
 	@ApiResponses({
 		@ApiResponse(code = 404, message = "Floor with given id does not exist")
