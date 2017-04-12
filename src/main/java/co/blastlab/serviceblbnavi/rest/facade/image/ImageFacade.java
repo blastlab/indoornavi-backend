@@ -2,6 +2,7 @@ package co.blastlab.serviceblbnavi.rest.facade.image;
 
 import co.blastlab.serviceblbnavi.dto.floor.ImageUpload;
 import co.blastlab.serviceblbnavi.ext.filter.TokenAuthorization;
+import co.blastlab.serviceblbnavi.properties.Properties;
 import io.swagger.annotations.*;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 
@@ -36,4 +37,9 @@ public interface ImageFacade {
 		@ApiResponse(code = 404, message = "Floor with given id does not exist or it has no image")
 	})
 	Response downloadImage(@PathParam("id") Long floorId);
+
+	@GET
+	@Path("/configuration")
+	@ApiOperation(value = "get properties of images", response = Properties.class)
+	Properties retrievePropertiesOfImages();
 }
