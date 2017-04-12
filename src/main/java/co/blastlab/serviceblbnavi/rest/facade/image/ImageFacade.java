@@ -29,6 +29,7 @@ public interface ImageFacade {
 
 	@GET
 	@Path("/{id: \\d+}")
+	@Produces({"image/png", "image/jpeg"})
 	@ApiOperation(value = "download image of the floor", response = Response.class)
 	@ApiResponses({
 		@ApiResponse(code = 404, message = "Floor with given id does not exist or it has no image")

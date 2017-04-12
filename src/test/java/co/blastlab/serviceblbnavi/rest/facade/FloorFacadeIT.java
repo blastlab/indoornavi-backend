@@ -30,6 +30,31 @@ public class FloorFacadeIT extends BaseIT {
 	}
 
 	@Test
+	public void getFloor(){
+		Integer floorId = 1;
+		givenUser()
+			.pathParam("id", floorId)
+			.when().get(FLOOR_PATH_WITH_ID)
+			.then().statusCode(HttpStatus.SC_OK)
+			.body(
+				"id", equalTo(1),
+				"level", equalTo(1),
+				"name", equalTo("P.1"),
+				"buildingId", equalTo(2),
+				"imageId", equalTo(null)
+			);
+	}
+
+	@Test
+	public void getNonexistingFloor(){
+		Integer nonexistingFloorId = 9999;
+		givenUser()
+			.pathParam("id", nonexistingFloorId)
+			.when().get(FLOOR_PATH_WITH_ID)
+			.then().statusCode(HttpStatus.SC_NOT_FOUND);
+	}
+
+	@Test
 	public void createNewFloor() {
 		String body = new RequestBodyBuilder("Floor.json")
 			.setParameter("level", 0)
