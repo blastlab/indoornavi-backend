@@ -45,7 +45,6 @@ public class ImageBean implements ImageFacade {
 	@ConfigProperty(name = "allowed.types")
 	private String allowedTypes;
 
-
 	@Override
 	public Response uploadImage(Long floorId, @MultipartForm ImageUpload imageUpload) throws IOException {
 		Optional<Floor> floorOptional = floorRepository.findById(floorId);
@@ -56,7 +55,7 @@ public class ImageBean implements ImageFacade {
 				imageEntity = new Image();
 				byte[] image = imageUpload.getImage();
 
-				if (isProperSize(image)) {
+				if (!isProperSize(image)) {
 					return Response.status(HttpStatus.SC_BAD_REQUEST).entity(new FileViolationContent(FILE_002)).build();
 				}
 
@@ -94,12 +93,10 @@ public class ImageBean implements ImageFacade {
 
 	@Override
 	public Properties retrievePropertiesOfImages() {
-
 		return new Properties(this.maxFileSize, this.allowedTypes.split(";"));
 	}
 
-	private static boolean isProperSize(byte[] image){
-		Properties properties = new Properties();
-		return image.length <= properties.getMaxFileSize();
+	private boolean isProperSize(byte[] image){
+		return image.length <= this.maxFileSize;
 	}
 }
