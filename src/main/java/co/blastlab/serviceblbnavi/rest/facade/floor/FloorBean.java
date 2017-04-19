@@ -25,6 +25,15 @@ public class FloorBean implements FloorFacade {
 	private BuildingRepository buildingRepository;
 
 	@Override
+	public FloorDto get(Long id) {
+		Optional<Floor> floorEntity = floorRepository.findById(id);
+		if (floorEntity.isPresent()) {
+			return new FloorDto(floorEntity.get());
+		}
+		throw new EntityNotFoundException();
+	}
+
+	@Override
 	public FloorDto create(FloorDto floor) {
 		Optional<Building> building = buildingRepository.findById(floor.getBuildingId());
 		if (building.isPresent()) {
