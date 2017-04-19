@@ -2,18 +2,15 @@ package co.blastlab.serviceblbnavi.dto.floor;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.jboss.resteasy.annotations.providers.multipart.PartType;
 
-import javax.validation.constraints.NotNull;
 import javax.ws.rs.FormParam;
 
 @Getter
 @Setter
 public class ImageUpload {
 
-	@FormParam("floor")
-	@NotNull
-	private Long floorId;
-
+	@PartType("application/octet-stream")
 	@FormParam("image")
 	private byte[] image;
 }

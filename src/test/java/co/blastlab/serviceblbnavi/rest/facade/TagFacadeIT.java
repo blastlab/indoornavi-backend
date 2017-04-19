@@ -1,7 +1,7 @@
 package co.blastlab.serviceblbnavi.rest.facade;
 
 import co.blastlab.serviceblbnavi.rest.facade.util.RequestBodyBuilder;
-import co.blastlab.serviceblbnavi.rest.facade.util.violation.DbViolationResponse;
+import co.blastlab.serviceblbnavi.rest.facade.util.violation.ExtViolationResponse;
 import co.blastlab.serviceblbnavi.rest.facade.util.violation.ViolationResponse;
 import com.google.common.collect.ImmutableList;
 import org.apache.http.HttpStatus;
@@ -110,16 +110,16 @@ public class TagFacadeIT extends BaseIT {
 			.setParameter("floorId", 2)
 			.build();
 
-		DbViolationResponse dbViolationResponse = givenUser()
+		ExtViolationResponse extViolationResponse = givenUser()
 			.body(body)
 			.when().post(TAG_PATH)
 			.then().statusCode(HttpStatus.SC_BAD_REQUEST)
 			.extract()
-			.as(DbViolationResponse.class);
+			.as(ExtViolationResponse.class);
 
-		assertThat(dbViolationResponse.getError(), is(DB_VALIDATION_ERROR_NAME));
-		assertThat(dbViolationResponse.getMessage(), is(CONSTRAINT_MESSAGE_003));
-		assertThat(dbViolationResponse.getCode(), is(CONSTRAINT_CODE_003));
+		assertThat(extViolationResponse.getError(), is(DB_VALIDATION_ERROR_NAME));
+		assertThat(extViolationResponse.getMessage(), is(CONSTRAINT_MESSAGE_003));
+		assertThat(extViolationResponse.getCode(), is(CONSTRAINT_CODE_003));
 	}
 
 	@Test
@@ -130,16 +130,16 @@ public class TagFacadeIT extends BaseIT {
 			.setParameter("floorId", 1)
 			.build();
 
-		DbViolationResponse dbViolationResponse = givenUser()
+		ExtViolationResponse extViolationResponse = givenUser()
 			.body(body)
 			.when().post(TAG_PATH)
 			.then().statusCode(HttpStatus.SC_BAD_REQUEST)
 			.extract()
-			.as(DbViolationResponse.class);
+			.as(ExtViolationResponse.class);
 
-		assertThat(dbViolationResponse.getError(), is(DB_VALIDATION_ERROR_NAME));
-		assertThat(dbViolationResponse.getMessage(), is(CONSTRAINT_MESSAGE_002));
-		assertThat(dbViolationResponse.getCode(), is(CONSTRAINT_CODE_002));
+		assertThat(extViolationResponse.getError(), is(DB_VALIDATION_ERROR_NAME));
+		assertThat(extViolationResponse.getMessage(), is(CONSTRAINT_MESSAGE_002));
+		assertThat(extViolationResponse.getCode(), is(CONSTRAINT_CODE_002));
 	}
 
 	@Test

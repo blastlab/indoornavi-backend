@@ -189,9 +189,9 @@ public class BuildingFacadeIT extends BaseIT {
 		assertThat(buildingWithFloors.getName(), equalTo("AABBCCDDFFFFF"));
 		assertThat(buildingWithFloors.getComplexId(), equalTo(2L));
 		assertThat(buildingWithFloors.getFloors(), containsInAnyOrder(
-			floorDtoCustomMatcher(new FloorDto(1L, 1,"P.1", 2L)),
-			floorDtoCustomMatcher(new FloorDto(2L, 2, "", 2L)),
-			floorDtoCustomMatcher(new FloorDto(3L, 3, "", 2L))
+			floorDtoCustomMatcher(new FloorDto(1L, 1,"P.1", 2L, null)),
+			floorDtoCustomMatcher(new FloorDto(2L, 2, "", 2L, null)),
+			floorDtoCustomMatcher(new FloorDto(3L, 3, "", 2L, null))
 		));
 	}
 
