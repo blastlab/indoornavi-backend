@@ -8,10 +8,10 @@ import co.blastlab.serviceblbnavi.dto.floor.FloorDto;
 import co.blastlab.serviceblbnavi.dto.floor.ImageUpload;
 import co.blastlab.serviceblbnavi.ext.mapper.content.FileViolationContent;
 import co.blastlab.serviceblbnavi.properties.Properties;
+import net.sf.jmimemagic.*;
 import org.apache.commons.io.IOUtils;
 import org.apache.deltaspike.core.api.config.ConfigProperty;
 import org.apache.http.HttpStatus;
-import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 
 import javax.ejb.Stateless;
 import javax.imageio.ImageIO;
@@ -26,6 +26,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Optional;
 
+import static co.blastlab.serviceblbnavi.ext.mapper.accessory.FileMessagePack.FILE_001;
 import static co.blastlab.serviceblbnavi.ext.mapper.accessory.FileMessagePack.FILE_002;
 
 @Stateless
@@ -46,7 +47,7 @@ public class ImageBean implements ImageFacade {
 	private String allowedTypes;
 
 	@Override
-	public Response uploadImage(Long floorId, @MultipartForm ImageUpload imageUpload) throws IOException {
+	public Response uploadImage(Long floorId, ImageUpload imageUpload) throws IOException, MagicParseException, MagicException, MagicMatchNotFoundException {
 		Optional<Floor> floorOptional = floorRepository.findById(floorId);
 		if (floorOptional.isPresent()) {
 			Image imageEntity = imageRepository.findBy(floorId);
@@ -55,8 +56,12 @@ public class ImageBean implements ImageFacade {
 				imageEntity = new Image();
 				byte[] image = imageUpload.getImage();
 
-				if (!isProperSize(image)) {
+				if (!isProperFileSize(image)) {
 					return Response.status(HttpStatus.SC_BAD_REQUEST).entity(new FileViolationContent(FILE_002)).build();
+				}
+
+				if (!isProperFileExtension(image)) {
+					return Response.status(HttpStatus.SC_BAD_REQUEST).entity(new FileViolationContent(FILE_001)).build();
 				}
 
 				BufferedImage bufferedImage = ImageIO.read(new ByteArrayInputStream(image));
@@ -96,7 +101,17 @@ public class ImageBean implements ImageFacade {
 		return new Properties(this.maxFileSize, this.allowedTypes.split(";"));
 	}
 
-	private boolean isProperSize(byte[] image){
+	private boolean isProperFileSize(byte[] image){
 		return image.length <= this.maxFileSize;
+	}
+
+	private boolean isProperFileExtension(byte[] image) {
+		try {
+			MagicMatch match = Magic.getMagicMatch(image);
+			String mimeType = match.getMimeType();
+			return mimeType.equals("image/jpeg") || mimeType.equals("image/png");
+		} catch (MagicParseException | MagicMatchNotFoundException | MagicException e) {
+			return false;
+		}
 	}
 }

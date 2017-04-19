@@ -8,6 +8,7 @@
 		<delete tableName="anchor"/>
 		<delete tableName="device"/>
 		<delete tableName="floor"/>
+		<delete tableName="image"/>
 		<delete tableName="building"/>
 		<delete tableName="complex"/>
 	</changeSet>
@@ -18,6 +19,10 @@
 
 	<changeSet id="Building" author="mcichosz" context="test" runOnChange="true" labels="Building" runAlways="true">
 		<loadUpdateData tableName="building" file="test/Building.csv" primaryKey="id"/>
+	</changeSet>
+
+	<changeSet id="Image" author="jsmol" context="test" runOnChange="true" labels="Image" runAlways="true">
+		<loadUpdateData tableName="image" file="test/Image.csv" primaryKey="id"/>
 	</changeSet>
 
 	<changeSet id="Floor" author="mcichosz" context="test" runOnChange="true" labels="Floor" runAlways="true">
@@ -37,5 +42,4 @@
 	<changeSet id="Tag" author="jsmol" context="test" runOnChange="true" labels="Tag" runAlways="true">
 		<loadUpdateData tableName="tag" file="test/Tag.csv" primaryKey="id"/>
 	</changeSet>
-
 </databaseChangeLog>
