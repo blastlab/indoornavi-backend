@@ -4,6 +4,9 @@ import co.blastlab.serviceblbnavi.dto.floor.ImageUpload;
 import co.blastlab.serviceblbnavi.ext.filter.TokenAuthorization;
 import co.blastlab.serviceblbnavi.properties.Properties;
 import io.swagger.annotations.*;
+import net.sf.jmimemagic.MagicException;
+import net.sf.jmimemagic.MagicMatchNotFoundException;
+import net.sf.jmimemagic.MagicParseException;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 
 import javax.validation.Valid;
@@ -26,8 +29,10 @@ public interface ImageFacade {
 	@ApiResponses({
 		@ApiResponse(code = 404, message = "Floor with given id does not exist")
 	})
+
 	Response uploadImage(@ApiParam(value = "floorId", required = true) @PathParam("floorId") @Valid @NotNull Long floorId,
-		@Valid @MultipartForm ImageUpload image) throws IOException;
+						 @ApiParam(value = "DO NOT USE THROUGH SWAGGER") @Valid @MultipartForm ImageUpload image
+	                     ) throws IOException, MagicParseException, MagicException, MagicMatchNotFoundException;
 
 	@GET
 	@Path("/{id: \\d+}")
@@ -36,7 +41,7 @@ public interface ImageFacade {
 	@ApiResponses({
 		@ApiResponse(code = 404, message = "Floor with given id does not exist or it has no image")
 	})
-	Response downloadImage(@PathParam("id") Long floorId);
+	Response downloadImage(@PathParam("id") Long id);
 
 	@GET
 	@Path("/configuration")

@@ -1,7 +1,11 @@
 package co.blastlab.serviceblbnavi.ext.mapper.content;
 
 import co.blastlab.serviceblbnavi.ext.mapper.accessory.FileMessagePack;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+@Getter
+@NoArgsConstructor
 public class FileViolationContent extends ErrorResponseContent {
 
 	private static final String ERROR = "file_violation";
