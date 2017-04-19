@@ -145,7 +145,11 @@ public class TagFacadeIT extends BaseIT {
 	@Test
 	public void updateTag(){
 		Integer existingFloorId = 3;
-		String body = new RequestBodyBuilder("Tag.json")
+		Integer newShortId = 10150;
+		Integer newLongId = 150002323;
+			String body = new RequestBodyBuilder("Tag.json")
+			.setParameter("shortId", newShortId)
+			.setParameter("longId", newLongId)
 			.setParameter("name", NAME_CREATING)
 			.setParameter("floorId", existingFloorId)
 			.setParameter("verified", VERIFIED_TRUE)
@@ -157,8 +161,8 @@ public class TagFacadeIT extends BaseIT {
 			.when().put(TAG_PATH_WITH_ID)
 			.then().statusCode(HttpStatus.SC_OK)
 			.body(
-				"shortId", equalTo(SHORT_ID_FOR_TAG_ID_4),
-				"longId", equalTo(151232323),
+				"shortId", equalTo(newShortId),
+				"longId", equalTo(newLongId),
 				"name", equalTo(NAME_CREATING),
 				"floorId", equalTo(existingFloorId),
 				"verified", equalTo(VERIFIED_TRUE)
@@ -191,6 +195,8 @@ public class TagFacadeIT extends BaseIT {
 		String body = new RequestBodyBuilder("Tag.json")
 			.setParameter("name", NAME_CREATING)
 			.setParameter("floorId", 2)
+			.setParameter("shortId", 10404)
+			.setParameter("longId", 45454545)
 			.build();
 
 		givenUser()
