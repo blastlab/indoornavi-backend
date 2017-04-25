@@ -1,9 +1,11 @@
 package co.blastlab.serviceblbnavi.socket;
 
 import co.blastlab.serviceblbnavi.dao.repository.CoordinatesRepository;
+import co.blastlab.serviceblbnavi.dao.repository.TagRepository;
 import co.blastlab.serviceblbnavi.domain.Coordinates;
 import co.blastlab.serviceblbnavi.dto.CoordinatesDto;
 import co.blastlab.serviceblbnavi.dto.DistanceMessage;
+import co.blastlab.serviceblbnavi.dto.tag.TagDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,6 +18,7 @@ import java.awt.*;
 import java.io.IOException;
 import java.util.*;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @ServerEndpoint("/coordinates")
 @Singleton
@@ -37,10 +40,22 @@ public class WebSocketServer {
 	@Inject
 	private CoordinatesCalculator coordinatesCalculator;
 
+	@Inject
+	private TagRepository tagRepository;
+
 	@OnOpen
-	public void open(Session session) {
+	public void open(Session session)  {
 		if (Objects.equals(session.getQueryString(), CLIENT)) {
 			clientSessions.add(session);
+			List<TagDto> tags = tagRepository.findAll().stream().map(TagDto::new).collect(Collectors.toList());
+			ObjectMapper objectMapper = new ObjectMapper();
+			TagsWrapper tagsWrapper = new TagsWrapper(TypeMessage.TAGS, tags);
+			try {
+				broadCastMessage(clientSessions, objectMapper.writeValueAsString(tagsWrapper));
+			} catch (JsonProcessingException e) {
+				e.printStackTrace();
+			}
+
 		} else if (Objects.equals(session.getQueryString(), SERVER)) {
 			serverSessions.add(session);
 		}
@@ -79,6 +94,8 @@ public class WebSocketServer {
 					coordinates.setY(coordinatesDto.getY());
 					coordinatesRepository.save(coordinates);
 					try {
+						//CoordinatesWrapper coordinatesWrapper = new CoordinatesWrapper(TypeMessage.COORDINATES, coordinatesDto);
+						//broadCastMessage(clientSessions, objectMapper.writeValueAsString(coordinatesWrapper));
 						broadCastMessage(clientSessions, objectMapper.writeValueAsString(coordinatesDto));
 					} catch (JsonProcessingException e) {
 						e.printStackTrace();
