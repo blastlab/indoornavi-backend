@@ -28,7 +28,11 @@
 	}
 </style>
 <body>
-<div id="container"></div>
+<div id="container">
+	<form>
+		<div id="checkboxes"></div>
+	</form>
+</div>
 <select title="color" id="color">
 	<option value="white">white</option>
 	<option value="black">black</option>
@@ -78,22 +82,40 @@
 
 	    var colorInt = 0;
 	    var RGB = 0;
+
+	    function createNewCheckbox(div, value){
+			    div.append(
+			    $(document.createElement("label")).html(value).prepend(
+				    $(document.createElement("input")).attr('name', 'shortId').attr('value', value).attr('type', 'checkbox').attr('checked', true)
+			    )
+		    );
+	    }
+
 	    socket.onmessage = function (msg) {
 		    var message = JSON.parse(msg.data);
-		    var $el = $('<div class="square"></div>');
-		    var color = getColor(RGB, colorInt);
-		    console.log(color);
-		    $el.css({
-			    'left': 250 + message.x,
-			    'top': 400 + message.y,
-			    'background-color': color
-		    });
-		    $container.append($el);
-		    colorInt += 3;
-		    if (colorInt > 255) {
-			    RGB++;
-			    colorInt = 0;
+		    console.log('my message: ' + JSON.stringify(message));
+
+		    if (message.type == "TAGS"){
+		    	for (var i = 0; i < message.tags.length; i++){
+		    		createNewCheckbox($('#checkboxes'), message.tags[i].shortId);
+			    }
 		    }
+
+			var $el = $('<div class="square"></div>');
+			var color = getColor(RGB, colorInt);
+			console.log(color);
+			$el.css({
+				'left': 250 + message.x,
+				'top': 400 + message.y,
+				'background-color': color
+			});
+			$container.append($el);
+			colorInt += 3;
+			if (colorInt > 255) {
+				RGB++;
+				colorInt = 0;
+			}
+		    //{"type":"COORDINATES","coordinatesDto":{"device":"test","x":627,"y":182}}
 	    };
 
 	    var anchors = [
