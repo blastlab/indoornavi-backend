@@ -1,4 +1,4 @@
-package co.blastlab.serviceblbnavi.socket;
+package co.blastlab.serviceblbnavi.socket.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,8 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-class Anchor {
-	private Integer id;
-	private double x;
-	private double y;
+public class MessageWrapper {
+
+	private MessageType type;
 }
