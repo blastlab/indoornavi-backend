@@ -1,5 +1,8 @@
-package co.blastlab.serviceblbnavi.socket;
+package co.blastlab.serviceblbnavi.socket.utils;
 
+import co.blastlab.serviceblbnavi.dao.repository.AnchorRepository;
+import co.blastlab.serviceblbnavi.dto.CoordinatesDto;
+import co.blastlab.serviceblbnavi.socket.dto.Point;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 import lombok.AllArgsConstructor;
@@ -9,9 +12,8 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
 import javax.ejb.Singleton;
-import java.awt.*;
+import javax.inject.Inject;
 import java.util.*;
-import java.util.List;
 
 @Singleton
 public class CoordinatesCalculator {
@@ -21,9 +23,10 @@ public class CoordinatesCalculator {
 	// 30 minutes
 	private final static long OLD_MEASURE_IN_MILISECONDS = 1_800_000;
 
-	private FakeDb db = new FakeDb();
+	@Inject
+	private AnchorRepository anchorRepository;
 
-	public Optional<Point> calculateTagPosition(int firstDeviceId, int secondDeviceId, double distance) {
+	public Optional<CoordinatesDto> calculateTagPosition(int firstDeviceId, int secondDeviceId, double distance) {
 		Integer tagId = getTagId(firstDeviceId, secondDeviceId);
 		Integer anchorId = getAnchorId(firstDeviceId, secondDeviceId);
 		if (tagId == null || anchorId == null) {
@@ -41,8 +44,8 @@ public class CoordinatesCalculator {
 		List<Point> intersectionPoints = new ArrayList<>();
 		pairs.forEach(pair -> {
 			intersectionPoints.addAll(IntersectionsCalculator.getIntersections(
-				db.findBy(pair.getLeft().getAnchorId()), pair.getLeft().getDistance(),
-				db.findBy(pair.getRight().getAnchorId()), pair.getRight().getDistance()
+				anchorRepository.findByShortId(pair.getLeft().getAnchorId()), pair.getLeft().getDistance(),
+				anchorRepository.findByShortId(pair.getRight().getAnchorId()), pair.getRight().getDistance()
 			));
 		});
 
@@ -66,7 +69,7 @@ public class CoordinatesCalculator {
 		y /= j;
 
 		clearConnectedAnchors(tagId);
-		return Optional.of(new Point(x, y));
+		return Optional.of(new CoordinatesDto(tagId, new Point(x, y)));
 	}
 
 	/**

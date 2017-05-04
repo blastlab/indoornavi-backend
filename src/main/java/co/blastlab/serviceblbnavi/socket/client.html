@@ -1,26 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+	<meta charset="UTF-8">
+	<title>Title</title>
 </head>
 <style>
-    #container {
-        width: 1500px;
-        height: 1500px;
-        background: grey;
-	    position: relative;
-    }
+	#container {
+		width: 1500px;
+		height: 1500px;
+		background: grey;
+		position: relative;
+	}
 
-    .square {
-        width: 5px;
-        height: 5px;
-        background: white;
-        position: absolute;
-    }
-
-	#color {
-		display: none;
+	.square {
+		width: 5px;
+		height: 5px;
+		background: white;
+		position: absolute;
 	}
 
 	.red {
@@ -33,127 +29,96 @@
 		<div id="checkboxes"></div>
 	</form>
 </div>
-<select title="color" id="color">
-	<option value="white">white</option>
-	<option value="black">black</option>
-	<option value="red">red</option>
-	<option value="pink">pink</option>
-	<option value="green">green</option>
-</select>
 </body>
 <script
-        src="https://code.jquery.com/jquery-3.1.1.min.js"
-        integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
-        crossorigin="anonymous"></script>
+	src="https://code.jquery.com/jquery-3.1.1.min.js"
+	integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+	crossorigin="anonymous"></script>
 <script>
-    $(document).ready(function () {
-	    var $container = $('#container');
+	$(document).ready(function () {
+		var $container = $('#container');
+		var isConnectionOpen = false;
+		var socket = new WebSocket("ws://localhost:80/coordinates?client");
+		var message = {
+			color: ''
+		};
+		var tags = [];
 
-	    var isConnectionOpen = false;
-	    var socket = new WebSocket("ws://localhost:80/coordinates?client");
-	    var message = {
-		    color: ''
-	    };
-	    socket.onopen = function () {
-		    console.log('connection opened');
-		    isConnectionOpen = true;
-	    };
+		socket.onopen = function () {
+			console.log('connection opened');
+			isConnectionOpen = true;
+		};
 
-	    socket.onclose = function() {
-		    console.log('connection closed');
-		    isConnectionOpen = false;
-	    };
+		socket.onclose = function () {
+			console.log('connection closed');
+			isConnectionOpen = false;
+		};
 
-	    function getColor(RGB, colorInt) {
-	    	var color;
-	    	if (colorInt <= 16) {
-	    		color = '0' + colorInt.toString(16);
-		    } else {
-	    		color = colorInt.toString(16)
-		    }
-	    	if (RGB == 0) {
-	    		return '#0000' + color
-		    } else if (RGB == 1) {
-	    		return '#00' + color + 'ff';
-		    } else if (RGB == 2) {
-	    		return '#' + color + 'ffff';
-		    }
-	    }
+		socket.onmessage = function (msg) {
+			var message = JSON.parse(msg.data);
+			console.log('my message: ' + JSON.stringify(message));
 
-	    var colorInt = 0;
-	    var RGB = 0;
+			if (message.type === 'TAGS') {
+				var checkboxes = $('#checkboxes');
+				for (var i = 0; i < message.tags.length; i++) {
+					if (tags.indexOf(message.tags[i]['shortId']) >= 0) continue;
 
-	    function createNewCheckbox(div, value){
-			    div.append(
-			    $(document.createElement("label")).html(value).prepend(
-				    $(document.createElement("input")).attr('name', 'shortId').attr('value', value).attr('type', 'checkbox').attr('checked', true)
-			    )
-		    );
-	    }
+					var checkbox = $('<input name="tag" checked type="checkbox" value="' + message.tags[i]['shortId'] + '">');
+					var wrapper = $('<span>' + message.tags[i]['shortId'] + '</span>');
+					checkbox.change(function() {
+						socket.send($(this).val());
+					});
+					wrapper.css({
+						'color': getColor(message.tags[i]['shortId'])
+					});
+					wrapper.append(checkbox);
+					checkboxes.append(wrapper);
+					tags.push(message.tags[i]['shortId']);
+				}
+			} else if (message.type === 'COORDINATES') {
+				var $el = $('<div class="square"></div>');
+				console.log('Received: ');
+				console.log(message['coordinatesDto']);
+				$el.css({
+					'left': 250 + message['coordinatesDto']['point'].x,
+					'top': 400 + message['coordinatesDto']['point'].y,
+					'background-color': getColor(message['coordinatesDto']['deviceId'])
+				});
+				$container.append($el);
+			}
+		};
 
-	    socket.onmessage = function (msg) {
-		    var message = JSON.parse(msg.data);
-		    console.log('my message: ' + JSON.stringify(message));
+		function getColor(deviceId) {
+			return {
+				10151: 'blue',
+				10404: 'purple',
+				10210: 'green',
+				10310: 'pink'
+			}[deviceId];
+		}
 
-		    if (message.type == "TAGS"){
-		    	for (var i = 0; i < message.tags.length; i++){
-		    		createNewCheckbox($('#checkboxes'), message.tags[i].shortId);
-			    }
-		    }
-
-			var $el = $('<div class="square"></div>');
-			var color = getColor(RGB, colorInt);
-			console.log(color);
+		var anchors = [
+			{
+				x: 0,
+				y: 0
+			},
+			{
+				x: 785,
+				y: 0
+			},
+			{
+				x: 485,
+				y: 397
+			}
+		];
+		for (var j = 0; j < anchors.length; j++) {
+			var $el = $('<div class="square red"></div>');
 			$el.css({
-				'left': 250 + message.x,
-				'top': 400 + message.y,
-				'background-color': color
+				'left': 250 + anchors[j].x,
+				'top': 400 + anchors[j].y
 			});
 			$container.append($el);
-			colorInt += 3;
-			if (colorInt > 255) {
-				RGB++;
-				colorInt = 0;
-			}
-		    //{"type":"COORDINATES","coordinatesDto":{"device":"test","x":627,"y":182}}
-	    };
-
-	    var anchors = [
-	    	{
-		        x: 0,
-			    y: 0
-	        },
-		    {
-		    	x: 785,
-			    y: 0
-		    },
-		    {
-		    	x: 485,
-			    y: 397
-		    }
-	    ];
-	    for (var j = 0; j < anchors.length; j++) {
-		    var $el = $('<div class="square red"></div>');
-		    $el.css({
-			    'left': 250+ anchors[j].x,
-			    'top': 400 + anchors[j].y
-		    });
-		    $container.append($el);
-	    }
-
-        var interval = null;
-	    interval = setInterval(function() {
-	    	console.log('waiting for connection');
-        	if (isConnectionOpen) {
-		        var $color = $('#color');
-		        $color.change(function() {
-			        message.color = $color.find('option:selected').val();
-			        socket.send(JSON.stringify(message));
-		        });
-		        clearInterval(interval);
-		        $color.show();
-	        }
-        }, 1000);
-    });
+		}
+	});
 </script>
 </html>

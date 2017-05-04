@@ -1,10 +1,11 @@
 package co.blastlab.serviceblbnavi.socket;
 
+import co.blastlab.serviceblbnavi.dto.CoordinatesDto;
+import co.blastlab.serviceblbnavi.socket.utils.CoordinatesCalculator;
 import com.google.common.collect.Range;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.awt.*;
 import java.util.Optional;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -24,15 +25,15 @@ public class CoordinatesCalculatorTest {
 	public void calculateTagPosition() throws Exception {
 		TxtParser txtParser = new TxtParser();
 		txtParser.parse();
-		Optional<Point> point = coordinatesCalculator.calculateTagPosition(1, 32768, 300);
-		assertThat(point.isPresent(), is(false));
-		point = coordinatesCalculator.calculateTagPosition(1, 32769, 700);
-		assertThat(point.isPresent(), is(false));
-		point = coordinatesCalculator.calculateTagPosition(1, 32770, 1044);
-		assertThat(point.isPresent(), is(true));
-		if (point.isPresent()) {
-			assertTrue(Range.open(297d, 303d).contains(point.get().getX()));
-			assertTrue(Range.open(-3d, 3d).contains(point.get().getY()));
+		Optional<CoordinatesDto> coords = coordinatesCalculator.calculateTagPosition(1, 32768, 300);
+		assertThat(coords.isPresent(), is(false));
+		coords = coordinatesCalculator.calculateTagPosition(1, 32769, 700);
+		assertThat(coords.isPresent(), is(false));
+		coords = coordinatesCalculator.calculateTagPosition(1, 32770, 1044);
+		assertThat(coords.isPresent(), is(true));
+		if (coords.isPresent()) {
+			assertTrue(Range.open(297, 303).contains(coords.get().getPoint().getX()));
+			assertTrue(Range.open(-3, 3).contains(coords.get().getPoint().getY()));
 		}
 	}
 }
