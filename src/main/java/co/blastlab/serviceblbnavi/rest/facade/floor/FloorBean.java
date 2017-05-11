@@ -4,14 +4,14 @@ import co.blastlab.serviceblbnavi.dao.repository.BuildingRepository;
 import co.blastlab.serviceblbnavi.dao.repository.FloorRepository;
 import co.blastlab.serviceblbnavi.domain.Building;
 import co.blastlab.serviceblbnavi.domain.Floor;
+import co.blastlab.serviceblbnavi.domain.Scale;
 import co.blastlab.serviceblbnavi.dto.floor.FloorDto;
-import io.swagger.annotations.ApiParam;
+import co.blastlab.serviceblbnavi.dto.floor.ScaleDto;
 import org.apache.http.HttpStatus;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
-import javax.validation.Valid;
 import javax.ws.rs.core.Response;
 import java.util.*;
 
@@ -63,7 +63,7 @@ public class FloorBean implements FloorFacade {
 	}
 
 	@Override
-	public List<FloorDto> updateLevels(@ApiParam(value = "floors", required = true) @Valid List<FloorDto> floors) throws Exception {
+	public List<FloorDto> updateLevels(List<FloorDto> floors) throws Exception {
 		List<FloorDto> updatedFloors = new ArrayList<>();
 		Map<Floor, Integer> floorEntityToLevel = new HashMap<>();
 		// We need to set null to all levels before we set new values due to unique constraint
@@ -91,6 +91,25 @@ public class FloorBean implements FloorFacade {
 		if (floor.isPresent()) {
 			floorRepository.remove(floor.get());
 			return Response.status(HttpStatus.SC_NO_CONTENT).build();
+		}
+		throw new EntityNotFoundException();
+	}
+
+	@Override
+	public Response setScale(Long id, ScaleDto scaleDto) {
+		Optional<Floor> floorOptional = floorRepository.findById(id);
+		if (floorOptional.isPresent()) {
+			Floor floor = floorOptional.get();
+			Scale scale = new Scale();
+			scale.setScale(scaleDto.getScale());
+			scale.setMeasure(scaleDto.getMeasure());
+			scale.setStartX(scaleDto.getStart().getX());
+			scale.setStartY(scaleDto.getStart().getY());
+			scale.setStopX(scaleDto.getStop().getX());
+			scale.setStopY(scaleDto.getStop().getY());
+			floor.setScale(scale);
+			floorRepository.save(floor);
+			return Response.ok().build();
 		}
 		throw new EntityNotFoundException();
 	}
