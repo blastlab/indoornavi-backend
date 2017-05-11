@@ -1,7 +1,7 @@
 package co.blastlab.serviceblbnavi.rest.facade;
 
 import co.blastlab.serviceblbnavi.rest.facade.util.RequestBodyBuilder;
-import co.blastlab.serviceblbnavi.rest.facade.util.violation.DbViolationResponse;
+import co.blastlab.serviceblbnavi.rest.facade.util.violation.ExtViolationResponse;
 import co.blastlab.serviceblbnavi.rest.facade.util.violation.ViolationResponse;
 import com.google.common.collect.ImmutableList;
 import org.apache.http.HttpStatus;
@@ -110,16 +110,16 @@ public class TagFacadeIT extends BaseIT {
 			.setParameter("floorId", 2)
 			.build();
 
-		DbViolationResponse dbViolationResponse = givenUser()
+		ExtViolationResponse extViolationResponse = givenUser()
 			.body(body)
 			.when().post(TAG_PATH)
 			.then().statusCode(HttpStatus.SC_BAD_REQUEST)
 			.extract()
-			.as(DbViolationResponse.class);
+			.as(ExtViolationResponse.class);
 
-		assertThat(dbViolationResponse.getError(), is(DB_VALIDATION_ERROR_NAME));
-		assertThat(dbViolationResponse.getMessage(), is(CONSTRAINT_MESSAGE_003));
-		assertThat(dbViolationResponse.getCode(), is(CONSTRAINT_CODE_003));
+		assertThat(extViolationResponse.getError(), is(DB_VALIDATION_ERROR_NAME));
+		assertThat(extViolationResponse.getMessage(), is(CONSTRAINT_MESSAGE_003));
+		assertThat(extViolationResponse.getCode(), is(CONSTRAINT_CODE_003));
 	}
 
 	@Test
@@ -130,22 +130,26 @@ public class TagFacadeIT extends BaseIT {
 			.setParameter("floorId", 1)
 			.build();
 
-		DbViolationResponse dbViolationResponse = givenUser()
+		ExtViolationResponse extViolationResponse = givenUser()
 			.body(body)
 			.when().post(TAG_PATH)
 			.then().statusCode(HttpStatus.SC_BAD_REQUEST)
 			.extract()
-			.as(DbViolationResponse.class);
+			.as(ExtViolationResponse.class);
 
-		assertThat(dbViolationResponse.getError(), is(DB_VALIDATION_ERROR_NAME));
-		assertThat(dbViolationResponse.getMessage(), is(CONSTRAINT_MESSAGE_002));
-		assertThat(dbViolationResponse.getCode(), is(CONSTRAINT_CODE_002));
+		assertThat(extViolationResponse.getError(), is(DB_VALIDATION_ERROR_NAME));
+		assertThat(extViolationResponse.getMessage(), is(CONSTRAINT_MESSAGE_002));
+		assertThat(extViolationResponse.getCode(), is(CONSTRAINT_CODE_002));
 	}
 
 	@Test
 	public void updateTag(){
 		Integer existingFloorId = 3;
-		String body = new RequestBodyBuilder("Tag.json")
+		Integer newShortId = 10150;
+		Integer newLongId = 150002323;
+			String body = new RequestBodyBuilder("Tag.json")
+			.setParameter("shortId", newShortId)
+			.setParameter("longId", newLongId)
 			.setParameter("name", NAME_CREATING)
 			.setParameter("floorId", existingFloorId)
 			.setParameter("verified", VERIFIED_TRUE)
@@ -157,8 +161,8 @@ public class TagFacadeIT extends BaseIT {
 			.when().put(TAG_PATH_WITH_ID)
 			.then().statusCode(HttpStatus.SC_OK)
 			.body(
-				"shortId", equalTo(SHORT_ID_FOR_TAG_ID_4),
-				"longId", equalTo(151232323),
+				"shortId", equalTo(newShortId),
+				"longId", equalTo(newLongId),
 				"name", equalTo(NAME_CREATING),
 				"floorId", equalTo(existingFloorId),
 				"verified", equalTo(VERIFIED_TRUE)
@@ -191,6 +195,8 @@ public class TagFacadeIT extends BaseIT {
 		String body = new RequestBodyBuilder("Tag.json")
 			.setParameter("name", NAME_CREATING)
 			.setParameter("floorId", 2)
+			.setParameter("shortId", 10404)
+			.setParameter("longId", 45454545)
 			.build();
 
 		givenUser()
