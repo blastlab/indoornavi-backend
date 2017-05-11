@@ -31,11 +31,14 @@ public class FloorDto {
 	@ApiModelProperty(example = "1")
 	private Long imageId;
 
+	private ScaleDto scale;
+
 	public FloorDto(Floor floor) {
 		this.setId(floor.getId());
 		this.setLevel(floor.getLevel());
 		this.setName(floor.getName());
 		this.setBuildingId(floor.getBuilding() != null ? floor.getBuilding().getId() : null);
 		this.setImageId(floor.getImage() != null ? floor.getImage().getId() : null);
+		this.setScale(floor.getScale() != null ? new ScaleDto(floor.getScale()) : null);
 	}
 }

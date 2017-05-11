@@ -19,6 +19,7 @@ public class FloorFacadeIT extends BaseIT {
 
 	private static final String FLOOR_PATH = "/floors";
 	private static final String FLOOR_PATH_WITH_ID = "/floors/{id}";
+	private static final String FLOOR_SET_SCALE_PATH = "/floors/{id}/setScale";
 
 	private static final String NAME_FLOOR = "Piętro $ \" \\ ążśźęćółń ĄŻŚŹĘĆŃÓŁ `~!@#%^&*()-_=+{}[]:;'|><,.?";
 	private static final String CONSTRAINT_MESSAGE_001 = "You can not have more than one floor with the same level";
@@ -264,9 +265,48 @@ public class FloorFacadeIT extends BaseIT {
 			.as(FloorDto[].class);
 
 		assertThat(Arrays.asList(floors), containsInAnyOrder(
-			floorDtoCustomMatcher(new FloorDto(4L, 1, "", 1L, null)),
-			floorDtoCustomMatcher(new FloorDto(5L, 0, "", 1L, null))
+			floorDtoCustomMatcher(new FloorDto(4L, 1, "", 1L, null, null)),
+			floorDtoCustomMatcher(new FloorDto(5L, 0, "", 1L, null, null))
 		));
+	}
+
+	@Test
+	public void shouldResponseWithStatusOk() {
+		givenUser()
+			.body(
+				new RequestBodyBuilder("Scale.json")
+				.setParameter("scale", 100)
+				.build()
+			)
+			.pathParam("id", 1)
+			.when().put(FLOOR_SET_SCALE_PATH)
+			.then().statusCode(HttpStatus.SC_OK);
+	}
+
+	@Test
+	public void shouldResponseWithStatusNotFound() {
+		givenUser()
+			.body(
+				new RequestBodyBuilder("Scale.json")
+					.setParameter("scale", 100)
+					.build()
+			)
+			.pathParam("id", 100)
+			.when().put(FLOOR_SET_SCALE_PATH)
+			.then().statusCode(HttpStatus.SC_NOT_FOUND);
+	}
+
+	@Test
+	public void shouldResponseWithStatusValidationError() {
+		givenUser()
+			.body(
+				new RequestBodyBuilder("Scale.json")
+					.setParameter("scale", null)
+					.build()
+			)
+			.pathParam("id", 1)
+			.when().put(FLOOR_SET_SCALE_PATH)
+			.then().statusCode(HttpStatus.SC_BAD_REQUEST);
 	}
 
 	private void assertViolations(ViolationResponse violationResponse) {
