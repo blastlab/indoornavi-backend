@@ -1,7 +1,7 @@
 package co.blastlab.serviceblbnavi.rest.facade;
 
 import co.blastlab.serviceblbnavi.rest.facade.util.RequestBodyBuilder;
-import co.blastlab.serviceblbnavi.rest.facade.util.violation.DbViolationResponse;
+import co.blastlab.serviceblbnavi.rest.facade.util.violation.ExtViolationResponse;
 import co.blastlab.serviceblbnavi.rest.facade.util.violation.ViolationResponse;
 import com.google.common.collect.ImmutableList;
 import org.apache.http.HttpStatus;
@@ -153,16 +153,16 @@ public class AnchorFacadeIT extends BaseIT {
 			.setParameter("verified", ANCHOR_NOT_VERIFIED)
 			.build();
 
-		DbViolationResponse dbViolationResponse = givenUser()
+		ExtViolationResponse extViolationResponse = givenUser()
 			.body(body)
 			.when().post(ANCHOR_PATH)
 			.then().statusCode(HttpStatus.SC_BAD_REQUEST)
 			.extract()
-			.as(DbViolationResponse.class);
+			.as(ExtViolationResponse.class);
 
-		assertThat(dbViolationResponse.getError(), is(DB_VALIDATION_ERROR_NAME));
-		assertThat(dbViolationResponse.getMessage(), is(CONSTRAINT_MESSAGE_003));
-		assertThat(dbViolationResponse.getCode(), is(CONSTRAINT_CODE_003));
+		assertThat(extViolationResponse.getError(), is(DB_VALIDATION_ERROR_NAME));
+		assertThat(extViolationResponse.getMessage(), is(CONSTRAINT_MESSAGE_003));
+		assertThat(extViolationResponse.getCode(), is(CONSTRAINT_CODE_003));
 	}
 
 	@Test
@@ -177,23 +177,23 @@ public class AnchorFacadeIT extends BaseIT {
 			.setParameter("verified", ANCHOR_NOT_VERIFIED)
 			.build();
 
-		DbViolationResponse dbViolationResponse = givenUser()
+		ExtViolationResponse extViolationResponse = givenUser()
 			.body(body)
 			.when().post(ANCHOR_PATH)
 			.then().statusCode(HttpStatus.SC_BAD_REQUEST)
 			.extract()
-			.as(DbViolationResponse.class);
+			.as(ExtViolationResponse.class);
 
-		assertThat(dbViolationResponse.getError(), is(DB_VALIDATION_ERROR_NAME));
-		assertThat(dbViolationResponse.getMessage(), is(CONSTRAINT_MESSAGE_002));
-		assertThat(dbViolationResponse.getCode(), is(CONSTRAINT_CODE_002));
+		assertThat(extViolationResponse.getError(), is(DB_VALIDATION_ERROR_NAME));
+		assertThat(extViolationResponse.getMessage(), is(CONSTRAINT_MESSAGE_002));
+		assertThat(extViolationResponse.getCode(), is(CONSTRAINT_CODE_002));
 	}
 
 	@Test
 	public void updateAnchor() {
 		String body = new RequestBodyBuilder("Anchor.json")
-			.setParameter("shortId", ANCHOR_SHORT_ID_EXISTING)
-			.setParameter("longId", ANCHOR_LONG_ID_EXISTING)
+			.setParameter("shortId", ANCHOR_SHORT_ID_EXISTING - 1)
+			.setParameter("longId", ANCHOR_LONG_ID_EXISTING + 5)
 			.setParameter("name", NAME)
 			.setParameter("floorId", FLOOR_EXISTING)
 			.setParameter("x", X)
@@ -207,8 +207,8 @@ public class AnchorFacadeIT extends BaseIT {
 			.when().put(ANCHOR_PATH_WITH_ID)
 			.then().statusCode(HttpStatus.SC_OK)
 			.body(
-				"shortId", equalTo(ANCHOR_SHORT_ID_EXISTING),
-				"longId", equalTo(ANCHOR_LONG_ID_EXISTING),
+				"shortId", equalTo(ANCHOR_SHORT_ID_EXISTING - 1),
+				"longId", equalTo(ANCHOR_LONG_ID_EXISTING + 5),
 				"name", equalTo(NAME),
 				"floorId", equalTo(FLOOR_EXISTING),
 				"x", equalTo(X),
@@ -250,6 +250,8 @@ public class AnchorFacadeIT extends BaseIT {
 	public void shouldAddFloorIdAndNameAndCoordinatesWhileUpdatingAnchor() {
 		Integer updatedAnchorId = 2;
 		String body = new RequestBodyBuilder("Anchor.json")
+			.setParameter("shortId", 40622)
+			.setParameter("longId", 93170459)
 			.setParameter("name", NAME)
 			.setParameter("floorId", FLOOR_EXISTING)
 			.setParameter("x", X)

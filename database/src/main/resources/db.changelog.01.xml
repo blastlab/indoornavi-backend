@@ -170,4 +170,39 @@
 			<column name="y" type="DOUBLE"/>
 		</createTable>
 	</changeSet>
+	<changeSet author="jsmol (generated)" id="issue-111-1">
+		<createTable tableName="Image">
+			<column name="id" type="BIGINT" autoIncrement="true">
+				<constraints nullable="false" primaryKey="true" primaryKeyName="ImagePK"/>
+			</column>
+			<column name="creationDate" type="timestamp"/>
+			<column name="modificationDate" type="timestamp"/>
+			<column name="bitmap" type="BLOB"/>
+			<column name="bitmapHeight" type="INT"/>
+			<column name="bitmapWidth" type="INT"/>
+			<column name="floor_id" type="BIGINT"/>
+		</createTable>
+	</changeSet>
+	<changeSet author="jsmol (generated)" id="issue-111-2">
+		<addForeignKeyConstraint baseColumnNames="floor_id" baseTableName="Image" constraintName="FK_3m9vugkgfmxx2ulfe0jb6gdye" deferrable="false"
+		                         initiallyDeferred="false" referencedColumnNames="id" referencedTableName="Floor"/>
+	</changeSet>
+	<changeSet author="jsmol (generated)" id="issue-111-3">
+		<addColumn tableName="Floor">
+			<column name="image_id" type="bigint"/>
+		</addColumn>
+	</changeSet>
+	<changeSet author="jsmol (generated)" id="issue-111-4">
+		<addForeignKeyConstraint baseColumnNames="image_id" baseTableName="Floor" constraintName="FK_6u98qhbox47qemgykogk61gt" deferrable="false"
+		                         initiallyDeferred="false" referencedColumnNames="id" referencedTableName="Image"/>
+	</changeSet>
+	<changeSet author="jsmol (generated)" id="issue-111-5">
+		<dropForeignKeyConstraint baseTableName="image" constraintName="FK_3m9vugkgfmxx2ulfe0jb6gdye"/>
+	</changeSet>
+	<changeSet author="jsmol (generated)" id="issue-111-6">
+		<dropColumn columnName="floor_id" tableName="image"/>
+	</changeSet>
+	<changeSet author="kgebert" id="issue-111-7">
+		<modifyDataType tableName="image" columnName="bitmap" newDataType="mediumblob" />
+	</changeSet>
 </databaseChangeLog>
