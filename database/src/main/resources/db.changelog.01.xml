@@ -205,4 +205,37 @@
 	<changeSet author="kgebert" id="issue-111-7">
 		<modifyDataType tableName="image" columnName="bitmap" newDataType="mediumblob" />
 	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-59-1">
+		<createTable tableName="Scale">
+			<column name="id" type="BIGINT" autoIncrement="true">
+				<constraints nullable="false" primaryKey="true" primaryKeyName="ScalePK" />
+			</column>
+			<column name="creationDate" type="timestamp"/>
+			<column name="modificationDate" type="timestamp"/>
+			<column name="measure" type="VARCHAR(255)"/>
+			<column name="realDistanceInCentimeters" type="INT">
+				<constraints nullable="false"/>
+			</column>
+			<column name="startX" type="INT">
+				<constraints nullable="false"/>
+			</column>
+			<column name="startY" type="INT">
+				<constraints nullable="false"/>
+			</column>
+			<column name="stopX" type="INT">
+				<constraints nullable="false"/>
+			</column>
+			<column name="stopY" type="INT">
+				<constraints nullable="false"/>
+			</column>
+		</createTable>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-59-2">
+		<addColumn tableName="Floor">
+			<column name="scale_id" type="bigint"/>
+		</addColumn>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-59-3">
+		<addForeignKeyConstraint onUpdate="CASCADE" onDelete="SET NULL" baseColumnNames="scale_id" baseTableName="Floor" constraintName="FK_Floor_Scale_Id" referencedColumnNames="id" referencedTableName="Scale"/>
+	</changeSet>
 </databaseChangeLog>

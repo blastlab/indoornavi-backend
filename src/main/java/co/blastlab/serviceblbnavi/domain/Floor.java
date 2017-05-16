@@ -14,7 +14,7 @@ import java.util.List;
 @Table(
 	uniqueConstraints = @UniqueConstraint(columnNames = {"level", "building_id"})
 )
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = true)
 public class Floor extends TrackedEntity {
 
 	private Integer level;
@@ -30,5 +30,8 @@ public class Floor extends TrackedEntity {
 
 	@OneToOne
 	private Image image;
+
+	@OneToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
+	private Scale scale;
 
 }
