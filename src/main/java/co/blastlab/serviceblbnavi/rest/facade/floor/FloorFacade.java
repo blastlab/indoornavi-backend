@@ -57,11 +57,11 @@ public interface FloorFacade {
 	Response delete(@PathParam("id") @ApiParam(value = "floor id", required = true) @Valid @NotNull Long id);
 
 	@PUT
-	@Path("/{id: \\d+}/setScale")
-	@ApiOperation(value = "set scale", response = Response.class)
+	@Path("/{id: \\d+}/scale")
+	@ApiOperation(value = "set scale", response = FloorDto.class)
 	@ApiResponses({
 		@ApiResponse(code = 404, message = "Floor with given id does not exist")
 	})
-	Response setScale(@PathParam("id") @ApiParam(value = "floor id", required = true) @Valid @NotNull Long id,
+	FloorDto setScale(@PathParam("id") @ApiParam(value = "floor id", required = true) @Valid @NotNull Long id,
 	                  @ApiParam(value = "scale", required = true) @Valid ScaleDto scaleDto);
 }

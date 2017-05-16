@@ -17,18 +17,18 @@ public class ScaleDto {
 	private Point stop;
 
 	/*
-		How many pixels equals one measure unit
+		Distance provided by user
 	 */
 	@NotNull
-	private Integer scale;
+	private Integer realDistance;
 
 	@NotNull
-	private Measure measure = Measure.MM;
+	private Measure measure = Measure.METERS;
 
 	public ScaleDto(Scale scale) {
 		this.setStart(new Point(scale.getStartX(), scale.getStartY()));
 		this.setStop(new Point(scale.getStopX(), scale.getStopY()));
-		this.setScale(scale.getScale());
+		this.setRealDistance(scale.getRealDistance());
 		this.setMeasure(scale.getMeasure());
 	}
 }

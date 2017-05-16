@@ -19,7 +19,7 @@ public class FloorFacadeIT extends BaseIT {
 
 	private static final String FLOOR_PATH = "/floors";
 	private static final String FLOOR_PATH_WITH_ID = "/floors/{id}";
-	private static final String FLOOR_SET_SCALE_PATH = "/floors/{id}/setScale";
+	private static final String FLOOR_SET_SCALE_PATH = "/floors/{id}/scale";
 
 	private static final String NAME_FLOOR = "Piętro $ \" \\ ążśźęćółń ĄŻŚŹĘĆŃÓŁ `~!@#%^&*()-_=+{}[]:;'|><,.?";
 	private static final String CONSTRAINT_MESSAGE_001 = "You can not have more than one floor with the same level";
@@ -272,15 +272,19 @@ public class FloorFacadeIT extends BaseIT {
 
 	@Test
 	public void shouldResponseWithStatusOk() {
-		givenUser()
+		FloorDto floorDto = givenUser()
 			.body(
 				new RequestBodyBuilder("Scale.json")
-				.setParameter("scale", 100)
-				.build()
+					.setParameter("realDistance", 100)
+					.build()
 			)
 			.pathParam("id", 1)
 			.when().put(FLOOR_SET_SCALE_PATH)
-			.then().statusCode(HttpStatus.SC_OK);
+			.then().statusCode(HttpStatus.SC_OK)
+			.extract()
+			.as(FloorDto.class);
+
+		assertThat(floorDto.getScale().getRealDistance(), is(100));
 	}
 
 	@Test
@@ -301,7 +305,7 @@ public class FloorFacadeIT extends BaseIT {
 		givenUser()
 			.body(
 				new RequestBodyBuilder("Scale.json")
-					.setParameter("scale", null)
+					.setParameter("realDistance", null)
 					.build()
 			)
 			.pathParam("id", 1)
