@@ -20,10 +20,14 @@ public class Scale extends TrackedEntity {
 	@Enumerated(EnumType.STRING)
 	private Measure measure;
 
-	// measure should be always centimeters
-	private int realDistance;
+	/*
+		measure should be always centimeters
+	*/
+	private int realDistanceInCentimeters;
 
-	// this method calculate distance between start point and stop point
+	/*
+	    this method calculate distance between start point and stop point
+    */
 	public double getDistance() {
 		return Math.sqrt(Math.pow(Math.abs(startX - stopX), 2) + Math.pow(Math.abs(startY - stopY), 2));
 	}

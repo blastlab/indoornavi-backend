@@ -213,7 +213,7 @@
 			<column name="creationDate" type="timestamp"/>
 			<column name="modificationDate" type="timestamp"/>
 			<column name="measure" type="VARCHAR(255)"/>
-			<column name="realDistance" type="INT">
+			<column name="realDistanceInCentimeters" type="INT">
 				<constraints nullable="false"/>
 			</column>
 			<column name="startX" type="INT">
@@ -236,6 +236,6 @@
 		</addColumn>
 	</changeSet>
 	<changeSet author="kgebert (generated)" id="navi-59-3">
-		<addForeignKeyConstraint onUpdate="CASCADE" onDelete="CASCADE" baseColumnNames="scale_id" baseTableName="Floor" constraintName="FK_Floor_Scale_Id" referencedColumnNames="id" referencedTableName="Scale"/>
+		<addForeignKeyConstraint onUpdate="CASCADE" onDelete="SET NULL" baseColumnNames="scale_id" baseTableName="Floor" constraintName="FK_Floor_Scale_Id" referencedColumnNames="id" referencedTableName="Scale"/>
 	</changeSet>
 </databaseChangeLog>

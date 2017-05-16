@@ -28,7 +28,7 @@ public class ScaleDto {
 	public ScaleDto(Scale scale) {
 		this.setStart(new Point(scale.getStartX(), scale.getStartY()));
 		this.setStop(new Point(scale.getStopX(), scale.getStopY()));
-		this.setRealDistance(scale.getRealDistance());
+		this.setRealDistance(scale.getMeasure().equals(Measure.METERS) ? scale.getRealDistanceInCentimeters() / 100 : scale.getRealDistanceInCentimeters());
 		this.setMeasure(scale.getMeasure());
 	}
 }
