@@ -6,6 +6,7 @@ import co.blastlab.serviceblbnavi.domain.Building;
 import co.blastlab.serviceblbnavi.domain.Floor;
 import co.blastlab.serviceblbnavi.domain.Scale;
 import co.blastlab.serviceblbnavi.dto.floor.FloorDto;
+import co.blastlab.serviceblbnavi.dto.floor.Measure;
 import co.blastlab.serviceblbnavi.dto.floor.ScaleDto;
 import org.apache.http.HttpStatus;
 
@@ -96,21 +97,17 @@ public class FloorBean implements FloorFacade {
 	}
 
 	@Override
-	public Response setScale(Long id, ScaleDto scaleDto) {
-		Optional<Floor> floorOptional = floorRepository.findById(id);
-		if (floorOptional.isPresent()) {
-			Floor floor = floorOptional.get();
-			Scale scale = new Scale();
-			scale.setScale(scaleDto.getScale());
-			scale.setMeasure(scaleDto.getMeasure());
-			scale.setStartX(scaleDto.getStart().getX());
-			scale.setStartY(scaleDto.getStart().getY());
-			scale.setStopX(scaleDto.getStop().getX());
-			scale.setStopY(scaleDto.getStop().getY());
-			floor.setScale(scale);
-			floorRepository.save(floor);
-			return Response.ok().build();
-		}
-		throw new EntityNotFoundException();
+	public FloorDto setScale(Long id, ScaleDto scaleDto) {
+		Floor floor = floorRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+		Scale scale = new Scale();
+		scale.setRealDistance(scaleDto.getMeasure().equals(Measure.METERS) ? scaleDto.getRealDistance() * 1000 : scaleDto.getRealDistance());
+		scale.setStartX(scaleDto.getStart().getX());
+		scale.setStartY(scaleDto.getStart().getY());
+		scale.setStopX(scaleDto.getStop().getX());
+		scale.setStopY(scaleDto.getStop().getY());
+		scale.setMeasure(scaleDto.getMeasure());
+		floor.setScale(scale);
+		floor = floorRepository.save(floor);
+		return new FloorDto(floor);
 	}
 }

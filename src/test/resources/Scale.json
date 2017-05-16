@@ -1,6 +1,6 @@
 {
-	"scale": 0,
-	"measure": "CM",
+	"realDistance": 0,
+	"measure": "CENTIMETERS",
 	"start": {
 		"x": 0,
 		"y": 0
