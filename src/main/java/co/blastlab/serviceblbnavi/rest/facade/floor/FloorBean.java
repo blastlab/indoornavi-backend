@@ -99,8 +99,8 @@ public class FloorBean implements FloorFacade {
 	@Override
 	public FloorDto setScale(Long id, ScaleDto scaleDto) {
 		Floor floor = floorRepository.findById(id).orElseThrow(EntityNotFoundException::new);
-		Scale scale = new Scale();
-		scale.setRealDistance(scaleDto.getMeasure().equals(Measure.METERS) ? scaleDto.getRealDistance() * 1000 : scaleDto.getRealDistance());
+		Scale scale = Optional.ofNullable(floor.getScale()).orElse(new Scale());
+		scale.setRealDistanceInCentimeters(scaleDto.getMeasure().equals(Measure.METERS) ? scaleDto.getRealDistance() * 100 : scaleDto.getRealDistance());
 		scale.setStartX(scaleDto.getStart().getX());
 		scale.setStartY(scaleDto.getStart().getY());
 		scale.setStopX(scaleDto.getStop().getX());
