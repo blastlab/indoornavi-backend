@@ -1,6 +1,7 @@
 package co.blastlab.serviceblbnavi.rest.facade.floor;
 
 import co.blastlab.serviceblbnavi.dto.floor.FloorDto;
+import co.blastlab.serviceblbnavi.dto.floor.ScaleDto;
 import co.blastlab.serviceblbnavi.ext.filter.TokenAuthorization;
 import io.swagger.annotations.*;
 
@@ -54,4 +55,13 @@ public interface FloorFacade {
 		@ApiResponse(code = 204, message = "Deleted successfully but there is no new information to return")
 	})
 	Response delete(@PathParam("id") @ApiParam(value = "floor id", required = true) @Valid @NotNull Long id);
+
+	@PUT
+	@Path("/{id: \\d+}/scale")
+	@ApiOperation(value = "set scale", response = FloorDto.class)
+	@ApiResponses({
+		@ApiResponse(code = 404, message = "Floor with given id does not exist")
+	})
+	FloorDto setScale(@PathParam("id") @ApiParam(value = "floor id", required = true) @Valid @NotNull Long id,
+	                  @ApiParam(value = "scale", required = true) @Valid ScaleDto scaleDto);
 }
