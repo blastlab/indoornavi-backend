@@ -12,11 +12,15 @@ import co.blastlab.serviceblbnavi.socket.dto.AnchorsWrapper;
 import co.blastlab.serviceblbnavi.socket.dto.CoordinatesWrapper;
 import co.blastlab.serviceblbnavi.socket.dto.MessageWrapper;
 import co.blastlab.serviceblbnavi.socket.dto.TagsWrapper;
+import co.blastlab.serviceblbnavi.socket.filters.Command;
+import co.blastlab.serviceblbnavi.socket.filters.Filter;
+import co.blastlab.serviceblbnavi.socket.filters.FilterType;
 import co.blastlab.serviceblbnavi.socket.filters.TagFilter;
 import co.blastlab.serviceblbnavi.socket.utils.CoordinatesCalculator;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import javax.ejb.Schedule;
 import javax.ejb.Singleton;
 import javax.inject.Inject;
 import javax.websocket.*;
@@ -29,8 +33,8 @@ import java.util.stream.Collectors;
 @Singleton
 public class WebSocketServer {
 
-	private static Set<Session> clientSessions = Collections.synchronizedSet(new HashSet<Session>());
-	private static Set<Session> serverSessions = Collections.synchronizedSet(new HashSet<Session>());
+	private static Set<Session> clientSessions = new HashSet<>();
+	private static Set<Session> serverSessions = new HashSet<>();
 
 	private final static String CLIENT = "client";
 	private final static String SERVER = "server";
@@ -47,8 +51,7 @@ public class WebSocketServer {
 	@Inject
 	private AnchorRepository anchorRepository;
 
-	@Inject
-	private TagFilter tagFilter;
+	private Map<FilterType, Filter> activeFilters = new HashMap<>();
 
 	@OnOpen
 	public void open(Session session)  {
@@ -56,7 +59,6 @@ public class WebSocketServer {
 			clientSessions.add(session);
 			List<TagDto> tags = tagRepository.findAll().stream().map(TagDto::new).collect(Collectors.toList());
 			TagsWrapper tagsWrapper = new TagsWrapper(tags);
-			tagFilter.addSession(session);
 			broadCastMessage(clientSessions, tagsWrapper);
 		} else if (Objects.equals(session.getQueryString(), SERVER)) {
 			serverSessions.add(session);
@@ -83,13 +85,17 @@ public class WebSocketServer {
 	public void handleMessage(String message, Session session) throws IOException {
 		ObjectMapper objectMapper = new ObjectMapper();
 		if (Objects.equals(session.getQueryString(), CLIENT)) {
-			Integer tagId = objectMapper.readValue(message, Integer.class);
-			tagFilter.switchActivity(session, tagId);
+			Command command = objectMapper.readValue(message, Command.class);
+			if (command.getFilterType().equals(FilterType.TAG_ACTIVE)) {
+				if (!activeFilters.containsKey(FilterType.TAG_ACTIVE)) {
+					activeFilters.put(FilterType.TAG_ACTIVE, new TagFilter());
+				}
+				activeFilters.get(FilterType.TAG_ACTIVE).update(session, objectMapper.readValue(command.getArgs(), Integer.class));
+			}
 		} else if (Objects.equals(session.getQueryString(), SERVER)) {
 			List<DistanceMessage> distanceMessages = objectMapper.readValue(message, new TypeReference<List<DistanceMessage>>(){});
 			distanceMessages.forEach(distanceMessage -> {
 				Optional<CoordinatesDto> coords = coordinatesCalculator.calculateTagPosition(distanceMessage.getDid1(), distanceMessage.getDid2(), distanceMessage.getDist());
-				System.out.println(String.format("Sending message: %s ", message));
 				if (coords.isPresent()) {
 					CoordinatesDto coordinatesDto = coords.get();
 					Coordinates coordinates = new Coordinates();
@@ -97,7 +103,11 @@ public class WebSocketServer {
 					coordinates.setX(Double.valueOf(coordinatesDto.getPoint().getX()));
 					coordinates.setY(Double.valueOf(coordinatesDto.getPoint().getY()));
 					coordinatesRepository.save(coordinates);
-					broadCastMessage(tagFilter.filter(clientSessions, coords.get().getDeviceId()), new CoordinatesWrapper(coordinatesDto));
+					Set<Session> sessions = clientSessions;
+					for(Filter filter : activeFilters.values()) {
+						sessions = filter.filter(sessions, coords.get().getDeviceId());
+					}
+					broadCastMessage(sessions, new CoordinatesWrapper(coordinatesDto));
 				}
 			});
 		}
@@ -114,5 +124,10 @@ public class WebSocketServer {
 				e.printStackTrace();
 			}
 		});
+	}
+
+	@Schedule(minute = "*/5", hour = "*", persistent = false)
+	public void cleanMeasureTable() {
+		coordinatesCalculator.cleanMeasureTable();
 	}
 }
