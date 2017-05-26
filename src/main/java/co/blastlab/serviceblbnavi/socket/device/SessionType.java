@@ -1,4 +1,4 @@
-package co.blastlab.serviceblbnavi.socket;
+package co.blastlab.serviceblbnavi.socket.device;
 
 import lombok.Getter;
 

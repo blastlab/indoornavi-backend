@@ -1,4 +1,4 @@
-package co.blastlab.serviceblbnavi.dto;
+package co.blastlab.serviceblbnavi.socket.measures;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

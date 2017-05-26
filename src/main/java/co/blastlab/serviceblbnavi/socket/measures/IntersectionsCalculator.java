@@ -1,4 +1,6 @@
-package co.blastlab.serviceblbnavi.socket;
+package co.blastlab.serviceblbnavi.socket.measures;
+
+import co.blastlab.serviceblbnavi.domain.Anchor;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -20,9 +22,16 @@ class IntersectionsCalculator {
 		if (L2 <= rdiff*rdiff)
 		{
 			// rozlaczne wewnetrznie
-			x = (firstAnchor.getX() + secondAnchor.getX() - dx * lenI * rsum) / 2;
-			y = (firstAnchor.getY() + secondAnchor.getY() - dy * lenI * rsum) / 2;
-			res.add(new Point((int)x, (int)y));
+			if (secondAnchorDistance > firstAnchorDistance)
+			{
+				x = secondAnchor.getX() + (firstAnchor.getX() - secondAnchor.getX()) * ((secondAnchorDistance + firstAnchorDistance + Math.sqrt(L2))/2.0) * lenI;
+				y = secondAnchor.getY() + (firstAnchor.getY() - secondAnchor.getY()) * ((secondAnchorDistance + firstAnchorDistance + Math.sqrt(L2))/2.0) * lenI;
+			}
+			else
+			{
+				x = firstAnchor.getX() + (secondAnchor.getX() - firstAnchor.getX()) * ((firstAnchorDistance + secondAnchorDistance + Math.sqrt(L2))/2.0) * lenI;
+				y = firstAnchor.getY() + (secondAnchor.getY() - firstAnchor.getY()) * ((firstAnchorDistance + secondAnchorDistance + Math.sqrt(L2))/2.0) * lenI;
+			}
 			res.add(new Point((int)x, (int)y));
 		}
 		else if(rsum*rsum < L2)
@@ -31,7 +40,6 @@ class IntersectionsCalculator {
 			// rozlaczne zewnetrznie
 			x = (firstAnchor.getX() + secondAnchor.getX() + dx * lenI * rdiff) / 2;
 			y = (firstAnchor.getY() + secondAnchor.getY() + dy * lenI * rdiff) / 2;
-			res.add(new Point((int)x, (int)y));
 			res.add(new Point((int)x, (int)y));
 		}
 		// gdy odleglosci sie przecinaja z pewnym zapasem
@@ -57,12 +65,13 @@ class IntersectionsCalculator {
 	static List<Double> calculateSumDistanceBetweenIntersectionPoints(List<Point> points) {
 		Double[] IPdistance = new Double[points.size()];
 		Arrays.fill(IPdistance, 0.0);
-		for (int indn = 0; indn < points.size(); ++indn)
+		for (int indn = 0; indn < points.size(); ++indn) {
 			for (Point point : points) {
 				double dx = points.get(indn).getX() - point.getX();
 				double dy = points.get(indn).getY() - point.getY();
 				IPdistance[indn] += Math.sqrt(dx * dx + dy * dy);
 			}
+		}
 		return Arrays.asList(IPdistance);
 	}
 

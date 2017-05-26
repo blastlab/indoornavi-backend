@@ -238,4 +238,40 @@
 	<changeSet author="kgebert (generated)" id="navi-59-3">
 		<addForeignKeyConstraint onUpdate="CASCADE" onDelete="SET NULL" baseColumnNames="scale_id" baseTableName="Floor" constraintName="FK_Floor_Scale_Id" referencedColumnNames="id" referencedTableName="Scale"/>
 	</changeSet>
+
+
+
+
+	<changeSet author="kgebert (generated)" id="navi-128-1">
+		<createTable tableName="Sink">
+			<column name="id" type="BIGINT" autoIncrement="true">
+				<constraints nullable="false" primaryKey="true" primaryKeyName="SinkPK" />
+			</column>
+			<column name="configured" type="BIT(1)">
+				<constraints nullable="false"/>
+			</column>
+		</createTable>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-128-2">
+		<createTable tableName="Sink_Anchor">
+			<column name="sink_id" type="BIGINT">
+				<constraints nullable="false"/>
+			</column>
+			<column name="anchors_id" type="BIGINT">
+				<constraints nullable="false"/>
+			</column>
+		</createTable>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-128-4">
+		<addUniqueConstraint columnNames="anchors_id" constraintName="UK_Sink_Anchor_Anchors_Id" tableName="Sink_Anchor"/>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-128-5">
+		<addForeignKeyConstraint baseColumnNames="id" baseTableName="Sink" constraintName="FK_Sink_Anchor_Id" referencedColumnNames="id" referencedTableName="Anchor"/>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-128-6">
+		<addForeignKeyConstraint baseColumnNames="sink_id" baseTableName="Sink_Anchor" constraintName="FK_Sink_Anchor_Sink_Id" referencedColumnNames="id" referencedTableName="Sink"/>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-128-7">
+		<addForeignKeyConstraint baseColumnNames="anchors_id" baseTableName="Sink_Anchor" constraintName="FK_Sink_Anchor_Anchor_Id" referencedColumnNames="id" referencedTableName="Anchor"/>
+	</changeSet>
 </databaseChangeLog>
