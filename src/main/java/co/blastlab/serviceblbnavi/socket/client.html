@@ -66,7 +66,10 @@
 					var checkbox = $('<input name="tag" checked type="checkbox" value="' + message.tags[i]['shortId'] + '">');
 					var wrapper = $('<span>' + message.tags[i]['shortId'] + '</span>');
 					checkbox.change(function() {
-						socket.send($(this).val());
+						socket.send(JSON.stringify({
+							filterType: 'TAG_ACTIVE',
+							args: $(this).val()
+						}));
 					});
 					wrapper.css({
 						'color': getColor(message.tags[i]['shortId'])

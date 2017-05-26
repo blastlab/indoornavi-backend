@@ -354,8 +354,8 @@ public class AnchorFacadeIT extends BaseIT {
 				"longId", equalTo(Arrays.asList(ANCHOR_LONG_ID_EXISTING, 93170459, 931701001)),
 				"name", equalTo(Arrays.asList("AnchorName", "", "")),
 				"floorId", equalTo(Arrays.asList(2, null, 2)),
-				"x", equalTo(Arrays.asList(1.618f, null, 2.39101f)),
-				"y", equalTo(Arrays.asList(0.577f, null, 1.64101f)),
+				"x", equalTo(Arrays.asList(0.0f, 785.0f, 485.0f)),
+				"y", equalTo(Arrays.asList(0.0f, 0.0f, 397.0f)),
 				"verified", equalTo(Arrays.asList(true, false, false))
 			);
 	}
