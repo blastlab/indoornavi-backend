@@ -1,6 +1,6 @@
-package co.blastlab.serviceblbnavi.socket;
+package co.blastlab.serviceblbnavi.socket.temp;
 
-import co.blastlab.serviceblbnavi.dto.DistanceMessage;
+import co.blastlab.serviceblbnavi.socket.measures.DistanceMessage;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.awt.*;
@@ -27,8 +27,8 @@ public class TxtParser {
 					int d2 = Integer.parseInt(devices[1], 16);
 					if (d2 < Short.MAX_VALUE) {
 						DistanceMessage distanceMessage = new DistanceMessage();
-						distanceMessage.setD1(d1);
-						distanceMessage.setD2(d2);
+						distanceMessage.setDid1(d1);
+						distanceMessage.setDid2(d2);
 						distanceMessage.setDist(Integer.parseInt(words[2]));
 						distanceMessageList.add(distanceMessage);
 					}

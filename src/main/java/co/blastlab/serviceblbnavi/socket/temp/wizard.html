@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Wizard</title>
+</head>
+<body>
+<div id="container">
+	<button id="step1">Step 1</button>
+	<button id="step2">Step 2</button>
+</div>
+</body>
+<script
+	src="https://code.jquery.com/jquery-3.1.1.min.js"
+	integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+	crossorigin="anonymous"></script>
+<script>
+	$(document).ready(function () {
+		var isConnectionOpen = false;
+		var socket = new WebSocket("ws://localhost:80/wizard");
+		socket.onopen = function () {
+			console.log('connection opened');
+			isConnectionOpen = true;
+		};
+
+		socket.onclose = function() {
+			console.log('connection closed');
+			isConnectionOpen = false;
+		};
+
+		socket.onmessage = function (msg) {
+			var message = JSON.parse(msg.data);
+			console.log(message);
+		};
+
+		$('#step1').on('click', function() {
+			if (!isConnectionOpen) return;
+			socket.send(JSON.stringify({
+				sinkShortId: 100011,
+				anchorShortId: null,
+				degree: null
+			}));
+		});
+
+		$('#step2').on('click', function() {
+			if (!isConnectionOpen) return;
+			socket.send(JSON.stringify({
+				sinkShortId: 100011,
+				anchorShortId: 100012,
+				degree: 100
+			}));
+		});
+
+	});
+</script>
+</html>
