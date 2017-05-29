@@ -34,6 +34,9 @@ public class DeviceRegistration {
 	@Inject
 	private DeviceRepository deviceRepository;
 
+	@Inject
+	WebSocketServer socketServer;
+
 	public static void broadcastDevice(Device device) throws JsonProcessingException {
 		ObjectMapper objectMapper = new ObjectMapper();
 		if (device instanceof Anchor) {
@@ -45,6 +48,8 @@ public class DeviceRegistration {
 
 	@OnOpen
 	public void registerSession(Session session) throws JsonProcessingException {
+		socketServer.cleanMeasureTable();
+
 		String queryString = session.getQueryString();
 		List<DeviceDto> devices = new ArrayList<>();
 		ObjectMapper objectMapper = new ObjectMapper();
