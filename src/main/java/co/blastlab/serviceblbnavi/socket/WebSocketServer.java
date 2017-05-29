@@ -86,7 +86,7 @@ public class WebSocketServer {
 		ObjectMapper objectMapper = new ObjectMapper();
 		if (Objects.equals(session.getQueryString(), CLIENT)) {
 			Command command = objectMapper.readValue(message, Command.class);
-			if (command.getFilterType().equals(FilterType.TAG_ACTIVE)) {
+			if (FilterType.TAG_ACTIVE.equals(command.getFilterType())) {
 				if (!activeFilters.containsKey(FilterType.TAG_ACTIVE)) {
 					activeFilters.put(FilterType.TAG_ACTIVE, new TagFilter());
 				}
