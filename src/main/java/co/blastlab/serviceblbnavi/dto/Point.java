@@ -1,4 +1,4 @@
-package co.blastlab.serviceblbnavi.dto.floor;
+package co.blastlab.serviceblbnavi.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

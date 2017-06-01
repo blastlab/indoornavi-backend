@@ -1,6 +1,6 @@
 package co.blastlab.serviceblbnavi.socket.bridge;
 
-import co.blastlab.serviceblbnavi.dto.floor.Point;
+import co.blastlab.serviceblbnavi.dto.Point;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,7 +25,7 @@ public class AnchorPositionBridge implements Bridge {
 	private Double L10; // distance between sink and first anchor
 	private Map<Integer, DistancePair> distancePairs = new HashMap<>();
 	@Inject
-	private Event<List<Point>> anchorPositionEvent;
+	private Event<AnchorPoints> anchorPositionEvent;
 
 	public void startListening(Integer sinkId, Integer firstAnchorId, Point sinkPosition, Double firstAnchorDegree) {
 		this.sinkId = sinkId;
@@ -78,7 +78,7 @@ public class AnchorPositionBridge implements Bridge {
 
 					if (distancePair.getL20() != null && distancePair.getL21() != null) {
 						List<Point> points = calculateAnchorPositions(distancePair);
-						anchorPositionEvent.fire(points);
+						anchorPositionEvent.fire(new AnchorPoints(otherAnchorId, points));
 					}
 				}
 

@@ -1,7 +1,7 @@
 package co.blastlab.serviceblbnavi.socket.wizard;
 
 import co.blastlab.serviceblbnavi.dao.repository.SinkRepository;
-import co.blastlab.serviceblbnavi.dto.floor.Point;
+import co.blastlab.serviceblbnavi.dto.Point;
 import co.blastlab.serviceblbnavi.socket.bridge.AnchorPositionBridge;
 import co.blastlab.serviceblbnavi.socket.bridge.SinkAnchorsDistanceBridge;
 import org.junit.After;
