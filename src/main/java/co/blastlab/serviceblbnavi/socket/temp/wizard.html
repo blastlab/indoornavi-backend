@@ -38,7 +38,8 @@
 			socket.send(JSON.stringify({
 				sinkShortId: 100011,
 				anchorShortId: null,
-				degree: null
+				degree: null,
+				sinkPosition: null
 			}));
 		});
 
@@ -47,7 +48,8 @@
 			socket.send(JSON.stringify({
 				sinkShortId: 100011,
 				anchorShortId: 100012,
-				degree: 100
+				degree: 100,
+				sinkPosition: {x: 1, y: 2}
 			}));
 		});
 

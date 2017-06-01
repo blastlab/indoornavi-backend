@@ -4,9 +4,9 @@ import co.blastlab.serviceblbnavi.dao.repository.AnchorRepository;
 import co.blastlab.serviceblbnavi.dao.repository.SinkRepository;
 import co.blastlab.serviceblbnavi.domain.Sink;
 import co.blastlab.serviceblbnavi.dto.anchor.AnchorDto;
-import co.blastlab.serviceblbnavi.dto.floor.Point;
 import co.blastlab.serviceblbnavi.socket.WebSocketCommunication;
 import co.blastlab.serviceblbnavi.socket.bridge.AnchorDistance;
+import co.blastlab.serviceblbnavi.socket.bridge.AnchorPoints;
 import co.blastlab.serviceblbnavi.socket.bridge.AnchorPositionBridge;
 import co.blastlab.serviceblbnavi.socket.bridge.SinkAnchorsDistanceBridge;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -87,7 +87,7 @@ public class WizardWebSocket extends WebSocketCommunication {
 		broadCastMessage(Collections.singleton(session), objectMapper.writeValueAsString(anchorDistance));
 	}
 
-	public void anchorPointsCalculated(@Observes List<Point> points) throws JsonProcessingException {
+	public void anchorPointsCalculated(@Observes AnchorPoints points) throws JsonProcessingException {
 		broadCastMessage(Collections.singleton(session), objectMapper.writeValueAsString(points));
 	}
 

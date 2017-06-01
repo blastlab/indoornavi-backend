@@ -1,6 +1,6 @@
 package co.blastlab.serviceblbnavi.socket.wizard;
 
-import co.blastlab.serviceblbnavi.dto.floor.Point;
+import co.blastlab.serviceblbnavi.dto.Point;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

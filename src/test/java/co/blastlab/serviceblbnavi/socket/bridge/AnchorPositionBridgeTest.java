@@ -1,6 +1,6 @@
 package co.blastlab.serviceblbnavi.socket.bridge;
 
-import co.blastlab.serviceblbnavi.dto.floor.Point;
+import co.blastlab.serviceblbnavi.dto.Point;
 import org.junit.Test;
 
 import java.util.List;
