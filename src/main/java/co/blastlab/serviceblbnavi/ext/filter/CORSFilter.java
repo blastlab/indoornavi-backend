@@ -5,14 +5,14 @@
  */
 package co.blastlab.serviceblbnavi.ext.filter;
 
+import org.jboss.resteasy.util.HttpResponseCodes;
+
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 public class CORSFilter implements Filter {
-
-	public static final Integer UNAUTHORIZED = 401;
 
 	@Override
 	public void init(FilterConfig filterConfig) throws ServletException {
@@ -28,16 +28,8 @@ public class CORSFilter implements Filter {
 		response.addHeader("Access-Control-Allow-Credentials", "true");
 		response.addHeader("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT");
 		response.addHeader("Access-Control-Allow-Headers", "Content-Type, Accept");
-		response.addHeader("Access-Control-Allow-Headers", "Content-Type, authorization");
-		response.addHeader("Access-Control-Allow-Headers", "Content-Type, auth_token");
-		response.addHeader("Access-Control-Allow-Headers", "Content-Type, sourceId");
-		response.addHeader("Access-Control-Allow-Headers", "Content-Type, targetId");
-		if (request.getMethod().equals("OPTIONS")) {
-			response.setStatus(HttpServletResponse.SC_OK);
-			return;
-		}
 
-		if (response.getStatus() != UNAUTHORIZED) {
+		if (response.getStatus() != HttpResponseCodes.SC_UNAUTHORIZED) {
 			chain.doFilter(request, servletResponse);
 		}
 	}

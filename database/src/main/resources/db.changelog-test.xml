@@ -11,6 +11,31 @@
 		<delete tableName="image"/>
 		<delete tableName="building"/>
 		<delete tableName="complex"/>
+		<delete tableName="permissiongroup_permission"/>
+		<delete tableName="permission"/>
+		<delete tableName="user_permissiongroup"/>
+		<delete tableName="permissiongroup"/>
+		<delete tableName="user"/>
+	</changeSet>
+
+	<changeSet id="PermissionGroup" author="kgebert" runOnChange="true" labels="PermissionGroup" runAlways="true">
+		<loadUpdateData tableName="permissiongroup" file="test/PermissionGroup.csv" primaryKey="id"  />
+	</changeSet>
+
+	<changeSet id="Permission" author="kgebert" runOnChange="true" labels="Permission" runAlways="true">
+		<loadUpdateData tableName="permission" file="test/Permission.csv" primaryKey="id"  />
+	</changeSet>
+
+	<changeSet id="PermissionGroup_Permission" author="kgebert" runOnChange="true" labels="PermissionGroup_Permission" runAlways="true">
+		<loadData tableName="permissiongroup_permission" file="test/PermissionGroupPermission.csv"  />
+	</changeSet>
+
+	<changeSet id="User" author="kgebert" runOnChange="true" labels="User" runAlways="true">
+		<loadUpdateData tableName="user" file="test/User.csv" primaryKey="id"/>
+	</changeSet>
+
+	<changeSet id="User_PermissionGroup" author="kgebert" runOnChange="true" labels="User_PermissionGroup" runAlways="true">
+		<loadData tableName="user_permissiongroup" file="test/UserPermissionGroup.csv"  />
 	</changeSet>
 
 	<changeSet id="Complex" author="mcichosz" context="test" runOnChange="true" labels="Complex" runAlways="true">

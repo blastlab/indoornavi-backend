@@ -1,6 +1,7 @@
 package co.blastlab.serviceblbnavi.rest.facade.tag;
 
 import co.blastlab.serviceblbnavi.dto.tag.TagDto;
+import co.blastlab.serviceblbnavi.ext.filter.AuthorizedAccess;
 import io.swagger.annotations.*;
 
 import javax.validation.Valid;
@@ -18,6 +19,7 @@ public interface TagFacade {
 	@ApiResponses({
 		@ApiResponse(code = 404, message = "Floor with given id does not exist")
 	})
+	@AuthorizedAccess("TAG_CREATE")
 	TagDto create(@ApiParam(value = "tag", required = true) @Valid TagDto tag);
 
 	@PUT
@@ -26,6 +28,7 @@ public interface TagFacade {
 	@ApiResponses({
 		@ApiResponse(code = 404, message = "Floor or tag with given id does not exist")
 	})
+	@AuthorizedAccess("TAG_UPDATE")
 	TagDto update(@ApiParam(value = "id", required = true) @PathParam("id") @Valid @NotNull Long id,
 	                 @ApiParam(value = "tag", required = true) @Valid TagDto tag);
 
@@ -36,9 +39,11 @@ public interface TagFacade {
 		@ApiResponse(code = 404, message = "Tag id empty or tag doesn not exist"),
 		@ApiResponse(code = 204, message = "Deleted successfully but there is no new information to return")
 	})
+	@AuthorizedAccess("TAG_DELETE")
 	Response delete(@ApiParam(value = "id", required = true) @PathParam("id") @Valid @NotNull Long id);
 
 	@GET
 	@ApiOperation(value = "find all tags", response = TagDto.class, responseContainer = "List")
+	@AuthorizedAccess("TAG_READ")
 	List<TagDto> findAll();
 }
