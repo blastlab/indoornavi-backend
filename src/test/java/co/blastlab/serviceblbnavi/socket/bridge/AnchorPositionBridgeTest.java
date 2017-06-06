@@ -48,16 +48,16 @@ public class AnchorPositionBridgeTest {
 	public void calculatePointsWithRotationAndWithMove() throws Exception {
 		AnchorPositionBridge anchorPositionCalculator = new AnchorPositionBridge();
 
-		anchorPositionCalculator.startListening(1, 2, new Point(10, 10), 90d);
+		anchorPositionCalculator.startListening(1, 2, new Point(10, -10), 43d);
 
 		anchorPositionCalculator.addDistance(1, 2, 100);
 
 		List<Point> points = anchorPositionCalculator.calculateAnchorPositions(new AnchorPositionBridge.DistancePair(100d, 100d));
 
 		assertThat(points.size(), is(2));
-		assertThat(points.get(0).getX(), is(-96));
-		assertThat(points.get(0).getY(), is(60));
-		assertThat(points.get(1).getX(), is(76));
-		assertThat(points.get(1).getY(), is(60));
+		assertThat(points.get(0).getX(), is(-12));
+		assertThat(points.get(0).getY(), is(86));
+		assertThat(points.get(1).getX(), is(105));
+		assertThat(points.get(1).getY(), is(-38));
 	}
 }
