@@ -26,10 +26,17 @@ public abstract class BaseIT extends RestAssuredIT {
 	private static final String JDBC_DRIVER_CLASS = "org.mariadb.jdbc.Driver";
 	private static final String DATABASE_URL = "jdbc:mysql://localhost:3306/Navi";
 	private static final String CHANGELOG_FILE = "database/src/main/resources/db.changelog-test.relative.xml";
-	private final ImmutableList<String> BASIC_LABELS = ImmutableList.of("Clear", "Complex");
+	private final ImmutableList<String> BASIC_LABELS = ImmutableList.of(
+		"Clear",
+		"Complex",
+		"User",
+		"Permission",
+		"PermissionGroup",
+		"PermissionGroup_Permission",
+		"User_PermissionGroup");
 
 	RequestSpecification givenUser() {
-		return RestAssured.given().header("auth_token", "TestToken");
+		return RestAssured.given().header("Authorization", "Bearer TestToken");
 	}
 
 	public abstract ImmutableList<String> getAdditionalLabels();

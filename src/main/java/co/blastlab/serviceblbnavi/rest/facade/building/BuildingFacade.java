@@ -1,7 +1,7 @@
 package co.blastlab.serviceblbnavi.rest.facade.building;
 
 import co.blastlab.serviceblbnavi.dto.building.BuildingDto;
-import co.blastlab.serviceblbnavi.ext.filter.TokenAuthorization;
+import co.blastlab.serviceblbnavi.ext.filter.AuthorizedAccess;
 import io.swagger.annotations.*;
 
 import javax.validation.Valid;
@@ -11,7 +11,6 @@ import javax.ws.rs.core.Response;
 
 @Path("/buildings")
 @Api("/buildings")
-@TokenAuthorization
 public interface BuildingFacade {
 
 	@POST
@@ -19,6 +18,7 @@ public interface BuildingFacade {
 	@ApiResponses({
 		@ApiResponse(code = 404, message = "Complex id does not exist or complex empty")
 	})
+	@AuthorizedAccess("BUILDING_CREATE")
 	BuildingDto create(@ApiParam(value = "building", required = true) @Valid BuildingDto building);
 
 	@PUT
@@ -27,6 +27,7 @@ public interface BuildingFacade {
 	@ApiResponses({
 		@ApiResponse(code = 404, message = "Building does not exist or complex does not contain given building")
 	})
+	@AuthorizedAccess("BUILDING_UPDATE")
 	BuildingDto update(@ApiParam(value = "id", required = true) @PathParam("id") @Valid @NotNull Long id,
 	                                  @ApiParam(value = "building", required = true) @Valid BuildingDto building);
 
@@ -37,6 +38,7 @@ public interface BuildingFacade {
 		@ApiResponse(code = 404, message = "Building with given id does not exist"),
 		@ApiResponse(code = 204, message = "Deleted successfully but there is no new information to return")
 	})
+	@AuthorizedAccess("BUILDING_DELETE")
 	Response delete(@PathParam("id") @ApiParam(value = "building id", required = true) @Valid @NotNull Long id);
 
 	@GET
@@ -45,5 +47,6 @@ public interface BuildingFacade {
 	@ApiResponses({
 		@ApiResponse(code = 404, message = "Building with given id was not found")
 	})
+	@AuthorizedAccess("BUILDING_READ")
 	BuildingDto.WithFloors find(@PathParam("id") @ApiParam(value = "id", required = true) @Valid @NotNull Long id);
 }

@@ -17,6 +17,9 @@ public class MessageConstraintSeacher {
 			case "unique_longId":
 				code = MessagePack.DB_003;
 				break;
+			case "unique_username":
+				code = MessagePack.DB_004;
+				break;
 			default:
 				code = MessagePack.DB_000;
 		}

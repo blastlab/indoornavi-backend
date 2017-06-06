@@ -21,10 +21,10 @@ public class RestApplication extends Application {
 		beanConfig.setBasePath(BASE_PATH);
 		beanConfig.setResourcePackage("co.blastlab.serviceblbnavi.rest.facade");
 		String description = String.join(" ",
-			"For most of rest methods auth_token is needed to be executed. Only:",
-			"<b>create person</b>",
-			"is available without auth_token.",
-			"For others, 401 exception will be thrown."
+			"For most of the rest methods Authorization header, containing token, must be present. Only:",
+			"<b>/auth endpoint</b>",
+			"is available without token.",
+			"For others, 401 status code will be thrown."
 		);
 		beanConfig.setDescription(description);
 		beanConfig.setScan(true);
