@@ -115,12 +115,15 @@ public class AnchorPositionBridge implements Bridge {
 
 	private Point moveAndRotate(Point2D.Double toTransform) {
 		AffineTransform affineTransform = new AffineTransform();
-		Point2D.Double result = new Point2D.Double();
+		Point2D.Double rotationResult = new Point2D.Double();
 		double radians = (Math.toRadians(firstAnchorDegree));
 		affineTransform.rotate(radians);
+		affineTransform.transform(toTransform, rotationResult);
+		affineTransform = new AffineTransform();
+		Point2D.Double moveResult = new Point2D.Double();
 		affineTransform.translate(this.sinkPosition.getX(), this.sinkPosition.getY());
-		affineTransform.transform(toTransform, result);
-		return new Point((int) result.getX(), (int) result.getY());
+		affineTransform.transform(rotationResult, moveResult);
+		return new Point((int) moveResult.getX(), (int) moveResult.getY());
 	}
 
 	@Getter

@@ -57,11 +57,11 @@
         	setInterval(function() {
 		        var distances = {
                     measures: [
-                        {"did1": 100012, "did2": 100011, "dist": Math.floor((Math.random() * 20) + 100)},
-                        {"did1": 100012, "did2": 100010, "dist": Math.floor((Math.random() * 20) + 50)},
-                        {"did1": 100011, "did2": 100010, "dist": Math.floor((Math.random() * 20) + 30)},
-                        {"did1": 100012, "did2": 100089, "dist": Math.floor((Math.random() * 20) + 90)}
-                ], info: [{code: 2, args: "{\"did\": 100020, \"eui\": 43905731}"}]};
+                        {"did1": 100012, "did2": 100011, "dist": Math.floor(100)},
+                        {"did1": 100012, "did2": 100010, "dist": Math.floor(70)},
+                        {"did1": 100011, "did2": 100010, "dist": Math.floor(60)},
+                        {"did1": 100012, "did2": 100089, "dist": Math.floor(90)}
+                ], info: [{code: 2, args: "{\"did\": 100012, \"eui\": 3905731}"}]};
 		        console.log("sending x, y ", JSON.stringify(distances));
 		        socket.send(JSON.stringify(distances));
             }, 3000);
