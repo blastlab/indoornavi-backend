@@ -2,7 +2,7 @@ package co.blastlab.serviceblbnavi.socket.utils;
 
 import co.blastlab.serviceblbnavi.dao.repository.AnchorRepository;
 import co.blastlab.serviceblbnavi.dto.CoordinatesDto;
-import co.blastlab.serviceblbnavi.socket.dto.Point;
+import co.blastlab.serviceblbnavi.dto.floor.Point;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 import lombok.AllArgsConstructor;

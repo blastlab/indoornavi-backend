@@ -29,7 +29,7 @@ public class RequestBodyBuilder {
 	}
 
 	public RequestBodyBuilder setParameter(String key, Object value, Integer i) {
-		if (value == null) {
+		if (value == null || value instanceof List) {
 			parameters.put(i, key, () -> value);
 		} else {
 			parameters.put(i, key, value::toString);
