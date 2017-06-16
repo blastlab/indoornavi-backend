@@ -8,10 +8,9 @@ import co.blastlab.serviceblbnavi.dto.CoordinatesDto;
 import co.blastlab.serviceblbnavi.dto.DistanceMessage;
 import co.blastlab.serviceblbnavi.dto.anchor.AnchorDto;
 import co.blastlab.serviceblbnavi.dto.tag.TagDto;
-import co.blastlab.serviceblbnavi.socket.dto.AnchorsWrapper;
-import co.blastlab.serviceblbnavi.socket.dto.CoordinatesWrapper;
-import co.blastlab.serviceblbnavi.socket.dto.MessageWrapper;
-import co.blastlab.serviceblbnavi.socket.dto.TagsWrapper;
+import co.blastlab.serviceblbnavi.socket.area.AreaEvent;
+import co.blastlab.serviceblbnavi.socket.area.AreaEventController;
+import co.blastlab.serviceblbnavi.socket.dto.*;
 import co.blastlab.serviceblbnavi.socket.filters.Command;
 import co.blastlab.serviceblbnavi.socket.filters.Filter;
 import co.blastlab.serviceblbnavi.socket.filters.FilterType;
@@ -50,6 +49,9 @@ public class WebSocketServer {
 
 	@Inject
 	private AnchorRepository anchorRepository;
+
+	@Inject
+	private AreaEventController areaEventController;
 
 	private Map<FilterType, Filter> activeFilters = new HashMap<>();
 
@@ -100,14 +102,19 @@ public class WebSocketServer {
 					CoordinatesDto coordinatesDto = coords.get();
 					Coordinates coordinates = new Coordinates();
 					coordinates.setDevice("TAG");
-					coordinates.setX(Double.valueOf(coordinatesDto.getPoint().getX()));
-					coordinates.setY(Double.valueOf(coordinatesDto.getPoint().getY()));
+					coordinates.setX((double) coordinatesDto.getPoint().getX());
+					coordinates.setY((double) coordinatesDto.getPoint().getY());
 					coordinatesRepository.save(coordinates);
 					Set<Session> sessions = clientSessions;
 					for(Filter filter : activeFilters.values()) {
 						sessions = filter.filter(sessions, coords.get().getDeviceId());
 					}
 					broadCastMessage(sessions, new CoordinatesWrapper(coordinatesDto));
+
+					List<AreaEvent> events = areaEventController.checkCoordinates(coordinatesDto);
+					for (AreaEvent event : events) {
+						broadCastMessage(sessions, new AreaEventWrapper(event));
+					}
 				}
 			});
 		}

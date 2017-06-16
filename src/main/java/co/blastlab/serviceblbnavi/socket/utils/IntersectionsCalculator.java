@@ -1,7 +1,7 @@
 package co.blastlab.serviceblbnavi.socket.utils;
 
 import co.blastlab.serviceblbnavi.domain.Anchor;
-import co.blastlab.serviceblbnavi.socket.dto.Point;
+import co.blastlab.serviceblbnavi.dto.floor.Point;
 
 import java.util.ArrayList;
 import java.util.Arrays;

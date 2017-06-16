@@ -4,7 +4,8 @@ import co.blastlab.serviceblbnavi.dao.repository.AnchorRepository;
 import co.blastlab.serviceblbnavi.dao.repository.CoordinatesRepository;
 import co.blastlab.serviceblbnavi.domain.Coordinates;
 import co.blastlab.serviceblbnavi.dto.CoordinatesDto;
-import co.blastlab.serviceblbnavi.socket.dto.Point;
+import co.blastlab.serviceblbnavi.dto.floor.Point;
+import co.blastlab.serviceblbnavi.socket.area.AreaEventController;
 import co.blastlab.serviceblbnavi.socket.utils.CoordinatesCalculator;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -14,6 +15,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import javax.websocket.Session;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -37,6 +39,9 @@ public class WebSocketServerTest {
 	@Mock
 	private CoordinatesRepository coordinatesRepository;
 
+	@Mock
+	private AreaEventController areaEventController;
+
 	@Test
 	public void testWebSocketOpenServerSession() {
 		when(session.getQueryString()).thenReturn("server");
@@ -51,6 +56,7 @@ public class WebSocketServerTest {
 		Optional<CoordinatesDto> expectedCoorinates = Optional.of(new CoordinatesDto(1, new Point(1, 2)));
 		when(session.getQueryString()).thenReturn("server");
 		when(coordinatesCalculator.calculateTagPosition(1, 2, 100d)).thenReturn(expectedCoorinates);
+		when(areaEventController.checkCoordinates(expectedCoorinates.get())).thenReturn(new ArrayList<>());
 
 		webSocketServer.handleMessage("[{\"did1\": 1, \"did2\": 2, \"dist\": 100}]", session);
 

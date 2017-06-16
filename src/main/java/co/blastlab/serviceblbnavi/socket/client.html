@@ -44,6 +44,30 @@
 		};
 		var tags = [];
 
+		$.getJSON('http://localhost:80/rest/v1/areas', function(areas) {
+			$.each(areas, function() {
+				$.each(this['points'], function() {
+					var $el = $('<div class="square"></div>');
+					$el.css({
+						'left': 250 + this['x'],
+						'top': 400 + this['y'],
+						'background-color': '#aaffaa'
+					});
+					$container.append($el);
+				});
+
+				$.each(this['buffer'], function() {
+					var $el = $('<div class="square"></div>');
+					$el.css({
+						'left': 250 + this['x'],
+						'top': 400 + this['y'],
+						'background-color': '#11ffaa'
+					});
+					$container.append($el);
+				});
+			});
+		});
+
 		socket.onopen = function () {
 			console.log('connection opened');
 			isConnectionOpen = true;
@@ -56,7 +80,6 @@
 
 		socket.onmessage = function (msg) {
 			var message = JSON.parse(msg.data);
-			console.log('my message: ' + JSON.stringify(message));
 
 			if (message.type === 'TAGS') {
 				var checkboxes = $('#checkboxes');
@@ -80,14 +103,22 @@
 				}
 			} else if (message.type === 'COORDINATES') {
 				var $el = $('<div class="square"></div>');
-				console.log('Received: ');
-				console.log(message['coordinatesDto']);
 				$el.css({
 					'left': 250 + message['coordinatesDto']['point'].x,
 					'top': 400 + message['coordinatesDto']['point'].y,
 					'background-color': getColor(message['coordinatesDto']['deviceId'])
 				});
 				$container.append($el);
+			} else if (message.type === 'EVENT') {
+				console.log(message.event)
+				var alertMessage = '';
+				var event = message['event'];
+				if (event['mode'] === 'ON_LEAVE') {
+					alertMessage += event['tagId'] + ' left area ' + event['areaName'];
+				} else if (event['mode'] === 'ON_ENTER') {
+					alertMessage += event['tagId'] + ' entered area ' + event['areaName'];
+				}
+				console.log(alertMessage);
 			}
 		};
 
