@@ -1,5 +1,9 @@
 package co.blastlab.serviceblbnavi.utils;
 
+import co.blastlab.serviceblbnavi.domain.User;
+import org.jboss.resteasy.util.Base64;
+
+import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
@@ -32,5 +36,19 @@ public class AuthUtils {
 		}
 		return generatedPassword;
 	}
+
+	public static void comparePasswords(String password, User user) throws AuthenticationException {
+		String saltedPassword;
+		try {
+			saltedPassword = AuthUtils.get_SHA_256_Password(password, Base64.decode(user.getSalt()));
+			if (!saltedPassword.equalsIgnoreCase(user.getPassword())) {
+				throw new AuthenticationException();
+			}
+		} catch (IOException e) {
+			throw new AuthenticationException();
+		}
+	}
+
+	public static class AuthenticationException extends Throwable {}
 
 }

@@ -1,5 +1,6 @@
 package co.blastlab.serviceblbnavi.rest.facade.user;
 
+import co.blastlab.serviceblbnavi.dto.user.ChangePasswordDto;
 import co.blastlab.serviceblbnavi.dto.user.UserDto;
 import co.blastlab.serviceblbnavi.ext.filter.AuthorizedAccess;
 import io.swagger.annotations.*;
@@ -43,4 +44,13 @@ public interface UserFacade {
 	})
 	@AuthorizedAccess("USER_DELETE")
 	Response delete(@ApiParam(value = "id", required = true) @PathParam("id") @Valid @NotNull Long id);
+
+	@PUT
+	@Path("/changePassword")
+	@ApiOperation(value = "change your password", response = Response.class)
+	@ApiResponses({
+		@ApiResponse(code = 304, message = "Old password doesn't match")
+	})
+	@AuthorizedAccess
+	Response changePassword(ChangePasswordDto changePasswordDto);
 }

@@ -3,12 +3,10 @@ package co.blastlab.serviceblbnavi.ext.filter;
 import co.blastlab.serviceblbnavi.dao.repository.UserRepository;
 import co.blastlab.serviceblbnavi.domain.Permission;
 import co.blastlab.serviceblbnavi.domain.User;
-import co.blastlab.serviceblbnavi.ext.qualifier.AuthenticatedUser;
 import co.blastlab.serviceblbnavi.rest.facade.auth.AuthService;
 import org.apache.commons.lang.time.DateUtils;
 
 import javax.annotation.Priority;
-import javax.enterprise.event.Event;
 import javax.inject.Inject;
 import javax.ws.rs.NotAuthorizedException;
 import javax.ws.rs.Priorities;
@@ -18,10 +16,12 @@ import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.ext.Provider;
 import java.io.IOException;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
+import java.security.Principal;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -40,10 +40,6 @@ public class AuthenticationFilter implements ContainerRequestFilter {
 
 	@Context
 	private ResourceInfo resourceInfo;
-
-	@Inject
-	@AuthenticatedUser
-	Event<String> userAuthenticatedEvent;
 
 	@Override
 	public void filter(ContainerRequestContext requestContext) throws IOException {
@@ -70,7 +66,28 @@ public class AuthenticationFilter implements ContainerRequestFilter {
 				checkPermissions(user, methodPermission);
 			}
 
-			userAuthenticatedEvent.fire(user.getUsername());
+			final SecurityContext currentSecurityContext = requestContext.getSecurityContext();
+			requestContext.setSecurityContext(new SecurityContext() {
+				@Override
+				public Principal getUserPrincipal() {
+					return user;
+				}
+
+				@Override
+				public boolean isUserInRole(String role) {
+					return true;
+				}
+
+				@Override
+				public boolean isSecure() {
+					return currentSecurityContext.isSecure();
+				}
+
+				@Override
+				public String getAuthenticationScheme() {
+					return "Bearer";
+				}
+			});
 
 		} catch (TokenInvalidOrExpired e) {
 			requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
