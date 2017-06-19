@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -11,7 +12,7 @@ import java.util.List;
 @Entity
 @Getter
 @Setter
-public class User extends TrackedEntity {
+public class User extends TrackedEntity implements Principal {
 	@Column(unique = true)
 	private String username;
 
@@ -24,4 +25,9 @@ public class User extends TrackedEntity {
 
 	@ManyToMany
 	private List<PermissionGroup> permissionGroups = new ArrayList<>();
+
+	@Override
+	public String getName() {
+		return this.getUsername();
+	}
 }
