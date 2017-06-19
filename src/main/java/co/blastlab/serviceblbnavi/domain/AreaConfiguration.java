@@ -20,8 +20,15 @@ public class AreaConfiguration extends TrackedEntity {
 	private Integer offset;
 
 	@Enumerated(EnumType.STRING)
-	private AreaConfigurationMode mode;
+	private Mode mode;
 
 	@ManyToMany(mappedBy = "configurations")
 	private List<Area> areas = new ArrayList<>();
+
+	public enum Mode {
+		ON_ENTER,
+		ON_LEAVE
+	}
 }
+
+

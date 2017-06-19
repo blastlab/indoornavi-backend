@@ -209,11 +209,6 @@
 			<artifactId>jts</artifactId>
 			<version>1.13</version>
 		</dependency>
-		<!--<dependency>-->
-			<!--<groupId>com.google.guava</groupId>-->
-			<!--<artifactId>guava</artifactId>-->
-			<!--<version>20.0</version>-->
-		<!--</dependency>-->
 	</dependencies>
 	<build>
 		<plugins>

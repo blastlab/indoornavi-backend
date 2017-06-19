@@ -285,15 +285,15 @@
 		</addColumn>
 	</changeSet>
 	<changeSet author="kgebert (generated)" id="1496842280369-9">
-		<addForeignKeyConstraint baseColumnNames="area_id" baseTableName="Area_AreaConfiguration" constraintName="FK_Area_AreaConfiguration_Area_Id" referencedColumnNames="id" referencedTableName="Area"/>
+		<addForeignKeyConstraint onDelete="CASCADE" baseColumnNames="area_id" baseTableName="Area_AreaConfiguration" constraintName="FK_Area_AreaConfiguration_Area_Id" referencedColumnNames="id" referencedTableName="Area"/>
 	</changeSet>
 	<changeSet author="kgebert (generated)" id="1496842280369-10">
-		<addForeignKeyConstraint baseColumnNames="tags_id" baseTableName="AreaConfiguration_Tag" constraintName="FK_AreaConfiguration_Tag_Id" referencedColumnNames="id" referencedTableName="Tag"/>
+		<addForeignKeyConstraint onDelete="CASCADE" baseColumnNames="tags_id" baseTableName="AreaConfiguration_Tag" constraintName="FK_AreaConfiguration_Tag_Id" referencedColumnNames="id" referencedTableName="Tag"/>
 	</changeSet>
 	<changeSet author="kgebert (generated)" id="1496842280369-11">
-		<addForeignKeyConstraint baseColumnNames="areaConfiguration_id" baseTableName="AreaConfiguration_Tag" constraintName="FK_AreaConfiguration_Tag_AreaConfiguration_Id" referencedColumnNames="id" referencedTableName="AreaConfiguration"/>
+		<addForeignKeyConstraint onDelete="CASCADE" baseColumnNames="areaConfiguration_id" baseTableName="AreaConfiguration_Tag" constraintName="FK_AreaConfiguration_Tag_AreaConfiguration_Id" referencedColumnNames="id" referencedTableName="AreaConfiguration"/>
 	</changeSet>
 	<changeSet author="kgebert (generated)" id="1496842280369-12">
-		<addForeignKeyConstraint baseColumnNames="configurations_id" baseTableName="Area_AreaConfiguration" constraintName="FK_Area_AreaConfiguration_Configuration_Id" referencedColumnNames="id" referencedTableName="AreaConfiguration"/>
+		<addForeignKeyConstraint onDelete="CASCADE" baseColumnNames="configurations_id" baseTableName="Area_AreaConfiguration" constraintName="FK_Area_AreaConfiguration_Configuration_Id" referencedColumnNames="id" referencedTableName="AreaConfiguration"/>
 	</changeSet>
 </databaseChangeLog>

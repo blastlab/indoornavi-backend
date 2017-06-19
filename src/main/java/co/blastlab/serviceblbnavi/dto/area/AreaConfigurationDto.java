@@ -1,7 +1,6 @@
 package co.blastlab.serviceblbnavi.dto.area;
 
 import co.blastlab.serviceblbnavi.domain.AreaConfiguration;
-import co.blastlab.serviceblbnavi.domain.AreaConfigurationMode;
 import co.blastlab.serviceblbnavi.domain.Device;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,7 +17,7 @@ public class AreaConfigurationDto {
 	private Long id;
 	private List<Integer> tags = new ArrayList<>();
 	private Integer offset;
-	private AreaConfigurationMode mode;
+	private AreaConfiguration.Mode mode;
 
 	public AreaConfigurationDto(AreaConfiguration areaConfiguration) {
 		this.setId(areaConfiguration.getId());
