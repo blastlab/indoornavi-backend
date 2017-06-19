@@ -3,7 +3,6 @@ package co.blastlab.serviceblbnavi.socket.area;
 import co.blastlab.serviceblbnavi.dao.repository.AreaRepository;
 import co.blastlab.serviceblbnavi.domain.Area;
 import co.blastlab.serviceblbnavi.domain.AreaConfiguration;
-import co.blastlab.serviceblbnavi.domain.AreaConfigurationMode;
 import co.blastlab.serviceblbnavi.domain.Tag;
 import co.blastlab.serviceblbnavi.dto.CoordinatesDto;
 import com.google.common.collect.HashBasedTable;
@@ -24,6 +23,9 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+
+import static co.blastlab.serviceblbnavi.domain.AreaConfiguration.Mode.ON_ENTER;
+import static co.blastlab.serviceblbnavi.domain.AreaConfiguration.Mode.ON_LEAVE;
 
 @Singleton
 @Startup
@@ -99,11 +101,11 @@ public class AreaEventController {
 	}
 
 	private boolean shouldSendOnEnterEvent(CoordinatesDto coordinatesData, AreaConfiguration areaConfiguration) {
-		return !tagCoordinatesHistory.containsRow(coordinatesData.getDeviceId()) && areaConfiguration.getMode().equals(AreaConfigurationMode.ON_ENTER);
+		return !tagCoordinatesHistory.containsRow(coordinatesData.getDeviceId()) && areaConfiguration.getMode().equals(ON_ENTER);
 	}
 
 	private boolean shouldSendOnLeaveEvent(CoordinatesDto coordinatesData, AreaConfiguration areaConfiguration) {
-		return tagCoordinatesHistory.containsRow(coordinatesData.getDeviceId()) && areaConfiguration.getMode().equals(AreaConfigurationMode.ON_LEAVE);
+		return tagCoordinatesHistory.containsRow(coordinatesData.getDeviceId()) && areaConfiguration.getMode().equals(ON_LEAVE);
 	}
 
 	private void updateTime(CoordinatesDto coordinatesData, Area area) {

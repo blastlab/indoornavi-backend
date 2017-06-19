@@ -1,6 +1,5 @@
 package co.blastlab.serviceblbnavi.rest.facade;
 
-import co.blastlab.serviceblbnavi.domain.AreaConfigurationMode;
 import co.blastlab.serviceblbnavi.dto.area.AreaConfigurationDto;
 import co.blastlab.serviceblbnavi.rest.facade.util.RequestBodyBuilder;
 import com.google.common.collect.ImmutableList;
@@ -9,6 +8,8 @@ import org.junit.Test;
 import java.util.Arrays;
 import java.util.List;
 
+import static co.blastlab.serviceblbnavi.domain.AreaConfiguration.Mode.ON_ENTER;
+import static co.blastlab.serviceblbnavi.domain.AreaConfiguration.Mode.ON_LEAVE;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
@@ -51,7 +52,7 @@ public class AreaConfigurationIT extends BaseIT {
 			.as(AreaConfigurationDto.class);
 
 		assertThat(configuration.getId(), is(notNullValue()));
-		assertThat(configuration.getMode(), is(AreaConfigurationMode.ON_ENTER));
+		assertThat(configuration.getMode(), is(ON_ENTER));
 		assertThat(configuration.getOffset(), is(50));
 		assertThat(configuration.getTags().size(), is(1));
 	}
@@ -74,7 +75,7 @@ public class AreaConfigurationIT extends BaseIT {
 			.as(AreaConfigurationDto.class);
 
 		assertThat(configuration.getId(), is(1L));
-		assertThat(configuration.getMode(), is(AreaConfigurationMode.ON_LEAVE));
+		assertThat(configuration.getMode(), is(ON_LEAVE));
 		assertThat(configuration.getOffset(), is(100));
 		assertThat(configuration.getTags().size(), is(1));
 	}

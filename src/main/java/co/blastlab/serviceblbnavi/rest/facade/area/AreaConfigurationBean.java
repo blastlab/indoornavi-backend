@@ -39,8 +39,6 @@ public class AreaConfigurationBean implements AreaConfigurationFacade {
 	// TODO: AutorizedAccess
 	public Response delete(Long id) {
 		AreaConfiguration areaConfigurationEntity = areaConfigurationRepository.findOptionalById(id).orElseThrow(EntityNotFoundException::new);
-		areaConfigurationEntity.getTags().clear();
-		areaConfigurationEntity.getAreas().forEach(area -> area.getConfigurations().remove(areaConfigurationEntity));
 		areaConfigurationRepository.remove(areaConfigurationEntity);
 		return Response.noContent().build();
 	}

@@ -40,7 +40,6 @@ public class AreaBean implements AreaFacade {
 	// TODO: AutorizedAccess
 	public Response delete(Long id) {
 		Area areaEntity = areaRepository.findOptionalById(id).orElseThrow(EntityNotFoundException::new);
-		areaEntity.getConfigurations().clear();
 		areaRepository.remove(areaEntity);
 		return Response.noContent().build();
 	}
