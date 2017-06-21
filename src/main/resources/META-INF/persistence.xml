@@ -10,6 +10,7 @@
 			<property name="hibernate.use_sql_comments" value="true"/>
 			<property name="hibernate.transaction.jta.platform" value="org.hibernate.service.jta.platform.internal.JBossAppServerJtaPlatform"/>
 			<property name="hibernate.id.new_generator_mappings" value="false"/>
+			<property name="hibernate.dialect" value="org.hibernate.spatial.dialect.mysql.MySQL5InnoDBSpatialDialect"/>
 		</properties>
 	</persistence-unit>
 </persistence>

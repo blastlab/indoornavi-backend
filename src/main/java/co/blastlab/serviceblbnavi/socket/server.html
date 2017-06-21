@@ -26,11 +26,11 @@
         var anchors = [];
 
         socket.onopen = function () {
+        	console.log('connection opened');
         	isConnectionOpen = true;
             sendPath(sinInterval, coordsSin, 10151);
             sendPath(lineInterval, coordsLine, 10404);
             sendPath(circleInterval, coordsCircle, 10210);
-            console.log(coordsLine2);
             sendPath(line2Interval, coordsLine2, 10310);
         };
 
@@ -39,6 +39,7 @@
         };
 
         socket.onmessage = function (msg) {
+        	console.log(msg);
             var message = JSON.parse(msg.data);
             if (message.type === 'ANCHORS') {
             	anchors = message['anchors'];

@@ -3,7 +3,12 @@
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.3.xsd">
 
+	<!-- This file is used in test enviroment -->
 	<changeSet id="Clear" author="kgebert" context="test" runOnChange="true" labels="Clear" runAlways="true">
+		<delete tableName="areaconfiguration_tag" />
+		<delete tableName="area_areaconfiguration" />
+		<delete tableName="area" />
+		<delete tableName="areaconfiguration" />
 		<delete tableName="tag"/>
 		<delete tableName="anchor"/>
 		<delete tableName="device"/>
@@ -66,5 +71,23 @@
 
 	<changeSet id="Tag" author="jsmol" context="test" runOnChange="true" labels="Tag" runAlways="true">
 		<loadUpdateData tableName="tag" file="test/Tag.csv" primaryKey="id" relativeToChangelogFile="true"/>
+	</changeSet>
+
+	<changeSet id="Area" author="kgebert" context="test" runOnChange="true" labels="Area" runAlways="true">
+		<sql>
+			insert into area (id, polygon, name) VALUES (1, GeomFromText('POLYGON(( 200 200, 400 200, 400 400, 200 400, 200 200 ))'), 'test');
+		</sql>
+	</changeSet>
+
+	<changeSet id="AreaConfiguration" author="kgebert" context="test" runOnChange="true" labels="AreaConfiguration" runAlways="true">
+		<loadUpdateData tableName="areaconfiguration" file="test/AreaConfiguration.csv" primaryKey="id" relativeToChangelogFile="true" />
+	</changeSet>
+
+	<changeSet id="Area_AreaConfiguration" author="kgebert" context="test" runOnChange="true" labels="Area_AreaConfiguration" runAlways="true">
+		<loadData tableName="area_areaconfiguration" file="test/AreaAreaConfiguration.csv" relativeToChangelogFile="true" />
+	</changeSet>
+
+	<changeSet id="AreaConfiguration_Tag" author="kgebert" context="test" runOnChange="true" labels="AreaConfiguration_Tag" runAlways="true">
+		<loadData tableName="areaconfiguration_tag" file="test/AreaConfigurationTag.csv" relativeToChangelogFile="true" />
 	</changeSet>
 </databaseChangeLog>
