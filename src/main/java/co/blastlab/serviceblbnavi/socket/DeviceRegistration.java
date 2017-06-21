@@ -102,11 +102,6 @@ public class DeviceRegistration {
 			deviceEntity.setShortId(deviceDto.getShortId());
 			deviceEntity.setLongId(deviceDto.getLongId());
 			deviceEntity.setVerified(false);
-//			if (deviceDto.getShortId() <= Short.MAX_VALUE) {
-//				deviceEntity = new Tag();
-//			} else {
-//				deviceEntity = new Anchor();
-//			}
 			deviceEntity = deviceRepository.save(deviceEntity);
 			broadCastMessage(anchorSessions, objectMapper.writeValueAsString(Collections.singletonList(new DeviceDto(deviceEntity))));
 		}

@@ -238,6 +238,64 @@
 	<changeSet author="kgebert (generated)" id="navi-59-3">
 		<addForeignKeyConstraint onUpdate="CASCADE" onDelete="SET NULL" baseColumnNames="scale_id" baseTableName="Floor" constraintName="FK_Floor_Scale_Id" referencedColumnNames="id" referencedTableName="Scale"/>
 	</changeSet>
+	<changeSet author="kgebert (generated)" id="1496754768263-1">
+		<createTable tableName="Area">
+			<column name="id" type="BIGINT" autoIncrement="true">
+				<constraints nullable="false" primaryKey="true" primaryKeyName="AreaPK" />
+			</column>
+			<column name="creationDate" type="timestamp"/>
+			<column name="modificationDate" type="timestamp"/>
+			<column name="polygon" type="POLYGON"/>
+		</createTable>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="1496842280369-1">
+		<createTable tableName="AreaConfiguration">
+			<column name="id" type="BIGINT" autoIncrement="true">
+				<constraints nullable="false" primaryKey="true" primaryKeyName="AreaConfigurationPK" />
+			</column>
+			<column name="creationDate" type="timestamp"/>
+			<column name="modificationDate" type="timestamp"/>
+			<column name="mode" type="VARCHAR(255)"/>
+			<column name="offset" type="INT"/>
+		</createTable>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="1496842280369-2">
+		<createTable tableName="AreaConfiguration_Tag">
+			<column name="areaConfiguration_id" type="BIGINT">
+				<constraints nullable="false"/>
+			</column>
+			<column name="tags_id" type="BIGINT">
+				<constraints nullable="false"/>
+			</column>
+		</createTable>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="1496842280369-3">
+		<createTable tableName="Area_AreaConfiguration">
+			<column name="area_id" type="BIGINT">
+				<constraints nullable="false"/>
+			</column>
+			<column name="configurations_id" type="BIGINT">
+				<constraints nullable="false"/>
+			</column>
+		</createTable>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="1496842280369-4">
+		<addColumn tableName="Area">
+			<column name="name" type="varchar(255)"/>
+		</addColumn>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="1496842280369-9">
+		<addForeignKeyConstraint onDelete="CASCADE" baseColumnNames="area_id" baseTableName="Area_AreaConfiguration" constraintName="FK_Area_AreaConfiguration_Area_Id" referencedColumnNames="id" referencedTableName="Area"/>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="1496842280369-10">
+		<addForeignKeyConstraint onDelete="CASCADE" baseColumnNames="tags_id" baseTableName="AreaConfiguration_Tag" constraintName="FK_AreaConfiguration_Tag_Id" referencedColumnNames="id" referencedTableName="Tag"/>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="1496842280369-11">
+		<addForeignKeyConstraint onDelete="CASCADE" baseColumnNames="areaConfiguration_id" baseTableName="AreaConfiguration_Tag" constraintName="FK_AreaConfiguration_Tag_AreaConfiguration_Id" referencedColumnNames="id" referencedTableName="AreaConfiguration"/>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="1496842280369-12">
+		<addForeignKeyConstraint onDelete="CASCADE" baseColumnNames="configurations_id" baseTableName="Area_AreaConfiguration" constraintName="FK_Area_AreaConfiguration_Configuration_Id" referencedColumnNames="id" referencedTableName="AreaConfiguration"/>
+	</changeSet>
 	<changeSet author="kgebert (generated)" id="navi-77-1">
 		<createTable tableName="User">
 			<column name="id" type="BIGINT" autoIncrement="true">

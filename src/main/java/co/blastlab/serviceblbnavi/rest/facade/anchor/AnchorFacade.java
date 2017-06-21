@@ -36,7 +36,7 @@ public interface AnchorFacade {
 	@Path("/{id: \\d+}")
 	@ApiOperation(value = "delete anchor by id", response = Response.class)
 	@ApiResponses({
-		@ApiResponse(code = 404, message = "Anchor id empty or anchor doesn not exist"),
+		@ApiResponse(code = 404, message = "Anchor id empty or anchor does not exist"),
 		@ApiResponse(code = 204, message = "Deleted successfully but there is no new information to return")
 	})
 	@AuthorizedAccess("ANCHOR_DELETE")

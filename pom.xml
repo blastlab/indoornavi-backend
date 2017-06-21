@@ -31,6 +31,15 @@
 		</dependencies>
 	</dependencyManagement>
 
+	<repositories>
+		<repository>
+			<id>
+				52-north
+			</id>
+			<url>http://52north.org/maven/repo/releases</url>
+		</repository>
+	</repositories>
+
 	<dependencies>
 		<dependency>
 			<groupId>javax</groupId>
@@ -190,6 +199,16 @@
 			<version>2.7.17</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-spatial</artifactId>
+			<version>5.0.7.Final</version>
+		</dependency>
+		<dependency>
+			<groupId>com.vividsolutions</groupId>
+			<artifactId>jts</artifactId>
+			<version>1.13</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>
@@ -206,7 +225,7 @@
 					<password></password>
 					<url>jdbc:mysql://localhost:3306/Navi</url>
 					<diffChangeLogFile>database/src/main/resources/db.changelog.NEW.xml</diffChangeLogFile>
-					<referenceUrl>hibernate:ejb3:NaviPU</referenceUrl>
+					<referenceUrl>hibernate:ejb3:NaviPU?dialect=org.hibernate.dialect.MySQL5Dialect</referenceUrl>
 				</configuration>
 				<dependencies>
 					<dependency>
