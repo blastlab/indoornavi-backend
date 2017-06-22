@@ -30,9 +30,11 @@ public class UserFacadeIT extends BaseIT {
 			.extract()
 			.as(UserDto[].class));
 
-		assertThat(users.size(), is(1));
+		assertThat(users.size(), is(2));
 		assertThat(users.get(0).getId(), is(1L));
 		assertThat(users.get(0).getUsername(), is("admin"));
+		assertThat(users.get(1).getId(), is(2L));
+		assertThat(users.get(1).getUsername(), is("user"));
 	}
 
 	@Test
@@ -78,10 +80,20 @@ public class UserFacadeIT extends BaseIT {
 	@Test
 	public void deleteUser() {
 		givenUser()
-			.pathParam("id", 1)
+			.pathParam("id", 2)
 			.when()
 			.delete("/users/{id}")
 			.then()
 			.statusCode(HttpStatus.SC_NO_CONTENT);
+	}
+
+	@Test
+	public void deleteSuperUserShouldBeNotAllowed() {
+		givenUser()
+			.pathParam("id", 1)
+			.when()
+			.delete("/users/{id}")
+			.then()
+			.statusCode(HttpStatus.SC_FORBIDDEN);
 	}
 }

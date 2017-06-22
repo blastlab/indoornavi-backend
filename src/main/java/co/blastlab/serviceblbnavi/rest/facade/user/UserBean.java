@@ -57,8 +57,12 @@ public class UserBean implements UserFacade {
 	@Override
 	public Response delete(Long id) {
 		User user = userRepository.findOptionalById(id).orElseThrow(EntityNotFoundException::new);
-		userRepository.remove(user);
-		return Response.noContent().build();
+		if (user.isSuperUser()) {
+			return Response.status(Response.Status.FORBIDDEN).build();
+		} else {
+			userRepository.remove(user);
+			return Response.noContent().build();
+		}
 	}
 
 	@Override

@@ -36,7 +36,9 @@
 	</changeSet>
 
 	<changeSet id="User" author="kgebert" runOnChange="true" labels="User" runAlways="true">
-		<loadUpdateData tableName="user" file="test/User.csv" primaryKey="id" relativeToChangelogFile="true" />
+		<loadUpdateData tableName="user" file="test/User.csv" primaryKey="id" relativeToChangelogFile="true">
+			<column name="superuser" type="boolean" />
+		</loadUpdateData>
 	</changeSet>
 
 	<changeSet id="User_PermissionGroup" author="kgebert" runOnChange="true" labels="User_PermissionGroup" runAlways="true">
