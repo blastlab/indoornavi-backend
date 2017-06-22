@@ -365,24 +365,11 @@
 	<changeSet author="kgebert (generated)" id="navi-77-10">
 		<addForeignKeyConstraint baseColumnNames="permissionGroup_id" baseTableName="PermissionGroup_Permission" constraintName="FK_Permission_PermissionGroup_Id" referencedColumnNames="id" referencedTableName="PermissionGroup"/>
 	</changeSet>
-
-	<changeSet id="navi-77-11" author="kgebert">
-		<loadUpdateData tableName="permissiongroup" file="test/PermissionGroup.csv" primaryKey="id"  />
-	</changeSet>
-
-	<changeSet id="navi-77-12" author="kgebert">
-		<loadUpdateData tableName="permission" file="test/Permission.csv" primaryKey="id"  />
-	</changeSet>
-
-	<changeSet id="navi-77-13" author="kgebert">
-		<loadData tableName="permissiongroup_permission" file="test/PermissionGroupPermission.csv"  />
-	</changeSet>
-
-	<changeSet id="navi-77-14" author="kgebert">
-		<loadUpdateData tableName="user" file="test/User.csv" primaryKey="id"/>
-	</changeSet>
-
-	<changeSet id="navi-77-15" author="kgebert">
-		<loadData tableName="user_permissiongroup" file="test/UserPermissionGroup.csv"  />
+	<changeSet author="kgebert (generated)" id="navi-77-11">
+		<addColumn tableName="User">
+			<column name="superUser" type="bit">
+				<constraints nullable="false"/>
+			</column>
+		</addColumn>
 	</changeSet>
 </databaseChangeLog>

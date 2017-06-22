@@ -40,7 +40,8 @@ public interface UserFacade {
 	@ApiOperation(value = "delete the user", response = Response.class)
 	@ApiResponses({
 		@ApiResponse(code = 404, message = "User id is empty or user does not exist"),
-		@ApiResponse(code = 204, message = "Deleted successfully but there is no new information to return")
+		@ApiResponse(code = 204, message = "Deleted successfully but there is no new information to return"),
+		@ApiResponse(code = 403, message = "You can not delete superUser")
 	})
 	@AuthorizedAccess("USER_DELETE")
 	Response delete(@ApiParam(value = "id", required = true) @PathParam("id") @Valid @NotNull Long id);

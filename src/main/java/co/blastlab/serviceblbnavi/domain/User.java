@@ -23,6 +23,8 @@ public class User extends TrackedEntity implements Principal {
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date tokenExpires;
 
+	private boolean superUser = false;
+
 	@ManyToMany
 	private List<PermissionGroup> permissionGroups = new ArrayList<>();
 

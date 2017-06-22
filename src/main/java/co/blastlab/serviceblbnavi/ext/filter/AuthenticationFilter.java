@@ -104,7 +104,7 @@ public class AuthenticationFilter implements ContainerRequestFilter {
 			throw new TokenInvalidOrExpired();
 		}
 
-		user.setTokenExpires(DateUtils.addMinutes(now, 5));
+		user.setTokenExpires(DateUtils.addMinutes(now, 30));
 
 		return authService.save(user);
 	}
