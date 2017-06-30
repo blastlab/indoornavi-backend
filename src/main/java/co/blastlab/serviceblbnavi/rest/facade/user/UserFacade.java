@@ -40,7 +40,7 @@ public interface UserFacade {
 	@ApiOperation(value = "delete the user", response = Response.class)
 	@ApiResponses({
 		@ApiResponse(code = 404, message = "User id is empty or user does not exist"),
-		@ApiResponse(code = 204, message = "Deleted successfully but there is no new information to return"),
+		@ApiResponse(code = 204, message = "Deleted successfully and there is no new information to return"),
 		@ApiResponse(code = 403, message = "You can not delete superUser")
 	})
 	@AuthorizedAccess("USER_DELETE")
@@ -50,7 +50,8 @@ public interface UserFacade {
 	@Path("/changePassword")
 	@ApiOperation(value = "change your password", response = Response.class)
 	@ApiResponses({
-		@ApiResponse(code = 304, message = "Old password doesn't match")
+		@ApiResponse(code = 304, message = "Old password doesn't match"),
+		@ApiResponse(code = 204, message = "Password successfully changed and there is no new information to return")
 	})
 	@AuthorizedAccess
 	Response changePassword(ChangePasswordDto changePasswordDto);

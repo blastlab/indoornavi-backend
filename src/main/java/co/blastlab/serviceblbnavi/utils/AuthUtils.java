@@ -37,12 +37,12 @@ public class AuthUtils {
 		return generatedPassword;
 	}
 
-	public static void comparePasswords(String password, User user) throws AuthenticationException {
+	public static void comparePasswords(String password, User user) throws AuthenticationException, InvalidPasswordException {
 		String saltedPassword;
 		try {
 			saltedPassword = AuthUtils.get_SHA_256_Password(password, Base64.decode(user.getSalt()));
 			if (!saltedPassword.equalsIgnoreCase(user.getPassword())) {
-				throw new AuthenticationException();
+				throw new InvalidPasswordException();
 			}
 		} catch (IOException e) {
 			throw new AuthenticationException();
@@ -51,4 +51,5 @@ public class AuthUtils {
 
 	public static class AuthenticationException extends Throwable {}
 
+	public static class InvalidPasswordException extends Throwable {}
 }
