@@ -18,6 +18,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import java.util.Date;
+import java.util.Set;
 
 @Stateless
 public class AuthenticationBean implements AuthenticationFacade {
@@ -37,9 +38,11 @@ public class AuthenticationBean implements AuthenticationFacade {
 			user.setToken(token);
 			user.setTokenExpires(DateUtils.addMinutes(new Date(), 5));
 			userRepository.save(user);
-			return Response.ok(new Token(token), MediaType.APPLICATION_JSON).build();
+			return Response.ok(new AutorizationResponse(token, user.getPermissionSet()), MediaType.APPLICATION_JSON).build();
 		} catch (AuthUtils.AuthenticationException e) {
-			return Response.status(Response.Status.UNAUTHORIZED).build();
+			return Response.status(Response.Status.NOT_FOUND).build();
+		} catch (AuthUtils.InvalidPasswordException e) {
+			return Response.status(Response.Status.BAD_REQUEST).build();
 		}
 	}
 
@@ -52,7 +55,7 @@ public class AuthenticationBean implements AuthenticationFacade {
 		return Response.ok().build();
 	}
 
-	private User authenticateUser(CredentialsDto credentialsDto) throws AuthUtils.AuthenticationException {
+	private User authenticateUser(CredentialsDto credentialsDto) throws AuthUtils.AuthenticationException, AuthUtils.InvalidPasswordException {
 		User user = userRepository.findOptionalByUsername(credentialsDto.getUsername()).orElseThrow(AuthUtils.AuthenticationException::new);
 
 		AuthUtils.comparePasswords(credentialsDto.getPlainPassword(), user);
@@ -64,8 +67,9 @@ public class AuthenticationBean implements AuthenticationFacade {
 	@Setter
 	@NoArgsConstructor
 	@AllArgsConstructor
-	private class Token {
+	private class AutorizationResponse {
 		private String token;
+		private Set<String> permissions;
 	}
 
 }

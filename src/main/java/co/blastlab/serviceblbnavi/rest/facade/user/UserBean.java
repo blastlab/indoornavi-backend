@@ -50,7 +50,9 @@ public class UserBean implements UserFacade {
 	public UserDto update(Long id, UserDto userDto) {
 		User user = userRepository.findOptionalById(id).orElseThrow(EntityNotFoundException::new);
 		user.setUsername(userDto.getUsername());
-		setPassword(user, userDto.getPassword());
+		if (userDto.getPassword() != null) {
+			setPassword(user, userDto.getPassword());
+		}
 		return new UserDto(userRepository.save(user));
 	}
 
@@ -71,7 +73,7 @@ public class UserBean implements UserFacade {
 
 		try {
 			AuthUtils.comparePasswords(changePasswordDto.getOldPassword(), currentUser);
-		} catch (AuthUtils.AuthenticationException e) {
+		} catch (AuthUtils.AuthenticationException | AuthUtils.InvalidPasswordException e) {
 			return Response.notModified().build();
 		}
 
@@ -79,7 +81,7 @@ public class UserBean implements UserFacade {
 
 		userRepository.save(currentUser);
 
-		return Response.ok().build();
+		return Response.noContent().build();
 	}
 
 	private void setPassword(User user, String newPassword) {

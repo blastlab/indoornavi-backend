@@ -15,14 +15,15 @@ public interface AuthenticationFacade {
 	@POST
 	@ApiOperation(value = "authenticate", response = Response.class)
 	@ApiResponses({
-		@ApiResponse(code = 401, message = "User not found or password incorrect")
+		@ApiResponse(code = 404, message = "User not found"),
+		@ApiResponse(code = 400, message = "Username or password incorrect")
 	})
 	Response authenticate(@ApiParam(value = "credentials", required = true) @Valid CredentialsDto credentials);
 
 	@POST
 	@ApiOperation(value = "logout", response = Response.class)
 	@ApiResponses({
-		@ApiResponse(code = 401, message = "User not found")
+		@ApiResponse(code = 404, message = "User not found")
 	})
 	@Path("/logout")
 	@AuthorizedAccess
