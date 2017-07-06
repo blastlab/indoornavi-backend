@@ -10,6 +10,6 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @NameBinding
 @Retention(RUNTIME)
 @Target({ElementType.METHOD, ElementType.TYPE})
-public @interface TokenAuthorization {
-
+public @interface AuthorizedAccess {
+	String value() default "";
 }
