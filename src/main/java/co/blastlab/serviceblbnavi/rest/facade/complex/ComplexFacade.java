@@ -1,7 +1,7 @@
 package co.blastlab.serviceblbnavi.rest.facade.complex;
 
 import co.blastlab.serviceblbnavi.dto.complex.ComplexDto;
-import co.blastlab.serviceblbnavi.ext.filter.TokenAuthorization;
+import co.blastlab.serviceblbnavi.ext.filter.AuthorizedAccess;
 import io.swagger.annotations.*;
 
 import javax.validation.Valid;
@@ -12,7 +12,6 @@ import java.util.List;
 
 @Path("/complexes")
 @Api("/complexes")
-@TokenAuthorization
 public interface ComplexFacade {
 
 	@POST
@@ -20,6 +19,7 @@ public interface ComplexFacade {
 	@ApiResponses({
 		@ApiResponse(code = 400, message = "Complex name is empty")
 	})
+	@AuthorizedAccess("COMPLEX_CREATE")
 	ComplexDto create(@ApiParam(value = "complex", required = true) @Valid ComplexDto complex);
 
 	@PUT
@@ -28,6 +28,7 @@ public interface ComplexFacade {
 	@ApiResponses({
 		@ApiResponse(code = 404, message = "Complex id empty or complex does not exist")
 	})
+	@AuthorizedAccess("COMPLEX_UPDATE")
 	ComplexDto update(@ApiParam(value = "id", required = true) @PathParam("id") @Valid @NotNull Long id,
 	                         @ApiParam(value = "complex", required = true) @Valid ComplexDto complex);
 
@@ -38,10 +39,12 @@ public interface ComplexFacade {
 		@ApiResponse(code = 404, message = "Complex id empty or complex does not exist"),
 		@ApiResponse(code = 204, message = "Deleted successfully but there is no new information to return")
 	})
+	@AuthorizedAccess("COMPLEX_DELETE")
 	Response delete(@ApiParam(value = "id", required = true) @PathParam("id") @Valid @NotNull Long id);
 
 	@GET
 	@ApiOperation(value = "find all complexes", response = ComplexDto.class, responseContainer = "List")
+	@AuthorizedAccess("COMPLEX_READ")
 	List<ComplexDto> findAll();
 
 	@GET
@@ -50,5 +53,6 @@ public interface ComplexFacade {
 	@ApiResponses({
 		@ApiResponse(code = 404, message = "Complex id empty or complex does not exist")
 	})
+	@AuthorizedAccess("COMPLEX_READ")
 	ComplexDto.WithBuildings findWithBuildings(@ApiParam(value = "id", required = true) @PathParam("id") @Valid @NotNull Long id);
 }

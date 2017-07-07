@@ -2,7 +2,7 @@ package co.blastlab.serviceblbnavi.rest.facade.floor;
 
 import co.blastlab.serviceblbnavi.dto.floor.FloorDto;
 import co.blastlab.serviceblbnavi.dto.floor.ScaleDto;
-import co.blastlab.serviceblbnavi.ext.filter.TokenAuthorization;
+import co.blastlab.serviceblbnavi.ext.filter.AuthorizedAccess;
 import io.swagger.annotations.*;
 
 import javax.validation.Valid;
@@ -13,12 +13,12 @@ import java.util.List;
 
 @Path("/floors")
 @Api("/floors")
-@TokenAuthorization
 public interface FloorFacade {
 
 	@GET
 	@Path("/{id: \\d+}")
 	@ApiOperation(value = "get specific floor", response = FloorDto.class)
+	@AuthorizedAccess("FLOOR_READ")
 	FloorDto get(@PathParam("id") @Valid @NotNull Long id);
 
 	@POST
@@ -27,6 +27,7 @@ public interface FloorFacade {
 		@ApiResponse(code = 404, message = "Building id does not exist or building id empty"),
 		@ApiResponse(code = 400, message = "Level and building id must be unique")
 	})
+	@AuthorizedAccess("FLOOR_CREATE")
 	FloorDto create(@ApiParam(value = "floor", required = true) @Valid FloorDto floor);
 
 	@PUT
@@ -35,6 +36,7 @@ public interface FloorFacade {
 	@ApiResponses({
 		@ApiResponse(code = 404, message = "Building id does not exist or building id empty")
 	})
+	@AuthorizedAccess("FLOOR_UPDATE")
 	FloorDto update(@ApiParam(value = "id", required = true) @PathParam("id") @Valid @NotNull Long id,
 	                       @ApiParam(value = "floor", required = true) @Valid FloorDto floor);
 
@@ -45,6 +47,7 @@ public interface FloorFacade {
 		@ApiResponse(code = 400, message = "Validation failed"),
 		@ApiResponse(code = 404, message = "One of the floors does not exist")
 	})
+	@AuthorizedAccess("FLOOR_UPDATE")
 	List<FloorDto> updateLevels(@ApiParam(value = "floors", required = true) @Valid List<FloorDto> floors) throws Exception;
 
 	@DELETE
@@ -54,6 +57,7 @@ public interface FloorFacade {
 		@ApiResponse(code = 404, message = "Floor with given id does not exist"),
 		@ApiResponse(code = 204, message = "Deleted successfully but there is no new information to return")
 	})
+	@AuthorizedAccess("FLOOR_DELETE")
 	Response delete(@PathParam("id") @ApiParam(value = "floor id", required = true) @Valid @NotNull Long id);
 
 	@PUT
@@ -62,6 +66,7 @@ public interface FloorFacade {
 	@ApiResponses({
 		@ApiResponse(code = 404, message = "Floor with given id does not exist")
 	})
+	@AuthorizedAccess("FLOOR_UPDATE")
 	FloorDto setScale(@PathParam("id") @ApiParam(value = "floor id", required = true) @Valid @NotNull Long id,
 	                  @ApiParam(value = "scale", required = true) @Valid ScaleDto scaleDto);
 }
