@@ -1,7 +1,7 @@
 package co.blastlab.serviceblbnavi.rest.facade.image;
 
 import co.blastlab.serviceblbnavi.dto.floor.ImageUpload;
-import co.blastlab.serviceblbnavi.ext.filter.TokenAuthorization;
+import co.blastlab.serviceblbnavi.ext.filter.AuthorizedAccess;
 import co.blastlab.serviceblbnavi.properties.Properties;
 import io.swagger.annotations.*;
 import net.sf.jmimemagic.MagicException;
@@ -18,7 +18,6 @@ import java.io.IOException;
 
 @Path("/images")
 @Api("/images")
-@TokenAuthorization
 public interface ImageFacade {
 
 	@POST
@@ -29,7 +28,7 @@ public interface ImageFacade {
 	@ApiResponses({
 		@ApiResponse(code = 404, message = "Floor with given id does not exist")
 	})
-
+	@AuthorizedAccess("FLOOR_UPDATE")
 	Response uploadImage(@ApiParam(value = "floorId", required = true) @PathParam("floorId") @Valid @NotNull Long floorId,
 						 @ApiParam(value = "DO NOT USE THROUGH SWAGGER") @Valid @MultipartForm ImageUpload image
 	                     ) throws IOException, MagicParseException, MagicException, MagicMatchNotFoundException;
@@ -41,10 +40,12 @@ public interface ImageFacade {
 	@ApiResponses({
 		@ApiResponse(code = 404, message = "Floor with given id does not exist or it has no image")
 	})
+	@AuthorizedAccess("FLOOR_READ")
 	Response downloadImage(@PathParam("id") Long id);
 
 	@GET
 	@Path("/configuration")
 	@ApiOperation(value = "get properties of images", response = Properties.class)
+	@AuthorizedAccess("FLOOR_UPDATE")
 	Properties retrievePropertiesOfImages();
 }
