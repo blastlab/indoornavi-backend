@@ -5,6 +5,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -13,10 +17,12 @@ public class UserDto {
 	private String username;
 	private String password;
 	private boolean superUser;
+	private List<PermissionGroupDto> permissionGroups = new ArrayList<>();
 
 	public UserDto(User user) {
 		this.setId(user.getId());
 		this.setUsername(user.getUsername());
 		this.setSuperUser(user.isSuperUser());
+		this.getPermissionGroups().addAll(user.getPermissionGroups().stream().map(PermissionGroupDto::new).collect(Collectors.toList()));
 	}
 }

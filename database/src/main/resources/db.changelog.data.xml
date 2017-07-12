@@ -22,4 +22,12 @@
 	<changeSet id="navi-77-15" author="kgebert">
 		<loadData tableName="user_permissiongroup" file="test/UserPermissionGroup.csv"/>
 	</changeSet>
+
+	<changeSet id="navi-135-1" author="kgebert">
+		<loadUpdateData tableName="permission" file="test/navi-135/Permission.csv" primaryKey="id"/>
+	</changeSet>
+
+	<changeSet id="navi-135-2" author="kgebert">
+		<loadData tableName="permissiongroup_permission" file="test/navi-135/PermissionGroupPermission.csv" />
+	</changeSet>
 </databaseChangeLog>
