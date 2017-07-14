@@ -9,4 +9,5 @@ import java.util.Optional;
 @Repository
 public interface PermissionGroupRepository extends EntityRepository<PermissionGroup, Long> {
 	Optional<PermissionGroup> findOptionalByName(String name);
+	Optional<PermissionGroup> findOptionalById(Long id);
 }

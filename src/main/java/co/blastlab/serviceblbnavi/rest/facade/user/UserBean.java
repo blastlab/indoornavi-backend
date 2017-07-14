@@ -2,9 +2,9 @@ package co.blastlab.serviceblbnavi.rest.facade.user;
 
 import co.blastlab.serviceblbnavi.dao.repository.PermissionGroupRepository;
 import co.blastlab.serviceblbnavi.dao.repository.UserRepository;
-import co.blastlab.serviceblbnavi.domain.PermissionGroup;
 import co.blastlab.serviceblbnavi.domain.User;
 import co.blastlab.serviceblbnavi.dto.user.ChangePasswordDto;
+import co.blastlab.serviceblbnavi.dto.user.PermissionGroupDto;
 import co.blastlab.serviceblbnavi.dto.user.UserDto;
 import co.blastlab.serviceblbnavi.utils.AuthUtils;
 import org.jboss.resteasy.util.Base64;
@@ -40,8 +40,9 @@ public class UserBean implements UserFacade {
 		User user = new User();
 		setPassword(user, userDto.getPassword());
 		user.setUsername(userDto.getUsername());
-		PermissionGroup guest = permissionGroupRepository.findOptionalByName("Guest").orElseThrow(EntityNotFoundException::new);
-		user.getPermissionGroups().add(guest);
+		for (PermissionGroupDto permissionGroupDto : userDto.getPermissionGroups()) {
+			user.getPermissionGroups().add(permissionGroupRepository.findBy(permissionGroupDto.getId()));
+		}
 		user = userRepository.save(user);
 		return new UserDto(user);
 	}
@@ -52,6 +53,10 @@ public class UserBean implements UserFacade {
 		user.setUsername(userDto.getUsername());
 		if (userDto.getPassword() != null) {
 			setPassword(user, userDto.getPassword());
+		}
+		user.getPermissionGroups().clear();
+		for (PermissionGroupDto permissionGroupDto : userDto.getPermissionGroups()) {
+			user.getPermissionGroups().add(permissionGroupRepository.findBy(permissionGroupDto.getId()));
 		}
 		return new UserDto(userRepository.save(user));
 	}
