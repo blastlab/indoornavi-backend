@@ -1,21 +1,15 @@
-package co.blastlab.serviceblbnavi.domain;
+package co.blastlab.serviceblbnavi.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.Entity;
-
-@Entity
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Anchor extends Device {
-
-	private Double x;
-
-	private Double y;
-
+public class Point {
+	private int x;
+	private int y;
 }

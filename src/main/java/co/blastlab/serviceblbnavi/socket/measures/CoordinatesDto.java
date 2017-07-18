@@ -1,4 +1,4 @@
-package co.blastlab.serviceblbnavi.dto;
+package co.blastlab.serviceblbnavi.socket.measures;
 
 import co.blastlab.serviceblbnavi.dto.floor.Point;
 import lombok.AllArgsConstructor;

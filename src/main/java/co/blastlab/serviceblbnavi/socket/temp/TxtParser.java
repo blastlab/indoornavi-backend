@@ -1,6 +1,6 @@
-package co.blastlab.serviceblbnavi.socket;
+package co.blastlab.serviceblbnavi.socket.temp;
 
-import co.blastlab.serviceblbnavi.dto.DistanceMessage;
+import co.blastlab.serviceblbnavi.socket.measures.DistanceMessage;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.awt.*;
