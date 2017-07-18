@@ -1,4 +1,4 @@
-package co.blastlab.serviceblbnavi.socket.dto;
+package co.blastlab.serviceblbnavi.socket.wrappers;
 
 import co.blastlab.serviceblbnavi.dto.tag.TagDto;
 import lombok.Getter;

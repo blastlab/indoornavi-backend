@@ -1,8 +1,8 @@
-package co.blastlab.serviceblbnavi.socket.utils;
+package co.blastlab.serviceblbnavi.socket.measures;
 
 import co.blastlab.serviceblbnavi.dao.repository.AnchorRepository;
-import co.blastlab.serviceblbnavi.dto.CoordinatesDto;
-import co.blastlab.serviceblbnavi.dto.floor.Point;
+import co.blastlab.serviceblbnavi.domain.Anchor;
+import co.blastlab.serviceblbnavi.dto.Point;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 import lombok.AllArgsConstructor;
@@ -17,16 +17,19 @@ import java.util.*;
 
 @Singleton
 public class CoordinatesCalculator {
-	// <tagId, anchorId, measure>
-	private Table<Integer, Integer, Measure> measureTable = HashBasedTable.create();
+
+	// <tagId, anchorShortId, measure>
+	private Table<Integer, Integer, List<Measure>> measureTable = HashBasedTable.create();
 
 	// 30 minutes
-	private final static long OLD_MEASURE_IN_MILISECONDS = 1_800_000;
+	private final static long OLD_DATA_IN_MILISECONDS = 1_800_000;
+
+	private Map<Integer, PointAndTime> previousCoorinates = new HashMap<>();
 
 	@Inject
 	private AnchorRepository anchorRepository;
 
-	public Optional<CoordinatesDto> calculateTagPosition(int firstDeviceId, int secondDeviceId, double distance) {
+	public Optional<CoordinatesDto> calculateTagPosition(int firstDeviceId, int secondDeviceId, int distance) {
 		Integer tagId = getTagId(firstDeviceId, secondDeviceId);
 		Integer anchorId = getAnchorId(firstDeviceId, secondDeviceId);
 		if (tagId == null || anchorId == null) {
@@ -42,53 +45,84 @@ public class CoordinatesCalculator {
 
 		Set<Pair<AnchorDistance, AnchorDistance>> pairs = getAnchorDistancePairs(connectedAnchors, tagId);
 		List<Point> intersectionPoints = new ArrayList<>();
-		pairs.forEach(pair -> {
+		for (Pair<AnchorDistance, AnchorDistance> pair : pairs) {
+			Optional<Anchor> left = anchorRepository.findByShortId(pair.getLeft().getAnchorId());
+			Optional<Anchor> right = anchorRepository.findByShortId(pair.getRight().getAnchorId());
+			if (!left.isPresent() || !right.isPresent()) {
+				return Optional.empty();
+			}
 			intersectionPoints.addAll(IntersectionsCalculator.getIntersections(
-				anchorRepository.findByShortId(pair.getLeft().getAnchorId()), pair.getLeft().getDistance(),
-				anchorRepository.findByShortId(pair.getRight().getAnchorId()), pair.getRight().getDistance()
+				left.get(), pair.getLeft().getDistance(),
+				right.get(), pair.getRight().getDistance()
 			));
-		});
+		}
+
 
 		List<Double> intersectionPointsDistance = IntersectionsCalculator.calculateSumDistanceBetweenIntersectionPoints(intersectionPoints);
-		List<Double> sortedIntersectionPointsDistance = new ArrayList<>();
-		sortedIntersectionPointsDistance.addAll(intersectionPointsDistance);
-		Collections.sort(sortedIntersectionPointsDistance);
-		Double thres = sortedIntersectionPointsDistance.get(connectedAnchors.size() - 1);
-
+		Double thres = calculateThres(intersectionPointsDistance, connectedAnchors.size());
 		int x = 0, y = 0, j = 0;
-		for (int ip = 0; ip < intersectionPoints.size(); ++ip)
-		{
+		for (int ip = 0; ip < intersectionPoints.size(); ++ip) {
 			if (intersectionPointsDistance.get(ip) <= thres) {
 				x += intersectionPoints.get(ip).getX();
 				y += intersectionPoints.get(ip).getY();
 				++j;
 			}
 		}
-		// TODO: uśrednienie na podstawie poprzedniej wartości taga x,y
 		x /= j;
 		y /= j;
+		Optional<PointAndTime> previousPoint = Optional.ofNullable(previousCoorinates.get(tagId));
+		if (previousPoint.isPresent()) {
+			x = (x + previousPoint.get().getPoint().getX()) / 2;
+			y = (y + previousPoint.get().getPoint().getY()) / 2;
+			Point newPoint = new Point(x, y);
+			previousCoorinates.put(tagId, new PointAndTime(newPoint, new Date().getTime()));
+			return Optional.of(new CoordinatesDto(tagId, newPoint));
+		}
+		Point currentPoint = new Point(x, y);
+		previousCoorinates.put(tagId, new PointAndTime(currentPoint, new Date().getTime()));
+		return Optional.of(new CoordinatesDto(tagId, currentPoint));
+	}
 
-		clearConnectedAnchors(tagId);
-		return Optional.of(new CoordinatesDto(tagId, new Point(x, y)));
+	private Double calculateThres(List<Double> intersectionPointsDistances, int connectedAnchorsCount) {
+		List<Double> sortedIntersectionPointsDistance = new ArrayList<>();
+		sortedIntersectionPointsDistance.addAll(intersectionPointsDistances);
+		Collections.sort(sortedIntersectionPointsDistance);
+		Double thresBase = sortedIntersectionPointsDistance.get(connectedAnchorsCount - 1);
+		Double thres = thresBase;
+		for (int i = connectedAnchorsCount; i < intersectionPointsDistances.size(); i++) {
+			if (sortedIntersectionPointsDistance.get(i) / thresBase - 1 < 0.10) {
+				thres = sortedIntersectionPointsDistance.get(i);
+			} else {
+				break;
+			}
+		}
+		return thres;
 	}
 
 	/**
-	 * Remove from measure table measures older than 30 minutes
+	 * Remove old data, older than OLD_DATA_IN_MILISECONDS
 	 */
-	public void cleanMeasureTable() {
+	public void cleanTables() {
 		long now = new Date().getTime();
 
-		Iterator<Table.Cell<Integer, Integer, Measure>> iterator = measureTable.cellSet().iterator();
+		Iterator<Table.Cell<Integer, Integer, List<Measure>>> measureIterator = measureTable.cellSet().iterator();
 
-		iterator.forEachRemaining(cell -> {
-			if (now - OLD_MEASURE_IN_MILISECONDS < cell.getValue().getTimestamp()) {
-				iterator.remove();
+		measureIterator.forEachRemaining(cell -> {
+			cell.getValue().removeIf(measure -> new Date((now - OLD_DATA_IN_MILISECONDS)).after(new Date(measure.getTimestamp())));
+		});
+
+		Iterator<Map.Entry<Integer, PointAndTime>> pointsIterator = previousCoorinates.entrySet().iterator();
+
+		pointsIterator.forEachRemaining(point -> {
+			if (new Date((now - OLD_DATA_IN_MILISECONDS)).after(new Date(point.getValue().getTimestamp()))) {
+				pointsIterator.remove();
 			}
 		});
 	}
 
 	/**
 	 * Choose tag id from two devices ids. Tags have id lower than 32767.
+	 *
 	 * @param firstDeviceId id of the first device
 	 * @param secondDeviceId id of the second device
 	 * @return tag id if found otherwise null
@@ -104,6 +138,7 @@ public class CoordinatesCalculator {
 
 	/**
 	 * Choose anchor id from two devices ids. Anchors have id higher than 32767.
+	 *
 	 * @param firstDeviceId id of the first device
 	 * @param secondDeviceId id of the second device
 	 * @return anchor id if found otherwise null
@@ -117,26 +152,25 @@ public class CoordinatesCalculator {
 		return null;
 	}
 
-	// TODO: uśrednienie dystansów
 	private void setConnection(int tagId, int anchorId, double distance) {
-		measureTable.put(tagId, anchorId, new Measure(distance, new Date().getTime()));
+		if (measureTable.contains(tagId, anchorId)) {
+			Measure measure = new Measure(distance, new Date().getTime());
+			if (measureTable.get(tagId, anchorId).size() >= 5) {
+				measureTable.get(tagId, anchorId).remove(0);
+			}
+			measureTable.get(tagId, anchorId).add(measure);
+		} else {
+			measureTable.put(tagId, anchorId, new ArrayList<>(Collections.singletonList(new Measure(distance, new Date().getTime()))));
+		}
 	}
 
 	private Set<Integer> getConnectedAnchors(Integer tagId) {
 		Set<Integer> connectedAnchors = new HashSet<>();
 		if (measureTable.containsRow(tagId)) {
-			Map<Integer, Measure> row = measureTable.row(tagId);
+			Map<Integer, List<Measure>> row = measureTable.row(tagId);
 			connectedAnchors = row.keySet();
 		}
 		return connectedAnchors;
-	}
-
-	private void clearConnectedAnchors(Integer tagId) {
-		synchronized (measureTable) {
-			if (measureTable.containsRow(tagId)) {
-				measureTable.row(tagId).clear();
-			}
-		}
 	}
 
 	private Set<Pair<AnchorDistance, AnchorDistance>> getAnchorDistancePairs(Set<Integer> connectedAnchors, Integer tagId) {
@@ -160,13 +194,14 @@ public class CoordinatesCalculator {
 	}
 
 	private Double getDistance(Integer tagId, Integer anchorId) {
-		return measureTable.get(tagId, anchorId).getDistance();
+		return measureTable.get(tagId, anchorId).stream().mapToDouble(Measure::getDistance).sum() / measureTable.get(tagId, anchorId).size();
 	}
 
 	@Getter
 	@Setter
 	@AllArgsConstructor
 	private static class Measure {
+
 		double distance;
 		long timestamp;
 	}
@@ -175,7 +210,17 @@ public class CoordinatesCalculator {
 	@Setter
 	@AllArgsConstructor
 	private class AnchorDistance {
+
 		int anchorId;
 		double distance;
+	}
+
+	@Getter
+	@Setter
+	@AllArgsConstructor
+	private class PointAndTime {
+
+		private Point point;
+		private long timestamp;
 	}
 }

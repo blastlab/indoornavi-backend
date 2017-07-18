@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.Entity;
+import javax.persistence.ManyToOne;
 
 @Entity
 @Getter
@@ -17,5 +18,13 @@ public class Anchor extends Device {
 	private Double x;
 
 	private Double y;
+
+	@ManyToOne
+	private Sink sink;
+
+	public Anchor(Double x, Double y) {
+		this.x = x;
+		this.y = y;
+	}
 
 }
