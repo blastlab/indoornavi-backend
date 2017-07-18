@@ -17,11 +17,13 @@ public abstract class WebSocket extends WebSocketCommunication {
 		return Objects.equals(session.getQueryString(), SERVER);
 	}
 
-	protected void open(Session session) {
+	protected void open(Session session, Runnable doForClients, Runnable doForServers) {
 		if (Objects.equals(session.getQueryString(), CLIENT)) {
 			getClientSessions().add(session);
+			doForClients.run();
 		} else if (Objects.equals(session.getQueryString(), SERVER)) {
 			getServerSessions().add(session);
+			doForServers.run();
 		}
 	}
 

@@ -22,7 +22,10 @@ public class AnchorPositionBridge implements Bridge {
 	private Point sinkPosition;
 	private Integer firstAnchorId;
 	private Double firstAnchorDegree;
-	private Double L10; // distance between sink and first anchor
+	/**
+	 * distance between sink and first anchor
+	 */
+	private Double L10;
 	private Map<Integer, DistancePair> distancePairs = new HashMap<>();
 	@Inject
 	private Event<AnchorPoints> anchorPositionEvent;
@@ -45,8 +48,8 @@ public class AnchorPositionBridge implements Bridge {
 	public void addDistance(Integer firstDeviceId, Integer secondDeviceId, Integer distance) throws UnrecognizedDeviceException {
 		if (this.sinkId != null && this.firstAnchorId != null) {
 
-			Integer sinkId = this.sinkId.equals(firstDeviceId) ? firstDeviceId : this.sinkId.equals(secondDeviceId) ? secondDeviceId : null;
-			Integer firstAnchorId = this.firstAnchorId.equals(firstDeviceId) ? firstDeviceId : this.firstAnchorId.equals(secondDeviceId) ? secondDeviceId : null;
+			Integer sinkId = getSinkId(firstDeviceId, secondDeviceId);
+			Integer firstAnchorId = getFirstAnchorId(firstDeviceId, secondDeviceId);
 			Integer otherAnchorId;
 			Double L21 = null;
 			Double L20 = null;
@@ -86,18 +89,16 @@ public class AnchorPositionBridge implements Bridge {
 		}
 	}
 
-	/*
-		L21 - distance between first and second anchor
-		L20 - distance between sink and second anchor
-	 */
+	private Integer getSinkId(Integer firstDeviceId, Integer secondDeviceId) {
+		return this.sinkId.equals(firstDeviceId) ? firstDeviceId : this.sinkId.equals(secondDeviceId) ? secondDeviceId : null;
+	}
+
+	private Integer getFirstAnchorId(Integer firstDeviceId, Integer secondDeviceId) {
+		return this.firstAnchorId.equals(firstDeviceId) ? firstDeviceId : this.firstAnchorId.equals(secondDeviceId) ? secondDeviceId : null;
+	}
+
 	List<Point> calculateAnchorPositions(DistancePair distancePair) {
-		Double L20 = distancePair.getL20();
-		Double L21 = distancePair.getL21();
-		List<Point> points = new ArrayList<>();
-		double X2 = L10 != null ? (int) ((L10 * L10 - L21 * L21 + L20 * L20) / (2 * L10)) : L20;
-		Point point = new Point();
-		point.setX((int) X2);
-		point.setY((int) Math.sqrt(Math.abs(L20 * L20 - X2 * X2)));
+		Point point = calculateSecondAnchorPosition(distancePair);
 
 		Point2D.Double mirrored = new Point2D.Double();
 		Point2D.Double secondAnchorPosition = new Point2D.Double(point.getX(), point.getY());
@@ -107,23 +108,60 @@ public class AnchorPositionBridge implements Bridge {
 		affineTransform.setTransform(AffineTransform.getScaleInstance(1, -1));
 		affineTransform.transform(secondAnchorPosition, mirrored);
 
+		List<Point> points = new ArrayList<>();
 		points.add(moveAndRotate(secondAnchorPosition));
 		points.add(moveAndRotate(mirrored));
 
 		return points;
 	}
 
+	/**
+	 * Calculate initial second anchor position
+	 * @param distancePair it's distance between sink and second anchor and between first anchor and second anchor
+	 * @return calculated initial position
+	 */
+	private Point calculateSecondAnchorPosition(DistancePair distancePair) {
+		Double L20 = distancePair.getL20();
+		Double L21 = distancePair.getL21();
+
+		double X2 = L10 != null ? (int) ((L10 * L10 - L21 * L21 + L20 * L20) / (2 * L10)) : L20;
+		Point point = new Point();
+		point.setX((int) X2);
+		point.setY((int) Math.sqrt(Math.abs(L20 * L20 - X2 * X2)));
+		return point;
+	}
+
 	private Point moveAndRotate(Point2D.Double toTransform) {
+		Point2D.Double rotationResult = rotate(toTransform);
+		Point2D.Double moveResult = move(rotationResult);
+		return new Point((int) moveResult.getX(), (int) moveResult.getY());
+	}
+
+	/**
+	 * Rotate by given degree (it's between y axis and first anchor position)
+	 * @param toTransform position of second anchor or it's mirrored position
+	 * @return result of rotation
+	 */
+	private Point2D.Double rotate(Point2D.Double toTransform) {
 		AffineTransform affineTransform = new AffineTransform();
 		Point2D.Double rotationResult = new Point2D.Double();
 		double radians = (Math.toRadians(firstAnchorDegree));
 		affineTransform.rotate(radians);
 		affineTransform.transform(toTransform, rotationResult);
-		affineTransform = new AffineTransform();
+		return rotationResult;
+	}
+
+	/**
+	 * Move point according to difference between sink initial position (0, 0) and it's current position (set by user)
+	 * @param toTransform rotated position of second anchor or it's mirrored position
+	 * @return result of moving
+	 */
+	private Point2D.Double move(Point2D.Double toTransform) {
+		AffineTransform affineTransform = new AffineTransform();
 		Point2D.Double moveResult = new Point2D.Double();
 		affineTransform.translate(this.sinkPosition.getX(), this.sinkPosition.getY());
-		affineTransform.transform(rotationResult, moveResult);
-		return new Point((int) moveResult.getX(), (int) moveResult.getY());
+		affineTransform.transform(toTransform, moveResult);
+		return moveResult;
 	}
 
 	@Getter
@@ -131,7 +169,13 @@ public class AnchorPositionBridge implements Bridge {
 	@NoArgsConstructor
 	@AllArgsConstructor
 	static class DistancePair {
+		/*
+		  distance between sink and second anchor
+ 		 */
 		private Double L20;
+		/*
+		  distance between first and second anchor
+ 		 */
 		private Double L21;
 	}
 }

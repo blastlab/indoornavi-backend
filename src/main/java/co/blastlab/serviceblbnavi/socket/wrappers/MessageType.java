@@ -1,4 +1,4 @@
-package co.blastlab.serviceblbnavi.socket.dto;
+package co.blastlab.serviceblbnavi.socket.wrappers;
 
 public enum MessageType {
 	TAGS, COORDINATES, ANCHORS, EVENT
