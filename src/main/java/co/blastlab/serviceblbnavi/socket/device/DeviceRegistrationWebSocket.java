@@ -1,4 +1,4 @@
-package co.blastlab.serviceblbnavi.socket;
+package co.blastlab.serviceblbnavi.socket.device;
 
 import co.blastlab.serviceblbnavi.dao.repository.AnchorRepository;
 import co.blastlab.serviceblbnavi.dao.repository.DeviceRepository;
@@ -7,6 +7,7 @@ import co.blastlab.serviceblbnavi.domain.Anchor;
 import co.blastlab.serviceblbnavi.domain.Device;
 import co.blastlab.serviceblbnavi.domain.Tag;
 import co.blastlab.serviceblbnavi.dto.device.DeviceDto;
+import co.blastlab.serviceblbnavi.socket.WebSocketCommunication;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -19,7 +20,7 @@ import java.util.*;
 
 @ApplicationScoped
 @ServerEndpoint("/devices/registration")
-public class DeviceRegistration {
+public class DeviceRegistrationWebSocket extends WebSocketCommunication {
 
 	private static Set<Session> anchorSessions = Collections.synchronizedSet(new HashSet<Session>());
 	private static Set<Session> tagSessions = Collections.synchronizedSet(new HashSet<Session>());
@@ -107,15 +108,5 @@ public class DeviceRegistration {
 		}
 	}
 
-	private static void broadCastMessage(final Set<Session> sessions, final String message) {
-		sessions.forEach(session -> {
-			try {
-				if (session.isOpen()) {
-					session.getBasicRemote().sendText(message);
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		});
-	}
+
 }

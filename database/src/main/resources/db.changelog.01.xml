@@ -238,6 +238,27 @@
 	<changeSet author="kgebert (generated)" id="navi-59-3">
 		<addForeignKeyConstraint onUpdate="CASCADE" onDelete="SET NULL" baseColumnNames="scale_id" baseTableName="Floor" constraintName="FK_Floor_Scale_Id" referencedColumnNames="id" referencedTableName="Scale"/>
 	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-128-1">
+		<createTable tableName="Sink">
+			<column name="id" type="BIGINT" autoIncrement="true">
+				<constraints nullable="false" primaryKey="true" primaryKeyName="SinkPK" />
+			</column>
+			<column name="configured" type="BIT(1)">
+				<constraints nullable="false"/>
+			</column>
+		</createTable>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-128-2">
+		<addForeignKeyConstraint baseColumnNames="id" baseTableName="Sink" constraintName="FK_Sink_Anchor_Id" referencedColumnNames="id" referencedTableName="Anchor"/>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-128-3">
+		<addColumn tableName="Anchor">
+			<column name="sink_id" type="bigint"/>
+		</addColumn>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-128-4">
+		<addForeignKeyConstraint baseColumnNames="sink_id" baseTableName="Anchor" constraintName="FK_Anchor_Sink_Id" referencedColumnNames="id" referencedTableName="Sink"/>
+	</changeSet>
 	<changeSet author="kgebert (generated)" id="1496754768263-1">
 		<createTable tableName="Area">
 			<column name="id" type="BIGINT" autoIncrement="true">
