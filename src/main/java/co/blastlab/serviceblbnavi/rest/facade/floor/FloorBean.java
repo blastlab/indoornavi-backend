@@ -6,7 +6,6 @@ import co.blastlab.serviceblbnavi.domain.Building;
 import co.blastlab.serviceblbnavi.domain.Floor;
 import co.blastlab.serviceblbnavi.domain.Scale;
 import co.blastlab.serviceblbnavi.dto.floor.FloorDto;
-import co.blastlab.serviceblbnavi.dto.floor.Measure;
 import co.blastlab.serviceblbnavi.dto.floor.ScaleDto;
 import org.apache.http.HttpStatus;
 
@@ -15,6 +14,8 @@ import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
 import javax.ws.rs.core.Response;
 import java.util.*;
+
+import static co.blastlab.serviceblbnavi.domain.Scale.scale;
 
 @Stateless
 public class FloorBean implements FloorFacade {
@@ -27,7 +28,7 @@ public class FloorBean implements FloorFacade {
 
 	@Override
 	public FloorDto get(Long id) {
-		Optional<Floor> floorEntity = floorRepository.findById(id);
+		Optional<Floor> floorEntity = floorRepository.findOptionalById(id);
 		if (floorEntity.isPresent()) {
 			return new FloorDto(floorEntity.get());
 		}
@@ -52,7 +53,7 @@ public class FloorBean implements FloorFacade {
 	public FloorDto update(Long id, FloorDto floor) {
 		Optional<Building> building = buildingRepository.findById(floor.getBuildingId());
 		if(building.isPresent()){
-			Optional<Floor> floorEntity = floorRepository.findById(id);
+			Optional<Floor> floorEntity = floorRepository.findOptionalById(id);
 			if (floorEntity.isPresent()) {
 				floorEntity.get().setLevel(floor.getLevel());
 				floorEntity.get().setName(floor.getName());
@@ -69,7 +70,7 @@ public class FloorBean implements FloorFacade {
 		Map<Floor, Integer> floorEntityToLevel = new HashMap<>();
 		// We need to set null to all levels before we set new values due to unique constraint
 		floors.forEach((floorDto) -> {
-			Optional<Floor> floorOptional = floorRepository.findById(floorDto.getId());
+			Optional<Floor> floorOptional = floorRepository.findOptionalById(floorDto.getId());
 			if (floorOptional.isPresent()) {
 				Floor floorEntity = floorOptional.get();
 				floorEntity.setLevel(null);
@@ -88,7 +89,7 @@ public class FloorBean implements FloorFacade {
 
 	@Override
 	public Response delete(Long id) {
-		Optional<Floor> floor = floorRepository.findById(id);
+		Optional<Floor> floor = floorRepository.findOptionalById(id);
 		if (floor.isPresent()) {
 			floorRepository.remove(floor.get());
 			return Response.status(HttpStatus.SC_NO_CONTENT).build();
@@ -98,14 +99,14 @@ public class FloorBean implements FloorFacade {
 
 	@Override
 	public FloorDto setScale(Long id, ScaleDto scaleDto) {
-		Floor floor = floorRepository.findById(id).orElseThrow(EntityNotFoundException::new);
-		Scale scale = Optional.ofNullable(floor.getScale()).orElse(new Scale());
-		scale.setRealDistanceInCentimeters(scaleDto.getMeasure().equals(Measure.METERS) ? scaleDto.getRealDistance() * 100 : scaleDto.getRealDistance());
-		scale.setStartX(scaleDto.getStart().getX());
-		scale.setStartY(scaleDto.getStart().getY());
-		scale.setStopX(scaleDto.getStop().getX());
-		scale.setStopY(scaleDto.getStop().getY());
-		scale.setMeasure(scaleDto.getMeasure());
+		Floor floor = floorRepository.findOptionalById(id).orElseThrow(EntityNotFoundException::new);
+		Scale scale = scale(floor.getScale())
+			.measure(scaleDto.getMeasure())
+			.distance(scaleDto.getRealDistance())
+			.startX(scaleDto.getStart().getX())
+			.startY(scaleDto.getStart().getY())
+			.stopX(scaleDto.getStop().getX())
+			.stopY(scaleDto.getStop().getY());
 		floor.setScale(scale);
 		floor = floorRepository.save(floor);
 		return new FloorDto(floor);

@@ -372,4 +372,19 @@
 			</column>
 		</addColumn>
 	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-73-1">
+		<createTable tableName="Configuration">
+			<column autoIncrement="true" name="id" type="BIGINT">
+				<constraints nullable="false" primaryKey="true" primaryKeyName="ConfigurationPK" />
+			</column>
+			<column name="creationDate" type="datetime"/>
+			<column name="modificationDate" type="datetime"/>
+			<column name="data" type="LONGTEXT"/>
+			<column name="version" type="INT"/>
+			<column name="floor_id" type="bigint"/>
+		</createTable>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-73-2">
+		<addForeignKeyConstraint baseColumnNames="floor_id" baseTableName="Configuration" constraintName="FK_Configuration_Floor_Id" referencedColumnNames="id" referencedTableName="Floor"/>
+	</changeSet>
 </databaseChangeLog>
