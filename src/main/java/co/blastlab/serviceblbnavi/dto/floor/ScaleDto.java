@@ -1,6 +1,7 @@
 package co.blastlab.serviceblbnavi.dto.floor;
 
 import co.blastlab.serviceblbnavi.domain.Scale;
+import co.blastlab.serviceblbnavi.dto.Point;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

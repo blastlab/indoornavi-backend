@@ -1,7 +1,7 @@
 package co.blastlab.serviceblbnavi.dto.area;
 
 import co.blastlab.serviceblbnavi.domain.Area;
-import co.blastlab.serviceblbnavi.dto.floor.Point;
+import co.blastlab.serviceblbnavi.dto.Point;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.io.WKTReader;

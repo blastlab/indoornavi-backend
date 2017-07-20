@@ -1,6 +1,6 @@
 package co.blastlab.serviceblbnavi.domain;
 
-import co.blastlab.serviceblbnavi.socket.DeviceRegistration;
+import co.blastlab.serviceblbnavi.socket.device.DeviceRegistrationWebSocket;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.Getter;
 import lombok.Setter;
@@ -28,7 +28,7 @@ public abstract class Device extends TrackedEntity {
 
 	@PostPersist
 	@PostUpdate
-	private void broadcast() throws JsonProcessingException {
-		DeviceRegistration.broadcastDevice(this);
+	void broadcast() throws JsonProcessingException {
+		DeviceRegistrationWebSocket.broadcastDevice(this);
 	}
 }

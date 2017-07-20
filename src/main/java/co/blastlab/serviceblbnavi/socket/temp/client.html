@@ -38,7 +38,7 @@
 	$(document).ready(function () {
 		var $container = $('#container');
 		var isConnectionOpen = false;
-		var socket = new WebSocket("ws://localhost:80/coordinates?client");
+		var socket = new WebSocket("ws://localhost:80/measures?client");
 		var message = {
 			color: ''
 		};
