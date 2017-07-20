@@ -1,4 +1,4 @@
-package co.blastlab.serviceblbnavi.socket.dto;
+package co.blastlab.serviceblbnavi.socket.wrappers;
 
 import co.blastlab.serviceblbnavi.socket.area.AreaEvent;
 import lombok.Getter;

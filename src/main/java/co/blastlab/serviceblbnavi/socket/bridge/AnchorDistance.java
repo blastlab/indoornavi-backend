@@ -1,15 +1,15 @@
-package co.blastlab.serviceblbnavi.dto.floor;
+package co.blastlab.serviceblbnavi.socket.bridge;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Getter
-@Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Point {
-	private int x;
-	private int y;
+@Getter
+@Setter
+public class AnchorDistance {
+	private Integer anchorId;
+	private Integer distance;
 }
