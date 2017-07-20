@@ -49,7 +49,6 @@ public class AreaEventController {
 
 	@PostConstruct
 	public void init() {
-		this.areas.addAll(areaRepository.findAll());
 		scheduledExecutorService.scheduleWithFixedDelay(this::updateData, 1, 30, TimeUnit.SECONDS);
 	}
 
