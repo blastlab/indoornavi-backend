@@ -7,7 +7,6 @@ import org.apache.deltaspike.data.api.Query;
 import org.apache.deltaspike.data.api.Repository;
 
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface ConfigurationRepostiory extends EntityRepository<Configuration, Long> {
@@ -15,6 +14,4 @@ public interface ConfigurationRepostiory extends EntityRepository<Configuration,
 	Integer getLatestVersion(Floor floor);
 
 	List<Configuration> findByFloorOrderByVersionDesc(Floor floor);
-
-	Optional<Configuration> findTopByFloorOrderByVersionDesc(Floor floor);
 }

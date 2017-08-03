@@ -1,7 +1,6 @@
 package co.blastlab.serviceblbnavi.rest.facade.configuration;
 
 import co.blastlab.serviceblbnavi.dto.configuration.ConfigurationDto;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.annotations.*;
 
 import javax.validation.Valid;
@@ -24,7 +23,7 @@ public interface ConfigurationFacade {
 	@PUT
 	@ApiOperation(value = "save draft", response = ConfigurationDto.class)
 	//	@AuthorizedAccess("CONFIGURATION_UPDATE")
-	ConfigurationDto saveDraft(@ApiParam(value = "configuration", required = true) @Valid ConfigurationDto configuration) throws JsonProcessingException;
+	ConfigurationDto saveDraft(@ApiParam(value = "configuration", required = true) @Valid ConfigurationDto configuration) throws IOException;
 
 	@Path("/{floorId: \\d+}")
 	@GET

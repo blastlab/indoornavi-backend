@@ -25,4 +25,9 @@ public class Configuration extends TrackedEntity {
 	 */
 	@Lob
 	private String data;
+
+	public Configuration(Floor floor, Integer version) {
+		this.floor = floor;
+		this.version = version;
+	}
 }

@@ -30,15 +30,6 @@ public class Scale extends TrackedEntity {
 	 */
 	private int realDistanceInCentimeters;
 
-//	/**
-//	 * Don't use this. Use builder instead.
-//	 */
-//	private Scale(int startX, int startY,
-//	              int stopX, int stopY,
-//	              Measure measure, int realDistanceInCentimeters) {
-//		this
-//	}
-
 	/*
 	    this method calculate distance between start point and stop point
     */
