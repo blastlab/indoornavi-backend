@@ -7,4 +7,5 @@ import lombok.Setter;
 @Setter
 class FirstStep extends WizardStep {
 	private Integer sinkShortId;
+	private Long floorId;
 }
