@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
@@ -15,7 +16,7 @@ import javax.persistence.ManyToOne;
 @Getter
 @Setter
 public class Configuration extends TrackedEntity {
-	@ManyToOne
+	@ManyToOne(cascade = CascadeType.REMOVE)
 	private Floor floor;
 
 	private Integer version;

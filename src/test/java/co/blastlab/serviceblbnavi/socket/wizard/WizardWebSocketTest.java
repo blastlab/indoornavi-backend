@@ -49,13 +49,13 @@ public class WizardWebSocketTest {
 
 	@Test
 	public void open() throws Exception {
-		verify(sinkRepository).findAll();
+		verify(sinkRepository).findByConfigured(false);
 	}
 
 	@Test
 	public void close() throws Exception {
-		wizardWebSocket.handleMessage("{ \"sinkShortId\": 1, \"anchorShortId\": null, \"sinkPosition\": null, \"degree\": null}", session);
-		wizardWebSocket.handleMessage("{ \"sinkShortId\": 1, \"anchorShortId\": 2, \"sinkPosition\": {}, \"degree\": 10.0 }", session);
+		wizardWebSocket.handleMessage("{ \"step\": \"FIRST\", \"sinkShortId\": 1 }", session);
+		wizardWebSocket.handleMessage("{ \"step\": \"SECOND\", \"anchorShortId\": 2, \"sinkPosition\": {}, \"degree\": 10.0 }", session);
 		wizardWebSocket.close(session);
 
 		verify(sinkAnchorsDistanceBridge).stopListening(1);
@@ -64,8 +64,8 @@ public class WizardWebSocketTest {
 
 	@Test
 	public void handleMessage() throws Exception {
-		wizardWebSocket.handleMessage("{ \"sinkShortId\": 1, \"anchorShortId\": null, \"sinkPosition\": null, \"degree\": null}", session);
-		wizardWebSocket.handleMessage("{ \"sinkShortId\": 1, \"anchorShortId\": 2, \"sinkPosition\": {\"x\": 1, \"y\": 1}, \"degree\": 10.0 }", session);
+		wizardWebSocket.handleMessage("{ \"step\": \"FIRST\", \"sinkShortId\": 1 }", session);
+		wizardWebSocket.handleMessage("{ \"step\": \"SECOND\", \"anchorShortId\": 2, \"sinkPosition\": {\"x\": 1, \"y\": 1}, \"degree\": 10.0 }", session);
 
 		verify(sinkAnchorsDistanceBridge).startListening(1);
 		verify(anchorPositionBridge).startListening(eq(1), eq(2), any(Point.class), eq(10.0));

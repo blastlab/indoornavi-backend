@@ -1,6 +1,8 @@
 package co.blastlab.serviceblbnavi.socket.wizard;
 
+import co.blastlab.serviceblbnavi.dao.repository.FloorRepository;
 import co.blastlab.serviceblbnavi.dao.repository.SinkRepository;
+import co.blastlab.serviceblbnavi.domain.Floor;
 import co.blastlab.serviceblbnavi.domain.Sink;
 import co.blastlab.serviceblbnavi.dto.sink.SinkDto;
 import co.blastlab.serviceblbnavi.socket.WebSocketCommunication;
@@ -32,6 +34,8 @@ public class WizardWebSocket extends WebSocketCommunication {
 
 	private Integer sinkShortId;
 
+	private Long floorId;
+
 	private Integer firstAnchorShortId;
 
 	@Inject
@@ -42,6 +46,9 @@ public class WizardWebSocket extends WebSocketCommunication {
 
 	@Inject
 	private AnchorPositionBridge anchorPositionCalculator;
+
+	@Inject
+	private FloorRepository floorRepository;
 
 	private ObjectMapper objectMapper;
 
@@ -96,6 +103,7 @@ public class WizardWebSocket extends WebSocketCommunication {
 			if (wizardStep.getStep().equals(Step.FIRST)) {
 				FirstStep firstStep = objectMapper.readValue(message, FirstStep.class);
 				this.sinkShortId = firstStep.getSinkShortId();
+				this.floorId = firstStep.getFloorId();
 				sinkAnchorsDistanceController.startListening(this.sinkShortId);
 			} else if (wizardStep.getStep().equals(Step.SECOND)) {
 				SecondStep secondStep = objectMapper.readValue(message, SecondStep.class);
@@ -106,6 +114,8 @@ public class WizardWebSocket extends WebSocketCommunication {
 				if (sinkOptional.isPresent()) {
 					Sink sink = sinkOptional.get();
 					sink.setConfigured(true);
+					Optional<Floor> floorOptional = floorRepository.findOptionalById(this.floorId);
+					floorOptional.ifPresent(sink::setFloor);
 					sinkRepository.save(sink);
 				}
 			}

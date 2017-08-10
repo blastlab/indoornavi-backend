@@ -406,6 +406,6 @@
 		</createTable>
 	</changeSet>
 	<changeSet author="kgebert (generated)" id="navi-73-2">
-		<addForeignKeyConstraint baseColumnNames="floor_id" baseTableName="Configuration" constraintName="FK_Configuration_Floor_Id" referencedColumnNames="id" referencedTableName="Floor"/>
+		<addForeignKeyConstraint onDelete="CASCADE" baseColumnNames="floor_id" baseTableName="Configuration" constraintName="FK_Configuration_Floor_Id" referencedColumnNames="id" referencedTableName="Floor"/>
 	</changeSet>
 </databaseChangeLog>
