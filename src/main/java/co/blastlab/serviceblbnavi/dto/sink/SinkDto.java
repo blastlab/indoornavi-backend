@@ -17,9 +17,11 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class SinkDto extends AnchorDto {
 	private List<AnchorDto> anchors = new ArrayList<>();
+	private Boolean configured;
 
 	public SinkDto(Sink sink) {
 		super(sink);
 		this.anchors.addAll(sink.getAnchors().stream().map(AnchorDto::new).collect(Collectors.toList()));
+		this.configured = sink.isConfigured();
 	}
 }

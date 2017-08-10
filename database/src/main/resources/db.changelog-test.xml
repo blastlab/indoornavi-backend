@@ -49,7 +49,7 @@
 	</changeSet>
 
 	<changeSet id="Sink" author="kgebert" context="test" runOnChange="true" labels="Sink" runAlways="true">
-		<loadUpdateData tableName="sink" file="test/Sink.csv" primaryKey="id" relativeToChangelogFile="true">
+		<loadUpdateData tableName="sink" file="test/Sink.csv" primaryKey="id">
 			<column name="configured" type="boolean" />
 		</loadUpdateData>
 	</changeSet>
