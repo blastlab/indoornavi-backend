@@ -9,5 +9,5 @@ import java.util.Optional;
 @Repository
 public interface FloorRepository extends EntityRepository<Floor, Long> {
 
-	Optional<Floor> findById(Long id);
+	Optional<Floor> findOptionalById(Long id);
 }
