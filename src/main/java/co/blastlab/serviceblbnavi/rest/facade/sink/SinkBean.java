@@ -26,21 +26,13 @@ public class SinkBean implements SinkFacade {
 	@Override
 	public SinkDto create(SinkDto sink) {
 		Sink sinkEntity = new Sink();
-		sinkEntity.setName(sink.getName());
-		sinkEntity.setShortId(sink.getShortId());
-		sinkEntity.setLongId(sink.getLongId());
-		sinkEntity = sinkRepository.save(sinkEntity);
-		return new SinkDto(sinkEntity);
+		return createOrUpdate(sinkEntity, sink);
 	}
 
 	@Override
 	public SinkDto update(Long id, SinkDto sink) {
 		Sink sinkEntity = sinkRepository.findOptionalById(id).orElseThrow(EntityNotFoundException::new);
-		sinkEntity.setName(sink.getName());
-		sinkEntity.setShortId(sink.getShortId());
-		sinkEntity.setLongId(sink.getLongId());
-		sinkEntity = sinkRepository.save(sinkEntity);
-		return new SinkDto(sinkEntity);
+		return createOrUpdate(sinkEntity, sink);
 	}
 
 	@Override
@@ -48,5 +40,13 @@ public class SinkBean implements SinkFacade {
 		Sink sink = sinkRepository.findOptionalById(id).orElseThrow(EntityNotFoundException::new);
 		sinkRepository.remove(sink);
 		return Response.status(HttpStatus.SC_NO_CONTENT).build();
+	}
+
+	private SinkDto createOrUpdate(Sink sinkEntity, SinkDto sink) {
+		sinkEntity.setName(sink.getName());
+		sinkEntity.setShortId(sink.getShortId());
+		sinkEntity.setLongId(sink.getLongId());
+		sinkRepository.save(sinkEntity);
+		return new SinkDto(sinkEntity);
 	}
 }

@@ -1,15 +1,10 @@
 package co.blastlab.serviceblbnavi.rest.facade;
 
-import co.blastlab.serviceblbnavi.dto.sink.SinkDto;
 import co.blastlab.serviceblbnavi.rest.facade.util.RequestBodyBuilder;
 import com.google.common.collect.ImmutableList;
 import org.junit.Test;
 
-import java.util.Arrays;
-import java.util.List;
-
 import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.assertThat;
 
 public class SinkFacadeIT extends BaseIT {
 
@@ -22,19 +17,18 @@ public class SinkFacadeIT extends BaseIT {
 
 	@Test
 	public void getAll() {
-		List<SinkDto> sinks = Arrays.asList(givenUser()
+		givenUser()
 			.when()
 			.get("/sinks")
 			.then()
+			// assertions
 			.statusCode(200)
-			.extract()
-			.as(SinkDto[].class));
-
-		assertThat(sinks.size(), is(1));
-		assertThat(sinks.get(0).getName(), is("Sink"));
-		assertThat(sinks.get(0).getAnchors().size(), is(0));
-		assertThat(sinks.get(0).getFloorId(), is(nullValue()));
-		assertThat(sinks.get(0).getConfigured(), is(false));
+			.body("size()", is(1))
+			.root("get(0)")
+			.body("name", is("Sink"))
+			.body("floorId", is(nullValue()))
+			.body("configured", is(false))
+			.body("anchors.size()", is(0));
 	}
 
 	@Test
@@ -45,19 +39,17 @@ public class SinkFacadeIT extends BaseIT {
 			.setParameter("longId", 999998901)
 			.build();
 
-		SinkDto sink = givenUser()
+		givenUser()
 			.when()
 			.body(body)
 			.post("/sinks")
 			.then()
+			// assertions
 			.statusCode(200)
-			.extract()
-			.as(SinkDto.class);
-
-		assertThat(sink.getName(), is("Sink name"));
-		assertThat(sink.getShortId(), is(999998));
-		assertThat(sink.getLongId(), is(999998901L));
-		assertThat(sink.getId(), is(notNullValue()));
+			.body("name", is("Sink name"))
+			.body("shortId", is(999998))
+			.body("longId", is(999998901))
+			.body("id", is(notNullValue()));
 	}
 
 	@Test
@@ -68,20 +60,18 @@ public class SinkFacadeIT extends BaseIT {
 			.setParameter("longId", 666666666)
 			.build();
 
-		SinkDto sink = givenUser()
+		givenUser()
 			.pathParam("id", 8)
 			.when()
 			.body(body)
 			.put("/sinks/{id}")
 			.then()
+			// assertions
 			.statusCode(200)
-			.extract()
-			.as(SinkDto.class);
-
-		assertThat(sink.getName(), is("Sink updated name"));
-		assertThat(sink.getShortId(), is(666666));
-		assertThat(sink.getLongId(), is(666666666L));
-		assertThat(sink.getId(), is(notNullValue()));
+			.body("name", is("Sink updated name"))
+			.body("shortId", is(666666))
+			.body("longId", is(666666666))
+			.body("id", is(notNullValue()));
 	}
 
 	@Test
