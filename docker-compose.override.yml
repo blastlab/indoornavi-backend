@@ -7,7 +7,7 @@ services:
       - '8787:8787'
       - '9990:9990'
     volumes:
-      - ./deployments:/opt/jboss/wildfly/standalone/deployments
+      - deployments:/opt/jboss/wildfly/standalone/deployments
     depends_on:
       - db
     environment:
@@ -26,6 +26,15 @@ services:
       file: database/docker-compose.yml
       service: liquibase
 
+  core_compiler:
+      build: compiler
+      volumes:
+         - .:/app
+         - deployments:/deployments
+         - maven_core_compiler:/root/.m2
+
 volumes:
   # For Liquibase container.
   maven_liquibase: {}
+  deployments: {}
+  maven_core_compiler: {}
