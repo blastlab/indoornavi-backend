@@ -13,6 +13,12 @@ import java.util.List;
 public class ConfigurationDto {
 	private Long floorId;
 	private Integer version;
-	private List<SinkDto> sinks = new ArrayList<>();
-	private ScaleDto scale;
+	private Data data;
+
+	@Getter
+	@Setter
+	public static class Data {
+		private List<SinkDto> sinks = new ArrayList<>();
+		private ScaleDto scale;
+	}
 }

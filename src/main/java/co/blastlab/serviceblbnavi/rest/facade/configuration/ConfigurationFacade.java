@@ -1,6 +1,7 @@
 package co.blastlab.serviceblbnavi.rest.facade.configuration;
 
 import co.blastlab.serviceblbnavi.dto.configuration.ConfigurationDto;
+import co.blastlab.serviceblbnavi.ext.filter.AuthorizedAccess;
 import io.swagger.annotations.*;
 
 import javax.validation.Valid;
@@ -17,13 +18,13 @@ public interface ConfigurationFacade {
 	@ApiResponses({
 		@ApiResponse(code = 404, message = "Floor/Anchor id empty or floor/anchor does not exist")
 	})
-	//	@AuthorizedAccess("CONFIGURATION_CREATE")
-	ConfigurationDto publish(@ApiParam(value = "configuration", required = true) @Valid ConfigurationDto configuration) throws IOException;
+	@AuthorizedAccess("FLOOR_UPDATE")
+	ConfigurationDto.Data publish(@ApiParam(value = "floorId", required = true) @Valid Long floorId) throws IOException;
 
 	@PUT
 	@ApiOperation(value = "save draft", response = ConfigurationDto.class)
-	//	@AuthorizedAccess("CONFIGURATION_UPDATE")
-	ConfigurationDto saveDraft(@ApiParam(value = "configuration", required = true) @Valid ConfigurationDto configuration) throws IOException;
+	@AuthorizedAccess("FLOOR_UPDATE")
+	ConfigurationDto.Data saveDraft(@ApiParam(value = "configuration", required = true) @Valid ConfigurationDto configuration) throws IOException;
 
 	@Path("/{floorId: \\d+}")
 	@GET
@@ -31,6 +32,6 @@ public interface ConfigurationFacade {
 	@ApiResponses({
 		@ApiResponse(code = 404, message = "Floor id empty or floor does not exist")
 	})
-		//	@AuthorizedAccess("CONFIGURATION_READ")
+	@AuthorizedAccess("FLOOR_UPDATE")
 	List<ConfigurationDto> getAllOrderedByVersionDescending(@ApiParam(value = "floorId", required = true) @PathParam("floorId") @Valid @NotNull Long floorId) throws IOException;
 }
