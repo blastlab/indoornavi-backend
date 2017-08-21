@@ -41,7 +41,7 @@ public class TagBean extends DeviceBean implements TagFacade {
 
 	@Override
 	public TagDto update(Long id, TagDto tag) {
-		Optional<Tag> tagOptional = tagRepository.findById(id);
+		Optional<Tag> tagOptional = tagRepository.findOptionalById(id);
 		if (tagOptional.isPresent()){
 			Tag tagEntity = tagOptional.get();
 			tagEntity.setShortId(tag.getShortId());
@@ -70,7 +70,7 @@ public class TagBean extends DeviceBean implements TagFacade {
 
 	@Override
 	public Response delete(Long id) {
-		Optional<Tag> tag = tagRepository.findById(id);
+		Optional<Tag> tag = tagRepository.findOptionalById(id);
 		if (tag.isPresent()) {
 			tagRepository.remove(tag.get());
 			return Response.status(HttpStatus.SC_NO_CONTENT).build();

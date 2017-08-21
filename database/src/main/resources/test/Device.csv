@@ -6,3 +6,4 @@ id,shortId,longId,name,floor_id,verified
 5,10404,45454545,,null,false
 6,102102,102102102,Tag102,null,false
 7,103103,103103103,,3,false
+8,999999,99999999,Sink,null,true
