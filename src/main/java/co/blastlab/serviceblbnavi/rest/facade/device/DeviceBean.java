@@ -17,7 +17,7 @@ public class DeviceBean {
 	private FloorRepository floorRepository;
 
 	public void setFloor(DeviceDto deviceDto, Device device) {
-		Optional<Floor> floor = floorRepository.findById(deviceDto.getFloorId());
+		Optional<Floor> floor = floorRepository.findOptionalById(deviceDto.getFloorId());
 		if (floor.isPresent()) {
 			device.setFloor(floor.get());
 		} else {
