@@ -9,6 +9,7 @@
 		<delete tableName="area" />
 		<delete tableName="areaconfiguration" />
 		<delete tableName="tag"/>
+		<delete tableName="sink"/>
 		<delete tableName="anchor"/>
 		<delete tableName="device"/>
 		<delete tableName="floor"/>
@@ -45,6 +46,12 @@
 
 	<changeSet id="Tag" author="jsmol" context="test" runOnChange="true" labels="Tag" runAlways="true">
 		<loadUpdateData tableName="tag" file="test/Tag.csv" primaryKey="id"/>
+	</changeSet>
+
+	<changeSet id="Sink" author="kgebert" context="test" runOnChange="true" labels="Sink" runAlways="true">
+		<loadUpdateData tableName="sink" file="test/Sink.csv" primaryKey="id">
+			<column name="configured" type="boolean" />
+		</loadUpdateData>
 	</changeSet>
 
 	<changeSet id="Area" author="kgebert" context="test" runOnChange="true" labels="Area" runAlways="true">

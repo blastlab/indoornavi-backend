@@ -1,7 +1,11 @@
 package co.blastlab.serviceblbnavi.rest.facade.complex;
 
 import co.blastlab.serviceblbnavi.dao.repository.ComplexRepository;
+import co.blastlab.serviceblbnavi.dao.repository.SinkRepository;
+import co.blastlab.serviceblbnavi.domain.Building;
 import co.blastlab.serviceblbnavi.domain.Complex;
+import co.blastlab.serviceblbnavi.domain.Floor;
+import co.blastlab.serviceblbnavi.domain.Sink;
 import co.blastlab.serviceblbnavi.dto.complex.ComplexDto;
 import org.apache.http.HttpStatus;
 
@@ -18,9 +22,12 @@ public class ComplexBean implements ComplexFacade {
 
 	private final ComplexRepository complexRepository;
 
+	private final SinkRepository sinkRepository;
+
 	@Inject
-	public ComplexBean(ComplexRepository complexRepository) {
+	public ComplexBean(ComplexRepository complexRepository, SinkRepository sinkRepository) {
 		this.complexRepository = complexRepository;
+		this.sinkRepository = sinkRepository;
 	}
 
 	@Override
@@ -46,12 +53,19 @@ public class ComplexBean implements ComplexFacade {
 
 	@Override
 	public Response delete(Long id) {
-		Optional<Complex> complex = complexRepository.findById(id);
-		if (complex.isPresent()) {
-			complexRepository.remove(complex.get());
-			return Response.status(HttpStatus.SC_NO_CONTENT).build();
+		Complex complex = complexRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+		for (Building building : complex.getBuildings()) {
+			for (Floor floor : building.getFloors()) {
+				List<Sink> byFloor = sinkRepository.findByFloor(floor);
+				for (Sink sink : byFloor) {
+					sink.setConfigured(false);
+					sink.setFloor(null);
+					sinkRepository.save(sink);
+				}
+			}
 		}
-		throw new EntityNotFoundException();
+		complexRepository.remove(complex);
+		return Response.status(HttpStatus.SC_NO_CONTENT).build();
 	}
 
 
