@@ -48,7 +48,7 @@ public class ImageBean implements ImageFacade {
 
 	@Override
 	public Response uploadImage(Long floorId, ImageUpload imageUpload) throws IOException, MagicParseException, MagicException, MagicMatchNotFoundException {
-		Optional<Floor> floorOptional = floorRepository.findById(floorId);
+		Optional<Floor> floorOptional = floorRepository.findOptionalById(floorId);
 		if (floorOptional.isPresent()) {
 			Image imageEntity = imageRepository.findBy(floorId);
 			if (imageEntity == null) {

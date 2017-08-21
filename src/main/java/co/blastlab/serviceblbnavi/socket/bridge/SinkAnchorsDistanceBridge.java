@@ -21,6 +21,10 @@ public class SinkAnchorsDistanceBridge implements Bridge {
 		}
 	}
 
+	/**
+	 * When anchor distance is not null then event is fired to:
+	 {@link co.blastlab.serviceblbnavi.socket.wizard.WizardWebSocket#anchorDistanceAdded(AnchorDistance)}
+	 */
 	@Override
 	public void addDistance(Integer firstDevice, Integer secondDevice, Integer distance) throws UnrecognizedDeviceException {
 		if (this.sinkId != null) {

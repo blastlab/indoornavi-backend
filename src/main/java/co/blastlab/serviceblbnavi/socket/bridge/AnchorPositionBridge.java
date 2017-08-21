@@ -44,6 +44,10 @@ public class AnchorPositionBridge implements Bridge {
 		}
 	}
 
+	/**
+	 * When the distance pair gets fullfilled the event with anchor points is fired to:
+	 {@link co.blastlab.serviceblbnavi.socket.wizard.WizardWebSocket#anchorPointsCalculated(AnchorPoints)}
+	 */
 	@Override
 	public void addDistance(Integer firstDeviceId, Integer secondDeviceId, Integer distance) throws UnrecognizedDeviceException {
 		if (this.sinkId != null && this.firstAnchorId != null) {
