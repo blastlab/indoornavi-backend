@@ -12,5 +12,5 @@ RUN mkdir /app
 WORKDIR /app
 
 
-CMD ["mvn", "clean", "install", "-DbuildDirectory=/target", "-Dwar.output.directory=deployments", "-DskipTests=true"]
+CMD ["mvn", "clean", "package"]
 
