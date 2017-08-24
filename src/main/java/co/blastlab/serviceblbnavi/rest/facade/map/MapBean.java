@@ -66,15 +66,15 @@ public class MapBean implements MapFacade {
 	}
 
 	private MapDto createOrUpdate(Map mapEntity, MapDto map) {
-		Floor floor = floorRepository.findOptionalById(map.getFloorId()).orElseThrow(EntityNotFoundException::new);
+		Floor floor = floorRepository.findOptionalById(map.getFloor().getId()).orElseThrow(EntityNotFoundException::new);
 		mapEntity.setFloor(floor);
 
 		List<Tag> tags = new ArrayList<>();
-		map.getTags().forEach(tagId -> tags.add(tagRepository.findOptionalById(tagId).orElseThrow(EntityNotFoundException::new)));
+		map.getTags().forEach(tagDto -> tags.add(tagRepository.findOptionalById(tagDto.getId()).orElseThrow(EntityNotFoundException::new)));
 		mapEntity.setTags(tags);
 
 		List<User> users = new ArrayList<>();
-		map.getUsers().forEach(userId -> users.add(userRepository.findOptionalById(userId).orElseThrow(EntityNotFoundException::new)));
+		map.getUsers().forEach(userDto -> users.add(userRepository.findOptionalById(userDto.getId()).orElseThrow(EntityNotFoundException::new)));
 		mapEntity.setUsers(users);
 
 		mapRepository.save(mapEntity);

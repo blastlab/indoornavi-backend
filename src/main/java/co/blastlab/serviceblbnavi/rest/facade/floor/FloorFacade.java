@@ -34,7 +34,7 @@ public interface FloorFacade {
 	@Path("/{id: \\d+}")
 	@ApiOperation(value = "update floor", response = FloorDto.class)
 	@ApiResponses({
-		@ApiResponse(code = 404, message = "Building id does not exist or building id empty")
+		@ApiResponse(code = 404, message = "Floor id does not exist or building id empty")
 	})
 	@AuthorizedAccess("FLOOR_UPDATE")
 	FloorDto update(@ApiParam(value = "id", required = true) @PathParam("id") @Valid @NotNull Long id,

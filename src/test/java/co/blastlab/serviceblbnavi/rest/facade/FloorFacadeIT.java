@@ -1,5 +1,6 @@
 package co.blastlab.serviceblbnavi.rest.facade;
 
+import co.blastlab.serviceblbnavi.dto.building.BuildingDto;
 import co.blastlab.serviceblbnavi.dto.floor.FloorDto;
 import co.blastlab.serviceblbnavi.rest.facade.util.RequestBodyBuilder;
 import co.blastlab.serviceblbnavi.rest.facade.util.violation.ExtViolationResponse;
@@ -8,6 +9,7 @@ import com.google.common.collect.ImmutableList;
 import org.apache.http.HttpStatus;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.util.Arrays;
 
 import static co.blastlab.serviceblbnavi.rest.facade.util.matcher.FloorMatcher.floorDtoCustomMatcher;
@@ -41,7 +43,7 @@ public class FloorFacadeIT extends BaseIT {
 				"id", equalTo(1),
 				"level", equalTo(1),
 				"name", equalTo("P.1"),
-				"buildingId", equalTo(2),
+				"building.id", equalTo(2),
 				"imageId", equalTo(null)
 			);
 	}
@@ -69,7 +71,7 @@ public class FloorFacadeIT extends BaseIT {
 			.body(
 				"level", equalTo(0),
 				"name", equalTo(NAME_FLOOR),
-				"buildingId", equalTo(2)
+				"building.id", equalTo(2)
 			);
 	}
 
@@ -87,7 +89,7 @@ public class FloorFacadeIT extends BaseIT {
 			.body(
 				"level", equalTo(-1),
 				"name", equalTo(""),
-				"buildingId", equalTo(2)
+				"building.id", equalTo(2)
 			);
 	}
 
@@ -110,12 +112,13 @@ public class FloorFacadeIT extends BaseIT {
 	}
 
 	@Test
-	public void shouldNotCreateNewFloorWithNonexistingBuildingId(){
-		Integer nonexistingFloorId = 9999;
+	public void shouldNotCreateNewFloorWithNonexistingBuildingId() throws IOException {
+		BuildingDto nonExistingBuilding = new BuildingDto();
+		nonExistingBuilding.setId(9999L);
 		String body = new RequestBodyBuilder("Floor.json")
 			.setParameter("name", "")
 			.setParameter("level", 0)
-			.setParameter("buildingId", nonexistingFloorId)
+			.setParameter("building", nonExistingBuilding)
 			.build();
 
 		givenUser()
@@ -143,7 +146,7 @@ public class FloorFacadeIT extends BaseIT {
 				"id", equalTo(floorIdWithoutName),
 				"level", equalTo(negativeLevel),
 				"name", equalTo(NAME_FLOOR),
-				"buildingId", equalTo(2)
+				"building.id", equalTo(2)
 			);
 	}
 
@@ -185,7 +188,7 @@ public class FloorFacadeIT extends BaseIT {
 				"id", equalTo(idFloorWithName),
 				"level", equalTo(0),
 				"name", equalTo(""),
-				"buildingId", equalTo(2)
+				"building.id", equalTo(2)
 			);
 	}
 
@@ -264,9 +267,12 @@ public class FloorFacadeIT extends BaseIT {
 			.extract()
 			.as(FloorDto[].class);
 
+		BuildingDto building = new BuildingDto();
+		building.setId(1L);
+
 		assertThat(Arrays.asList(floors), containsInAnyOrder(
-			floorDtoCustomMatcher(new FloorDto(4L, 1, "", 1L, null, null)),
-			floorDtoCustomMatcher(new FloorDto(5L, 0, "", 1L, null, null))
+			floorDtoCustomMatcher(new FloorDto(4L, 1, "", building, null, null)),
+			floorDtoCustomMatcher(new FloorDto(5L, 0, "", building, null, null))
 		));
 	}
 
@@ -317,7 +323,7 @@ public class FloorFacadeIT extends BaseIT {
 		assertThat(violationResponse.getViolations(),
 			containsInAnyOrder(
 				validViolation("level", "may not be null"),
-				validViolation("buildingId", "may not be null")
+				validViolation("building", "may not be null")
 			)
 		);
 	}
