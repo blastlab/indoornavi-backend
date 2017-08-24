@@ -36,31 +36,22 @@ public class FloorBean implements FloorFacade {
 
 	@Override
 	public FloorDto create(FloorDto floor) {
-		Optional<Building> building = buildingRepository.findById(floor.getBuildingId());
-		if (building.isPresent()) {
-			Floor floorEntity = new Floor();
-			floorEntity.setLevel(floor.getLevel());
-			floorEntity.setName(floor.getName());
-			floorEntity.setBuilding(building.get());
-			floorEntity = floorRepository.save(floorEntity);
-			return new FloorDto(floorEntity);
-		}
-		throw new EntityNotFoundException();
+		Building building = buildingRepository.findOptionalById(floor.getBuilding().getId()).orElseThrow(EntityNotFoundException::new);
+		Floor floorEntity = new Floor();
+		floorEntity.setLevel(floor.getLevel());
+		floorEntity.setName(floor.getName());
+		floorEntity.setBuilding(building);
+		floorEntity = floorRepository.save(floorEntity);
+		return new FloorDto(floorEntity);
 	}
 
 	@Override
 	public FloorDto update(Long id, FloorDto floor) {
-		Optional<Building> building = buildingRepository.findById(floor.getBuildingId());
-		if(building.isPresent()){
-			Optional<Floor> floorEntity = floorRepository.findOptionalById(id);
-			if (floorEntity.isPresent()) {
-				floorEntity.get().setLevel(floor.getLevel());
-				floorEntity.get().setName(floor.getName());
-				Floor floorDb = floorRepository.save(floorEntity.get());
-				return new FloorDto(floorDb);
-			}
-		}
-		throw new EntityNotFoundException();
+		Floor floorEntity = floorRepository.findOptionalById(id).orElseThrow(EntityNotFoundException::new);
+		floorEntity.setLevel(floor.getLevel());
+		floorEntity.setName(floor.getName());
+		Floor floorDb = floorRepository.save(floorEntity);
+		return new FloorDto(floorDb);
 	}
 
 	@Override

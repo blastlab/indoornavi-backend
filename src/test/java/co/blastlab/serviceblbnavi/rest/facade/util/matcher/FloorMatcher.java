@@ -15,7 +15,7 @@ public class FloorMatcher {
 				FloorDto floorDto = (FloorDto)o;
 
 				return floorDto.getId().equals(floor.getId()) && floorDto.getLevel().equals(floor.getLevel())
-					   && floorDto.getName().matches(floor.getName()) && floorDto.getBuildingId().equals(floor.getBuildingId());
+					   && floorDto.getName().matches(floor.getName()) && floorDto.getBuilding().getId().equals(floor.getBuilding().getId());
 			}
 		};
 	}

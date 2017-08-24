@@ -1,5 +1,5 @@
 {
-	"floorId": 1,
-	"users": [1],
-	"tags": [4]
+	"floor": { "id": 1 },
+	"users": [{ "id": 1 }],
+	"tags": [{ "id": 4 }]
 }

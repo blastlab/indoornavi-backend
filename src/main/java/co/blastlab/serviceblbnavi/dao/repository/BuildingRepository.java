@@ -9,5 +9,5 @@ import java.util.Optional;
 @Repository
 public interface BuildingRepository extends EntityRepository<Building, Long> {
 
-	Optional<Building> findById(Long id);
+	Optional<Building> findOptionalById(Long id);
 }
