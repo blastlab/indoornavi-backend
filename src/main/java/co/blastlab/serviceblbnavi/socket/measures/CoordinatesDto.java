@@ -5,11 +5,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
-
 @Getter
 @Setter
 @AllArgsConstructor
 public class CoordinatesDto {
-	private Integer deviceId;
+	private Integer tagShortId;
+	private Long floorId;
 	private Point point;
 }

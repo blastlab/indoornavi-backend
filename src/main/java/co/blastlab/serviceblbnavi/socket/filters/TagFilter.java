@@ -13,16 +13,9 @@ import java.util.stream.Collectors;
 @Singleton
 public class TagFilter implements Filter {
 	/**
-	 * The key is: {@link Session} and value is set of inactive tags ids
+	 * The key is: {@link Session} and value is a set of active tags ids
  	 */
 	private Map<Session, Set<Integer>> sessions = new HashMap<>();
-
-	private FilterType filterType = FilterType.TAG_ACTIVE;
-
-	@Override
-	public FilterType getType() {
-		return filterType;
-	}
 
 	@Override
 	public void update(Session session, Object... args) throws IOException {
@@ -41,7 +34,7 @@ public class TagFilter implements Filter {
 		checkArgs(args);
 		Integer tagId = (Integer) args[0];
 		return sessions.stream().filter(
-			session -> !this.sessions.containsKey(session) || !this.sessions.get(session).contains(tagId)).collect(Collectors.toSet()
+			session -> this.sessions.containsKey(session) && this.sessions.get(session).contains(tagId)).collect(Collectors.toSet()
 		);
 	}
 
@@ -54,6 +47,9 @@ public class TagFilter implements Filter {
 	private void checkArgs(Object... args) {
 		if (args.length != 1) {
 			throw new InvalidParameterException("This method needs excacly one argument: Integer tagId");
+		}
+		if (!(args[0] instanceof Integer)) {
+			throw new InvalidParameterException("Argument must be an Integer type");
 		}
 	}
 }

@@ -7,5 +7,4 @@ import java.util.Set;
 public interface Filter {
 	void update(Session session, Object... args) throws IOException;
 	Set<Session> filter(Set<Session> sessions, Object... args);
-	FilterType getType();
 }

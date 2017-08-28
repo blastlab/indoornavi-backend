@@ -71,16 +71,21 @@ public class CoordinatesCalculator {
 		x /= j;
 		y /= j;
 		Optional<PointAndTime> previousPoint = Optional.ofNullable(previousCoorinates.get(tagId));
+		Long floorId = null;
+		Optional<Anchor> anchor = anchorRepository.findByShortId(anchorId);
+		if (anchor.isPresent()) {
+			floorId = anchor.get().getFloor().getId();
+		}
 		if (previousPoint.isPresent()) {
 			x = (x + previousPoint.get().getPoint().getX()) / 2;
 			y = (y + previousPoint.get().getPoint().getY()) / 2;
 			Point newPoint = new Point(x, y);
 			previousCoorinates.put(tagId, new PointAndTime(newPoint, new Date().getTime()));
-			return Optional.of(new CoordinatesDto(tagId, newPoint));
+			return Optional.of(new CoordinatesDto(tagId, floorId, newPoint));
 		}
 		Point currentPoint = new Point(x, y);
 		previousCoorinates.put(tagId, new PointAndTime(currentPoint, new Date().getTime()));
-		return Optional.of(new CoordinatesDto(tagId, currentPoint));
+		return Optional.of(new CoordinatesDto(tagId, floorId, currentPoint));
 	}
 
 	private Double calculateThres(List<Double> intersectionPointsDistances, int connectedAnchorsCount) {
@@ -173,6 +178,10 @@ public class CoordinatesCalculator {
 		return connectedAnchors;
 	}
 
+	private Double getDistance(Integer tagId, Integer anchorId) {
+		return measureTable.get(tagId, anchorId).stream().mapToDouble(Measure::getDistance).sum() / measureTable.get(tagId, anchorId).size();
+	}
+
 	private Set<Pair<AnchorDistance, AnchorDistance>> getAnchorDistancePairs(Set<Integer> connectedAnchors, Integer tagId) {
 		Set<Pair<AnchorDistance, AnchorDistance>> pairs = new HashSet<>();
 		Integer[] connectedAnchorsArray = connectedAnchors.toArray(new Integer[connectedAnchors.size()]);
@@ -191,10 +200,6 @@ public class CoordinatesCalculator {
 			)
 		);
 		return pairs;
-	}
-
-	private Double getDistance(Integer tagId, Integer anchorId) {
-		return measureTable.get(tagId, anchorId).stream().mapToDouble(Measure::getDistance).sum() / measureTable.get(tagId, anchorId).size();
 	}
 
 	@Getter
