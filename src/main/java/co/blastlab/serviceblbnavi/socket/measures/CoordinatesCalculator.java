@@ -74,7 +74,7 @@ public class CoordinatesCalculator {
 		Long floorId = null;
 		Optional<Anchor> anchor = anchorRepository.findByShortId(anchorId);
 		if (anchor.isPresent()) {
-			floorId = anchor.get().getFloor().getId();
+			floorId = anchor.get().getFloor() != null ? anchor.get().getFloor().getId() : null;
 		}
 		if (previousPoint.isPresent()) {
 			x = (x + previousPoint.get().getPoint().getX()) / 2;
