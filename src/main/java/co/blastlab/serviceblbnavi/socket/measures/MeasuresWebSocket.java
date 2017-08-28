@@ -14,10 +14,7 @@ import co.blastlab.serviceblbnavi.socket.area.AreaEventController;
 import co.blastlab.serviceblbnavi.socket.bridge.AnchorPositionBridge;
 import co.blastlab.serviceblbnavi.socket.bridge.SinkAnchorsDistanceBridge;
 import co.blastlab.serviceblbnavi.socket.bridge.UnrecognizedDeviceException;
-import co.blastlab.serviceblbnavi.socket.filters.Command;
-import co.blastlab.serviceblbnavi.socket.filters.Filter;
-import co.blastlab.serviceblbnavi.socket.filters.FilterType;
-import co.blastlab.serviceblbnavi.socket.filters.TagFilter;
+import co.blastlab.serviceblbnavi.socket.filters.*;
 import co.blastlab.serviceblbnavi.socket.wizard.SinkDetails;
 import co.blastlab.serviceblbnavi.socket.wrappers.AnchorsWrapper;
 import co.blastlab.serviceblbnavi.socket.wrappers.AreaEventWrapper;
@@ -81,6 +78,9 @@ public class MeasuresWebSocket extends WebSocket {
 			List<TagDto> tags = tagRepository.findAll().stream().map(TagDto::new).collect(Collectors.toList());
 			TagsWrapper tagsWrapper = new TagsWrapper(tags);
 			broadCastMessage(clientSessions, tagsWrapper);
+
+			activeFilters.putIfAbsent(FilterType.FLOOR, new FloorFilter());
+			activeFilters.putIfAbsent(FilterType.TAG, new TagFilter());
 		}, () -> {
 			List<AnchorDto> anchors = anchorRepository.findAll().stream().map(AnchorDto::new).collect(Collectors.toList());
 			broadCastMessage(serverSessions, new AnchorsWrapper(anchors));
@@ -111,11 +111,16 @@ public class MeasuresWebSocket extends WebSocket {
 	public void handleMessage(String message, Session session) throws IOException {
 		if (isClientSession(session)) {
 			Command command = objectMapper.readValue(message, Command.class);
-			if (FilterType.TAG_ACTIVE.equals(command.getFilterType())) {
-				if (!activeFilters.containsKey(FilterType.TAG_ACTIVE)) {
-					activeFilters.put(FilterType.TAG_ACTIVE, new TagFilter());
+			if (Command.Type.TOGGLE_TAG.equals(command.getType())) {
+				activeFilters.get(FilterType.TAG).update(session, objectMapper.readValue(command.getArgs(), Integer.class));
+			}
+			else if (Command.Type.SET_FLOOR.equals(command.getType())) {
+				activeFilters.get(FilterType.FLOOR).update(session, objectMapper.readValue(command.getArgs(), Long.class));
+			}
+			else if (Command.Type.SET_TAGS.equals(command.getType())) {
+				for (Integer tagId : objectMapper.readValue(command.getArgs(), Integer[].class)) {
+					activeFilters.get(FilterType.TAG).update(session, tagId);
 				}
-				activeFilters.get(FilterType.TAG_ACTIVE).update(session, objectMapper.readValue(command.getArgs(), Integer.class));
 			}
 		} else if (isServerSession(session)) {
 			DistanceMessageWrapper wrapper = objectMapper.readValue(message, DistanceMessageWrapper.class);
@@ -152,7 +157,12 @@ public class MeasuresWebSocket extends WebSocket {
 			} else {
 				Optional<CoordinatesDto> coords = coordinatesCalculator.calculateTagPosition(distanceMessage.getDid1(), distanceMessage.getDid2(), distanceMessage.getDist());
 
-				coords.ifPresent(this::saveAndSendCoordinates);
+				if (coords.isPresent()) {
+					this.saveCoordinates(coords.get());
+					Set<Session> sessions = this.filterSessions(coords.get());
+					broadCastMessage(sessions, new CoordinatesWrapper(coords.get()));
+					this.sendAreaEvents(coords.get());
+				}
 			}
 		});
 	}
@@ -161,21 +171,30 @@ public class MeasuresWebSocket extends WebSocket {
 		return distanceMessage.getDid1() > Short.MAX_VALUE && distanceMessage.getDid2() > Short.MAX_VALUE;
 	}
 
-	private void saveAndSendCoordinates(CoordinatesDto coordinatesDto) {
+	private void saveCoordinates(CoordinatesDto coordinatesDto) {
 		Coordinates coordinates = new Coordinates();
 		coordinates.setDevice("TAG");
 		coordinates.setX((double) coordinatesDto.getPoint().getX());
 		coordinates.setY((double) coordinatesDto.getPoint().getY());
 		coordinatesRepository.save(coordinates);
-		Set<Session> sessions = clientSessions;
-		for(Filter filter : activeFilters.values()) {
-			sessions = filter.filter(sessions, coordinatesDto.getDeviceId());
-		}
-		broadCastMessage(sessions, new CoordinatesWrapper(coordinatesDto));
+	}
 
+	private Set<Session> filterSessions(CoordinatesDto coordinatesDto) {
+		Set<Session> sessions = clientSessions;
+		for(Map.Entry<FilterType, Filter> filterEntry : activeFilters.entrySet()) {
+			if (FilterType.TAG.equals(filterEntry.getKey())) {
+				sessions = filterEntry.getValue().filter(sessions, coordinatesDto.getTagShortId());
+			} else if (FilterType.FLOOR.equals(filterEntry.getKey())) {
+				sessions = filterEntry.getValue().filter(sessions, coordinatesDto.getFloorId());
+			}
+		}
+		return sessions;
+	}
+
+	private void sendAreaEvents(CoordinatesDto coordinatesDto) {
 		List<AreaEvent> events = areaEventController.checkCoordinates(coordinatesDto);
 		for (AreaEvent event : events) {
-			broadCastMessage(sessions, new AreaEventWrapper(event));
+			broadCastMessage(this.getClientSessions(), new AreaEventWrapper(event));
 		}
 	}
 

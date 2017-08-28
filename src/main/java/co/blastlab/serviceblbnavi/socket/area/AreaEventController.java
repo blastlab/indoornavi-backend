@@ -78,14 +78,14 @@ public class AreaEventController {
 						if (point.isWithinDistance(areaEntry.getKey().getPolygon(), areaConfiguration.getOffset())) {
 							if (shouldSendOnEnterEvent(coordinatesData, areaConfiguration)) {
 								events.add(createEvent(coordinatesData, areaEntry.getKey(), areaConfiguration));
-								tagCoordinatesHistory.put(coordinatesData.getDeviceId(), areaEntry.getKey(), new Date());
-							} else if (tagCoordinatesHistory.containsRow(coordinatesData.getDeviceId())) {
+								tagCoordinatesHistory.put(coordinatesData.getTagShortId(), areaEntry.getKey(), new Date());
+							} else if (tagCoordinatesHistory.containsRow(coordinatesData.getTagShortId())) {
 								updateTime(coordinatesData, areaEntry.getKey());
 							}
 						} else {
 							if (shouldSendOnLeaveEvent(coordinatesData, areaConfiguration)) {
 								events.add(createEvent(coordinatesData, areaEntry.getKey(), areaConfiguration));
-								tagCoordinatesHistory.remove(coordinatesData.getDeviceId(), areaEntry.getKey());
+								tagCoordinatesHistory.remove(coordinatesData.getTagShortId(), areaEntry.getKey());
 							}
 						}
 					}
@@ -100,22 +100,22 @@ public class AreaEventController {
 	}
 
 	private boolean shouldSendOnEnterEvent(CoordinatesDto coordinatesData, AreaConfiguration areaConfiguration) {
-		return !tagCoordinatesHistory.containsRow(coordinatesData.getDeviceId()) && areaConfiguration.getMode().equals(ON_ENTER);
+		return !tagCoordinatesHistory.containsRow(coordinatesData.getTagShortId()) && areaConfiguration.getMode().equals(ON_ENTER);
 	}
 
 	private boolean shouldSendOnLeaveEvent(CoordinatesDto coordinatesData, AreaConfiguration areaConfiguration) {
-		return tagCoordinatesHistory.containsRow(coordinatesData.getDeviceId()) && areaConfiguration.getMode().equals(ON_LEAVE);
+		return tagCoordinatesHistory.containsRow(coordinatesData.getTagShortId()) && areaConfiguration.getMode().equals(ON_LEAVE);
 	}
 
 	private void updateTime(CoordinatesDto coordinatesData, Area area) {
-		tagCoordinatesHistory.get(coordinatesData.getDeviceId(), area).setTime(new Date().getTime());
+		tagCoordinatesHistory.get(coordinatesData.getTagShortId(), area).setTime(new Date().getTime());
 	}
 
 	private AreaEvent createEvent(CoordinatesDto coordinatesData, Area area, AreaConfiguration areaConfiguration) {
 		AreaEvent event = new AreaEvent();
 		event.setAreaName(area.getName());
 		event.setMode(areaConfiguration.getMode());
-		event.setTagId(coordinatesData.getDeviceId());
+		event.setTagId(coordinatesData.getTagShortId());
 		return event;
 	}
 
@@ -130,7 +130,7 @@ public class AreaEventController {
 		for (Area area : this.areas) {
 			for (AreaConfiguration areaConfiguration : area.getConfigurations()) {
 				for (Tag tag : areaConfiguration.getTags()) {
-					if (tag.getShortId().equals(coordinatesData.getDeviceId())) {
+					if (tag.getShortId().equals(coordinatesData.getTagShortId())) {
 						if (filteredAreas.containsKey(area)) {
 							filteredAreas.get(area).add(areaConfiguration);
 						} else {
