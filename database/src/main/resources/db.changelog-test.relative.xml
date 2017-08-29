@@ -13,6 +13,7 @@
 		<delete tableName="area" />
 		<delete tableName="areaconfiguration" />
 		<delete tableName="tag"/>
+		<delete tableName="sink"/>
 		<delete tableName="anchor"/>
 		<delete tableName="device"/>
 		<delete tableName="floor"/>
@@ -29,6 +30,7 @@
 	<changeSet id="Permission" author="kgebert" runOnChange="true" labels="Permission" runAlways="true">
 		<loadUpdateData tableName="permission" file="test/Permission.csv" primaryKey="id" relativeToChangelogFile="true" />
 		<loadUpdateData tableName="permission" file="test/navi-142/Permission.csv" primaryKey="id" relativeToChangelogFile="true" />
+		<loadUpdateData tableName="permission" file="test/navi-73/Permission.csv" primaryKey="id" relativeToChangelogFile="true" />
 	</changeSet>
 
 	<changeSet id="PermissionGroup" author="kgebert" runOnChange="true" labels="PermissionGroup" runAlways="true">
@@ -38,6 +40,7 @@
 	<changeSet id="PermissionGroup_Permission" author="kgebert" runOnChange="true" labels="PermissionGroup_Permission" runAlways="true">
 		<loadData tableName="permissiongroup_permission" file="test/PermissionGroupPermission.csv" relativeToChangelogFile="true" />
 		<loadData tableName="permissiongroup_permission" file="test/navi-142/PermissionGroupPermission.csv" relativeToChangelogFile="true" />
+		<loadData tableName="permissiongroup_permission" file="test/navi-73/PermissionGroupPermission.csv" relativeToChangelogFile="true" />
 	</changeSet>
 
 	<changeSet id="User" author="kgebert" runOnChange="true" labels="User" runAlways="true">
@@ -78,6 +81,12 @@
 
 	<changeSet id="Tag" author="jsmol" context="test" runOnChange="true" labels="Tag" runAlways="true">
 		<loadUpdateData tableName="tag" file="test/Tag.csv" primaryKey="id" relativeToChangelogFile="true"/>
+	</changeSet>
+
+	<changeSet id="Sink" author="kgebert" context="test" runOnChange="true" labels="Sink" runAlways="true">
+		<loadUpdateData tableName="sink" file="test/Sink.csv" primaryKey="id" relativeToChangelogFile="true">
+			<column name="configured" type="boolean" />
+		</loadUpdateData>
 	</changeSet>
 
 	<changeSet id="Area" author="kgebert" context="test" runOnChange="true" labels="Area" runAlways="true">

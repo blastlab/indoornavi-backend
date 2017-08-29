@@ -351,7 +351,7 @@ public class AnchorFacadeIT extends BaseIT {
 			.body(
 				"id", equalTo(Arrays.asList(1, 2, 3, 8)),
 				"shortId", equalTo(Arrays.asList(ANCHOR_SHORT_ID_EXISTING, 40622, 55101, 999999)),
-				"longId", equalTo(Arrays.asList(ANCHOR_LONG_ID_EXISTING, 93170459, 931701001, 99999999)),
+				"longId", equalTo(Arrays.asList(ANCHOR_LONG_ID_EXISTING, 93170459, 931701001, 9090909090L)),
 				"name", equalTo(Arrays.asList("AnchorName", "", "", "Sink")),
 				"floorId", equalTo(Arrays.asList(2, null, 2, null)),
 				"x", equalTo(Arrays.asList(0.0f, 785.0f, 485.0f, null)),
