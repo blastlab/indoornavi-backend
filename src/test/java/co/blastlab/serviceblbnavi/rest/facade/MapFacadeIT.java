@@ -67,7 +67,7 @@ public class MapFacadeIT extends BaseIT {
 			.then()
 			// assertions
 			.statusCode(HttpStatus.SC_OK)
-			.body("size()", is(1))
+			.body("size()", is(2))
 			.body("get(0).id", is(1))
 			.body("get(0).floor", is(not(nullValue())))
 			.body("get(0).users.size()", is(1))
@@ -87,6 +87,17 @@ public class MapFacadeIT extends BaseIT {
 			.body("floor", is(not(nullValue())))
 			.body("users.size()", is(1))
 			.body("tags.size()", is(1));
+	}
+
+	@Test
+	public void getSpecificByUserWhoHasNoPermissionToSeeIt() {
+		givenUser()
+			.pathParam("id", 2)
+			.when()
+			.get("/maps/{id}")
+			.then()
+			// assertions
+			.statusCode(HttpStatus.SC_FORBIDDEN);
 	}
 
 	@Test
