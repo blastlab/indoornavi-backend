@@ -14,7 +14,10 @@ import org.apache.http.HttpStatus;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
+import javax.ws.rs.ForbiddenException;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.SecurityContext;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,6 +29,9 @@ public class MapBean implements MapFacade {
 	private final TagRepository tagRepository;
 	private final UserRepository userRepository;
 	private final FloorRepository floorRepository;
+
+	@Context
+	SecurityContext securityContext;
 
 	@Inject
 	public MapBean(MapRepository mapRepository, TagRepository tagRepository,
@@ -55,7 +61,12 @@ public class MapBean implements MapFacade {
 
 	@Override
 	public MapDto get(Long id) {
-		return new MapDto(mapRepository.findOptionalById(id).orElseThrow(EntityNotFoundException::new));
+		Map map = mapRepository.findOptionalById(id).orElseThrow(EntityNotFoundException::new);
+		User user = userRepository.findOptionalByUsername(securityContext.getUserPrincipal().getName()).orElseThrow(EntityNotFoundException::new);
+		if (map.getUsers().contains(user)) {
+			return new MapDto(map);
+		}
+		throw new ForbiddenException();
 	}
 
 	@Override
