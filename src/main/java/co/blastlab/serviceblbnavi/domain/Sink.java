@@ -18,7 +18,7 @@ import java.util.List;
 public class Sink extends Anchor {
 	private boolean configured;
 
-	@OneToMany
+	@OneToMany(mappedBy = "sink")
 	private List<Anchor> anchors = new ArrayList<>();
 
 	@PostPersist
