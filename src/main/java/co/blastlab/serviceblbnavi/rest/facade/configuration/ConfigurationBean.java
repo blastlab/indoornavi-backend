@@ -1,12 +1,11 @@
 package co.blastlab.serviceblbnavi.rest.facade.configuration;
 
-import co.blastlab.serviceblbnavi.dao.repository.AnchorRepository;
 import co.blastlab.serviceblbnavi.dao.repository.ConfigurationRepostiory;
 import co.blastlab.serviceblbnavi.dao.repository.FloorRepository;
-import co.blastlab.serviceblbnavi.dao.repository.SinkRepository;
-import co.blastlab.serviceblbnavi.domain.*;
+import co.blastlab.serviceblbnavi.domain.Configuration;
+import co.blastlab.serviceblbnavi.domain.Floor;
 import co.blastlab.serviceblbnavi.dto.configuration.ConfigurationDto;
-import co.blastlab.serviceblbnavi.dto.floor.ScaleDto;
+import co.blastlab.serviceblbnavi.utils.ConfigurationExtractor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.ejb.Stateless;
@@ -15,17 +14,13 @@ import javax.persistence.EntityNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
-import static co.blastlab.serviceblbnavi.domain.Scale.scale;
+import java.util.Optional;
 
 @Stateless
 public class ConfigurationBean implements ConfigurationFacade {
 
 	@Inject
-	private AnchorRepository anchorRepository;
-
-	@Inject
-	private SinkRepository sinkRepository;
+	private ConfigurationExtractor configurationExtractor;
 
 	@Inject
 	private FloorRepository floorRepository;
@@ -34,65 +29,32 @@ public class ConfigurationBean implements ConfigurationFacade {
 	private ConfigurationRepostiory configurationRepostiory;
 
 	@Override
-	public ConfigurationDto publish(ConfigurationDto configuration) throws IOException {
-		final Floor floor = floorRepository.findOptionalById(configuration.getFloorId()).orElseThrow(EntityNotFoundException::new);
-		extractSinks(configuration, floor);
-		extractScale(configuration, floor);
+	public ConfigurationDto.Data publish(Long floorId) throws IOException {
+		final Floor floor = floorRepository.findOptionalById(floorId).orElseThrow(EntityNotFoundException::new);
+		Configuration configurationEntity = configurationRepostiory.findTop1ByFloorOrderByVersionDesc(floor).orElseThrow(EntityNotFoundException::new);
+		ObjectMapper objectMapper = new ObjectMapper();
+		ConfigurationDto.Data configurationData = objectMapper.readValue(configurationEntity.getData(), ConfigurationDto.Data.class);
+
+		configurationExtractor.extractSinks(configurationData, floor);
+		configurationExtractor.extractScale(configurationData, floor);
 
 		Integer latestVersion = configurationRepostiory.getLatestVersion(floor);
-		configuration.setVersion(latestVersion + 1);
-		ObjectMapper objectMapper = new ObjectMapper();
-		Configuration configurationEntity = configurationRepostiory.save(
-			new Configuration(floor, latestVersion + 1, objectMapper.writeValueAsString(configuration))
+		Configuration newConfigurationEntity = configurationRepostiory.save(
+			new Configuration(floor, latestVersion + 1, objectMapper.writeValueAsString(configurationData))
 		);
-		return objectMapper.readValue(configurationEntity.getData(), ConfigurationDto.class);
-	}
-
-	private void extractScale(ConfigurationDto configuration, Floor floor) {
-		ScaleDto scaleDto = configuration.getScale();
-		Scale scale = scale(floor.getScale())
-			.measure(scaleDto.getMeasure())
-			.distance(scaleDto.getRealDistance())
-			.startX(scaleDto.getStart().getX())
-			.startY(scaleDto.getStart().getY())
-			.stopX(scaleDto.getStop().getX())
-			.stopY(scaleDto.getStop().getY());
-		floor.setScale(scale);
-		floorRepository.save(floor);
-	}
-
-	private void extractSinks(ConfigurationDto configuration, Floor floor) {
-		configuration.getSinks().forEach((sinkDto) -> {
-			Sink sink = sinkRepository.findOptionalByShortId(sinkDto.getShortId()).orElseThrow(EntityNotFoundException::new);
-			sink.setFloor(floor);
-			sink.setX(sinkDto.getX());
-			sink.setY(sinkDto.getY());
-			sinkRepository.save(sink);
-
-			sinkDto.getAnchors().forEach((anchorDto -> {
-				Anchor anchor = anchorRepository.findOptionalByShortId(anchorDto.getShortId()).orElseThrow(EntityNotFoundException::new);
-				anchor.setFloor(floor);
-				anchor.setX(anchorDto.getX());
-				anchor.setY(anchorDto.getY());
-				anchorRepository.save(anchor);
-			}));
-		});
+		configurationRepostiory.save(newConfigurationEntity);
+		return objectMapper.readValue(newConfigurationEntity.getData(), ConfigurationDto.Data.class);
 	}
 
 	@Override
-	public ConfigurationDto saveDraft(ConfigurationDto configuration) throws IOException {
+	public ConfigurationDto.Data saveDraft(ConfigurationDto configuration) throws IOException {
 		Floor floor = floorRepository.findOptionalById(configuration.getFloorId()).orElseThrow(EntityNotFoundException::new);
-		List<Configuration> configurations = configurationRepostiory.findByFloorOrderByVersionDesc(floor);
-		Configuration latestConfiguration;
-		if (configurations.size() == 0) {
-			latestConfiguration = new Configuration(floor, 0);
-		} else {
-			latestConfiguration = configurations.get(0);
-		}
+		Optional<Configuration> configurationOptional = configurationRepostiory.findTop1ByFloorOrderByVersionDesc(floor);
+		Configuration latestConfiguration = configurationOptional.orElse(new Configuration(floor, 0));
 		ObjectMapper objectMapper = new ObjectMapper();
-		latestConfiguration.setData(objectMapper.writeValueAsString(configuration));
+		latestConfiguration.setData(objectMapper.writeValueAsString(configuration.getData()));
 		latestConfiguration = configurationRepostiory.save(latestConfiguration);
-		return objectMapper.readValue(latestConfiguration.getData(), ConfigurationDto.class);
+		return objectMapper.readValue(latestConfiguration.getData(), ConfigurationDto.Data.class);
 	}
 
 	@Override
@@ -102,7 +64,11 @@ public class ConfigurationBean implements ConfigurationFacade {
 		List<Configuration> configurations = configurationRepostiory.findByFloorOrderByVersionDesc(floor);
 		List<ConfigurationDto> configurationDtos = new ArrayList<>();
 		for (Configuration configuration : configurations) {
-			configurationDtos.add(objectMapper.readValue(configuration.getData(), ConfigurationDto.class));
+			ConfigurationDto configurationDto = new ConfigurationDto();
+			configurationDto.setVersion(configuration.getVersion());
+			configurationDto.setFloorId(configuration.getFloor().getId());
+			configurationDto.setData(objectMapper.readValue(configuration.getData(), ConfigurationDto.Data.class));
+			configurationDtos.add(configurationDto);
 		}
 		return configurationDtos;
 	}
