@@ -11,7 +11,7 @@ import static io.restassured.config.RestAssuredConfig.config;
 
 public abstract class RestAssuredIT {
 
-	private static final int PORT = 80;
+	private static final int PORT = 90;
 
 	@BeforeClass
 	public static void setupRestAssuredParameters() {
