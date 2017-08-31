@@ -5,8 +5,11 @@ import co.blastlab.serviceblbnavi.dao.repository.DeviceRepository;
 import co.blastlab.serviceblbnavi.dao.repository.TagRepository;
 import co.blastlab.serviceblbnavi.domain.Anchor;
 import co.blastlab.serviceblbnavi.domain.Device;
+import co.blastlab.serviceblbnavi.domain.Sink;
 import co.blastlab.serviceblbnavi.domain.Tag;
+import co.blastlab.serviceblbnavi.dto.anchor.AnchorDto;
 import co.blastlab.serviceblbnavi.dto.device.DeviceDto;
+import co.blastlab.serviceblbnavi.dto.sink.SinkDto;
 import co.blastlab.serviceblbnavi.socket.WebSocketCommunication;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -38,7 +41,7 @@ public class DeviceRegistrationWebSocket extends WebSocketCommunication {
 	public static void broadcastDevice(Device device) throws JsonProcessingException {
 		ObjectMapper objectMapper = new ObjectMapper();
 		if (device instanceof Anchor) {
-			broadCastMessage(anchorSessions, objectMapper.writeValueAsString(Collections.singletonList(new DeviceDto(device))));
+			broadCastMessage(anchorSessions, objectMapper.writeValueAsString(Collections.singletonList(new AnchorDto((Anchor) device))));
 		} else {
 			broadCastMessage(tagSessions, objectMapper.writeValueAsString(Collections.singletonList(new DeviceDto(device))));
 		}
@@ -53,8 +56,8 @@ public class DeviceRegistrationWebSocket extends WebSocketCommunication {
 		if (SessionType.SINK.getName().equals(queryString)) {
 			sinkSessions.add(session);
 		} else if (SessionType.ANCHOR.getName().equals(queryString)) {
-			anchorRepository.findAll().forEach((anchor) -> {
-				devices.add(new DeviceDto(anchor));
+			anchorRepository.findAll().forEach((Device anchor) -> {
+				devices.add((anchor instanceof Sink) ? new SinkDto((Sink) anchor) : new AnchorDto((Anchor) anchor));
 			});
 			anchorSessions.add(session);
 			broadCastMessage(anchorSessions, objectMapper.writeValueAsString(devices));
