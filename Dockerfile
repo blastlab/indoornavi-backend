@@ -32,3 +32,4 @@ RUN cp $JBOSS_HOME/modules/system/layers/base/org/mariadb/jdbc/main/mariadb-java
 COPY docker/start-server.sh /
 
 CMD ["/start-server.sh"]
+
