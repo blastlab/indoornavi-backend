@@ -40,8 +40,10 @@ public class DeviceRegistrationWebSocket extends WebSocketCommunication {
 
 	public static void broadcastDevice(Device device) throws JsonProcessingException {
 		ObjectMapper objectMapper = new ObjectMapper();
-		if (device instanceof Anchor) {
-			broadCastMessage(anchorSessions, objectMapper.writeValueAsString(Collections.singletonList(new AnchorDto((Anchor) device))));
+		if (device instanceof Sink) {
+			broadCastMessage(anchorSessions, objectMapper.writeValueAsString(Collections.singletonList(new SinkDto((Sink) device))));
+		} else if (device instanceof Anchor){
+			broadCastMessage(tagSessions, objectMapper.writeValueAsString(Collections.singletonList(new AnchorDto((Anchor) device))));
 		} else {
 			broadCastMessage(tagSessions, objectMapper.writeValueAsString(Collections.singletonList(new DeviceDto(device))));
 		}
