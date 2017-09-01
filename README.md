@@ -27,3 +27,20 @@ All endpoints, parameters, DTOs and possible HTTP status codes should be describ
 functionality was accepted by Product Owner (if suitable) and branch was merged to `development`.
 
 Only issue for which code fulfills above rules can be found as done.
+
+## Obsługa
+##### Odpalenie aplikacji
+
+``` docker-compose up ```
+
+##### Odpalenie testów jednostkowych
+
+``` mvn test ```
+
+##### Odpalenie testów integracyjnych
+
+``` mvn verify ```
+
+##### Deployment aplikacji
+
+``` mvn package ```
