@@ -2,36 +2,48 @@ version: '2'
 services:
   core:
     build: .
+    container_name:
+      core
     ports:
       - '90:8080'
       - '8787:8787'
       - '9990:9990'
     volumes:
-      - deployments:/opt/jboss/wildfly/standalone/deployments
+      - ./deployments:/opt/jboss/wildfly/standalone/deployments
+    entrypoint: ["wait-for-container-end.sh", "-c", "liquibase", "--", "/start-server.sh"]
     depends_on:
       - db
     environment:
       TZ: Europe/Warsaw
       APP_ENVIRONMENT: development
       APP_DB_HOST: db
-    entrypoint: ["wait-for-it", "db:3306", "-t", "0", "--", "/start-server.sh"]
+#    entrypoint: ["wait-for-it", "db:3306", "-t", "0", "--", "/start-server.sh"]
 
   db:
     extends:
       file: database/docker-compose.yml
       service: db
+    container_name:
+      db
 
   liquibase:
+    ports:
+      - '8677:8677'
     extends:
       file: database/docker-compose.yml
       service: liquibase
+    container_name:
+      liquibase
 
   core_compiler:
-      build: compiler
-      volumes:
-         - .:/app
-         - deployments:/deployments
-         - maven_core_compiler:/root/.m2
+    build: compiler
+    volumes:
+      - ./:/app
+      - ./maven_core_compiler:/root/.m2
+    container_name:
+      core_compiler
+#    entrypoint: ["docker/wait-for-container-end.sh", "-c", "liquibase"]
+
 
 volumes:
   # For Liquibase container.
