@@ -2,6 +2,7 @@ package co.blastlab.serviceblbnavi.socket.device;
 
 import co.blastlab.serviceblbnavi.dao.repository.AnchorRepository;
 import co.blastlab.serviceblbnavi.dao.repository.DeviceRepository;
+import co.blastlab.serviceblbnavi.dao.repository.SinkRepository;
 import co.blastlab.serviceblbnavi.dao.repository.TagRepository;
 import co.blastlab.serviceblbnavi.domain.Anchor;
 import co.blastlab.serviceblbnavi.domain.Device;
@@ -38,12 +39,15 @@ public class DeviceRegistrationWebSocket extends WebSocketCommunication {
 	@Inject
 	private DeviceRepository deviceRepository;
 
+	@Inject
+	private SinkRepository sinkRepository;
+
 	public static void broadcastDevice(Device device) throws JsonProcessingException {
 		ObjectMapper objectMapper = new ObjectMapper();
 		if (device instanceof Sink) {
-			broadCastMessage(anchorSessions, objectMapper.writeValueAsString(Collections.singletonList(new SinkDto((Sink) device))));
+			broadCastMessage(sinkSessions, objectMapper.writeValueAsString(Collections.singletonList(new SinkDto((Sink) device))));
 		} else if (device instanceof Anchor){
-			broadCastMessage(tagSessions, objectMapper.writeValueAsString(Collections.singletonList(new AnchorDto((Anchor) device))));
+			broadCastMessage(anchorSessions, objectMapper.writeValueAsString(Collections.singletonList(new AnchorDto((Anchor) device))));
 		} else {
 			broadCastMessage(tagSessions, objectMapper.writeValueAsString(Collections.singletonList(new DeviceDto(device))));
 		}
@@ -56,10 +60,14 @@ public class DeviceRegistrationWebSocket extends WebSocketCommunication {
 		ObjectMapper objectMapper = new ObjectMapper();
 
 		if (SessionType.SINK.getName().equals(queryString)) {
+			sinkRepository.findAll().forEach((sink) -> {
+				devices.add(new SinkDto(sink));
+			});
 			sinkSessions.add(session);
+			broadCastMessage(sinkSessions, objectMapper.writeValueAsString(devices));
 		} else if (SessionType.ANCHOR.getName().equals(queryString)) {
-			anchorRepository.findAll().forEach((Device anchor) -> {
-				devices.add((anchor instanceof Sink) ? new SinkDto((Sink) anchor) : new AnchorDto((Anchor) anchor));
+			anchorRepository.findAll().stream().filter((anchor -> !(anchor instanceof Sink))).forEach((Anchor anchor) -> {
+				devices.add(new AnchorDto(anchor));
 			});
 			anchorSessions.add(session);
 			broadCastMessage(anchorSessions, objectMapper.writeValueAsString(devices));

@@ -3,9 +3,9 @@ package co.blastlab.serviceblbnavi.socket.device;
 import lombok.Getter;
 
 enum SessionType {
-	ANCHOR("anchor"),
-	TAG("tag"),
-	SINK("sink");
+	ANCHOR("anchors"),
+	TAG("tags"),
+	SINK("sinks");
 
 	@Getter
 	private final String name;
