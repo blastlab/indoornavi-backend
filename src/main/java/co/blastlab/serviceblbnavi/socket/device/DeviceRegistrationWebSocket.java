@@ -42,6 +42,7 @@ public class DeviceRegistrationWebSocket extends WebSocketCommunication {
 	@Inject
 	private SinkRepository sinkRepository;
 
+	// TODO: przerobić na CDI events (strona 55. Beginning Java EE 7)
 	public static void broadcastDevice(Device device) throws JsonProcessingException {
 		ObjectMapper objectMapper = new ObjectMapper();
 		if (device instanceof Sink) {
