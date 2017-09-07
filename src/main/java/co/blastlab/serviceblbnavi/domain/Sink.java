@@ -25,6 +25,7 @@ public class Sink extends Anchor {
 	@PostUpdate
 	@Override
 	void broadcast() throws JsonProcessingException {
+		super.broadcast();
 		WizardWebSocket.broadcastNewSink(this);
 	}
 }
