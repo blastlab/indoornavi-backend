@@ -13,7 +13,7 @@
 <script>
 	$(document).ready(function () {
 		var isConnectionOpen = false;
-		var socket = new WebSocket("ws://localhost:80/measures?server");
+		var socket = new WebSocket("ws://localhost:90/measures?server");
 		var coordsSin = sin(200, 900);
 		var coordsLine = lineUp({x: 5, y: 5}, {x: 300, y: 300}, 5, 5);
 		var coordsCircle = circle(100, 0.1, {x: 300, y: 0});

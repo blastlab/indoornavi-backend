@@ -1,8 +1,10 @@
 package co.blastlab.serviceblbnavi.rest.facade.floor;
 
 import co.blastlab.serviceblbnavi.dao.repository.BuildingRepository;
+import co.blastlab.serviceblbnavi.dao.repository.ConfigurationRepostiory;
 import co.blastlab.serviceblbnavi.dao.repository.FloorRepository;
 import co.blastlab.serviceblbnavi.domain.Building;
+import co.blastlab.serviceblbnavi.domain.Configuration;
 import co.blastlab.serviceblbnavi.domain.Floor;
 import co.blastlab.serviceblbnavi.domain.Scale;
 import co.blastlab.serviceblbnavi.dto.floor.FloorDto;
@@ -25,6 +27,9 @@ public class FloorBean implements FloorFacade {
 
 	@Inject
 	private BuildingRepository buildingRepository;
+
+	@Inject
+	private ConfigurationRepostiory configurationRepostiory;
 
 	@Override
 	public FloorDto get(Long id) {
@@ -91,6 +96,10 @@ public class FloorBean implements FloorFacade {
 	public Response delete(Long id) {
 		Optional<Floor> floor = floorRepository.findOptionalById(id);
 		if (floor.isPresent()) {
+			List<Configuration> byFloor = configurationRepostiory.findByFloor(floor.get());
+			for (Configuration configuration : byFloor) {
+				configurationRepostiory.remove(configuration);
+			}
 			floorRepository.remove(floor.get());
 			return Response.status(HttpStatus.SC_NO_CONTENT).build();
 		}

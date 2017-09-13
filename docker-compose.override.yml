@@ -10,7 +10,7 @@ services:
       - '9990:9990'
     volumes:
       - ./deployments:/opt/jboss/wildfly/standalone/deployments
-    entrypoint: ["wait-for-container-end.sh", "-c", "liquibase", "--", "/start-server.sh"]
+    entrypoint: ["wait-for-container-end.sh", "-c", "172.18.0.4", "--", "/start-server.sh"]
     depends_on:
       - db
     environment:
