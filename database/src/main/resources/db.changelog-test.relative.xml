@@ -5,6 +5,7 @@
 
 	<!-- This file is used in test enviroment -->
 	<changeSet id="Clear" author="kgebert" context="test" runOnChange="true" labels="Clear" runAlways="true">
+		<delete tableName="configuration" />
 		<delete tableName="areaconfiguration_tag" />
 		<delete tableName="area_areaconfiguration" />
 		<delete tableName="area" />
@@ -100,5 +101,11 @@
 
 	<changeSet id="AreaConfiguration_Tag" author="kgebert" context="test" runOnChange="true" labels="AreaConfiguration_Tag" runAlways="true">
 		<loadData tableName="areaconfiguration_tag" file="test/AreaConfigurationTag.csv" relativeToChangelogFile="true" />
+	</changeSet>
+
+	<changeSet id="Configuration" author="kgebert" context="test" runOnChange="true" labels="Configuration" runAlways="true">
+		<loadUpdateData quotchar="'" tableName="configuration" file="test/Configuration.csv" primaryKey="id" relativeToChangelogFile="true">
+			<column name="published" type="boolean" />
+		</loadUpdateData>
 	</changeSet>
 </databaseChangeLog>
