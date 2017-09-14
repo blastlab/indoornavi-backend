@@ -177,7 +177,7 @@ public class BuildingFacadeIT extends BaseIT {
 
 	@Test
 	public void findBuildingAndItsFloors(){
-		Integer buildingIdWithFloors = 2;
+		Long buildingIdWithFloors = 2L;
 		BuildingDto.WithFloors buildingWithFloors = givenUser()
 			.pathParam("id", buildingIdWithFloors)
 			.when().get(BUILDING_PATH_WITH_ID_AND_FLOORS)
@@ -185,13 +185,16 @@ public class BuildingFacadeIT extends BaseIT {
 			.extract()
 			.as(BuildingDto.WithFloors.class);
 
+		BuildingDto buildingDto = new BuildingDto();
+		buildingDto.setId(buildingIdWithFloors);
+
 		assertThat(buildingWithFloors.getId(), equalTo(2L));
 		assertThat(buildingWithFloors.getName(), equalTo("AABBCCDDFFFFF"));
 		assertThat(buildingWithFloors.getComplexId(), equalTo(2L));
 		assertThat(buildingWithFloors.getFloors(), containsInAnyOrder(
-			floorDtoCustomMatcher(new FloorDto(1L, 1,"P.1", 2L, null, null)),
-			floorDtoCustomMatcher(new FloorDto(2L, 2, "", 2L, null, null)),
-			floorDtoCustomMatcher(new FloorDto(3L, 3, "", 2L, null, null))
+			floorDtoCustomMatcher(new FloorDto(1L, 1,"P.1", buildingDto, null, null)),
+			floorDtoCustomMatcher(new FloorDto(2L, 2, "", buildingDto, null, null)),
+			floorDtoCustomMatcher(new FloorDto(3L, 3, "", buildingDto, null, null))
 		));
 	}
 

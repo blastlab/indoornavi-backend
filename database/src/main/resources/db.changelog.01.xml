@@ -106,16 +106,20 @@
 		</createTable>
 	</changeSet>
 	<changeSet author="jsmol (generated)" id="issue-81-5">
-		<addForeignKeyConstraint baseColumnNames="id" baseTableName="Tag" constraintName="FK_6yv7s5k85a0emvco4ikb6t5ps" deferrable="false"
-		                         initiallyDeferred="false" referencedColumnNames="id" referencedTableName="Device"/>
+		<addForeignKeyConstraint
+			baseColumnNames="id" baseTableName="Tag" constraintName="Tag_Device_Id"
+			referencedColumnNames="id" referencedTableName="Device"/>
 	</changeSet>
 	<changeSet author="jsmol (generated)" id="issue-81-6">
-		<addForeignKeyConstraint baseColumnNames="id" baseTableName="Anchor" constraintName="FK_9d0jmo49iq4b14x2b91ob0w2f" deferrable="false"
-		                         initiallyDeferred="false" referencedColumnNames="id" referencedTableName="Device"/>
+		<addForeignKeyConstraint
+			baseColumnNames="id" baseTableName="Anchor" constraintName="Anchor_Device_Id"
+             referencedColumnNames="id" referencedTableName="Device"/>
 	</changeSet>
 	<changeSet author="jsmol (generated)" id="issue-81-7">
-		<addForeignKeyConstraint baseColumnNames="floor_id" baseTableName="Device" constraintName="FK_gp6ktayfrcytao4bqq8vd4yms" deferrable="false"
-		                         initiallyDeferred="false" referencedColumnNames="id" referencedTableName="Floor"/>
+		<addForeignKeyConstraint
+			onDelete="SET NULL"
+			baseColumnNames="floor_id" baseTableName="Device" constraintName="Device_Floor_Id"
+            referencedColumnNames="id" referencedTableName="Floor"/>
 	</changeSet>
 	<changeSet author="jsmol (generated)" id="issue-81-8">
 		<dropForeignKeyConstraint baseTableName="anchor" constraintName="FK_gtwmd57hn5sf1q3c7ysdwp2db"/>
@@ -407,5 +411,51 @@
 	</changeSet>
 	<changeSet author="kgebert (generated)" id="navi-73-2">
 		<addForeignKeyConstraint onDelete="CASCADE" baseColumnNames="floor_id" baseTableName="Configuration" constraintName="FK_Configuration_Floor_Id" referencedColumnNames="id" referencedTableName="Floor"/>
+	</changeSet>
+
+	<changeSet author="kgebert (generated)" id="navi-142-1">
+		<createTable tableName="Map">
+			<column autoIncrement="true" name="id" type="BIGINT">
+				<constraints primaryKey="true" primaryKeyName="MapPK"/>
+			</column>
+			<column name="creationDate" type="datetime"/>
+			<column name="modificationDate" type="datetime"/>
+			<column name="floor_id" type="BIGINT"/>
+		</createTable>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-142-2">
+		<createTable tableName="Map_Tag">
+			<column name="Map_id" type="BIGINT">
+				<constraints nullable="false"/>
+			</column>
+			<column name="tags_id" type="BIGINT">
+				<constraints nullable="false"/>
+			</column>
+		</createTable>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-142-3">
+		<createTable tableName="Map_User">
+			<column name="Map_id" type="BIGINT">
+				<constraints nullable="false"/>
+			</column>
+			<column name="users_id" type="BIGINT">
+				<constraints nullable="false"/>
+			</column>
+		</createTable>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-142-6">
+		<addForeignKeyConstraint onDelete="CASCADE" baseColumnNames="Map_id" baseTableName="Map_User" constraintName="FK_MapUser_Map_Id" referencedColumnNames="id" referencedTableName="Map"/>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-142-7">
+		<addForeignKeyConstraint baseColumnNames="users_id" baseTableName="Map_User" constraintName="FK_MapUser_User_Id" referencedColumnNames="id" referencedTableName="User"/>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-142-8">
+		<addForeignKeyConstraint onDelete="CASCADE" baseColumnNames="Map_id" baseTableName="Map_Tag" constraintName="FK_MapTag_Map_Id" referencedColumnNames="id" referencedTableName="Map"/>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-142-11">
+		<addForeignKeyConstraint baseColumnNames="tags_id" baseTableName="Map_Tag" constraintName="FK_MapTag_Tag_Id" referencedColumnNames="id" referencedTableName="Tag"/>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-142-12">
+		<addForeignKeyConstraint onDelete="CASCADE" baseColumnNames="floor_id" baseTableName="Map" constraintName="FK_Map_Floor_Id" referencedColumnNames="id" referencedTableName="Floor"/>
 	</changeSet>
 </databaseChangeLog>

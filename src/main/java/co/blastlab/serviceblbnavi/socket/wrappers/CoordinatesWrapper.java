@@ -8,10 +8,10 @@ import lombok.Setter;
 @Setter
 public class CoordinatesWrapper extends MessageWrapper {
 
-	private CoordinatesDto coordinatesDto;
+	private CoordinatesDto coordinates;
 
-	public CoordinatesWrapper(CoordinatesDto coordinatesDto) {
+	public CoordinatesWrapper(CoordinatesDto coordinates) {
 		super(MessageType.COORDINATES);
-		this.coordinatesDto = coordinatesDto;
+		this.coordinates = coordinates;
 	}
 }

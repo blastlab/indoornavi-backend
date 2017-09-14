@@ -1,9 +1,9 @@
 id,shortId,longId,name,floor_id,verified
-1,44384,16777216,AnchorName,2,true
-2,40622,93170459,,null,false
-3,55101,931701001,,2,false
-4,10151,151232323,TagName,2,true
-5,10404,45454545,,null,false
-6,102102,102102102,Tag102,null,false
-7,103103,103103103,,3,false
-8,999999,9090909090,Sink,null,true
+1,111111,11111111,LeftBottomAnchor,2,true
+2,222222,22222222,TopRightAnchor,2,true
+3,333333,33333333,BottomRightAnchor,2,true
+4,10999,1099999,Tag_1,null,true
+5,11999,1199999,Tag_2,null,false
+6,12999,1299999,Tag_3,null,false
+7,13999,1399999,Tag_4,null,false
+8,999999,9090909090,Sink,2,true

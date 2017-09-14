@@ -6,6 +6,12 @@ import lombok.Setter;
 @Getter
 @Setter
 public class Command {
-	private FilterType filterType;
+	private Type type;
 	private String args;
+
+	public enum Type {
+		TOGGLE_TAG,
+		SET_FLOOR,
+		SET_TAGS
+	}
 }

@@ -5,6 +5,9 @@
 
 	<!-- This file is used in test enviroment -->
 	<changeSet id="Clear" author="kgebert" context="test" runOnChange="true" labels="Clear" runAlways="true">
+		<delete tableName="map_tag" />
+		<delete tableName="map_user" />
+		<delete tableName="map" />
 		<delete tableName="areaconfiguration_tag" />
 		<delete tableName="area_areaconfiguration" />
 		<delete tableName="area" />
@@ -26,6 +29,7 @@
 
 	<changeSet id="Permission" author="kgebert" runOnChange="true" labels="Permission" runAlways="true">
 		<loadUpdateData tableName="permission" file="test/Permission.csv" primaryKey="id" relativeToChangelogFile="true" />
+		<loadUpdateData tableName="permission" file="test/navi-142/Permission.csv" primaryKey="id" relativeToChangelogFile="true" />
 		<loadUpdateData tableName="permission" file="test/navi-73/Permission.csv" primaryKey="id" relativeToChangelogFile="true" />
 	</changeSet>
 
@@ -35,6 +39,7 @@
 
 	<changeSet id="PermissionGroup_Permission" author="kgebert" runOnChange="true" labels="PermissionGroup_Permission" runAlways="true">
 		<loadData tableName="permissiongroup_permission" file="test/PermissionGroupPermission.csv" relativeToChangelogFile="true" />
+		<loadData tableName="permissiongroup_permission" file="test/navi-142/PermissionGroupPermission.csv" relativeToChangelogFile="true" />
 		<loadData tableName="permissiongroup_permission" file="test/navi-73/PermissionGroupPermission.csv" relativeToChangelogFile="true" />
 	</changeSet>
 
@@ -100,5 +105,17 @@
 
 	<changeSet id="AreaConfiguration_Tag" author="kgebert" context="test" runOnChange="true" labels="AreaConfiguration_Tag" runAlways="true">
 		<loadData tableName="areaconfiguration_tag" file="test/AreaConfigurationTag.csv" relativeToChangelogFile="true" />
+	</changeSet>
+
+	<changeSet id="Map" author="kgebert" context="test" runOnChange="true" labels="Map" runAlways="true">
+		<loadUpdateData tableName="map" file="test/Map.csv" primaryKey="id" relativeToChangelogFile="true" />
+	</changeSet>
+
+	<changeSet id="Map_Tag" author="kgebert" context="test" runOnChange="true" labels="Map_Tag" runAlways="true">
+		<loadData tableName="map_tag" file="test/MapTag.csv" relativeToChangelogFile="true" />
+	</changeSet>
+
+	<changeSet id="Map_User" author="kgebert" context="test" runOnChange="true" labels="Map_User" runAlways="true">
+		<loadData tableName="map_user" file="test/MapUser.csv" relativeToChangelogFile="true" />
 	</changeSet>
 </databaseChangeLog>
