@@ -9,6 +9,6 @@ import java.util.Optional;
 @Repository
 public interface TagRepository extends EntityRepository<Tag, Long> {
 
-	Optional<Tag> findById(Long id);
+	Optional<Tag> findOptionalById(Long id);
 	Optional<Tag> findOptionalByShortId(Integer shortId);
 }

@@ -48,38 +48,33 @@ public class ImageBean implements ImageFacade {
 
 	@Override
 	public Response uploadImage(Long floorId, ImageUpload imageUpload) throws IOException, MagicParseException, MagicException, MagicMatchNotFoundException {
-		Optional<Floor> floorOptional = floorRepository.findOptionalById(floorId);
-		if (floorOptional.isPresent()) {
-			Image imageEntity = imageRepository.findBy(floorId);
-			if (imageEntity == null) {
-				Floor floorEntity = floorOptional.get();
-				imageEntity = new Image();
-				byte[] image = imageUpload.getImage();
+		Floor floor = floorRepository.findOptionalById(floorId).orElseThrow(EntityNotFoundException::new);
+		if (floor.getImage() == null) {
+			Image imageEntity = new Image();
+			byte[] image = imageUpload.getImage();
 
-				if (!isProperFileSize(image)) {
-					return Response.status(HttpStatus.SC_BAD_REQUEST).entity(new FileViolationContent(FILE_002)).build();
-				}
-
-				if (!isProperFileExtension(image)) {
-					return Response.status(HttpStatus.SC_BAD_REQUEST).entity(new FileViolationContent(FILE_001)).build();
-				}
-
-				BufferedImage bufferedImage = ImageIO.read(new ByteArrayInputStream(image));
-				imageEntity.setBitmapHeight(bufferedImage.getHeight());
-				imageEntity.setBitmapWidth(bufferedImage.getWidth());
-				imageEntity.setBitmap(image);
-				imageRepository.save(imageEntity);
-				floorEntity.setImage(imageEntity);
-				return Response.ok(new FloorDto(floorEntity)).build();
+			if (!isProperFileSize(image)) {
+				return Response.status(HttpStatus.SC_BAD_REQUEST).entity(new FileViolationContent(FILE_002)).build();
 			}
-			return Response.status(HttpStatus.SC_CONFLICT).build();
+
+			if (!isProperFileExtension(image)) {
+				return Response.status(HttpStatus.SC_BAD_REQUEST).entity(new FileViolationContent(FILE_001)).build();
+			}
+
+			BufferedImage bufferedImage = ImageIO.read(new ByteArrayInputStream(image));
+			imageEntity.setBitmapHeight(bufferedImage.getHeight());
+			imageEntity.setBitmapWidth(bufferedImage.getWidth());
+			imageEntity.setBitmap(image);
+			imageRepository.save(imageEntity);
+			floor.setImage(imageEntity);
+			return Response.ok(new FloorDto(floor)).build();
 		}
-		throw new EntityNotFoundException();
+		return Response.status(HttpStatus.SC_CONFLICT).build();
 	}
 
 	@Override
 	public Response downloadImage(Long id) {
-		Optional<Image> imageOptional = imageRepository.findById(id);
+		Optional<Image> imageOptional = imageRepository.findOptionalById(id);
 		if (imageOptional.isPresent()) {
 			byte[] image = imageOptional.get().getBitmap();
 
