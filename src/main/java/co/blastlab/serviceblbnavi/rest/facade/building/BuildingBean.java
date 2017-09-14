@@ -39,7 +39,7 @@ public class BuildingBean implements BuildingFacade {
 	public BuildingDto update(Long id, BuildingDto building) {
 		Optional<Complex> complex = complexRepository.findByBuildingId(id);
 		if (complex.isPresent()) {
-			Optional<Building> buildingEntity = buildingRepository.findById(id);
+			Optional<Building> buildingEntity = buildingRepository.findOptionalById(id);
 			if (buildingEntity.isPresent()) {
 				buildingEntity.get().setComplex(complex.get());
 				buildingEntity.get().setName(building.getName());
@@ -52,7 +52,7 @@ public class BuildingBean implements BuildingFacade {
 
 	@Override
 	public Response delete(Long id) {
-		Optional<Building> building = buildingRepository.findById(id);
+		Optional<Building> building = buildingRepository.findOptionalById(id);
 		if (building.isPresent()) {
 			buildingRepository.remove(building.get());
 			return Response.status(HttpStatus.SC_NO_CONTENT).build();
@@ -62,7 +62,7 @@ public class BuildingBean implements BuildingFacade {
 
 	@Override
 	public BuildingDto.WithFloors find(Long id) {
-		Optional<Building> buildingEntity = buildingRepository.findById(id);
+		Optional<Building> buildingEntity = buildingRepository.findOptionalById(id);
 		if (buildingEntity.isPresent()) {
 			return new BuildingDto.WithFloors(buildingEntity.get());
 		}
