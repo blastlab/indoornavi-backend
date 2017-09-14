@@ -1,6 +1,6 @@
 {
 	"level": 0,
 	"name": "",
-	"buildingId": 2,
+	"building": { "id": 2 },
 	"imageId": null
 }
