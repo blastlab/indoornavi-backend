@@ -10,6 +10,7 @@ import lombok.Setter;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Getter
@@ -18,7 +19,7 @@ import java.util.List;
 public class ConfigurationDto {
 	private Long floorId;
 	private Integer version;
-	private Boolean published;
+	private Date publishedDate;
 	private Data data;
 
 	public ConfigurationDto(Configuration configuration) throws IOException {
@@ -26,7 +27,7 @@ public class ConfigurationDto {
 		this.setVersion(configuration.getVersion());
 		this.setFloorId(configuration.getFloor().getId());
 		this.setData(objectMapper.readValue(configuration.getData(), ConfigurationDto.Data.class));
-		this.setPublished(configuration.getPublished());
+		this.setPublishedDate(configuration.getModificationDate());
 	}
 
 	@Getter
