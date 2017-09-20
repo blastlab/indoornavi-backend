@@ -24,8 +24,8 @@ public class TagFacadeIT extends BaseIT {
 	private static final int SHORT_ID_CREATING = 32767;
 	private static final long LONG_ID_CREATING = 10535714511L;
 
-	private static final int SHORT_ID_FOR_TAG_ID_4 = 10151;
-	private static final int LONG_ID_FOR_TAG_ID_4 = 151232323;
+	private static final int SHORT_ID_FOR_TAG_ID_4 = 10999;
+	private static final int LONG_ID_FOR_TAG_ID_4 = 1099999;
 	private static final int FLOOR_FOR_TAG_ID_4 = 2;
 	private static final int TAG_ID_4 = 4;
 	private static final boolean VERIFIED_FALSE = false;
@@ -283,10 +283,10 @@ public class TagFacadeIT extends BaseIT {
 			.then().statusCode(HttpStatus.SC_OK)
 		.body(
 			"id", equalTo(Arrays.asList(4, 5, 6, 7)),
-			"shortId", equalTo(Arrays.asList(SHORT_ID_FOR_TAG_ID_4, 10404, 102102, 103103)),
-			"longId", equalTo(Arrays.asList(Integer.valueOf(Long.toString(LONG_ID_FOR_TAG_ID_4)), 45454545, 102102102, 103103103)),
-			"name", equalTo(Arrays.asList("TagName", "", "Tag102", "")),
-			"floorId", equalTo(Arrays.asList(2, null, null, 3)),
+			"shortId", equalTo(Arrays.asList(SHORT_ID_FOR_TAG_ID_4, 11999, 12999, 13999)),
+			"longId", equalTo(Arrays.asList(Integer.valueOf(Long.toString(LONG_ID_FOR_TAG_ID_4)), 1199999, 1299999, 1399999)),
+			"name", equalTo(Arrays.asList("Tag_1", "Tag_2", "Tag_3", "Tag_4")),
+			"floorId", equalTo(Arrays.asList(null, null, null, null)),
 			"verified", equalTo(Arrays.asList(true, false, false, false))
 		);
 	}
