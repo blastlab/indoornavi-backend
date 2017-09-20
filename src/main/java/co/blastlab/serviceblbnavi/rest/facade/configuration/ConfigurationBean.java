@@ -38,36 +38,46 @@ public class ConfigurationBean implements ConfigurationFacade {
 		configurationExtractor.extractSinks(configurationData, floor);
 		configurationExtractor.extractScale(configurationData, floor);
 
-		Integer latestVersion = configurationRepostiory.getLatestVersion(floor);
-		Configuration newConfigurationEntity = configurationRepostiory.save(
-			new Configuration(floor, latestVersion + 1, objectMapper.writeValueAsString(configurationData))
-		);
-		configurationRepostiory.save(newConfigurationEntity);
-		return objectMapper.readValue(newConfigurationEntity.getData(), ConfigurationDto.Data.class);
+		configurationEntity.setPublished(true);
+		return objectMapper.readValue(configurationEntity.getData(), ConfigurationDto.Data.class);
 	}
 
 	@Override
 	public ConfigurationDto.Data saveDraft(ConfigurationDto configuration) throws IOException {
 		Floor floor = floorRepository.findOptionalById(configuration.getFloorId()).orElseThrow(EntityNotFoundException::new);
 		Optional<Configuration> configurationOptional = configurationRepostiory.findTop1ByFloorOrderByVersionDesc(floor);
-		Configuration latestConfiguration = configurationOptional.orElse(new Configuration(floor, 0));
+		Configuration latestConfiguration = configurationOptional.orElse(new Configuration(floor, 0, false));
 		ObjectMapper objectMapper = new ObjectMapper();
-		latestConfiguration.setData(objectMapper.writeValueAsString(configuration.getData()));
+		if (latestConfiguration.getPublished()) {
+			Integer latestVersion = configurationRepostiory.getLatestVersion(floor);
+			latestConfiguration = new Configuration(floor, latestVersion + 1, objectMapper.writeValueAsString(configuration.getData()), false);
+		} else {
+			latestConfiguration.setData(objectMapper.writeValueAsString(configuration.getData()));
+		}
 		latestConfiguration = configurationRepostiory.save(latestConfiguration);
 		return objectMapper.readValue(latestConfiguration.getData(), ConfigurationDto.Data.class);
 	}
 
 	@Override
-	public List<ConfigurationDto> getAllOrderedByVersionDescending(Long floorId) throws IOException {
+	public ConfigurationDto undo(Long floorId) throws IOException {
+		Floor floor = floorRepository.findOptionalById(floorId).orElseThrow(EntityNotFoundException::new);
+
+		Optional<Configuration> configurationOptional = configurationRepostiory.findTop1ByFloorAndPublishedOrderByVersionDesc(floor, false);
+		configurationOptional.ifPresent(configuration -> configurationRepostiory.remove(configuration));
+
 		ObjectMapper objectMapper = new ObjectMapper();
+		Configuration latestConfiguration = configurationRepostiory.findTop1ByFloorOrderByVersionDesc(floor)
+			.orElse(new Configuration(floor, 0, objectMapper.writeValueAsString(new ConfigurationDto.Data()),false));
+		return new ConfigurationDto(latestConfiguration);
+	}
+
+	@Override
+	public List<ConfigurationDto> getAllOrderedByVersionDescending(Long floorId) throws IOException {
 		Floor floor = floorRepository.findOptionalById(floorId).orElseThrow(EntityNotFoundException::new);
 		List<Configuration> configurations = configurationRepostiory.findByFloorOrderByVersionDesc(floor);
 		List<ConfigurationDto> configurationDtos = new ArrayList<>();
 		for (Configuration configuration : configurations) {
-			ConfigurationDto configurationDto = new ConfigurationDto();
-			configurationDto.setVersion(configuration.getVersion());
-			configurationDto.setFloorId(configuration.getFloor().getId());
-			configurationDto.setData(objectMapper.readValue(configuration.getData(), ConfigurationDto.Data.class));
+			ConfigurationDto configurationDto = new ConfigurationDto(configuration);
 			configurationDtos.add(configurationDto);
 		}
 		return configurationDtos;

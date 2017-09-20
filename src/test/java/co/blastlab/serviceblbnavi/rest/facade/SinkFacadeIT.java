@@ -4,7 +4,8 @@ import co.blastlab.serviceblbnavi.rest.facade.util.RequestBodyBuilder;
 import com.google.common.collect.ImmutableList;
 import org.junit.Test;
 
-import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
 
 public class SinkFacadeIT extends BaseIT {
 
@@ -26,7 +27,7 @@ public class SinkFacadeIT extends BaseIT {
 			.body("size()", is(1))
 			.root("get(0)")
 			.body("name", is("Sink"))
-			.body("floorId", is(nullValue()))
+			.body("floorId", is(2))
 			.body("configured", is(false))
 			.body("anchors.size()", is(0));
 	}

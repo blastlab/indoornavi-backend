@@ -27,8 +27,8 @@ public class AnchorFacadeIT extends BaseIT {
 	private static final int FLOOR_EXISTING = 4;
 	private static final int ANCHOR_ID_NONEXISTING = 666;
 	private static final int ANCHOR_ID_FOR_UPDATE = 1;
-	private static final int ANCHOR_SHORT_ID_EXISTING = 44384;
-	private static final int ANCHOR_LONG_ID_EXISTING = 16777216;
+	private static final int ANCHOR_SHORT_ID_EXISTING = 111111;
+	private static final int ANCHOR_LONG_ID_EXISTING = 11111111;
 	private static final int ANCHOR_SHORT_ID_CREATING = 1345;
 	private static final long ANCHOR_LONG_ID_CREATING = 9753571457L;
 
@@ -350,13 +350,13 @@ public class AnchorFacadeIT extends BaseIT {
 			.then().statusCode(HttpStatus.SC_OK)
 			.body(
 				"id", equalTo(Arrays.asList(1, 2, 3, 8)),
-				"shortId", equalTo(Arrays.asList(ANCHOR_SHORT_ID_EXISTING, 40622, 55101, 999999)),
-				"longId", equalTo(Arrays.asList(ANCHOR_LONG_ID_EXISTING, 93170459, 931701001, 9090909090L)),
-				"name", equalTo(Arrays.asList("AnchorName", "", "", "Sink")),
-				"floorId", equalTo(Arrays.asList(2, null, 2, null)),
-				"x", equalTo(Arrays.asList(0.0f, 785.0f, 485.0f, null)),
-				"y", equalTo(Arrays.asList(0.0f, 0.0f, 397.0f, null)),
-				"verified", equalTo(Arrays.asList(true, false, false, true))
+				"shortId", equalTo(Arrays.asList(ANCHOR_SHORT_ID_EXISTING, 222222, 333333, 999999)),
+				"longId", equalTo(Arrays.asList(ANCHOR_LONG_ID_EXISTING, 22222222, 33333333, 9090909090L)),
+				"name", equalTo(Arrays.asList("LeftBottomAnchor", "TopRightAnchor", "BottomRightAnchor", "Sink")),
+				"floorId", equalTo(Arrays.asList(2, 2, 2, 2)),
+				"x", equalTo(Arrays.asList(0.0f, 500.0f, 500.0f, 0.0f)),
+				"y", equalTo(Arrays.asList(500.0f, 0.0f, 500.0f, 0.0f)),
+				"verified", equalTo(Arrays.asList(true, true, true, true))
 			);
 	}
 
