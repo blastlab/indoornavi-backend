@@ -463,4 +463,19 @@
 	<changeSet author="kgebert (generated)" id="navi-142-12">
 		<addForeignKeyConstraint onDelete="CASCADE" baseColumnNames="floor_id" baseTableName="Map" constraintName="FK_Map_Floor_Id" referencedColumnNames="id" referencedTableName="Floor"/>
 	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-118-1">
+		<createTable tableName="ApiKey">
+			<column autoIncrement="true" name="id" type="BIGINT">
+				<constraints primaryKey="true" primaryKeyName="ApiKeyPK"/>
+			</column>
+			<column name="creationDate" type="datetime"/>
+			<column name="modificationDate" type="datetime"/>
+			<column name="host" type="VARCHAR(255)"/>
+			<column name="value" type="VARCHAR(255)"/>
+			<column name="user_id" type="BIGINT"/>
+		</createTable>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-118-2">
+		<addForeignKeyConstraint onDelete="CASCADE" baseColumnNames="user_id" baseTableName="ApiKey" constraintName="FK_ApiKeyUser_Id" referencedColumnNames="id" referencedTableName="User"/>
+	</changeSet>
 </databaseChangeLog>
