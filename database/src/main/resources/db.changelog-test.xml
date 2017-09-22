@@ -4,6 +4,7 @@
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.3.xsd">
 	<!-- This file is used in development enviroment -->
 	<changeSet id="Clear" author="kgebert" context="test" runOnChange="true" labels="Clear" runAlways="true">
+		<delete tableName="apikey" />
 		<delete tableName="configuration" />
 		<delete tableName="map_tag" />
 		<delete tableName="map_user" />
@@ -86,5 +87,9 @@
 
 	<changeSet id="Map_User" author="kgebert" context="test" runOnChange="true" labels="Map_User" runAlways="true">
 		<loadData tableName="map_user" file="test/MapUser.csv" />
+	</changeSet>
+
+	<changeSet id="ApiKey" author="kgebert" context="test" runOnChange="true" labels="ApiKey" runAlways="true">
+		<loadUpdateData tableName="apikey" file="test/ApiKey.csv" primaryKey="id" />
 	</changeSet>
 </databaseChangeLog>
