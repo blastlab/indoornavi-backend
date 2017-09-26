@@ -412,6 +412,11 @@
 	<changeSet author="kgebert (generated)" id="navi-73-2">
 		<addForeignKeyConstraint onDelete="CASCADE" baseColumnNames="floor_id" baseTableName="Configuration" constraintName="FK_Configuration_Floor_Id" referencedColumnNames="id" referencedTableName="Floor"/>
 	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-149-1">
+		<addColumn tableName="Configuration">
+			<column name="published" type="bit"/>
+		</addColumn>
+	</changeSet>
 
 	<changeSet author="kgebert (generated)" id="navi-142-1">
 		<createTable tableName="Map">

@@ -38,13 +38,13 @@
 	$(document).ready(function () {
 		var $container = $('#container');
 		var isConnectionOpen = false;
-		var socket = new WebSocket("ws://localhost:80/measures?client");
+		var socket = new WebSocket("ws://localhost:90/measures?client");
 		var message = {
 			color: ''
 		};
 		var tags = [];
 
-		$.getJSON('http://localhost:80/rest/v1/areas', function(areas) {
+		$.getJSON('http://localhost:90/rest/v1/areas', function(areas) {
 			$.each(areas, function() {
 				$.each(this['points'], function() {
 					var $el = $('<div class="square"></div>');
