@@ -28,6 +28,9 @@ public class User extends TrackedEntity implements Principal {
 	@ManyToMany
 	private List<PermissionGroup> permissionGroups = new ArrayList<>();
 
+	@OneToMany(mappedBy = "user")
+	private List<ApiKey> keys = new ArrayList<>();
+
 	@Override
 	public String getName() {
 		return this.getUsername();
