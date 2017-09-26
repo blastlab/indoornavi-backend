@@ -1,6 +1,7 @@
 package co.blastlab.serviceblbnavi.rest.facade.map;
 
 import co.blastlab.serviceblbnavi.dto.map.MapDto;
+import co.blastlab.serviceblbnavi.dto.map.OriginChecker;
 import co.blastlab.serviceblbnavi.ext.filter.AuthorizedAccess;
 import io.swagger.annotations.*;
 
@@ -54,4 +55,10 @@ public interface MapFacade {
 	})
 	@AuthorizedAccess("MAP_DELETE")
 	Response delete(@ApiParam(value = "id", required = true) @PathParam("id") @Valid @NotNull Long id);
+
+	@POST
+	@Path("/checkOrigin")
+	@AuthorizedAccess
+	Boolean checkOrigin(OriginChecker originChecker);
+
 }

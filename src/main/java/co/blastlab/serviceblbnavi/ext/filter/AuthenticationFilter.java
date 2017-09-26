@@ -1,6 +1,8 @@
 package co.blastlab.serviceblbnavi.ext.filter;
 
+import co.blastlab.serviceblbnavi.dao.repository.ApiKeyRepository;
 import co.blastlab.serviceblbnavi.dao.repository.UserRepository;
+import co.blastlab.serviceblbnavi.domain.ApiKey;
 import co.blastlab.serviceblbnavi.domain.Permission;
 import co.blastlab.serviceblbnavi.domain.User;
 import co.blastlab.serviceblbnavi.rest.facade.auth.AuthService;
@@ -36,6 +38,9 @@ public class AuthenticationFilter implements ContainerRequestFilter {
 	private UserRepository userRepository;
 
 	@Inject
+	private ApiKeyRepository apiKeyRepository;
+
+	@Inject
 	private AuthService authService;
 
 	@Context
@@ -45,14 +50,22 @@ public class AuthenticationFilter implements ContainerRequestFilter {
 	public void filter(ContainerRequestContext requestContext) throws IOException {
 		String authorizationHeader = requestContext.getHeaderString(HttpHeaders.AUTHORIZATION);
 
-		if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+		if (authorizationHeader == null || (!authorizationHeader.startsWith("Bearer ") && !authorizationHeader.startsWith("Token "))) {
 			throw new NotAuthorizedException("Authorization header must be provided");
 		}
 
-		String token = authorizationHeader.substring("Bearer".length()).trim();
+		if (authorizationHeader.startsWith("Bearer ")) {
+			filterForBearer(authorizationHeader, requestContext);
+		} else {
+			filterForToken(authorizationHeader, requestContext);
+		}
+	}
+
+	private void filterForBearer(String authorizationHeader, ContainerRequestContext requestContext) {
+		String bearer = authorizationHeader.substring("Bearer".length()).trim();
 
 		try {
-			User user = validateToken(token);
+			User user = validateBearer(bearer);
 
 			Class<?> resourceClass = resourceInfo.getResourceClass();
 			String classPermission = extractPermission(resourceClass);
@@ -96,7 +109,41 @@ public class AuthenticationFilter implements ContainerRequestFilter {
 		}
 	}
 
-	private User validateToken(String token) throws TokenInvalidOrExpired {
+	private void filterForToken(String authorizationHeader, ContainerRequestContext requestContext) {
+		String token = authorizationHeader.substring("Token".length()).trim();
+
+		try {
+			User user = validateToken(token);
+
+			final SecurityContext currentSecurityContext = requestContext.getSecurityContext();
+			requestContext.setSecurityContext(new SecurityContext() {
+				@Override
+				public Principal getUserPrincipal() {
+					return user;
+				}
+
+				@Override
+				public boolean isUserInRole(String role) {
+					return true;
+				}
+
+				@Override
+				public boolean isSecure() {
+					return currentSecurityContext.isSecure();
+				}
+
+				@Override
+				public String getAuthenticationScheme() {
+					return "Token";
+				}
+			});
+
+		} catch (TokenInvalidOrExpired e) {
+			requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
+		}
+	}
+
+	private User validateBearer(String token) throws TokenInvalidOrExpired {
 		User user = userRepository.findOptionalByToken(token).orElseThrow(TokenInvalidOrExpired::new);
 		Date now = new Date();
 
@@ -107,6 +154,11 @@ public class AuthenticationFilter implements ContainerRequestFilter {
 		user.setTokenExpires(DateUtils.addMinutes(now, 30));
 
 		return authService.save(user);
+	}
+
+	private User validateToken(String token) throws TokenInvalidOrExpired {
+		ApiKey apiKey = apiKeyRepository.findOptionalByValue(token).orElseThrow(TokenInvalidOrExpired::new);
+		return apiKey.getUser();
 	}
 
 	private void checkPermissions(User user, String permission) throws UserNotAllowedToPerformAction {
