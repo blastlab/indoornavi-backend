@@ -40,4 +40,12 @@ public interface AreaFacade {
 	@GET
 	@ApiOperation(value = "find all areas", response = AreaDto.class, responseContainer = "List")
 	List<AreaDto> findAll();
+
+	@GET
+	@Path("/{floorId: \\d+}")
+	@ApiOperation(value = "find all areas by floor id", response = AreaDto.class, responseContainer = "list")
+	@ApiResponses({
+		@ApiResponse(code = 404, message = "Floor id empty or floor does not exist")
+	})
+	List<AreaDto> findAllByFloor(@PathParam("floorId") @Valid @NotNull Long floorId);
 }

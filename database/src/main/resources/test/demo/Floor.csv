@@ -1,0 +1,5 @@
+id,level,name,building_id,image_id
+1,0,Areas,1,null
+2,0,'Ground Floor A',2,null
+3,0,'Ground Floor B',3,null
+4,1,'First Floor B',3,null

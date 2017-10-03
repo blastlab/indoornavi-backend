@@ -478,4 +478,12 @@
 	<changeSet author="kgebert (generated)" id="navi-118-2">
 		<addForeignKeyConstraint onDelete="CASCADE" baseColumnNames="user_id" baseTableName="ApiKey" constraintName="FK_ApiKeyUser_Id" referencedColumnNames="id" referencedTableName="User"/>
 	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-152-1">
+		<addColumn tableName="Area">
+			<column name="floor_id" type="bigint"/>
+		</addColumn>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-152-2">
+		<addForeignKeyConstraint baseColumnNames="floor_id" baseTableName="Area" constraintName="FK_Area_Floor_Id" referencedColumnNames="id" referencedTableName="Floor"/>
+	</changeSet>
 </databaseChangeLog>
