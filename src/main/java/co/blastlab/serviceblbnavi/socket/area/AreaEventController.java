@@ -1,8 +1,10 @@
 package co.blastlab.serviceblbnavi.socket.area;
 
 import co.blastlab.serviceblbnavi.dao.repository.AreaRepository;
+import co.blastlab.serviceblbnavi.dao.repository.FloorRepository;
 import co.blastlab.serviceblbnavi.domain.Area;
 import co.blastlab.serviceblbnavi.domain.AreaConfiguration;
+import co.blastlab.serviceblbnavi.domain.Floor;
 import co.blastlab.serviceblbnavi.domain.Tag;
 import co.blastlab.serviceblbnavi.socket.measures.CoordinatesDto;
 import com.google.common.collect.HashBasedTable;
@@ -34,7 +36,8 @@ public class AreaEventController {
 	@Inject
 	private AreaRepository areaRepository;
 
-	private List<Area> areas = new ArrayList<>();
+	@Inject
+	private FloorRepository floorRepository;
 
 	private WKTReader wktReader = new WKTReader();
 
@@ -53,9 +56,6 @@ public class AreaEventController {
 	}
 
 	private void updateData() {
-		this.areas.clear();
-		this.areas.addAll(areaRepository.findAll());
-
 		Iterator<Table.Cell<Integer, Area, Date>> iterator = this.tagCoordinatesHistory.cellSet().iterator();
 
 		Date now = new Date();
@@ -116,6 +116,7 @@ public class AreaEventController {
 		event.setAreaName(area.getName());
 		event.setMode(areaConfiguration.getMode());
 		event.setTagId(coordinatesData.getTagShortId());
+		event.setAreaId(area.getId());
 		return event;
 	}
 
@@ -125,9 +126,10 @@ public class AreaEventController {
 	}
 
 	private Map<Area, List<AreaConfiguration>> getFilteredAreas(CoordinatesDto coordinatesData) {
-
+		Floor floor = floorRepository.findBy(coordinatesData.getFloorId());
+		List<Area> floorAreas = areaRepository.findByFloor(floor);
 		Map<Area, List<AreaConfiguration>> filteredAreas = new HashMap<>();
-		for (Area area : this.areas) {
+		for (Area area : floorAreas) {
 			for (AreaConfiguration areaConfiguration : area.getConfigurations()) {
 				for (Tag tag : areaConfiguration.getTags()) {
 					if (tag.getShortId().equals(coordinatesData.getTagShortId())) {

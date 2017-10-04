@@ -92,4 +92,19 @@ public class AreaFacadeIT extends BaseIT {
 			.then()
 			.statusCode(204);
 	}
+
+	@Test
+	public void getAllAreasForSpecificFloor() {
+		givenUser()
+			.pathParam("floorId", 2)
+			.when()
+			.get("/areas/{floorId}")
+			.then()
+			.statusCode(200)
+			// assertions
+			.body("size()", is(1))
+			.body("get(0).points", is(notNullValue()))
+			.body("get(0).buffer", is(notNullValue()))
+			.body("get(0).name", is("test"));
+	}
 }
