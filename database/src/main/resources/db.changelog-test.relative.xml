@@ -92,7 +92,7 @@
 
 	<changeSet id="Area" author="kgebert" context="test" runOnChange="true" labels="Area" runAlways="true">
 		<sql>
-			insert into area (id, polygon, name) VALUES (1, GeomFromText('POLYGON(( 200 200, 400 200, 400 400, 200 400, 200 200 ))'), 'test');
+			insert into area (id, polygon, name, floor_id) VALUES (1, GeomFromText('POLYGON(( 190 750, 580 750, 580 980, 190 980, 190 750 ))'), 'test', 2);
 		</sql>
 	</changeSet>
 

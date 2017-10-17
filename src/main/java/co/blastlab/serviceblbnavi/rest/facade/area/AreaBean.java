@@ -2,8 +2,10 @@ package co.blastlab.serviceblbnavi.rest.facade.area;
 
 import co.blastlab.serviceblbnavi.dao.repository.AreaConfigurationRepository;
 import co.blastlab.serviceblbnavi.dao.repository.AreaRepository;
+import co.blastlab.serviceblbnavi.dao.repository.FloorRepository;
 import co.blastlab.serviceblbnavi.domain.Area;
 import co.blastlab.serviceblbnavi.domain.AreaConfiguration;
+import co.blastlab.serviceblbnavi.domain.Floor;
 import co.blastlab.serviceblbnavi.dto.area.AreaDto;
 
 import javax.ejb.Stateless;
@@ -18,6 +20,9 @@ public class AreaBean implements AreaFacade {
 
 	@Inject
 	private AreaRepository areaRepository;
+
+	@Inject
+	private FloorRepository floorRepository;
 
 	@Inject
 	private AreaConfigurationRepository areaConfigurationRepository;
@@ -48,6 +53,13 @@ public class AreaBean implements AreaFacade {
 	// TODO: AutorizedAccess
 	public List<AreaDto> findAll() {
 		return areaRepository.findAll().stream().map(AreaDto::new).collect(Collectors.toList());
+	}
+
+	@Override
+	public List<AreaDto> findAllByFloor(Long floorId) {
+		Floor floor = floorRepository.findOptionalById(floorId).orElseThrow(EntityNotFoundException::new);
+		List<Area> areas = areaRepository.findByFloor(floor);
+		return areas.stream().map(AreaDto::new).collect(Collectors.toList());
 	}
 
 	private AreaDto createOrUpdate(Area areaEntity, AreaDto area) {
