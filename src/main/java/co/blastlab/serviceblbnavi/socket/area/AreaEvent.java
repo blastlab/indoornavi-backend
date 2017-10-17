@@ -8,6 +8,7 @@ import lombok.Setter;
 @Setter
 public class AreaEvent {
 	private AreaConfiguration.Mode mode;
+	private Long areaId;
 	private String areaName;
 	private Integer tagId;
 }
