@@ -49,8 +49,19 @@ public class ConfigurationExtractor {
 				anchor.setFloor(floor);
 				anchor.setX(anchorDto.getX());
 				anchor.setY(anchorDto.getY());
+				anchor.setSink(sink);
 				anchorRepository.save(anchor);
 			}));
 		});
+	}
+
+	public void extractAnchors(ConfigurationDto.Data configuration, Floor floor) {
+		configuration.getAnchors().forEach((anchorDto -> {
+			Anchor anchor = anchorRepository.findOptionalByShortId(anchorDto.getShortId()).orElseThrow(EntityNotFoundException::new);
+			anchor.setFloor(floor);
+			anchor.setX(anchorDto.getX());
+			anchor.setY(anchorDto.getY());
+			anchorRepository.save(anchor);
+		}));
 	}
 }
