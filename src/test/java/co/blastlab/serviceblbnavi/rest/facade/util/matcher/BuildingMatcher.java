@@ -16,7 +16,7 @@ public class BuildingMatcher {
 				BuildingDto buildingDto = (BuildingDto)o;
 
 				return buildingDto.getId().equals(building.getId()) && buildingDto.getName().matches(building.getName()) &&
-					   buildingDto.getComplexId().equals(building.getComplexId());
+					   buildingDto.getComplex().getId().equals(building.getComplex().getId());
 			}
 		};
 	}
