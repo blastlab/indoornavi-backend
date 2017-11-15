@@ -28,29 +28,29 @@
 		<delete tableName="user"/>
 	</changeSet>
 
-	<changeSet id="Permission" author="kgebert" runOnChange="true" labels="Permission" runAlways="true">
+	<changeSet context="test" id="Permission" author="kgebert" runOnChange="true" labels="Permission" runAlways="true">
 		<loadUpdateData tableName="permission" file="test/Permission.csv" primaryKey="id" relativeToChangelogFile="true" />
 		<loadUpdateData tableName="permission" file="test/navi-142/Permission.csv" primaryKey="id" relativeToChangelogFile="true" />
 		<loadUpdateData tableName="permission" file="test/navi-73/Permission.csv" primaryKey="id" relativeToChangelogFile="true" />
 	</changeSet>
 
-	<changeSet id="PermissionGroup" author="kgebert" runOnChange="true" labels="PermissionGroup" runAlways="true">
+	<changeSet context="test" id="PermissionGroup" author="kgebert" runOnChange="true" labels="PermissionGroup" runAlways="true">
 		<loadUpdateData tableName="permissiongroup" file="test/PermissionGroup.csv" primaryKey="id" relativeToChangelogFile="true" />
 	</changeSet>
 
-	<changeSet id="PermissionGroup_Permission" author="kgebert" runOnChange="true" labels="PermissionGroup_Permission" runAlways="true">
+	<changeSet context="test" id="PermissionGroup_Permission" author="kgebert" runOnChange="true" labels="PermissionGroup_Permission" runAlways="true">
 		<loadData tableName="permissiongroup_permission" file="test/PermissionGroupPermission.csv" relativeToChangelogFile="true" />
 		<loadData tableName="permissiongroup_permission" file="test/navi-142/PermissionGroupPermission.csv" relativeToChangelogFile="true" />
 		<loadData tableName="permissiongroup_permission" file="test/navi-73/PermissionGroupPermission.csv" relativeToChangelogFile="true" />
 	</changeSet>
 
-	<changeSet id="User" author="kgebert" runOnChange="true" labels="User" runAlways="true">
+	<changeSet context="test" id="User" author="kgebert" runOnChange="true" labels="User" runAlways="true">
 		<loadUpdateData tableName="user" file="test/User.csv" primaryKey="id" relativeToChangelogFile="true">
 			<column name="superuser" type="boolean" />
 		</loadUpdateData>
 	</changeSet>
 
-	<changeSet id="User_PermissionGroup" author="kgebert" runOnChange="true" labels="User_PermissionGroup" runAlways="true">
+	<changeSet context="test" id="User_PermissionGroup" author="kgebert" runOnChange="true" labels="User_PermissionGroup" runAlways="true">
 		<loadData tableName="user_permissiongroup" file="test/UserPermissionGroup.csv" relativeToChangelogFile="true" />
 	</changeSet>
 
