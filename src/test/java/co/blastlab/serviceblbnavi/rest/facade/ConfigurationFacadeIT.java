@@ -73,4 +73,26 @@ public class ConfigurationFacadeIT extends BaseIT {
 			.statusCode(200)
 			.body("data.scale.realDistance", is(15));
 	}
+
+	@Test
+	public void publishWithWrongConfiguration() {
+		// given - we need to save draft first
+		String body = new RequestBodyBuilder("WrongConfiguration.json")
+			.build();
+
+		givenUser()
+			.body(body)
+			.when()
+			.put("/configurations")
+			.then();
+
+		// when
+		givenUser()
+			.pathParam("floorId", "1")
+			.when()
+			.post("/configurations/{floorId}")
+			.then()
+			// then
+			.statusCode(404);
+	}
 }
