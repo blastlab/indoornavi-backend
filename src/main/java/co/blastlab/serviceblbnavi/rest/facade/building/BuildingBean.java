@@ -24,7 +24,7 @@ public class BuildingBean implements BuildingFacade {
 
 	@Override
 	public BuildingDto create(BuildingDto building) {
-		Optional<Complex> complex = complexRepository.findById(building.getComplexId());
+		Optional<Complex> complex = complexRepository.findById(building.getComplex().getId());
 		if (complex.isPresent()) {
 			Building buildingEntity = new Building();
 			buildingEntity.setComplex(complex.get());

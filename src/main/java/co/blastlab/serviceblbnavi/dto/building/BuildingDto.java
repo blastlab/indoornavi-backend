@@ -1,6 +1,7 @@
 package co.blastlab.serviceblbnavi.dto.building;
 
 import co.blastlab.serviceblbnavi.domain.Building;
+import co.blastlab.serviceblbnavi.dto.complex.ComplexDto;
 import co.blastlab.serviceblbnavi.dto.floor.FloorDto;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.annotations.ApiModelProperty;
@@ -27,13 +28,12 @@ public class BuildingDto {
 	private String name;
 
 	@NotNull
-	@ApiModelProperty(example = "1")
-	private Long complexId;
+	private ComplexDto complex;
 
 	public BuildingDto(Building building) {
 		this.setId(building.getId());
 		this.setName(building.getName());
-		this.setComplexId(building.getComplex() != null ? building.getComplex().getId() : null);
+		this.setComplex(building.getComplex() != null ? new ComplexDto(building.getComplex()) : null);
 	}
 
 
