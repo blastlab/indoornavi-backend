@@ -1,0 +1,27 @@
+{
+	"floorId": 1,
+	"data": {
+		"anchors": [
+			{
+				"shortId": 111111
+			},
+			{
+				"shortId": 1
+			}
+		],
+		"sinks": [
+		],
+		"scale": {
+			"start": {
+				"x": 0,
+				"y": 0
+			},
+			"stop": {
+				"x": 100,
+				"y": 100
+			},
+			"realDistance": 100,
+			"measure": "CENTIMETERS"
+		}
+	}
+}

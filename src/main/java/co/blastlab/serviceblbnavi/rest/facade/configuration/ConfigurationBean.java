@@ -36,6 +36,7 @@ public class ConfigurationBean implements ConfigurationFacade {
 		ConfigurationDto.Data configurationData = objectMapper.readValue(configurationEntity.getData(), ConfigurationDto.Data.class);
 
 		configurationExtractor.extractSinks(configurationData, floor);
+		configurationExtractor.extractAnchors(configurationData, floor);
 		configurationExtractor.extractScale(configurationData, floor);
 
 		configurationEntity.setPublished(true);
