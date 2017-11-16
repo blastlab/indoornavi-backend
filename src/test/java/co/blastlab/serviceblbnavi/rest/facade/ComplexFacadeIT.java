@@ -189,8 +189,8 @@ public class ComplexFacadeIT extends BaseIT {
 		assertThat(complexWithBuildings.getId(), equalTo(2L));
 		assertThat(complexWithBuildings.getName(), equalTo("AABBCCDD"));
 		assertThat(complexWithBuildings.getBuildings(), containsInAnyOrder(
-			buildingDtoCustomMatcher(new BuildingDto(1L,"AABBCC", 2L)),
-			buildingDtoCustomMatcher(new BuildingDto(2L,"AABBCCDDFFFFF", 2L))
+			buildingDtoCustomMatcher(new BuildingDto(1L,"AABBCC", new ComplexDto(2L, "Test 1"))),
+			buildingDtoCustomMatcher(new BuildingDto(2L,"AABBCCDDFFFFF", new ComplexDto(2L, "Test 1")))
 		));
 	}
 
