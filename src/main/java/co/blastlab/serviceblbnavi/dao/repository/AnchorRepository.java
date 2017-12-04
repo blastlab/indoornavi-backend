@@ -17,6 +17,6 @@ public interface AnchorRepository extends EntityRepository<Anchor, Long> {
 
 	Optional<Anchor> findOptionalByShortId(Integer shortId);
 
-	List<Anchor> findAllByFloor(Floor floor);
+	List<Anchor> findByFloor(Floor floor);
 
 }
