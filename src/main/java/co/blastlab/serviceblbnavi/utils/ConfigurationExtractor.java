@@ -82,7 +82,7 @@ public class ConfigurationExtractor {
 	}
 
 	private void resetAnchors(Floor floor) {
-		List<Anchor> anchorsOnTheFloor = anchorRepository.findAllByFloor(floor);
+		List<Anchor> anchorsOnTheFloor = anchorRepository.findByFloor(floor);
 		anchorsOnTheFloor.forEach((anchor -> {
 			anchor.setFloor(null);
 			anchor.setX(null);
