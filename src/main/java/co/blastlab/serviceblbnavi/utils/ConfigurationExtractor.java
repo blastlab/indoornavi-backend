@@ -12,6 +12,7 @@ import co.blastlab.serviceblbnavi.dto.floor.ScaleDto;
 
 import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
+import java.util.List;
 
 import static co.blastlab.serviceblbnavi.domain.Scale.scale;
 
@@ -37,6 +38,9 @@ public class ConfigurationExtractor {
 	}
 
 	public void extractSinks(ConfigurationDto.Data configuration, Floor floor) {
+		this.resetSinks(floor);
+		this.resetAnchors(floor);
+
 		configuration.getSinks().forEach((sinkDto) -> {
 			Sink sink = sinkRepository.findOptionalByShortId(sinkDto.getShortId()).orElseThrow(EntityNotFoundException::new);
 			sink.setFloor(floor);
@@ -56,11 +60,34 @@ public class ConfigurationExtractor {
 	}
 
 	public void extractAnchors(ConfigurationDto.Data configuration, Floor floor) {
+		this.resetAnchors(floor);
+
 		configuration.getAnchors().forEach((anchorDto -> {
 			Anchor anchor = anchorRepository.findOptionalByShortId(anchorDto.getShortId()).orElseThrow(EntityNotFoundException::new);
 			anchor.setFloor(floor);
 			anchor.setX(anchorDto.getX());
 			anchor.setY(anchorDto.getY());
+			anchorRepository.save(anchor);
+		}));
+	}
+
+	private void resetSinks(Floor floor) {
+		List<Sink> sinksOnTheFloor = sinkRepository.findByFloor(floor);
+		sinksOnTheFloor.forEach((sink -> {
+			sink.setFloor(null);
+			sink.setX(null);
+			sink.setY(null);
+			sinkRepository.save(sink);
+		}));
+	}
+
+	private void resetAnchors(Floor floor) {
+		List<Anchor> anchorsOnTheFloor = anchorRepository.findAllByFloor(floor);
+		anchorsOnTheFloor.forEach((anchor -> {
+			anchor.setFloor(null);
+			anchor.setX(null);
+			anchor.setY(null);
+			anchor.setSink(null);
 			anchorRepository.save(anchor);
 		}));
 	}
