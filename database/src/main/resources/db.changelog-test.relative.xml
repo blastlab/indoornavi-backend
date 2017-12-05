@@ -13,6 +13,7 @@
 		<delete tableName="area_areaconfiguration" />
 		<delete tableName="area" />
 		<delete tableName="areaconfiguration" />
+		<delete tableName="coordinates"/>
 		<delete tableName="tag"/>
 		<delete tableName="sink"/>
 		<delete tableName="anchor"/>
@@ -124,5 +125,11 @@
 
 	<changeSet id="Map_User" author="kgebert" context="test" runOnChange="true" labels="Map_User" runAlways="true">
 		<loadData tableName="map_user" file="test/MapUser.csv" relativeToChangelogFile="true" />
+	</changeSet>
+	
+	<changeSet id="Coordinates" author="kgebert" context="test" runOnChange="true" labels="Coordinates" runAlways="true">
+		<loadData tableName="coordinates" file="test/Coordinates.csv" relativeToChangelogFile="true">
+			<column name="creation_date" type="DATE" />
+		</loadData>
 	</changeSet>
 </databaseChangeLog>

@@ -1,6 +1,6 @@
 package co.blastlab.serviceblbnavi.socket.wrappers;
 
-import co.blastlab.serviceblbnavi.socket.measures.CoordinatesDto;
+import co.blastlab.serviceblbnavi.dto.report.CoordinatesDto;
 import lombok.Getter;
 import lombok.Setter;
 

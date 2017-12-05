@@ -1,12 +1,10 @@
 package co.blastlab.serviceblbnavi.socket.measures;
 
-import co.blastlab.serviceblbnavi.dao.repository.AnchorRepository;
-import co.blastlab.serviceblbnavi.dao.repository.CoordinatesRepository;
-import co.blastlab.serviceblbnavi.dao.repository.SinkRepository;
-import co.blastlab.serviceblbnavi.dao.repository.TagRepository;
+import co.blastlab.serviceblbnavi.dao.repository.*;
 import co.blastlab.serviceblbnavi.domain.Coordinates;
 import co.blastlab.serviceblbnavi.domain.Sink;
 import co.blastlab.serviceblbnavi.dto.anchor.AnchorDto;
+import co.blastlab.serviceblbnavi.dto.report.CoordinatesDto;
 import co.blastlab.serviceblbnavi.dto.tag.TagDto;
 import co.blastlab.serviceblbnavi.socket.WebSocket;
 import co.blastlab.serviceblbnavi.socket.area.AreaEvent;
@@ -26,6 +24,7 @@ import javax.annotation.PostConstruct;
 import javax.ejb.Schedule;
 import javax.ejb.Singleton;
 import javax.inject.Inject;
+import javax.persistence.EntityNotFoundException;
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
@@ -66,6 +65,9 @@ public class MeasuresWebSocket extends WebSocket {
 
 	@Inject
 	private AnchorRepository anchorRepository;
+
+	@Inject
+	private FloorRepository floorRepository;
 
 	@Inject
 	private AreaEventController areaEventController;
@@ -173,9 +175,10 @@ public class MeasuresWebSocket extends WebSocket {
 
 	private void saveCoordinates(CoordinatesDto coordinatesDto) {
 		Coordinates coordinates = new Coordinates();
-		coordinates.setDevice("TAG");
-		coordinates.setX((double) coordinatesDto.getPoint().getX());
-		coordinates.setY((double) coordinatesDto.getPoint().getY());
+		coordinates.setTag(tagRepository.findOptionalByShortId(coordinatesDto.getTagShortId()).orElseThrow(EntityNotFoundException::new));
+		coordinates.setX(coordinatesDto.getPoint().getX());
+		coordinates.setY(coordinatesDto.getPoint().getY());
+		coordinates.setFloor(floorRepository.findOptionalById(coordinatesDto.getFloorId()).orElseThrow(EntityNotFoundException::new));
 		coordinatesRepository.save(coordinates);
 	}
 

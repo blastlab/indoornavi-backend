@@ -3,6 +3,7 @@ package co.blastlab.serviceblbnavi.socket.measures;
 import co.blastlab.serviceblbnavi.dao.repository.AnchorRepository;
 import co.blastlab.serviceblbnavi.domain.Anchor;
 import co.blastlab.serviceblbnavi.dto.Point;
+import co.blastlab.serviceblbnavi.dto.report.CoordinatesDto;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 import lombok.AllArgsConstructor;
@@ -76,16 +77,17 @@ public class CoordinatesCalculator {
 		if (anchor.isPresent()) {
 			floorId = anchor.get().getFloor() != null ? anchor.get().getFloor().getId() : null;
 		}
+		Date currentDate = new Date();
 		if (previousPoint.isPresent()) {
 			x = (x + previousPoint.get().getPoint().getX()) / 2;
 			y = (y + previousPoint.get().getPoint().getY()) / 2;
 			Point newPoint = new Point(x, y);
-			previousCoorinates.put(tagId, new PointAndTime(newPoint, new Date().getTime()));
-			return Optional.of(new CoordinatesDto(tagId, floorId, newPoint));
+			previousCoorinates.put(tagId, new PointAndTime(newPoint, currentDate.getTime()));
+			return Optional.of(new CoordinatesDto(tagId, floorId, newPoint, currentDate));
 		}
 		Point currentPoint = new Point(x, y);
-		previousCoorinates.put(tagId, new PointAndTime(currentPoint, new Date().getTime()));
-		return Optional.of(new CoordinatesDto(tagId, floorId, currentPoint));
+		previousCoorinates.put(tagId, new PointAndTime(currentPoint, currentDate.getTime()));
+		return Optional.of(new CoordinatesDto(tagId, floorId, currentPoint, currentDate));
 	}
 
 	private Double calculateThres(List<Double> intersectionPointsDistances, int connectedAnchorsCount) {
