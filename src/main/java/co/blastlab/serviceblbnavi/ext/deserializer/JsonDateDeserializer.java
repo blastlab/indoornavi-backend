@@ -17,7 +17,7 @@ public class JsonDateDeserializer extends JsonDeserializer<LocalDateTime> {
 		ObjectCodec oc = jp.getCodec();
 		TextNode node = oc.readTree(jp);
 		String dateString = node.textValue();
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+		DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 		return LocalDateTime.parse(dateString, formatter);
 	}
 }

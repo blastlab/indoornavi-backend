@@ -64,7 +64,7 @@ public class ReportFacadeIT extends BaseIT {
 	public void getCoordinatesForStartDate() {
 		// given
 		String body = new RequestBodyBuilder("Report.json")
-			.setParameter("from", "2011-04-01 00:00:00")
+			.setParameter("from", "2011-04-01T00:00:00")
 			.build();
 
 		// when
@@ -86,7 +86,7 @@ public class ReportFacadeIT extends BaseIT {
 	public void getCoordinatesForEndDate() {
 		// given
 		String body = new RequestBodyBuilder("Report.json")
-			.setParameter("to", "2011-03-01 23:59:59")
+			.setParameter("to", "2011-03-01T23:59:59")
 			.build();
 
 		// when
@@ -108,8 +108,8 @@ public class ReportFacadeIT extends BaseIT {
 	public void getCoordinatesForStartAndEndDate() {
 		// given
 		String body = new RequestBodyBuilder("Report.json")
-			.setParameter("from", "2011-03-01 23:59:59")
-			.setParameter("to", "2011-04-01 23:59:59")
+			.setParameter("from", "2011-03-01T23:59:59")
+			.setParameter("to", "2011-04-01T23:59:59")
 			.build();
 
 		// when
