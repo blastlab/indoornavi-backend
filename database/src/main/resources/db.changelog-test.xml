@@ -13,6 +13,7 @@
 		<delete tableName="area_areaconfiguration" />
 		<delete tableName="area" />
 		<delete tableName="areaconfiguration" />
+		<delete tableName="coordinates"/>
 		<delete tableName="tag"/>
 		<delete tableName="sink"/>
 		<delete tableName="anchor"/>

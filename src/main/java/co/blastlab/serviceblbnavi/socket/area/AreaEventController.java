@@ -6,7 +6,7 @@ import co.blastlab.serviceblbnavi.domain.Area;
 import co.blastlab.serviceblbnavi.domain.AreaConfiguration;
 import co.blastlab.serviceblbnavi.domain.Floor;
 import co.blastlab.serviceblbnavi.domain.Tag;
-import co.blastlab.serviceblbnavi.socket.measures.CoordinatesDto;
+import co.blastlab.serviceblbnavi.dto.report.CoordinatesDto;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 import com.vividsolutions.jts.geom.Coordinate;
