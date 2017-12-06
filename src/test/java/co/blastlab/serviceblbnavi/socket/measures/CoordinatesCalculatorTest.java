@@ -2,6 +2,7 @@ package co.blastlab.serviceblbnavi.socket.measures;
 
 import co.blastlab.serviceblbnavi.dao.repository.AnchorRepository;
 import co.blastlab.serviceblbnavi.domain.Anchor;
+import co.blastlab.serviceblbnavi.dto.report.CoordinatesDto;
 import com.google.common.collect.Range;
 import org.junit.Test;
 import org.junit.runner.RunWith;
