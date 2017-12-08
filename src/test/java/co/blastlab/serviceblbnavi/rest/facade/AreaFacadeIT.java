@@ -32,10 +32,13 @@ public class AreaFacadeIT extends BaseIT {
 			.extract()
 			.as(AreaDto[].class));
 
-		assertThat(areas.size(), is(1));
+		assertThat(areas.size(), is(2));
 		assertThat(areas.get(0).getName(), is("test"));
 		assertThat(areas.get(0).getConfigurations().size(), is(2));
 		assertThat(areas.get(0).getPoints().size(), is(5));
+		assertThat(areas.get(1).getName(), is("test2"));
+		assertThat(areas.get(1).getConfigurations().size(), is(0));
+		assertThat(areas.get(1).getPoints().size(), is(5));
 	}
 
 	@Test
@@ -102,9 +105,12 @@ public class AreaFacadeIT extends BaseIT {
 			.then()
 			.statusCode(200)
 			// assertions
-			.body("size()", is(1))
+			.body("size()", is(2))
 			.body("get(0).points", is(notNullValue()))
 			.body("get(0).buffer", is(notNullValue()))
-			.body("get(0).name", is("test"));
+			.body("get(0).name", is("test"))
+			.body("get(1).points", is(notNullValue()))
+			.body("get(1).buffer", is(notNullValue()))
+			.body("get(1).name", is("test2"));
 	}
 }
