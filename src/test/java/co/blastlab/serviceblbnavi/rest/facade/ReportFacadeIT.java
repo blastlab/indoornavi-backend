@@ -12,7 +12,8 @@ public class ReportFacadeIT extends BaseIT {
 	@Override
 	public ImmutableList<String> getAdditionalLabels() {
 		return ImmutableList.of(
-			"Building", "Floor", "Device", "Tag", "Coordinates"
+			"Building", "Floor", "Device", "Tag", "Coordinates",
+			"Area", "AreaConfiguration", "Area_AreaConfiguration", "AreaConfiguration_Tag"
 		);
 	}
 
@@ -33,9 +34,9 @@ public class ReportFacadeIT extends BaseIT {
 			// then
 			.statusCode(HttpStatus.SC_OK)
 			.body(
-				"size()", equalTo(6),
-				"get(5).point.x", equalTo(10),
-				"get(5).point.y", equalTo(0)
+				"size()", equalTo(7),
+				"get(5).point.x", equalTo(300),
+				"get(5).point.y", equalTo(1060)
 			);
 	}
 
@@ -54,9 +55,9 @@ public class ReportFacadeIT extends BaseIT {
 			// then
 			.statusCode(HttpStatus.SC_OK)
 			.body(
-				"size()", equalTo(7),
-				"get(0).point.x", equalTo(0),
-				"get(0).point.y", equalTo(0)
+				"size()", equalTo(9),
+				"get(0).point.x", equalTo(180),
+				"get(0).point.y", equalTo(740)
 			);
 	}
 
@@ -76,9 +77,9 @@ public class ReportFacadeIT extends BaseIT {
 			// then
 			.statusCode(HttpStatus.SC_OK)
 			.body(
-				"size()", equalTo(4),
-				"get(3).point.x", equalTo(10),
-				"get(3).point.y", equalTo(0)
+				"size()", equalTo(6),
+				"get(3).point.x", equalTo(400),
+				"get(3).point.y", equalTo(1060)
 			);
 	}
 
@@ -99,8 +100,8 @@ public class ReportFacadeIT extends BaseIT {
 			.statusCode(HttpStatus.SC_OK)
 			.body(
 				"size()", equalTo(3),
-				"get(2).point.x", equalTo(2),
-				"get(2).point.y", equalTo(8)
+				"get(2).point.x", equalTo(210),
+				"get(2).point.y", equalTo(760)
 			);
 	}
 
@@ -122,8 +123,134 @@ public class ReportFacadeIT extends BaseIT {
 			.statusCode(HttpStatus.SC_OK)
 			.body(
 				"size()", equalTo(1),
-				"get(0).point.x", equalTo(5),
-				"get(0).point.y", equalTo(10)
+				"get(0).point.x", equalTo(600),
+				"get(0).point.y", equalTo(760)
+			);
+	}
+
+	@Test
+	public void getAllAreaEvents() {
+		// given
+		String body = new RequestBodyBuilder("Report.json")
+			.build();
+
+		// when
+		givenUser()
+			.body(body)
+			.when()
+			.post("/reports/events")
+			.then()
+			// then
+			.statusCode(HttpStatus.SC_OK)
+			.body(
+				"size()", equalTo(4),
+				"get(0).mode", equalTo("ON_ENTER"),
+				"get(1).mode", equalTo("ON_LEAVE"),
+				"get(2).mode", equalTo("ON_LEAVE"),
+				"get(3).mode", equalTo("ON_LEAVE")
+			);
+	}
+
+	@Test
+	public void getAllAreaEventsForSpecificFloor() {
+		// given
+		Integer floorId = 2;
+		String body = new RequestBodyBuilder("Report.json")
+			.setParameter("floorId", floorId)
+			.build();
+
+		// when
+		givenUser()
+			.body(body)
+			.when()
+			.post("/reports/events")
+			.then()
+			// then
+			.statusCode(HttpStatus.SC_OK)
+			.body(
+				"size()", equalTo(3),
+				"get(0).mode", equalTo("ON_ENTER"),
+				"get(0).tagId", equalTo(10999),
+				"get(1).mode", equalTo("ON_LEAVE"),
+				"get(1).tagId", equalTo(10999),
+				"get(2).mode", equalTo("ON_LEAVE"),
+				"get(2).tagId", equalTo(11999)
+			);
+	}
+
+	@Test
+	public void getAllAreaEventsForStartDate() {
+		// given
+		String body = new RequestBodyBuilder("Report.json")
+			.setParameter("from", "2011-03-01T23:59:59")
+			.build();
+
+		// when
+		givenUser()
+			.body(body)
+			.when()
+			.post("/reports/events")
+			.then()
+			// then
+			.statusCode(HttpStatus.SC_OK)
+			.body(
+				"size()", equalTo(2),
+				"get(0).mode", equalTo("ON_LEAVE"),
+				"get(0).areaName", equalTo("test"),
+				"get(0).tagId", equalTo(11999),
+				"get(1).mode", equalTo("ON_LEAVE"),
+				"get(1).areaName", equalTo("test"),
+				"get(1).tagId", equalTo(12999)
+			);
+	}
+
+	@Test
+	public void getAllAreaEventsForEndDate() {
+		// given
+		String body = new RequestBodyBuilder("Report.json")
+			.setParameter("to", "2011-03-01T23:59:59")
+			.build();
+
+		// when
+		givenUser()
+			.body(body)
+			.when()
+			.post("/reports/events")
+			.then()
+			// then
+			.statusCode(HttpStatus.SC_OK)
+			.body(
+				"size()", equalTo(1),
+				"get(0).mode", equalTo("ON_ENTER"),
+				"get(0).areaName", equalTo("test"),
+				"get(0).tagId", equalTo(10999)
+			);
+	}
+
+	@Test
+	public void getAllAreaEventsForStartAndEndDate() {
+		// given
+		String body = new RequestBodyBuilder("Report.json")
+			.setParameter("from", "2011-01-01T00:00:00")
+			.setParameter("to", "2011-04-01T23:59:59")
+			.build();
+
+		// when
+		givenUser()
+			.body(body)
+			.when()
+			.post("/reports/events")
+			.then()
+			// then
+			.statusCode(HttpStatus.SC_OK)
+			.body(
+				"size()", equalTo(2),
+				"get(0).mode", equalTo("ON_ENTER"),
+				"get(0).areaName", equalTo("test"),
+				"get(0).tagId", equalTo(10999),
+				"get(1).mode", equalTo("ON_LEAVE"),
+				"get(1).areaName", equalTo("test"),
+				"get(1).tagId", equalTo(10999)
 			);
 	}
 }
