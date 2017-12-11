@@ -27,6 +27,6 @@ public abstract class CoordinatesRepository implements EntityRepository<Coordina
 		if (floorId != null) {
 			criteria = criteria.join(Coordinates_.floor,  where(Floor.class).eq(Floor_.id, floorId));
 		}
-		return criteria.getResultList();
+		return criteria.orderAsc(Coordinates_.creationDate).getResultList();
 	}
 }
