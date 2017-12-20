@@ -38,9 +38,6 @@ public class ConfigurationExtractor {
 	}
 
 	public void extractSinks(ConfigurationDto.Data configuration, Floor floor) {
-		this.resetSinks(floor);
-		this.resetAnchors(floor);
-
 		configuration.getSinks().forEach((sinkDto) -> {
 			Sink sink = sinkRepository.findOptionalByShortId(sinkDto.getShortId()).orElseThrow(EntityNotFoundException::new);
 			sink.setFloor(floor);
@@ -60,8 +57,6 @@ public class ConfigurationExtractor {
 	}
 
 	public void extractAnchors(ConfigurationDto.Data configuration, Floor floor) {
-		this.resetAnchors(floor);
-
 		configuration.getAnchors().forEach((anchorDto -> {
 			Anchor anchor = anchorRepository.findOptionalByShortId(anchorDto.getShortId()).orElseThrow(EntityNotFoundException::new);
 			anchor.setFloor(floor);
@@ -71,7 +66,7 @@ public class ConfigurationExtractor {
 		}));
 	}
 
-	private void resetSinks(Floor floor) {
+	public void resetSinks(Floor floor) {
 		List<Sink> sinksOnTheFloor = sinkRepository.findByFloor(floor);
 		sinksOnTheFloor.forEach((sink -> {
 			sink.setFloor(null);
@@ -81,7 +76,7 @@ public class ConfigurationExtractor {
 		}));
 	}
 
-	private void resetAnchors(Floor floor) {
+	public void resetAnchors(Floor floor) {
 		List<Anchor> anchorsOnTheFloor = anchorRepository.findByFloor(floor);
 		anchorsOnTheFloor.forEach((anchor -> {
 			anchor.setFloor(null);
