@@ -3,6 +3,7 @@ package co.blastlab.serviceblbnavi.rest.facade.anchor;
 import co.blastlab.serviceblbnavi.dao.repository.AnchorRepository;
 import co.blastlab.serviceblbnavi.dao.repository.FloorRepository;
 import co.blastlab.serviceblbnavi.domain.Anchor;
+import co.blastlab.serviceblbnavi.domain.Sink;
 import co.blastlab.serviceblbnavi.dto.anchor.AnchorDto;
 import co.blastlab.serviceblbnavi.rest.facade.device.DeviceBean;
 import org.apache.http.HttpStatus;
@@ -64,7 +65,11 @@ public class AnchorBean extends DeviceBean implements AnchorFacade {
 	public List<AnchorDto> findAll() {
 		List<AnchorDto> anchors = new ArrayList<>();
 		anchorRepository.findAll()
-			.forEach(anchorEntity -> anchors.add(new AnchorDto(anchorEntity)));
+			.forEach(anchorEntity -> {
+				if(!(anchorEntity instanceof Sink)){
+					anchors.add(new AnchorDto(anchorEntity));
+				}
+			});
 		return anchors;
 	}
 
