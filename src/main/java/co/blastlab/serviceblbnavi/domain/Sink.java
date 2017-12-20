@@ -16,7 +16,7 @@ import java.util.List;
 @Setter
 @Entity
 public class Sink extends Anchor {
-	private boolean configured;
+	private boolean configured = false;
 
 	@OneToMany(mappedBy = "sink")
 	private List<Anchor> anchors = new ArrayList<>();
