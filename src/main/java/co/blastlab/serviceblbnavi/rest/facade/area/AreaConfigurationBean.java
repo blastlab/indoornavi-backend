@@ -53,7 +53,7 @@ public class AreaConfigurationBean implements AreaConfigurationFacade {
 		areaConfigurationEntity.setOffset(areaConfiguration.getOffset());
 		areaConfigurationEntity.setMode(areaConfiguration.getMode());
 		areaConfigurationEntity.setTags(
-			areaConfiguration.getTags().stream().map(tagShortId -> tagRepository.findOptionalByShortId(tagShortId).orElseThrow(EntityNotFoundException::new))
+			areaConfiguration.getTags().stream().map(tagDto -> tagRepository.findOptionalByShortId(tagDto.getShortId()).orElseThrow(EntityNotFoundException::new))
 				.collect(Collectors.toList())
 		);
 		AreaConfiguration savedEntity = areaConfigurationRepository.save(areaConfigurationEntity);
