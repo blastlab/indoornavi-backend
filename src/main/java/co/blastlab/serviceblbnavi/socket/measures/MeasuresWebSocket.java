@@ -18,6 +18,7 @@ import co.blastlab.serviceblbnavi.socket.wrappers.AnchorsWrapper;
 import co.blastlab.serviceblbnavi.socket.wrappers.AreaEventWrapper;
 import co.blastlab.serviceblbnavi.socket.wrappers.CoordinatesWrapper;
 import co.blastlab.serviceblbnavi.socket.wrappers.TagsWrapper;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.annotation.PostConstruct;
@@ -125,9 +126,9 @@ public class MeasuresWebSocket extends WebSocket {
 				}
 			}
 		} else if (isServerSession(session)) {
-			DistanceMessageWrapper wrapper = objectMapper.readValue(message, DistanceMessageWrapper.class);
-			handleInfo(wrapper);
-			handleMeasures(wrapper);
+			List<DistanceMessage> measures = objectMapper.readValue(message, new TypeReference<List<DistanceMessage>>(){});
+//			handleInfo(wrapper);
+			handleMeasures(measures);
 		}
 	}
 
@@ -147,8 +148,8 @@ public class MeasuresWebSocket extends WebSocket {
 		});
 	}
 
-	private void handleMeasures(DistanceMessageWrapper wrapper) {
-		wrapper.getMeasures().forEach(distanceMessage -> {
+	private void handleMeasures(List<DistanceMessage> measures) {
+		measures.forEach(distanceMessage -> {
 			if (bothDevicesAreAnchors(distanceMessage)) {
 				try {
 					sinkAnchorsDistanceBridge.addDistance(distanceMessage.getDid1(), distanceMessage.getDid2(), distanceMessage.getDist());
