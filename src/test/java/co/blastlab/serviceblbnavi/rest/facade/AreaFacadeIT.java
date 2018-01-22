@@ -1,5 +1,6 @@
 package co.blastlab.serviceblbnavi.rest.facade;
 
+import co.blastlab.serviceblbnavi.dto.area.AreaConfigurationDto;
 import co.blastlab.serviceblbnavi.dto.area.AreaDto;
 import co.blastlab.serviceblbnavi.rest.facade.util.RequestBodyBuilder;
 import com.google.common.collect.ImmutableList;
@@ -64,9 +65,11 @@ public class AreaFacadeIT extends BaseIT {
 
 	@Test
 	public void updateArea() throws Exception {
+		AreaConfigurationDto areaConfiguration = new AreaConfigurationDto();
+		areaConfiguration.setId(2L);
 		String body = new RequestBodyBuilder("Area.json")
 			.setParameter("name", "update area")
-			.setParameter("configurations", ImmutableList.of(2))
+			.setParameter("configurations", ImmutableList.of(areaConfiguration))
 			.build();
 
 		AreaDto area = givenUser()
@@ -82,7 +85,7 @@ public class AreaFacadeIT extends BaseIT {
 		assertThat(area.getName(), is("update area"));
 		assertThat(area.getPoints().size(), is(5));
 		assertThat(area.getConfigurations().size(), is(1));
-		assertThat(area.getConfigurations().get(0), is(2L));
+		assertThat(area.getConfigurations().get(0).getId(), is(2L));
 		assertThat(area.getId(), is(1L));
 	}
 
