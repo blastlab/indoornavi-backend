@@ -1,14 +1,13 @@
 package co.blastlab.serviceblbnavi.utils;
 
 import co.blastlab.serviceblbnavi.dao.repository.AnchorRepository;
+import co.blastlab.serviceblbnavi.dao.repository.AreaRepository;
 import co.blastlab.serviceblbnavi.dao.repository.FloorRepository;
 import co.blastlab.serviceblbnavi.dao.repository.SinkRepository;
-import co.blastlab.serviceblbnavi.domain.Anchor;
-import co.blastlab.serviceblbnavi.domain.Floor;
-import co.blastlab.serviceblbnavi.domain.Scale;
-import co.blastlab.serviceblbnavi.domain.Sink;
+import co.blastlab.serviceblbnavi.domain.*;
 import co.blastlab.serviceblbnavi.dto.configuration.ConfigurationDto;
 import co.blastlab.serviceblbnavi.dto.floor.ScaleDto;
+import co.blastlab.serviceblbnavi.service.AreaService;
 
 import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
@@ -23,6 +22,10 @@ public class ConfigurationExtractor {
 	private SinkRepository sinkRepository;
 	@Inject
 	private AnchorRepository anchorRepository;
+	@Inject
+	private AreaRepository areaRepository;
+	@Inject
+	private AreaService areaService;
 
 	public void extractScale(ConfigurationDto.Data configuration, Floor floor) {
 		ScaleDto scaleDto = configuration.getScale();
@@ -66,6 +69,12 @@ public class ConfigurationExtractor {
 		}));
 	}
 
+	public void extractAreas(ConfigurationDto.Data configuration, Floor floor) {
+		configuration.getAreas().forEach((areaDto -> {
+			areaService.createOrUpdate(new Area(), areaDto, floor);
+		}));
+	}
+
 	public void resetSinks(Floor floor) {
 		List<Sink> sinksOnTheFloor = sinkRepository.findByFloor(floor);
 		sinksOnTheFloor.forEach((sink -> {
@@ -85,5 +94,10 @@ public class ConfigurationExtractor {
 			anchor.setSink(null);
 			anchorRepository.save(anchor);
 		}));
+	}
+
+	public void resetAreas(Floor floor) {
+		List<Area> areasOnTheFloor = areaRepository.findByFloor(floor);
+		areasOnTheFloor.forEach((area -> areaRepository.remove(area)));
 	}
 }

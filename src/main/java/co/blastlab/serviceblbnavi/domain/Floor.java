@@ -34,7 +34,7 @@ public class Floor extends TrackedEntity {
 	@OneToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
 	private Scale scale;
 
-	@OneToMany(mappedBy = "floor")
+	@OneToMany(mappedBy = "floor", cascade = {CascadeType.ALL})
 	private List<Area> areas;
 
 }

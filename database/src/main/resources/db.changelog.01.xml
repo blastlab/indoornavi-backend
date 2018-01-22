@@ -484,7 +484,7 @@
 		</addColumn>
 	</changeSet>
 	<changeSet author="kgebert (generated)" id="navi-152-2">
-		<addForeignKeyConstraint baseColumnNames="floor_id" baseTableName="Area" constraintName="FK_Area_Floor_Id" referencedColumnNames="id" referencedTableName="Floor"/>
+		<addForeignKeyConstraint onDelete="CASCADE" baseColumnNames="floor_id" baseTableName="Area" constraintName="FK_Area_Floor_Id" referencedColumnNames="id" referencedTableName="Floor"/>
 	</changeSet>
 
 	<changeSet author="kgebert (generated)" id="navi-166-1">
