@@ -14,17 +14,17 @@ import javax.ws.rs.Path;
 import java.util.List;
 
 @Path("/reports")
-@Api("/report")
+@Api("/reports")
 public interface ReportFacade {
 	@POST
 	@Path("/coordinates")
-	@ApiOperation(value = "get coordinates", response = CoordinatesDto.class, responseContainer = "list")
+	@ApiOperation(value = "get coordinates", response = CoordinatesDto.class, responseContainer = "List")
 	@AuthorizedAccess
 	List<CoordinatesDto> getCoordinates(@ApiParam(value = "filter", required = true) @Valid ReportFilterDto filter);
 
 	@POST
 	@Path("/events")
-	@ApiOperation(value = "get area events", response = AreaEvent.class, responseContainer = "list")
+	@ApiOperation(value = "get area events", response = AreaEvent.class, responseContainer = "List")
 	@AuthorizedAccess
 	List<AreaEvent> getAreaEvents(@ApiParam(value = "filter", required = true) @Valid ReportFilterDto filter);
 
