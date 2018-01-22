@@ -1,5 +1,6 @@
 package co.blastlab.serviceblbnavi.service;
 
+import co.blastlab.serviceblbnavi.dao.repository.AreaConfigurationRepository;
 import co.blastlab.serviceblbnavi.dao.repository.AreaRepository;
 import co.blastlab.serviceblbnavi.dao.repository.TagRepository;
 import co.blastlab.serviceblbnavi.domain.Area;
@@ -12,18 +13,22 @@ import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class AreaService {
 	@Inject
 	private TagRepository tagRepository;
 	@Inject
 	private AreaRepository areaRepository;
+	@Inject
+	private AreaConfigurationRepository areaConfigurationRepository;
 
 	public AreaDto createOrUpdate(Area areaEntity, AreaDto area, Floor floor) {
 		areaEntity.setName(area.getName());
 		List<AreaConfiguration> areaConfigurations = new ArrayList<>();
 		area.getConfigurations().forEach((areaConfigurationDto) -> {
-			AreaConfiguration areaConfiguration = new AreaConfiguration();
+			Optional<AreaConfiguration> areaConfigurationOptional = areaConfigurationRepository.findOptionalById(areaConfigurationDto.getId());
+			AreaConfiguration areaConfiguration = areaConfigurationOptional.orElse(new AreaConfiguration());
 			areaConfiguration.setMode(areaConfigurationDto.getMode());
 			areaConfiguration.setOffset(areaConfigurationDto.getOffset());
 			List<Tag> tags = new ArrayList<>();
