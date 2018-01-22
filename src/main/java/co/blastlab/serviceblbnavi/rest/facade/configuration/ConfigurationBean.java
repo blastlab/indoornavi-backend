@@ -37,9 +37,11 @@ public class ConfigurationBean implements ConfigurationFacade {
 
 		configurationExtractor.resetAnchors(floor);
 		configurationExtractor.resetSinks(floor);
+		configurationExtractor.resetAreas(floor);
 		configurationExtractor.extractSinks(configurationData, floor);
 		configurationExtractor.extractAnchors(configurationData, floor);
 		configurationExtractor.extractScale(configurationData, floor);
+		configurationExtractor.extractAreas(configurationData, floor);
 
 		configurationEntity.setPublished(true);
 		return objectMapper.readValue(configurationEntity.getData(), ConfigurationDto.Data.class);
