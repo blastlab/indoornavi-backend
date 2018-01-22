@@ -9,12 +9,14 @@ import co.blastlab.serviceblbnavi.dto.report.ReportFilterDto;
 import co.blastlab.serviceblbnavi.socket.area.AreaEvent;
 import com.google.common.collect.Range;
 
+import javax.ejb.Stateless;
 import javax.inject.Inject;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Stateless
 public class ReportBean implements ReportFacade {
 
 	@Inject
@@ -41,7 +43,7 @@ public class ReportBean implements ReportFacade {
 			List<Area> areas = areaRepository.findAreasThePointIsWithin(coordinatesDto.getPoint().getX(), coordinatesDto.getPoint().getY());
 			Integer tagShortId = coordinatesDto.getTagShortId();
 			LocalDateTime date = LocalDateTime.ofInstant(coordinatesDto.getDate().toInstant(), ZoneId.systemDefault());
-			if (tagInArea.containsKey(tagShortId) && !areas.isEmpty()) {
+			if (!tagInArea.containsKey(tagShortId) && !areas.isEmpty()) {
 				// the tag has entered the areas
 				areas.forEach(area -> {
 					events.add(new AreaEvent(AreaConfiguration.Mode.ON_ENTER, area.getId(), area.getName(), tagShortId, date));
@@ -53,7 +55,7 @@ public class ReportBean implements ReportFacade {
 					events.add(new AreaEvent(AreaConfiguration.Mode.ON_LEAVE, area.getId(), area.getName(), tagShortId, date));
 				});
 				tagInArea.get(tagShortId).clear();
-			} else if (!tagInArea.containsKey(tagShortId) && !areas.isEmpty()) {
+			} else if (tagInArea.containsKey(tagShortId) && !areas.isEmpty()) {
 				// the tag has already been in the areas
 				tagInArea.put(tagShortId, areas);
 			}
