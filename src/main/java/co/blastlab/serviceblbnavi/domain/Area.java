@@ -3,6 +3,7 @@ package co.blastlab.serviceblbnavi.domain;
 import com.vividsolutions.jts.geom.Polygon;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.Cascade;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -26,5 +27,6 @@ public class Area extends TrackedEntity {
 		joinColumns = {@JoinColumn(name = "area_id")},
 		inverseJoinColumns = {@JoinColumn(name = "configurations_id")}
 	)
+	@Cascade(org.hibernate.annotations.CascadeType.ALL)
 	private List<AreaConfiguration> configurations = new ArrayList<>();
 }

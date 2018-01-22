@@ -1,6 +1,8 @@
 {
   "tags": [
-    10999
+    {
+      "shortId": 10999
+    }
   ],
   "offset": 50,
   "mode": "ON_ENTER"

@@ -19,16 +19,18 @@ import java.util.stream.Collectors;
 public class AreaDto {
 	private Long id;
 	private String name;
+	private Long floorId;
 	private List<Point> points = new ArrayList<>();
-	private List<Long> configurations = new ArrayList<>();
+	private List<AreaConfigurationDto> configurations = new ArrayList<>();
 	private List<Point> buffer = new ArrayList<>();
 
 	public AreaDto(Area area) {
 		this.setId(area.getId());
 		this.setName(area.getName());
+		this.setFloorId(area.getFloor() != null ? area.getFloor().getId() : null);
 		this.setPoints(this.toPoints(area.getPolygon()));
 		this.setBuffer(this.toPoints(((Polygon) area.getPolygon().buffer(50))));
-		this.setConfigurations(area.getConfigurations().stream().map(areaConfiguration -> areaConfiguration.getId()).collect(Collectors.toList()));
+		this.setConfigurations(area.getConfigurations().stream().map(AreaConfigurationDto::new).collect(Collectors.toList()));
 	}
 
 	public Polygon toPolygon() {
