@@ -1,9 +1,9 @@
 package co.blastlab.serviceblbnavi.rest.facade.configuration;
 
-import co.blastlab.serviceblbnavi.dao.repository.ConfigurationRepostiory;
-import co.blastlab.serviceblbnavi.dao.repository.FloorRepository;
+import co.blastlab.serviceblbnavi.dao.repository.*;
 import co.blastlab.serviceblbnavi.domain.Configuration;
 import co.blastlab.serviceblbnavi.domain.Floor;
+import co.blastlab.serviceblbnavi.domain.Publication;
 import co.blastlab.serviceblbnavi.dto.configuration.ConfigurationDto;
 import co.blastlab.serviceblbnavi.utils.ConfigurationExtractor;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -28,9 +28,26 @@ public class ConfigurationBean implements ConfigurationFacade {
 	@Inject
 	private ConfigurationRepostiory configurationRepostiory;
 
+	@Inject
+	private PublicationRepository publicationRepository;
+
+	@Inject
+	private TagRepository tagRepository;
+
+	@Inject
+	private UserRepository userRepository;
+
 	@Override
 	public ConfigurationDto.Data publish(Long floorId) throws IOException {
 		final Floor floor = floorRepository.findOptionalById(floorId).orElseThrow(EntityNotFoundException::new);
+		List<Publication> publications = publicationRepository.findByFloor(floor);
+		if (publications.isEmpty()) {
+			Publication publication = new Publication();
+			publication.setFloor(floor);
+			publication.setTags(tagRepository.findAll());
+			publication.setUsers(userRepository.findAll());
+			publicationRepository.save(publication);
+		}
 		Configuration configurationEntity = configurationRepostiory.findTop1ByFloorOrderByVersionDesc(floor).orElseThrow(EntityNotFoundException::new);
 		ObjectMapper objectMapper = new ObjectMapper();
 		ConfigurationDto.Data configurationData = objectMapper.readValue(configurationEntity.getData(), ConfigurationDto.Data.class);

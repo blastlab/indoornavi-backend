@@ -419,9 +419,9 @@
 	</changeSet>
 
 	<changeSet author="kgebert (generated)" id="navi-142-1">
-		<createTable tableName="Map">
+		<createTable tableName="Publication">
 			<column autoIncrement="true" name="id" type="BIGINT">
-				<constraints primaryKey="true" primaryKeyName="MapPK"/>
+				<constraints primaryKey="true" primaryKeyName="PublicationPK"/>
 			</column>
 			<column name="creationDate" type="datetime"/>
 			<column name="modificationDate" type="datetime"/>
@@ -429,8 +429,8 @@
 		</createTable>
 	</changeSet>
 	<changeSet author="kgebert (generated)" id="navi-142-2">
-		<createTable tableName="Map_Tag">
-			<column name="Map_id" type="BIGINT">
+		<createTable tableName="Publication_Tag">
+			<column name="Publication_id" type="BIGINT">
 				<constraints nullable="false"/>
 			</column>
 			<column name="tags_id" type="BIGINT">
@@ -439,8 +439,8 @@
 		</createTable>
 	</changeSet>
 	<changeSet author="kgebert (generated)" id="navi-142-3">
-		<createTable tableName="Map_User">
-			<column name="Map_id" type="BIGINT">
+		<createTable tableName="Publication_User">
+			<column name="Publication_id" type="BIGINT">
 				<constraints nullable="false"/>
 			</column>
 			<column name="users_id" type="BIGINT">
@@ -449,19 +449,19 @@
 		</createTable>
 	</changeSet>
 	<changeSet author="kgebert (generated)" id="navi-142-6">
-		<addForeignKeyConstraint onDelete="CASCADE" baseColumnNames="Map_id" baseTableName="Map_User" constraintName="FK_MapUser_Map_Id" referencedColumnNames="id" referencedTableName="Map"/>
+		<addForeignKeyConstraint onDelete="CASCADE" baseColumnNames="Publication_id" baseTableName="Publication_User" constraintName="FK_PublicationUser_Publication_Id" referencedColumnNames="id" referencedTableName="Publication"/>
 	</changeSet>
 	<changeSet author="kgebert (generated)" id="navi-142-7">
-		<addForeignKeyConstraint baseColumnNames="users_id" baseTableName="Map_User" constraintName="FK_MapUser_User_Id" referencedColumnNames="id" referencedTableName="User"/>
+		<addForeignKeyConstraint baseColumnNames="users_id" baseTableName="Publication_User" constraintName="FK_PublicationUser_User_Id" referencedColumnNames="id" referencedTableName="User"/>
 	</changeSet>
 	<changeSet author="kgebert (generated)" id="navi-142-8">
-		<addForeignKeyConstraint onDelete="CASCADE" baseColumnNames="Map_id" baseTableName="Map_Tag" constraintName="FK_MapTag_Map_Id" referencedColumnNames="id" referencedTableName="Map"/>
+		<addForeignKeyConstraint onDelete="CASCADE" baseColumnNames="Publication_id" baseTableName="Publication_Tag" constraintName="FK_PublicationTag_Publication_Id" referencedColumnNames="id" referencedTableName="Publication"/>
 	</changeSet>
 	<changeSet author="kgebert (generated)" id="navi-142-11">
-		<addForeignKeyConstraint baseColumnNames="tags_id" baseTableName="Map_Tag" constraintName="FK_MapTag_Tag_Id" referencedColumnNames="id" referencedTableName="Tag"/>
+		<addForeignKeyConstraint baseColumnNames="tags_id" baseTableName="Publication_Tag" constraintName="FK_PublicationTag_Tag_Id" referencedColumnNames="id" referencedTableName="Tag"/>
 	</changeSet>
 	<changeSet author="kgebert (generated)" id="navi-142-12">
-		<addForeignKeyConstraint onDelete="CASCADE" baseColumnNames="floor_id" baseTableName="Map" constraintName="FK_Map_Floor_Id" referencedColumnNames="id" referencedTableName="Floor"/>
+		<addForeignKeyConstraint onDelete="CASCADE" baseColumnNames="floor_id" baseTableName="Publication" constraintName="FK_Publication_Floor_Id" referencedColumnNames="id" referencedTableName="Floor"/>
 	</changeSet>
 	<changeSet author="kgebert (generated)" id="navi-118-1">
 		<createTable tableName="ApiKey">
