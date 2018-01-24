@@ -1,9 +1,9 @@
-package co.blastlab.serviceblbnavi.rest.facade.map;
+package co.blastlab.serviceblbnavi.rest.facade.publication;
 
 import co.blastlab.serviceblbnavi.dao.repository.*;
 import co.blastlab.serviceblbnavi.domain.*;
-import co.blastlab.serviceblbnavi.dto.map.MapDto;
 import co.blastlab.serviceblbnavi.dto.map.OriginChecker;
+import co.blastlab.serviceblbnavi.dto.map.PublicationDto;
 import org.apache.http.HttpStatus;
 
 import javax.ejb.Stateless;
@@ -19,9 +19,9 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Stateless
-public class MapBean implements MapFacade {
+public class PublicationBean implements PublicationFacade {
 
-	private final MapRepository mapRepository;
+	private final PublicationRepository publicationRepository;
 	private final TagRepository tagRepository;
 	private final UserRepository userRepository;
 	private final FloorRepository floorRepository;
@@ -31,9 +31,9 @@ public class MapBean implements MapFacade {
 	SecurityContext securityContext;
 
 	@Inject
-	public MapBean(MapRepository mapRepository, TagRepository tagRepository,
-	               UserRepository userRepository, FloorRepository floorRepository, ApiKeyRepository apiKeyRepository) {
-		this.mapRepository = mapRepository;
+	public PublicationBean(PublicationRepository publicationRepository, TagRepository tagRepository,
+	                       UserRepository userRepository, FloorRepository floorRepository, ApiKeyRepository apiKeyRepository) {
+		this.publicationRepository = publicationRepository;
 		this.tagRepository = tagRepository;
 		this.userRepository = userRepository;
 		this.floorRepository = floorRepository;
@@ -41,36 +41,44 @@ public class MapBean implements MapFacade {
 	}
 
 	@Override
-	public MapDto create(MapDto map) {
-		Map mapEntity = new Map();
-		return createOrUpdate(mapEntity, map);
+	public PublicationDto create(PublicationDto publication) {
+		Publication publicationEntity = new Publication();
+		return createOrUpdate(publicationEntity, publication);
 	}
 
 	@Override
-	public MapDto update(Long id, MapDto map) {
-		Map mapEntity = mapRepository.findOptionalById(id).orElseThrow(EntityNotFoundException::new);
-		return createOrUpdate(mapEntity, map);
+	public PublicationDto update(Long id, PublicationDto publication) {
+		Publication publicationEntity = publicationRepository.findOptionalById(id).orElseThrow(EntityNotFoundException::new);
+		return createOrUpdate(publicationEntity, publication);
 	}
 
 	@Override
-	public List<MapDto> getAll() {
-		return mapRepository.findAll().stream().map(MapDto::new).collect(Collectors.toList());
+	public List<PublicationDto> getAll() {
+		return publicationRepository.findAll().stream().map(PublicationDto::new).collect(Collectors.toList());
 	}
 
 	@Override
-	public MapDto get(Long id) {
-		Map map = mapRepository.findOptionalById(id).orElseThrow(EntityNotFoundException::new);
+	public PublicationDto get(Long floorId) {
+		Floor floor = floorRepository.findOptionalById(floorId).orElseThrow(EntityNotFoundException::new);
+		List<Publication> publications = publicationRepository.findByFloor(floor);
 		User user = userRepository.findOptionalByUsername(securityContext.getUserPrincipal().getName()).orElseThrow(EntityNotFoundException::new);
-		if (map.getUsers().contains(user)) {
-			return new MapDto(map);
+		PublicationDto publication = null;
+		for (Publication publicationEntity : publications) {
+			if (publicationEntity.getUsers().contains(user)) {
+				publication = new PublicationDto(publicationEntity);
+				break;
+			}
 		}
-		throw new ForbiddenException();
+		if (publication == null) {
+			throw new ForbiddenException();
+		}
+		return publication;
 	}
 
 	@Override
 	public Response delete(Long id) {
-		Map map = mapRepository.findOptionalById(id).orElseThrow(EntityNotFoundException::new);
-		mapRepository.remove(map);
+		Publication map = publicationRepository.findOptionalById(id).orElseThrow(EntityNotFoundException::new);
+		publicationRepository.remove(map);
 		return Response.status(HttpStatus.SC_NO_CONTENT).build();
 	}
 
@@ -80,7 +88,7 @@ public class MapBean implements MapFacade {
 		return optionalByValue.isPresent() && optionalByValue.get().getHost().equals(originChecker.getOrigin());
 	}
 
-	private MapDto createOrUpdate(Map mapEntity, MapDto map) {
+	private PublicationDto createOrUpdate(Publication mapEntity, PublicationDto map) {
 		Floor floor = floorRepository.findOptionalById(map.getFloor().getId()).orElseThrow(EntityNotFoundException::new);
 		mapEntity.setFloor(floor);
 
@@ -92,7 +100,7 @@ public class MapBean implements MapFacade {
 		map.getUsers().forEach(userDto -> users.add(userRepository.findOptionalById(userDto.getId()).orElseThrow(EntityNotFoundException::new)));
 		mapEntity.setUsers(users);
 
-		mapRepository.save(mapEntity);
-		return new MapDto(mapEntity);
+		publicationRepository.save(mapEntity);
+		return new PublicationDto(mapEntity);
 	}
 }

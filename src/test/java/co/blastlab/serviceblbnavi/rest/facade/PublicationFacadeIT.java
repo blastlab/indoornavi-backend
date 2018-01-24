@@ -10,7 +10,7 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.core.Is.is;
 
-public class MapFacadeIT extends BaseIT {
+public class PublicationFacadeIT extends BaseIT {
 
 	@Override
 	public ImmutableList<String> getAdditionalLabels() {
@@ -19,13 +19,13 @@ public class MapFacadeIT extends BaseIT {
 
 	@Test
 	public void create() {
-		String body = new RequestBodyBuilder("Map.json")
+		String body = new RequestBodyBuilder("Publication.json")
 			.build();
 
 		givenUser()
 			.body(body)
 			.when()
-			.post("/maps")
+			.post("/publications")
 			.then()
 			// assertions
 			.statusCode(HttpStatus.SC_OK)
@@ -37,7 +37,7 @@ public class MapFacadeIT extends BaseIT {
 
 	@Test
 	public void update() {
-		String body = new RequestBodyBuilder("Map.json")
+		String body = new RequestBodyBuilder("Publication.json")
 			.setParameter("tags", ImmutableList.of(
 				new TagDto(4L, null, null, null, null, null),
 				new TagDto(5L, null, null, null, null, null))
@@ -49,7 +49,7 @@ public class MapFacadeIT extends BaseIT {
 			.pathParam("id", 1)
 			.body(body)
 			.when()
-			.put("/maps/{id}")
+			.put("/publications/{id}")
 			.then()
 			// assertions
 			.statusCode(HttpStatus.SC_OK)
@@ -63,7 +63,7 @@ public class MapFacadeIT extends BaseIT {
 	public void getAll() {
 		givenUser()
 			.when()
-			.get("/maps")
+			.get("/publications")
 			.then()
 			// assertions
 			.statusCode(HttpStatus.SC_OK)
@@ -79,7 +79,7 @@ public class MapFacadeIT extends BaseIT {
 		givenUser()
 			.pathParam("id", 1)
 			.when()
-			.get("/maps/{id}")
+			.get("/publications/{id}")
 			.then()
 			// assertions
 			.statusCode(HttpStatus.SC_OK)
@@ -94,7 +94,7 @@ public class MapFacadeIT extends BaseIT {
 		givenUser()
 			.pathParam("id", 2)
 			.when()
-			.get("/maps/{id}")
+			.get("/publications/{id}")
 			.then()
 			// assertions
 			.statusCode(HttpStatus.SC_FORBIDDEN);
@@ -105,7 +105,7 @@ public class MapFacadeIT extends BaseIT {
 		givenUser()
 			.pathParam("id", 1)
 			.when()
-			.delete("/maps/{id}")
+			.delete("/publications/{id}")
 			.then()
 			// assertions
 			.statusCode(HttpStatus.SC_NO_CONTENT);

@@ -12,7 +12,7 @@ import java.util.List;
 @Entity
 @Getter
 @Setter
-public class Map extends TrackedEntity {
+public class Publication extends TrackedEntity {
 	@ManyToOne
 	private Floor floor;
 	@ManyToMany
