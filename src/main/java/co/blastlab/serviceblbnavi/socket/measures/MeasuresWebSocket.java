@@ -1,8 +1,10 @@
 package co.blastlab.serviceblbnavi.socket.measures;
 
-import co.blastlab.serviceblbnavi.dao.repository.*;
+import co.blastlab.serviceblbnavi.dao.repository.AnchorRepository;
+import co.blastlab.serviceblbnavi.dao.repository.CoordinatesRepository;
+import co.blastlab.serviceblbnavi.dao.repository.FloorRepository;
+import co.blastlab.serviceblbnavi.dao.repository.TagRepository;
 import co.blastlab.serviceblbnavi.domain.Coordinates;
-import co.blastlab.serviceblbnavi.domain.Sink;
 import co.blastlab.serviceblbnavi.dto.anchor.AnchorDto;
 import co.blastlab.serviceblbnavi.dto.report.CoordinatesDto;
 import co.blastlab.serviceblbnavi.dto.tag.TagDto;
@@ -13,11 +15,11 @@ import co.blastlab.serviceblbnavi.socket.bridge.AnchorPositionBridge;
 import co.blastlab.serviceblbnavi.socket.bridge.SinkAnchorsDistanceBridge;
 import co.blastlab.serviceblbnavi.socket.bridge.UnrecognizedDeviceException;
 import co.blastlab.serviceblbnavi.socket.filters.*;
-import co.blastlab.serviceblbnavi.socket.wizard.SinkDetails;
 import co.blastlab.serviceblbnavi.socket.wrappers.AnchorsWrapper;
 import co.blastlab.serviceblbnavi.socket.wrappers.AreaEventWrapper;
 import co.blastlab.serviceblbnavi.socket.wrappers.CoordinatesWrapper;
 import co.blastlab.serviceblbnavi.socket.wrappers.TagsWrapper;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.annotation.PostConstruct;
@@ -47,9 +49,6 @@ public class MeasuresWebSocket extends WebSocket {
 
 	@Inject
 	private CoordinatesRepository coordinatesRepository;
-
-	@Inject
-	private SinkRepository sinkRepository;
 
 	@Inject
 	private SinkAnchorsDistanceBridge sinkAnchorsDistanceBridge;
@@ -125,30 +124,13 @@ public class MeasuresWebSocket extends WebSocket {
 				}
 			}
 		} else if (isServerSession(session)) {
-			DistanceMessageWrapper wrapper = objectMapper.readValue(message, DistanceMessageWrapper.class);
-			handleInfo(wrapper);
-			handleMeasures(wrapper);
+			List<DistanceMessage> measures = objectMapper.readValue(message, new TypeReference<List<DistanceMessage>>(){});
+			handleMeasures(measures);
 		}
 	}
 
-	private void handleInfo(DistanceMessageWrapper wrapper) {
-		wrapper.getInfo().forEach(info -> {
-			if (info.getCode().equals(2)) {
-				try {
-					SinkDetails sinkDetails = objectMapper.readValue(info.getArgs(), SinkDetails.class);
-					Sink sink = sinkRepository.findOptionalByShortId(sinkDetails.getDid()).orElseGet(Sink::new);
-					sink.setShortId(sinkDetails.getDid());
-					sink.setLongId(sinkDetails.getEui());
-					sinkRepository.save(sink);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
-
-	private void handleMeasures(DistanceMessageWrapper wrapper) {
-		wrapper.getMeasures().forEach(distanceMessage -> {
+	private void handleMeasures(List<DistanceMessage> measures) {
+		measures.forEach(distanceMessage -> {
 			if (bothDevicesAreAnchors(distanceMessage)) {
 				try {
 					sinkAnchorsDistanceBridge.addDistance(distanceMessage.getDid1(), distanceMessage.getDid2(), distanceMessage.getDist());
