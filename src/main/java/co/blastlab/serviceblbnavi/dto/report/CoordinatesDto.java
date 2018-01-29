@@ -15,13 +15,14 @@ import java.util.Date;
 @NoArgsConstructor
 public class CoordinatesDto {
 	private Integer tagShortId;
+	private Integer anchorShortId;
 	private Long floorId;
 	private Point point;
 	private Date date;
 
 	public CoordinatesDto(Coordinates coordinates) {
-		this.tagShortId = coordinates.getTag().getShortId();
-		this.floorId = coordinates.getFloor().getId();
+		this.tagShortId = coordinates.getTag() != null ? coordinates.getTag().getShortId() : null;
+		this.floorId = coordinates.getFloor() != null ? coordinates.getFloor().getId() : null;
 		this.point = new Point(coordinates.getX(), coordinates.getY());
 		this.date = coordinates.getCreationDate();
 	}

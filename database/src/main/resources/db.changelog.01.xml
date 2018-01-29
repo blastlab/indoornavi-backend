@@ -498,12 +498,20 @@
 		</addColumn>
 	</changeSet>
 	<changeSet author="kgebert (generated)" id="navi-166-3">
-		<addForeignKeyConstraint baseColumnNames="floor_id" baseTableName="Coordinates" constraintName="FK_e71f0gjv82bpxjgsm8d9spbr3" referencedColumnNames="id" referencedTableName="Floor"/>
+		<addForeignKeyConstraint baseColumnNames="floor_id" baseTableName="Coordinates" constraintName="FK_Coordiantes_Floor" referencedColumnNames="id" referencedTableName="Floor"/>
 	</changeSet>
 	<changeSet author="kgebert (generated)" id="navi-166-4">
-		<addForeignKeyConstraint baseColumnNames="tag_id" baseTableName="Coordinates" constraintName="FK_m8k3o1hgglyud57k94i8gdo0" referencedColumnNames="id" referencedTableName="Tag"/>
+		<addForeignKeyConstraint baseColumnNames="tag_id" baseTableName="Coordinates" constraintName="FK_Coordiantes_Tag" referencedColumnNames="id" referencedTableName="Tag"/>
 	</changeSet>
 	<changeSet author="kgebert (generated)" id="navi-166-5">
 		<dropColumn columnName="device" tableName="coordinates"/>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-191-1">
+		<addColumn tableName="Coordinates">
+			<column name="sink_id" type="bigint"/>
+		</addColumn>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-191-2">
+		<addForeignKeyConstraint baseColumnNames="sink_id" baseTableName="Coordinates" constraintName="FK_Coordinates_Sink" referencedColumnNames="id" referencedTableName="Sink"/>
 	</changeSet>
 </databaseChangeLog>

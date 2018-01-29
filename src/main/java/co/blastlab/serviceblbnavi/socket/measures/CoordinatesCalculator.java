@@ -83,11 +83,11 @@ public class CoordinatesCalculator {
 			y = (y + previousPoint.get().getPoint().getY()) / 2;
 			Point newPoint = new Point(x, y);
 			previousCoorinates.put(tagId, new PointAndTime(newPoint, currentDate.getTime()));
-			return Optional.of(new CoordinatesDto(tagId, floorId, newPoint, currentDate));
+			return Optional.of(new CoordinatesDto(tagId, anchorId, floorId, newPoint, currentDate));
 		}
 		Point currentPoint = new Point(x, y);
 		previousCoorinates.put(tagId, new PointAndTime(currentPoint, currentDate.getTime()));
-		return Optional.of(new CoordinatesDto(tagId, floorId, currentPoint, currentDate));
+		return Optional.of(new CoordinatesDto(tagId, anchorId, floorId, currentPoint, currentDate));
 	}
 
 	private Double calculateThres(List<Double> intersectionPointsDistances, int connectedAnchorsCount) {
