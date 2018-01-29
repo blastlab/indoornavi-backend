@@ -148,13 +148,14 @@ public class MeasuresWebSocket extends WebSocket {
 					Sink sink = null;
 					if (sinkOptional.isPresent()) {
 						sink = sinkOptional.get();
+						tagShortIdToSink.put(coords.get().getTagShortId(), sink);
 					} else if (tagShortIdToSink.containsKey(coords.get().getAnchorShortId())) {
 						sink = tagShortIdToSink.get(coords.get().getAnchorShortId());
 					}
 					if (sink != null) {
 						this.saveCoordinates(coords.get(), sink);
 						Set<Session> sessions = this.filterSessions(coords.get());
-						broadCastMessage(sessions, new CoordinatesWrapper(coords.get(), sink.getShortId()));
+						broadCastMessage(sessions, new CoordinatesWrapper(coords.get(), sink));
 					}
 					this.sendAreaEvents(coords.get());
 				}
