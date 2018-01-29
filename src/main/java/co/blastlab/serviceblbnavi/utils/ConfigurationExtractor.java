@@ -9,14 +9,12 @@ import co.blastlab.serviceblbnavi.dto.configuration.ConfigurationDto;
 import co.blastlab.serviceblbnavi.dto.floor.ScaleDto;
 import co.blastlab.serviceblbnavi.service.AreaService;
 
-import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
 import java.util.List;
 
 import static co.blastlab.serviceblbnavi.domain.Scale.scale;
 
-@Stateless
 public class ConfigurationExtractor {
 	@Inject
 	private FloorRepository floorRepository;
@@ -61,7 +59,7 @@ public class ConfigurationExtractor {
 		});
 	}
 
-	public void extractAnchors(ConfigurationDto.Data configuration, Floor floor) {
+	public void extractAnchors(ConfigurationDto.Data configuration, Floor floor) throws EntityNotFoundException {
 		configuration.getAnchors().forEach((anchorDto -> {
 			Anchor anchor = anchorRepository.findOptionalByShortId(anchorDto.getShortId()).orElseThrow(EntityNotFoundException::new);
 			anchor.setFloor(floor);
