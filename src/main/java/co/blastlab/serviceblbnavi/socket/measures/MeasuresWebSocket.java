@@ -1,10 +1,8 @@
 package co.blastlab.serviceblbnavi.socket.measures;
 
-import co.blastlab.serviceblbnavi.dao.repository.AnchorRepository;
-import co.blastlab.serviceblbnavi.dao.repository.CoordinatesRepository;
-import co.blastlab.serviceblbnavi.dao.repository.FloorRepository;
-import co.blastlab.serviceblbnavi.dao.repository.TagRepository;
+import co.blastlab.serviceblbnavi.dao.repository.*;
 import co.blastlab.serviceblbnavi.domain.Coordinates;
+import co.blastlab.serviceblbnavi.domain.Sink;
 import co.blastlab.serviceblbnavi.dto.anchor.AnchorDto;
 import co.blastlab.serviceblbnavi.dto.report.CoordinatesDto;
 import co.blastlab.serviceblbnavi.dto.tag.TagDto;
@@ -69,9 +67,14 @@ public class MeasuresWebSocket extends WebSocket {
 	private FloorRepository floorRepository;
 
 	@Inject
+	private SinkRepository sinkRepository;
+
+	@Inject
 	private AreaEventController areaEventController;
 
 	private Map<FilterType, Filter> activeFilters = new HashMap<>();
+
+	private Map<Integer, Sink> tagShortIdToSink = new HashMap<>();
 
 	@OnOpen
 	public void open(Session session) {
@@ -140,11 +143,19 @@ public class MeasuresWebSocket extends WebSocket {
 				}
 			} else {
 				Optional<CoordinatesDto> coords = coordinatesCalculator.calculateTagPosition(distanceMessage.getDid1(), distanceMessage.getDid2(), distanceMessage.getDist());
-
 				if (coords.isPresent()) {
-					this.saveCoordinates(coords.get());
-					Set<Session> sessions = this.filterSessions(coords.get());
-					broadCastMessage(sessions, new CoordinatesWrapper(coords.get()));
+					Optional<Sink> sinkOptional = sinkRepository.findOptionalByShortId(coords.get().getAnchorShortId());
+					Sink sink = null;
+					if (sinkOptional.isPresent()) {
+						sink = sinkOptional.get();
+					} else if (tagShortIdToSink.containsKey(coords.get().getAnchorShortId())) {
+						sink = tagShortIdToSink.get(coords.get().getAnchorShortId());
+					}
+					if (sink != null) {
+						this.saveCoordinates(coords.get(), sink);
+						Set<Session> sessions = this.filterSessions(coords.get());
+						broadCastMessage(sessions, new CoordinatesWrapper(coords.get(), sink.getShortId()));
+					}
 					this.sendAreaEvents(coords.get());
 				}
 			}
@@ -155,12 +166,13 @@ public class MeasuresWebSocket extends WebSocket {
 		return distanceMessage.getDid1() > Short.MAX_VALUE && distanceMessage.getDid2() > Short.MAX_VALUE;
 	}
 
-	private void saveCoordinates(CoordinatesDto coordinatesDto) {
+	private void saveCoordinates(CoordinatesDto coordinatesDto, Sink sink) {
 		Coordinates coordinates = new Coordinates();
 		coordinates.setTag(tagRepository.findOptionalByShortId(coordinatesDto.getTagShortId()).orElseThrow(EntityNotFoundException::new));
 		coordinates.setX(coordinatesDto.getPoint().getX());
 		coordinates.setY(coordinatesDto.getPoint().getY());
 		coordinates.setFloor(floorRepository.findOptionalById(coordinatesDto.getFloorId()).orElseThrow(EntityNotFoundException::new));
+		coordinates.setSink(sink);
 		coordinatesRepository.save(coordinates);
 	}
 

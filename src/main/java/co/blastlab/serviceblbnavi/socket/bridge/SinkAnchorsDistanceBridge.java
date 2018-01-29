@@ -3,10 +3,13 @@ package co.blastlab.serviceblbnavi.socket.bridge;
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.util.*;
 
 @Singleton
 public class SinkAnchorsDistanceBridge implements Bridge {
 	private Integer sinkId;
+
+	private Map<Integer, List<Integer>> distancesPerAnchor = new HashMap<>();
 
 	@Inject
 	private Event<AnchorDistance> anchorDistanceEvent;
@@ -18,6 +21,7 @@ public class SinkAnchorsDistanceBridge implements Bridge {
 	public void stopListening(Integer sinkId) {
 		if (this.sinkId.equals(sinkId)) {
 			this.sinkId = null;
+			this.distancesPerAnchor.clear();
 		}
 	}
 
@@ -35,7 +39,17 @@ public class SinkAnchorsDistanceBridge implements Bridge {
 				anchorDistance = new AnchorDistance(firstDevice, distance);
 			}
 			if (anchorDistance != null) {
-				anchorDistanceEvent.fire(anchorDistance);
+				if (distancesPerAnchor.containsKey(anchorDistance.getAnchorId())) {
+					distancesPerAnchor.get(anchorDistance.getAnchorId()).add(anchorDistance.getDistance());
+				} else {
+					distancesPerAnchor.put(anchorDistance.getAnchorId(), new ArrayList<>(Collections.singletonList(anchorDistance.getDistance())));
+				}
+				if (distancesPerAnchor.get(anchorDistance.getAnchorId()).size() == 10) {
+					anchorDistance.setDistance(
+						distancesPerAnchor.get(anchorDistance.getAnchorId()).stream().mapToInt(Integer::intValue).sum() / 10
+					);
+					anchorDistanceEvent.fire(anchorDistance);
+				}
 			}
 		}
 	}
