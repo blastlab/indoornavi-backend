@@ -9,11 +9,9 @@ import lombok.Setter;
 public class CoordinatesWrapper extends MessageWrapper {
 
 	private CoordinatesDto coordinates;
-	private Integer sinkShortId;
 
-	public CoordinatesWrapper(CoordinatesDto coordinates, Integer sinkShortId) {
+	public CoordinatesWrapper(CoordinatesDto coordinates) {
 		super(MessageType.COORDINATES);
 		this.coordinates = coordinates;
-		this.sinkShortId = sinkShortId;
 	}
 }

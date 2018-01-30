@@ -28,9 +28,9 @@ public class CoordinatesCalculatorTest {
 
 	@Test
 	public void calculateTagPosition() throws Exception {
-		when(anchorRepository.findByShortId(32768)).thenReturn(Optional.of(new Anchor(0d, 0d)));
-		when(anchorRepository.findByShortId(32769)).thenReturn(Optional.of(new Anchor(100d, 0d)));
-		when(anchorRepository.findByShortId(32770)).thenReturn(Optional.of(new Anchor(0d, 100d)));
+		when(anchorRepository.findByShortId(32768)).thenReturn(Optional.of(new Anchor(0, 0)));
+		when(anchorRepository.findByShortId(32769)).thenReturn(Optional.of(new Anchor(100, 0)));
+		when(anchorRepository.findByShortId(32770)).thenReturn(Optional.of(new Anchor(0, 100)));
 
 		Optional<CoordinatesDto> coordinatesDto = coordinatesCalculator.calculateTagPosition(1, 32768, 300);
 		assertThat(coordinatesDto.isPresent(), is(false));

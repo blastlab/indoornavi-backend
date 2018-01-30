@@ -15,14 +15,14 @@ import javax.persistence.ManyToOne;
 @NoArgsConstructor
 public class Anchor extends Device {
 
-	private Double x;
+	private Integer x;
 
-	private Double y;
+	private Integer y;
 
 	@ManyToOne
 	private Sink sink;
 
-	public Anchor(Double x, Double y) {
+	public Anchor(Integer x, Integer y) {
 		this.x = x;
 		this.y = y;
 	}

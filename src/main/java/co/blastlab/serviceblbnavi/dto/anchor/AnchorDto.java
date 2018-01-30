@@ -13,9 +13,9 @@ import lombok.Setter;
 @AllArgsConstructor
 public class AnchorDto extends DeviceDto {
 
-	private Double x;
+	private Integer x;
 
-	private Double y;
+	private Integer y;
 
 	public AnchorDto(Anchor anchor) {
 		super(anchor);
