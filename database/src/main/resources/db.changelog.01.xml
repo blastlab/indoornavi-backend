@@ -506,12 +506,4 @@
 	<changeSet author="kgebert (generated)" id="navi-166-5">
 		<dropColumn columnName="device" tableName="coordinates"/>
 	</changeSet>
-	<changeSet author="kgebert (generated)" id="navi-191-1">
-		<addColumn tableName="Coordinates">
-			<column name="sink_id" type="bigint"/>
-		</addColumn>
-	</changeSet>
-	<changeSet author="kgebert (generated)" id="navi-191-2">
-		<addForeignKeyConstraint baseColumnNames="sink_id" baseTableName="Coordinates" constraintName="FK_Coordinates_Sink" referencedColumnNames="id" referencedTableName="Sink"/>
-	</changeSet>
 </databaseChangeLog>

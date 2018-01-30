@@ -16,6 +16,4 @@ public class Coordinates extends TrackedEntity {
 	private Tag tag;
 	@ManyToOne
 	private Floor floor;
-	@ManyToOne
-	private Sink sink;
 }
