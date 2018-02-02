@@ -8,6 +8,7 @@
 		<delete tableName="configuration" />
 		<delete tableName="publication_tag" />
 		<delete tableName="publication_user" />
+		<delete tableName="publication_floor" />
 		<delete tableName="publication" />
 		<delete tableName="areaconfiguration_tag" />
 		<delete tableName="area_areaconfiguration" />
@@ -88,6 +89,10 @@
 
 	<changeSet id="Publication_User" author="kgebert" context="test" runOnChange="true" labels="Publication_User" runAlways="true">
 		<loadData tableName="publication_user" file="test/PublicationUser.csv" />
+	</changeSet>
+
+	<changeSet id="Publication_Floor" author="kgebert" context="test" runOnChange="true" labels="Publication_Floor" runAlways="true">
+		<loadData tableName="publication_floor" file="test/PublicationFloor.csv" />
 	</changeSet>
 
 	<changeSet id="ApiKey" author="kgebert" context="test" runOnChange="true" labels="ApiKey" runAlways="true">
