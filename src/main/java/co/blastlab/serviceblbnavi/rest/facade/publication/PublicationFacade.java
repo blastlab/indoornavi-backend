@@ -41,9 +41,9 @@ public interface PublicationFacade {
 
 	@DELETE
 	@Path("/{id: \\d+}")
-	@ApiOperation(value = "get specific publication", response = Response.class)
+	@ApiOperation(value = "remove specific publication", response = Response.class)
 	@ApiResponses({
-		@ApiResponse(code = 404, message = "Map with given id does not exist")
+		@ApiResponse(code = 404, message = "Publication with given id does not exist")
 	})
 	@AuthorizedAccess("PUBLICATION_DELETE")
 	Response delete(@ApiParam(value = "id", required = true) @PathParam("id") @Valid @NotNull Long id);
@@ -54,7 +54,7 @@ public interface PublicationFacade {
 	Boolean checkOrigin(OriginChecker originChecker);
 
 	@GET
-	@Path("/{id: \\d+}/getTags")
+	@Path("/{id: \\d+}/tags")
 	@AuthorizedAccess("PUBLICATION_READ")
 	List<TagDto> getTagsForUser(@ApiParam(value = "id", required = true) @PathParam("id") @Valid @NotNull Long floorId);
 
