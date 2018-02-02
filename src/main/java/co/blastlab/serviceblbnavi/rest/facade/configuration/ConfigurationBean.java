@@ -40,10 +40,10 @@ public class ConfigurationBean implements ConfigurationFacade {
 	@Override
 	public ConfigurationDto.Data publish(Long floorId) throws IOException {
 		final Floor floor = floorRepository.findOptionalById(floorId).orElseThrow(EntityNotFoundException::new);
-		List<Publication> publications = publicationRepository.findByFloor(floor);
+		List<Publication> publications = publicationRepository.findAllContainingFloor(floor);
 		if (publications.isEmpty()) {
 			Publication publication = new Publication();
-			publication.setFloor(floor);
+			publication.getFloors().add(floor);
 			publication.setTags(tagRepository.findAll());
 			publication.setUsers(userRepository.findAll());
 			publicationRepository.save(publication);

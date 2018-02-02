@@ -7,6 +7,7 @@
 	<changeSet id="Clear" author="kgebert" context="test" runOnChange="true" labels="Clear" runAlways="true">
 		<delete tableName="configuration" />
 		<delete tableName="publication_tag" />
+		<delete tableName="publication_floor" />
 		<delete tableName="publication_user" />
 		<delete tableName="publication" />
 		<delete tableName="areaconfiguration_tag" />
@@ -126,6 +127,10 @@
 
 	<changeSet id="Publication_User" author="kgebert" context="test" runOnChange="true" labels="Publication_User" runAlways="true">
 		<loadData tableName="publication_user" file="test/PublicationUser.csv" relativeToChangelogFile="true" />
+	</changeSet>
+
+	<changeSet id="Publication_Floor" author="kgebert" context="test" runOnChange="true" labels="Publication_Floor" runAlways="true">
+		<loadData tableName="publication_floor" file="test/PublicationFloor.csv" relativeToChangelogFile="true" />
 	</changeSet>
 	
 	<changeSet id="Coordinates" author="kgebert" context="test" runOnChange="true" labels="Coordinates" runAlways="true">

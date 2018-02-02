@@ -506,4 +506,26 @@
 	<changeSet author="kgebert (generated)" id="navi-166-5">
 		<dropColumn columnName="device" tableName="coordinates"/>
 	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-187-1">
+		<createTable tableName="Publication_Floor">
+			<column name="Publication_id" type="BIGINT">
+				<constraints nullable="false"/>
+			</column>
+			<column name="floors_id" type="BIGINT">
+				<constraints nullable="false"/>
+			</column>
+		</createTable>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-187-2">
+		<addForeignKeyConstraint baseColumnNames="Publication_id" baseTableName="Publication_Floor" constraintName="FK_Publication_Floor_Publication_Id" referencedColumnNames="id" referencedTableName="Publication"/>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-187-3">
+		<addForeignKeyConstraint baseColumnNames="floors_id" baseTableName="Publication_Floor" constraintName="FK_Publication_Floor_Floor_Id" referencedColumnNames="id" referencedTableName="Floor"/>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-187-4">
+		<dropForeignKeyConstraint baseTableName="publication" constraintName="FK_Publication_Floor_Id"/>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-187-5">
+		<dropColumn columnName="floor_id" tableName="publication"/>
+	</changeSet>
 </databaseChangeLog>

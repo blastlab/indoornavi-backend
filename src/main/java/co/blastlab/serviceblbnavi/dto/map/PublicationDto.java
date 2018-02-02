@@ -19,13 +19,13 @@ import java.util.stream.Collectors;
 public class PublicationDto {
 	@ApiModelProperty(example = "1", readOnly = true)
 	private Long id;
-	private FloorDto floor;
+	private List<FloorDto> floors = new ArrayList<>();
 	private List<UserDto> users = new ArrayList<>();
 	private List<TagDto> tags = new ArrayList<>();
 
 	public PublicationDto(Publication map) {
 		this.id = map.getId();
-		this.floor = new FloorDto(map.getFloor());
+		this.floors = map.getFloors().stream().map(FloorDto::new).collect(Collectors.toList());
 		this.users = map.getUsers().stream().map(UserDto::new).collect(Collectors.toList());
 		this.tags = map.getTags().stream().map(TagDto::new).collect(Collectors.toList());
 	}

@@ -2,6 +2,7 @@ package co.blastlab.serviceblbnavi.rest.facade.publication;
 
 import co.blastlab.serviceblbnavi.dto.map.OriginChecker;
 import co.blastlab.serviceblbnavi.dto.map.PublicationDto;
+import co.blastlab.serviceblbnavi.dto.tag.TagDto;
 import co.blastlab.serviceblbnavi.ext.filter.AuthorizedAccess;
 import io.swagger.annotations.*;
 
@@ -34,18 +35,9 @@ public interface PublicationFacade {
 	                      @ApiParam(value = "publication", required = true) @Valid PublicationDto publication);
 
 	@GET
-	@ApiOperation(value = "get all maps", response = PublicationDto.class, responseContainer = "list")
+	@ApiOperation(value = "get all publications", response = PublicationDto.class, responseContainer = "list")
 	@AuthorizedAccess("PUBLICATION_READ")
 	List<PublicationDto> getAll();
-
-	@GET
-	@Path("/{id: \\d+}")
-	@ApiOperation(value = "get specific publication", response = PublicationDto.class)
-	@ApiResponses({
-		@ApiResponse(code = 404, message = "Map with given id does not exist")
-	})
-	@AuthorizedAccess("PUBLICATION_READ")
-	PublicationDto get(@ApiParam(value = "id", required = true) @PathParam("id") @Valid @NotNull Long id);
 
 	@DELETE
 	@Path("/{id: \\d+}")
@@ -60,5 +52,10 @@ public interface PublicationFacade {
 	@Path("/checkOrigin")
 	@AuthorizedAccess
 	Boolean checkOrigin(OriginChecker originChecker);
+
+	@GET
+	@Path("/{id: \\d+}/getTags")
+	@AuthorizedAccess("PUBLICATION_READ")
+	List<TagDto> getTagsForUser(@ApiParam(value = "id", required = true) @PathParam("id") @Valid @NotNull Long floorId);
 
 }

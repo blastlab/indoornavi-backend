@@ -4,12 +4,12 @@ import co.blastlab.serviceblbnavi.dao.repository.*;
 import co.blastlab.serviceblbnavi.domain.*;
 import co.blastlab.serviceblbnavi.dto.map.OriginChecker;
 import co.blastlab.serviceblbnavi.dto.map.PublicationDto;
+import co.blastlab.serviceblbnavi.dto.tag.TagDto;
 import org.apache.http.HttpStatus;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
-import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
@@ -58,24 +58,6 @@ public class PublicationBean implements PublicationFacade {
 	}
 
 	@Override
-	public PublicationDto get(Long floorId) {
-		Floor floor = floorRepository.findOptionalById(floorId).orElseThrow(EntityNotFoundException::new);
-		List<Publication> publications = publicationRepository.findByFloor(floor);
-		User user = userRepository.findOptionalByUsername(securityContext.getUserPrincipal().getName()).orElseThrow(EntityNotFoundException::new);
-		PublicationDto publication = null;
-		for (Publication publicationEntity : publications) {
-			if (publicationEntity.getUsers().contains(user)) {
-				publication = new PublicationDto(publicationEntity);
-				break;
-			}
-		}
-		if (publication == null) {
-			throw new ForbiddenException();
-		}
-		return publication;
-	}
-
-	@Override
 	public Response delete(Long id) {
 		Publication map = publicationRepository.findOptionalById(id).orElseThrow(EntityNotFoundException::new);
 		publicationRepository.remove(map);
@@ -88,9 +70,21 @@ public class PublicationBean implements PublicationFacade {
 		return optionalByValue.isPresent() && optionalByValue.get().getHost().equals(originChecker.getOrigin());
 	}
 
+	@Override
+	public List<TagDto> getTagsForUser(Long floorId) {
+		Floor floor = floorRepository.findOptionalById(floorId).orElseThrow(EntityNotFoundException::new);
+		List<Publication> publications = publicationRepository.findAllContainingFloor(floor);
+		User user = userRepository.findOptionalByUsername(securityContext.getUserPrincipal().getName()).orElseThrow(EntityNotFoundException::new);
+		publications = publications.stream().filter(publication -> publication.getUsers().contains(user)).collect(Collectors.toList());
+		List<Tag> tags = new ArrayList<>();
+		publications.forEach(publication -> tags.addAll(publication.getTags()));
+		return tags.stream().map(TagDto::new).collect(Collectors.toList());
+	}
+
 	private PublicationDto createOrUpdate(Publication mapEntity, PublicationDto map) {
-		Floor floor = floorRepository.findOptionalById(map.getFloor().getId()).orElseThrow(EntityNotFoundException::new);
-		mapEntity.setFloor(floor);
+		List<Floor> floors = new ArrayList<>();
+		map.getFloors().forEach(floorDto -> floors.add(floorRepository.findOptionalById(floorDto.getId()).orElseThrow(EntityNotFoundException::new)));
+		mapEntity.setFloors(floors);
 
 		List<Tag> tags = new ArrayList<>();
 		map.getTags().forEach(tagDto -> tags.add(tagRepository.findOptionalById(tagDto.getId()).orElseThrow(EntityNotFoundException::new)));
