@@ -36,6 +36,7 @@ public class AreaDto {
 	public Polygon toPolygon() {
 		GeometryFactory geometryFactory = new GeometryFactory();
 		List<Coordinate> coordinates = points.stream().map(point -> new Coordinate(point.getX(), point.getY())).collect(Collectors.toList());
+		coordinates.add(coordinates.get(0));
 		return geometryFactory.createPolygon(
 			coordinates.toArray(new Coordinate[coordinates.size()])
 		);
@@ -47,6 +48,7 @@ public class AreaDto {
 		for (Coordinate coordinate : coordinates) {
 			points.add(new Point((int) coordinate.x, (int) coordinate.y));
 		}
+		points.remove(points.size() - 1);
 		return points;
 	}
 }
