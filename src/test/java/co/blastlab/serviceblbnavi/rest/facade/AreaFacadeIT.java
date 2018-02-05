@@ -36,10 +36,10 @@ public class AreaFacadeIT extends BaseIT {
 		assertThat(areas.size(), is(2));
 		assertThat(areas.get(0).getName(), is("test"));
 		assertThat(areas.get(0).getConfigurations().size(), is(2));
-		assertThat(areas.get(0).getPoints().size(), is(5));
+		assertThat(areas.get(0).getPoints().size(), is(4));
 		assertThat(areas.get(1).getName(), is("test2"));
 		assertThat(areas.get(1).getConfigurations().size(), is(0));
-		assertThat(areas.get(1).getPoints().size(), is(5));
+		assertThat(areas.get(1).getPoints().size(), is(4));
 	}
 
 	@Test
