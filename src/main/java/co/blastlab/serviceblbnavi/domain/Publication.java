@@ -5,16 +5,15 @@ import lombok.Setter;
 
 import javax.persistence.Entity;
 import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Getter
 @Setter
-public class Map extends TrackedEntity {
-	@ManyToOne
-	private Floor floor;
+public class Publication extends TrackedEntity {
+	@ManyToMany
+	private List<Floor> floors = new ArrayList<>();
 	@ManyToMany
 	private List<User> users = new ArrayList<>();
 	@ManyToMany
