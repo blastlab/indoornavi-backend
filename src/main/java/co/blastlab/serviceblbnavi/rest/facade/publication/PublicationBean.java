@@ -10,6 +10,7 @@ import org.apache.http.HttpStatus;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
+import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
@@ -76,6 +77,9 @@ public class PublicationBean implements PublicationFacade {
 		List<Publication> publications = publicationRepository.findAllContainingFloor(floor);
 		User user = userRepository.findOptionalByUsername(securityContext.getUserPrincipal().getName()).orElseThrow(EntityNotFoundException::new);
 		publications = publications.stream().filter(publication -> publication.getUsers().contains(user)).collect(Collectors.toList());
+		if (publications.size() == 0) {
+			throw new ForbiddenException();
+		}
 		List<Tag> tags = new ArrayList<>();
 		publications.forEach(publication -> tags.addAll(publication.getTags()));
 		return tags.stream().map(TagDto::new).collect(Collectors.toList());
