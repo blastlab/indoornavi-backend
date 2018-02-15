@@ -113,7 +113,8 @@
 
 	<changeSet id="Configuration" author="kgebert" context="test" runOnChange="true" labels="Configuration" runAlways="true">
 		<loadUpdateData quotchar="'" tableName="configuration" file="test/Configuration.csv" primaryKey="id" relativeToChangelogFile="true">
-			<column name="published" type="boolean" />
+			<column name="publishedDate" type="DATE" />
+			<column name="saveDraftDate" type="DATE" />
 		</loadUpdateData>
 	</changeSet>
 

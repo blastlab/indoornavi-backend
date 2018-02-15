@@ -19,17 +19,21 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 public class ConfigurationDto {
+	private Long id;
 	private Long floorId;
 	private Integer version;
-	private Date publishedDate;
 	private Data data;
+	private Date publishedDate;
+	private Date savedDraftDate;
 
 	public ConfigurationDto(Configuration configuration) throws IOException {
 		ObjectMapper objectMapper = new ObjectMapper();
+		this.setId(configuration.getId());
 		this.setVersion(configuration.getVersion());
 		this.setFloorId(configuration.getFloor().getId());
 		this.setData(objectMapper.readValue(configuration.getData(), ConfigurationDto.Data.class));
-		this.setPublishedDate(configuration.getModificationDate());
+		this.setSavedDraftDate(configuration.getSaveDraftDate());
+		this.setPublishedDate(configuration.getPublishedDate());
 	}
 
 	@Getter

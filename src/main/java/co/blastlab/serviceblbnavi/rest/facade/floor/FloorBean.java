@@ -3,10 +3,8 @@ package co.blastlab.serviceblbnavi.rest.facade.floor;
 import co.blastlab.serviceblbnavi.dao.repository.BuildingRepository;
 import co.blastlab.serviceblbnavi.dao.repository.ConfigurationRepostiory;
 import co.blastlab.serviceblbnavi.dao.repository.FloorRepository;
-import co.blastlab.serviceblbnavi.domain.Building;
-import co.blastlab.serviceblbnavi.domain.Configuration;
-import co.blastlab.serviceblbnavi.domain.Floor;
-import co.blastlab.serviceblbnavi.domain.Scale;
+import co.blastlab.serviceblbnavi.dao.repository.PublicationRepository;
+import co.blastlab.serviceblbnavi.domain.*;
 import co.blastlab.serviceblbnavi.dto.floor.FloorDto;
 import co.blastlab.serviceblbnavi.dto.floor.ScaleDto;
 import org.apache.http.HttpStatus;
@@ -30,6 +28,9 @@ public class FloorBean implements FloorFacade {
 
 	@Inject
 	private ConfigurationRepostiory configurationRepostiory;
+
+	@Inject
+	private PublicationRepository publicationRepository;
 
 	@Override
 	public FloorDto get(Long id) {
@@ -85,13 +86,21 @@ public class FloorBean implements FloorFacade {
 
 	@Override
 	public Response delete(Long id) {
-		Optional<Floor> floor = floorRepository.findOptionalById(id);
-		if (floor.isPresent()) {
-			List<Configuration> byFloor = configurationRepostiory.findByFloor(floor.get());
+		Optional<Floor> floorOptional = floorRepository.findOptionalById(id);
+		if (floorOptional.isPresent()) {
+			Floor floor = floorOptional.get();
+			List<Configuration> byFloor = configurationRepostiory.findByFloor(floor);
 			for (Configuration configuration : byFloor) {
 				configurationRepostiory.remove(configuration);
 			}
-			floorRepository.remove(floor.get());
+			List<Publication> publications = publicationRepository.findAllContainingFloor(floor);
+			for (Publication publication : publications) {
+				// if this is the last floor in this publication, we have to remove it
+				if (publication.getFloors().size() == 1) {
+					publicationRepository.remove(publication);
+				}
+			}
+			floorRepository.remove(floor);
 			return Response.status(HttpStatus.SC_NO_CONTENT).build();
 		}
 		throw new EntityNotFoundException();

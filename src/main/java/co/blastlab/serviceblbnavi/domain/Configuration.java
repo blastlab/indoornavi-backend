@@ -8,6 +8,7 @@ import lombok.Setter;
 import javax.persistence.Entity;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
+import java.util.Date;
 
 @Entity
 @NoArgsConstructor
@@ -26,11 +27,12 @@ public class Configuration extends TrackedEntity {
 	@Lob
 	private String data;
 
-	private Boolean published;
+	private Date publishedDate;
 
-	public Configuration(Floor floor, Integer version, Boolean published) {
+	private Date saveDraftDate;
+
+	public Configuration(Floor floor, Integer version) {
 		this.floor = floor;
 		this.version = version;
-		this.published = published;
 	}
 }

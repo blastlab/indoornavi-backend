@@ -16,6 +16,5 @@ public interface ConfigurationRepostiory extends EntityRepository<Configuration,
 
 	List<Configuration> findByFloorOrderByVersionDesc(Floor floor);
 	Optional<Configuration> findTop1ByFloorOrderByVersionDesc(Floor floor);
-	Optional<Configuration> findTop1ByFloorAndPublishedOrderByVersionDesc(Floor floor, Boolean published);
 	List<Configuration> findByFloor(Floor floor);
 }
