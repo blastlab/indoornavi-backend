@@ -449,16 +449,16 @@
 		</createTable>
 	</changeSet>
 	<changeSet author="kgebert (generated)" id="navi-142-6">
-		<addForeignKeyConstraint onDelete="CASCADE" baseColumnNames="Publication_id" baseTableName="Publication_User" constraintName="FK_PublicationUser_Publication_Id" referencedColumnNames="id" referencedTableName="Publication"/>
+		<addForeignKeyConstraint baseColumnNames="Publication_id" baseTableName="Publication_User" constraintName="FK_PublicationUser_Publication_Id" referencedColumnNames="id" referencedTableName="Publication"/>
 	</changeSet>
 	<changeSet author="kgebert (generated)" id="navi-142-7">
-		<addForeignKeyConstraint baseColumnNames="users_id" baseTableName="Publication_User" constraintName="FK_PublicationUser_User_Id" referencedColumnNames="id" referencedTableName="User"/>
+		<addForeignKeyConstraint onDelete="CASCADE" baseColumnNames="users_id" baseTableName="Publication_User" constraintName="FK_PublicationUser_User_Id" referencedColumnNames="id" referencedTableName="User"/>
 	</changeSet>
 	<changeSet author="kgebert (generated)" id="navi-142-8">
-		<addForeignKeyConstraint onDelete="CASCADE" baseColumnNames="Publication_id" baseTableName="Publication_Tag" constraintName="FK_PublicationTag_Publication_Id" referencedColumnNames="id" referencedTableName="Publication"/>
+		<addForeignKeyConstraint baseColumnNames="Publication_id" baseTableName="Publication_Tag" constraintName="FK_PublicationTag_Publication_Id" referencedColumnNames="id" referencedTableName="Publication"/>
 	</changeSet>
 	<changeSet author="kgebert (generated)" id="navi-142-11">
-		<addForeignKeyConstraint baseColumnNames="tags_id" baseTableName="Publication_Tag" constraintName="FK_PublicationTag_Tag_Id" referencedColumnNames="id" referencedTableName="Tag"/>
+		<addForeignKeyConstraint onDelete="CASCADE" baseColumnNames="tags_id" baseTableName="Publication_Tag" constraintName="FK_PublicationTag_Tag_Id" referencedColumnNames="id" referencedTableName="Tag"/>
 	</changeSet>
 	<changeSet author="kgebert (generated)" id="navi-142-12">
 		<addForeignKeyConstraint onDelete="CASCADE" baseColumnNames="floor_id" baseTableName="Publication" constraintName="FK_Publication_Floor_Id" referencedColumnNames="id" referencedTableName="Floor"/>
@@ -520,12 +520,25 @@
 		<addForeignKeyConstraint baseColumnNames="Publication_id" baseTableName="Publication_Floor" constraintName="FK_Publication_Floor_Publication_Id" referencedColumnNames="id" referencedTableName="Publication"/>
 	</changeSet>
 	<changeSet author="kgebert (generated)" id="navi-187-3">
-		<addForeignKeyConstraint baseColumnNames="floors_id" baseTableName="Publication_Floor" constraintName="FK_Publication_Floor_Floor_Id" referencedColumnNames="id" referencedTableName="Floor"/>
+		<addForeignKeyConstraint onDelete="CASCADE" baseColumnNames="floors_id" baseTableName="Publication_Floor" constraintName="FK_Publication_Floor_Floor_Id" referencedColumnNames="id" referencedTableName="Floor"/>
 	</changeSet>
 	<changeSet author="kgebert (generated)" id="navi-187-4">
 		<dropForeignKeyConstraint baseTableName="publication" constraintName="FK_Publication_Floor_Id"/>
 	</changeSet>
 	<changeSet author="kgebert (generated)" id="navi-187-5">
 		<dropColumn columnName="floor_id" tableName="publication"/>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-184-1">
+		<addColumn tableName="Configuration">
+			<column name="publishedDate" type="datetime"/>
+		</addColumn>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-184-2">
+		<dropColumn columnName="published" tableName="configuration"/>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-184-3">
+		<addColumn tableName="Configuration">
+			<column name="saveDraftDate" type="datetime"/>
+		</addColumn>
 	</changeSet>
 </databaseChangeLog>

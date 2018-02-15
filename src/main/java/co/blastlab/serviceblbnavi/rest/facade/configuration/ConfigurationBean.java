@@ -13,6 +13,7 @@ import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -60,7 +61,7 @@ public class ConfigurationBean implements ConfigurationFacade {
 		configurationExtractor.extractScale(configurationData, floor);
 		configurationExtractor.extractAreas(configurationData, floor);
 
-		configurationEntity.setPublished(true);
+		configurationEntity.setPublishedDate(new Date());
 		return objectMapper.readValue(configurationEntity.getData(), ConfigurationDto.Data.class);
 	}
 
@@ -68,12 +69,19 @@ public class ConfigurationBean implements ConfigurationFacade {
 	public ConfigurationDto.Data saveDraft(ConfigurationDto configuration) throws IOException {
 		Floor floor = floorRepository.findOptionalById(configuration.getFloorId()).orElseThrow(EntityNotFoundException::new);
 		Optional<Configuration> configurationOptional = configurationRepostiory.findTop1ByFloorOrderByVersionDesc(floor);
-		Configuration latestConfiguration = configurationOptional.orElse(new Configuration(floor, 0, false));
+		Configuration latestConfiguration = configurationOptional.orElse(new Configuration(floor, 0));
 		ObjectMapper objectMapper = new ObjectMapper();
-		if (latestConfiguration.getPublished()) {
+		if (latestConfiguration.getPublishedDate() != null) {
 			Integer latestVersion = configurationRepostiory.getLatestVersion(floor);
-			latestConfiguration = new Configuration(floor, latestVersion + 1, objectMapper.writeValueAsString(configuration.getData()), false);
+			latestConfiguration = new Configuration(
+				floor,
+				latestVersion + 1,
+				objectMapper.writeValueAsString(configuration.getData()),
+				null,
+				new Date()
+			);
 		} else {
+			latestConfiguration.setSaveDraftDate(new Date());
 			latestConfiguration.setData(objectMapper.writeValueAsString(configuration.getData()));
 		}
 		latestConfiguration = configurationRepostiory.save(latestConfiguration);
@@ -84,13 +92,24 @@ public class ConfigurationBean implements ConfigurationFacade {
 	public ConfigurationDto undo(Long floorId) throws IOException {
 		Floor floor = floorRepository.findOptionalById(floorId).orElseThrow(EntityNotFoundException::new);
 
-		Optional<Configuration> configurationOptional = configurationRepostiory.findTop1ByFloorAndPublishedOrderByVersionDesc(floor, false);
-		configurationOptional.ifPresent(configuration -> configurationRepostiory.remove(configuration));
+		List<Configuration> latestConfigurations = configurationRepostiory.findByFloorOrderByVersionDesc(floor);
 
-		ObjectMapper objectMapper = new ObjectMapper();
-		Configuration latestConfiguration = configurationRepostiory.findTop1ByFloorOrderByVersionDesc(floor)
-			.orElse(new Configuration(floor, 0, objectMapper.writeValueAsString(new ConfigurationDto.Data()),false));
-		return new ConfigurationDto(latestConfiguration);
+		if (latestConfigurations.size() == 0) {
+			throw new EntityNotFoundException();
+		} else {
+			Configuration configuration = latestConfigurations.get(0);
+			if (latestConfigurations.size() == 1) {
+				ObjectMapper objectMapper = new ObjectMapper();
+				configuration.setPublishedDate(null);
+				configuration.setSaveDraftDate(null);
+				configuration.setData(objectMapper.writeValueAsString(new ConfigurationDto.Data()));
+				configurationRepostiory.save(configuration);
+				return new ConfigurationDto(configuration);
+			} else {
+				configurationRepostiory.remove(configuration);
+				return new ConfigurationDto(latestConfigurations.get(1));
+			}
+		}
 	}
 
 	@Override
