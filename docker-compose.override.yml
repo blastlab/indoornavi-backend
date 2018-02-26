@@ -45,13 +45,13 @@ services:
     build: compiler
     volumes:
       - ./:/app
-      - ./maven_core_compiler:/root/.m2
+      - deployments:/app/deployments
+      - m2:/root/.m2
     container_name:
       core_compiler
 
 
 volumes:
   # For Liquibase container.
-  maven_liquibase: {}
-  deployments: {}
-  maven_core_compiler: {}
+  deployments:
+  m2:
