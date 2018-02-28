@@ -10,7 +10,7 @@ services:
 
 
   liquibase:
-    build: liquibase
+    build: database
     ports:
       - '2306:80'
     environment:
@@ -19,7 +19,7 @@ services:
       USER: root
       PASSWORD: ""
     volumes:
-      - ./liquibase/changelog:/liquibase/changelog
+      - ./database/src/main/resources:/liquibase/changelog
     entrypoint: ["wait-for-it", "db:3306", "-t", "0", "--", "/run.sh"]
 
   core:
