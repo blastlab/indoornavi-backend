@@ -15,7 +15,7 @@ services:
       - '2306:80'
     environment:
       HOST: db
-      SCHEMA: test
+      SCHEMA: navi
       USER: root
       PASSWORD: ""
     volumes:
