@@ -55,6 +55,7 @@ public class InfoWebSocket extends WebSocket {
 	public void handleMessage(String message, Session session) throws IOException {
 		CompletableFuture<FileListSummary> fileListSummaryCompletableFuture = new CompletableFuture<>();
 		if (isServerSession(session)) {
+			System.out.println(message);
 			List<Info> infos = objectMapper.readValue(message, new TypeReference<List<Info>>(){});
 			for (Info info : infos) {
 				InfoType infoType = InfoType.from(info.getCode());
