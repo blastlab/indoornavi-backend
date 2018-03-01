@@ -1,16 +1,16 @@
 package co.blastlab.serviceblbnavi.socket.info.out.file;
 
-import co.blastlab.serviceblbnavi.socket.info.Info;
+import co.blastlab.serviceblbnavi.socket.info.InfoCode;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class AskList extends Info {
+public class AskList extends InfoCode {
 	public String extension;
 
 	public AskList(String extension) {
-		super(FileArgsType.ASK_LIST.getValue());
+		super(FileInfoType.ASK_LIST.getValue());
 		this.extension = extension;
 	}
 }

@@ -1,7 +1,6 @@
 package co.blastlab.serviceblbnavi.socket.info;
 
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Date;
@@ -10,14 +9,12 @@ import java.util.Map;
 
 @Getter
 @Setter
-@NoArgsConstructor
-public class Info {
-	private Integer code;
+public class Info extends InfoCode {
 	private long time;
 	private Object args;
 
 	public Info(Integer code) {
-		this.code = code;
+		super(code);
 		this.time = new Date().getTime();
 	}
 
