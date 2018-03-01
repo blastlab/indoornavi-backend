@@ -100,8 +100,8 @@ public class InfoWebSocket extends WebSocket {
 	}
 
 	private void handleFileMessage(CompletableFuture<FileListSummary> fileListSummaryCompletableFuture, Info info) {
-		Info fileInfo = (FileInfo) info.getArgs();
-		FileInfoType fileInfoType = FileInfoType.from(fileInfo.getCode());
+		InfoCode infoCode = (InfoCode) info.getArgs();
+		FileInfoType fileInfoType = FileInfoType.from(infoCode.getCode());
 		switch (fileInfoType) {
 			case INFO:
 				break;
