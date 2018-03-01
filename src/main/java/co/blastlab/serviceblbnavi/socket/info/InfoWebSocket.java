@@ -7,6 +7,7 @@ import co.blastlab.serviceblbnavi.socket.info.in.FileListSummary;
 import co.blastlab.serviceblbnavi.socket.info.out.file.AskList;
 import co.blastlab.serviceblbnavi.socket.info.out.file.Delete;
 import co.blastlab.serviceblbnavi.socket.info.out.file.FileInfo;
+import co.blastlab.serviceblbnavi.socket.info.out.file.FileInfoType;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -73,8 +74,7 @@ public class InfoWebSocket extends WebSocket {
 					case FIRMWARE_UPGRADE:
 						break;
 					case FILE:
-						FileListSummary fileListSummary = (FileListSummary) info.getArgs();
-						fileListSummaryCompletableFuture.complete(fileListSummary);
+						handleFileMessage(fileListSummaryCompletableFuture, info);
 						break;
 				}
 			}
@@ -96,6 +96,25 @@ public class InfoWebSocket extends WebSocket {
 				doUpload(fileListSummaryCompletableFuture, message);
 			}
 		});
+	}
+
+	private void handleFileMessage(CompletableFuture<FileListSummary> fileListSummaryCompletableFuture, Info info) {
+		Info fileInfo = (FileInfo) info.getArgs();
+		FileInfoType fileInfoType = FileInfoType.from(fileInfo.getCode());
+		switch (fileInfoType) {
+			case INFO:
+				break;
+			case DOWNLOAD:
+				break;
+			case ASK_LIST:
+				break;
+			case LIST:
+				FileListSummary fileListSummary = (FileListSummary) info.getArgs();
+				fileListSummaryCompletableFuture.complete(fileListSummary);
+				break;
+			case DELETE:
+				break;
+		}
 	}
 
 	private void removeRedundantFile(FileListSummary fileListSummary) {

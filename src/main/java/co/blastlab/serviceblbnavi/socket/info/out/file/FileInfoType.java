@@ -3,7 +3,7 @@ package co.blastlab.serviceblbnavi.socket.info.out.file;
 import java.util.HashMap;
 import java.util.Map;
 
-public enum FileArgsType {
+public enum FileInfoType {
 	INFO(0),
 	DOWNLOAD(1),
 	ASK_LIST(2),
@@ -11,14 +11,14 @@ public enum FileArgsType {
 	DELETE(4);
 
 	private final int value;
-	FileArgsType(final int newValue) {
+	FileInfoType(final int newValue) {
 		this.value = newValue;
 	}
 
-	private static final Map<Integer, FileArgsType> map = new HashMap<>();
+	private static final Map<Integer, FileInfoType> map = new HashMap<>();
 	static
 	{
-		for (FileArgsType infoType : FileArgsType.values())
+		for (FileInfoType infoType : FileInfoType.values())
 			map.put(infoType.getValue(), infoType);
 	}
 
@@ -26,7 +26,7 @@ public enum FileArgsType {
 		return value;
 	}
 
-	public static FileArgsType from(int value) {
+	public static FileInfoType from(int value) {
 		return map.get(value);
 	}
 }
