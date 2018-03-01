@@ -2,9 +2,11 @@ package co.blastlab.serviceblbnavi.socket.info;
 
 import co.blastlab.serviceblbnavi.socket.WebSocket;
 import co.blastlab.serviceblbnavi.socket.info.Info.InfoType;
+import co.blastlab.serviceblbnavi.socket.info.in.FileListDetails;
 import co.blastlab.serviceblbnavi.socket.info.in.FileListSummary;
 import co.blastlab.serviceblbnavi.socket.info.out.file.AskList;
 import co.blastlab.serviceblbnavi.socket.info.out.file.Delete;
+import co.blastlab.serviceblbnavi.socket.info.out.file.FileInfo;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -17,6 +19,7 @@ import javax.websocket.server.ServerEndpoint;
 import javax.xml.bind.DatatypeConverter;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
@@ -81,7 +84,7 @@ public class InfoWebSocket extends WebSocket {
 	}
 
 	private void doUpload(CompletableFuture<FileListSummary> fileListSummaryCompletableFuture, String message) {
-		askForFileList(objectMapper);
+		askForFileList();
 		fileListSummaryCompletableFuture.thenAccept(fileListSummary -> {
 			byte[] bytes = DatatypeConverter.parseBase64Binary(message.split(",")[1]);
 			if (fileListSummary.freeSpace >= bytes.length) {
@@ -89,17 +92,19 @@ public class InfoWebSocket extends WebSocket {
 //						serverSession.getBasicRemote().sendObject();
 				});
 			} else {
-				removeRedundantFile();
+				removeRedundantFile(fileListSummary);
 				doUpload(fileListSummaryCompletableFuture, message);
 			}
 		});
 	}
 
-	private void removeRedundantFile() {
+	private void removeRedundantFile(FileListSummary fileListSummary) {
+		fileListSummary.getFiles().sort(Comparator.comparing(FileListDetails::getCreatedUTC).reversed());
+		String path = fileListSummary.getFiles().get(0).getPath();
 		getServerSessions().forEach(session -> {
 			try {
-				Info info = new Delete("");
-				info.setCode(InfoType.FILE.getValue());
+				Info info = new FileInfo();
+				info.setArgs(new Delete(path));
 				session.getBasicRemote().sendText(objectMapper.writeValueAsString(info));
 			} catch (IOException e) {
 				// TODO: send info about an error
@@ -108,11 +113,11 @@ public class InfoWebSocket extends WebSocket {
 		});
 	}
 
-	private void askForFileList(ObjectMapper objectMapper) {
+	private void askForFileList() {
 		getServerSessions().forEach(session -> {
 			try {
-				Info info = new AskList("");
-				info.setCode(InfoType.FILE.getValue());
+				Info info = new FileInfo();
+				info.setArgs(new AskList(""));
 				session.getBasicRemote().sendText(objectMapper.writeValueAsString(info));
 			} catch (IOException e) {
 				// TODO: send info about an error

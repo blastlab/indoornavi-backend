@@ -1,15 +1,25 @@
 package co.blastlab.serviceblbnavi.socket.info;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 @Getter
 @Setter
+@NoArgsConstructor
 public class Info {
 	private Integer code;
+	private long time;
+	private Object args;
+
+	public Info(Integer code) {
+		this.code = code;
+		this.time = new Date().getTime();
+	}
 
 	public enum InfoType {
 		STATION_WAKE_UP(0),

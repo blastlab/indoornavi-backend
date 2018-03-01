@@ -6,11 +6,9 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class AskList extends Info {
-	public String extension;
+public class FileInfo extends Info {
 
-	public AskList(String extension) {
-		super(FileArgsType.ASK_LIST.getValue());
-		this.extension = extension;
+	public FileInfo() {
+		super(InfoType.FILE.getValue());
 	}
 }
