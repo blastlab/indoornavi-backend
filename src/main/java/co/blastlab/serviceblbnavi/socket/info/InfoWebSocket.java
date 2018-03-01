@@ -9,7 +9,10 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.ejb.Singleton;
-import javax.websocket.*;
+import javax.websocket.OnClose;
+import javax.websocket.OnMessage;
+import javax.websocket.OnOpen;
+import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 import javax.xml.bind.DatatypeConverter;
 import java.io.IOException;
@@ -97,8 +100,8 @@ public class InfoWebSocket extends WebSocket {
 			try {
 				Info info = new Delete("");
 				info.setCode(InfoType.FILE.getValue());
-				session.getBasicRemote().sendObject(info);
-			} catch (IOException | EncodeException e) {
+				session.getBasicRemote().sendText(objectMapper.writeValueAsString(info));
+			} catch (IOException e) {
 				// TODO: send info about an error
 				e.printStackTrace();
 			}
@@ -110,8 +113,8 @@ public class InfoWebSocket extends WebSocket {
 			try {
 				Info info = new AskList("");
 				info.setCode(InfoType.FILE.getValue());
-				session.getBasicRemote().sendObject(info);
-			} catch (IOException | EncodeException e) {
+				session.getBasicRemote().sendText(objectMapper.writeValueAsString(info));
+			} catch (IOException e) {
 				// TODO: send info about an error
 				e.printStackTrace();
 			}
