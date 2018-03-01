@@ -7,6 +7,7 @@ import co.blastlab.serviceblbnavi.socket.info.in.FileListSummary;
 import co.blastlab.serviceblbnavi.socket.info.out.file.AskList;
 import co.blastlab.serviceblbnavi.socket.info.out.file.Delete;
 import co.blastlab.serviceblbnavi.socket.info.out.file.FileInfo;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -18,10 +19,7 @@ import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 import javax.xml.bind.DatatypeConverter;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 @ServerEndpoint("/info")
@@ -56,27 +54,29 @@ public class InfoWebSocket extends WebSocket {
 	public void handleMessage(String message, Session session) throws IOException {
 		CompletableFuture<FileListSummary> fileListSummaryCompletableFuture = new CompletableFuture<>();
 		if (isServerSession(session)) {
-			Info info = objectMapper.readValue(message, Info.class);
-			InfoType infoType = InfoType.from(info.getCode());
-			switch (infoType) {
-				case STATION_WAKE_UP:
-					break;
-				case STATION_SLEEP:
-					break;
-				case SINK_DID:
-					break;
-				case VERSION:
-					break;
-				case NEW_DEVICE:
-					break;
-				case STATUS:
-					break;
-				case FIRMWARE_UPGRADE:
-					break;
-				case FILE:
-					FileListSummary fileListSummary = objectMapper.readValue(message, FileListSummary.class);
-					fileListSummaryCompletableFuture.complete(fileListSummary);
-					break;
+			List<Info> infos = objectMapper.readValue(message, new TypeReference<List<Info>>(){});
+			for (Info info : infos) {
+				InfoType infoType = InfoType.from(info.getCode());
+				switch (infoType) {
+					case STATION_WAKE_UP:
+						break;
+					case STATION_SLEEP:
+						break;
+					case SINK_DID:
+						break;
+					case VERSION:
+						break;
+					case NEW_DEVICE:
+						break;
+					case STATUS:
+						break;
+					case FIRMWARE_UPGRADE:
+						break;
+					case FILE:
+						FileListSummary fileListSummary = (FileListSummary) info.getArgs();
+						fileListSummaryCompletableFuture.complete(fileListSummary);
+						break;
+				}
 			}
 		} else if (isClientSession(session)) {
 			doUpload(fileListSummaryCompletableFuture, message);
@@ -105,7 +105,7 @@ public class InfoWebSocket extends WebSocket {
 			try {
 				Info info = new FileInfo();
 				info.setArgs(new Delete(path));
-				session.getBasicRemote().sendText(objectMapper.writeValueAsString(info));
+				session.getBasicRemote().sendText(objectMapper.writeValueAsString(Collections.singletonList(info)));
 			} catch (IOException e) {
 				// TODO: send info about an error
 				e.printStackTrace();
@@ -118,7 +118,7 @@ public class InfoWebSocket extends WebSocket {
 			try {
 				Info info = new FileInfo();
 				info.setArgs(new AskList(""));
-				session.getBasicRemote().sendText(objectMapper.writeValueAsString(info));
+				session.getBasicRemote().sendText(objectMapper.writeValueAsString(Collections.singletonList(info)));
 			} catch (IOException e) {
 				// TODO: send info about an error
 				e.printStackTrace();
