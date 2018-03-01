@@ -3,8 +3,9 @@ package co.blastlab.serviceblbnavi.socket.info;
 import co.blastlab.serviceblbnavi.socket.WebSocket;
 import co.blastlab.serviceblbnavi.socket.info.Info.InfoType;
 import co.blastlab.serviceblbnavi.socket.info.in.FileListSummary;
-import co.blastlab.serviceblbnavi.socket.info.out.file.AskListArgs;
-import co.blastlab.serviceblbnavi.socket.info.out.file.DeleteArgs;
+import co.blastlab.serviceblbnavi.socket.info.out.file.AskList;
+import co.blastlab.serviceblbnavi.socket.info.out.file.Delete;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.ejb.Singleton;
@@ -23,7 +24,7 @@ public class InfoWebSocket extends WebSocket {
 
 	private static Set<Session> clientSessions = Collections.synchronizedSet(new HashSet<Session>());
 	private static Set<Session> serverSessions = Collections.synchronizedSet(new HashSet<Session>());
-	private ObjectMapper objectMapper = new ObjectMapper();
+	private ObjectMapper objectMapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
 	@Override
 	protected Set<Session> getClientSessions() {
@@ -67,7 +68,7 @@ public class InfoWebSocket extends WebSocket {
 				case FIRMWARE_UPGRADE:
 					break;
 				case FILE:
-					FileListSummary fileListSummary = objectMapper.readValue(info.getArgs(), FileListSummary.class);
+					FileListSummary fileListSummary = objectMapper.readValue(message, FileListSummary.class);
 					fileListSummaryCompletableFuture.complete(fileListSummary);
 					break;
 			}
@@ -94,9 +95,8 @@ public class InfoWebSocket extends WebSocket {
 	private void removeRedundantFile() {
 		getServerSessions().forEach(session -> {
 			try {
-				Info info = new Info();
+				Info info = new Delete("");
 				info.setCode(InfoType.FILE.getValue());
-				info.setArgs(objectMapper.writeValueAsString(new DeleteArgs("")));
 				session.getBasicRemote().sendObject(info);
 			} catch (IOException | EncodeException e) {
 				// TODO: send info about an error
@@ -108,9 +108,8 @@ public class InfoWebSocket extends WebSocket {
 	private void askForFileList(ObjectMapper objectMapper) {
 		getServerSessions().forEach(session -> {
 			try {
-				Info info = new Info();
+				Info info = new AskList("");
 				info.setCode(InfoType.FILE.getValue());
-				info.setArgs(objectMapper.writeValueAsString(new AskListArgs("")));
 				session.getBasicRemote().sendObject(info);
 			} catch (IOException | EncodeException e) {
 				// TODO: send info about an error

@@ -10,7 +10,6 @@ import java.util.Map;
 @Setter
 public class Info {
 	private Integer code;
-	private String args;
 
 	public enum InfoType {
 		STATION_WAKE_UP(0),
