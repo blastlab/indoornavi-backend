@@ -21,12 +21,13 @@ public class Info extends InfoCode {
 	}
 
 	public enum InfoType {
-		STATION_WAKE_UP(0),
-		STATION_SLEEP(1),
-		SINK_DID(2),
-		VERSION(3),
-		NEW_DEVICE(4),
-		STATUS(5),
+		INFO(0),
+		STATION_WAKE_UP(1),
+		STATION_SLEEP(2),
+		SINK_DID(3),
+		VERSION(4),
+		NEW_DEVICE(5),
+		STATUS(6),
 		FIRMWARE_UPGRADE(20),
 		FILE(21);
 
