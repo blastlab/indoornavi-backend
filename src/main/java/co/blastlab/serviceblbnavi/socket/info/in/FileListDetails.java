@@ -10,6 +10,6 @@ public class FileListDetails extends Info {
 	public String path;
 	public int fsize;
 	public byte[] md5;
-	public short fCRC;
+	public int fCRC;
 	public long createdUTC;
 }
