@@ -107,7 +107,7 @@ public class InfoWebSocket extends WebSocket {
 	}
 
 	private void handleFileMessage(CompletableFuture<FileListSummary> fileListSummaryCompletableFuture, Info info) {
-		InfoCode infoCode = (InfoCode) info.getArgs();
+		InfoCode infoCode = objectMapper.convertValue(info.getArgs(), InfoCode.class);
 		FileInfoType fileInfoType = FileInfoType.from(infoCode.getCode());
 		switch (fileInfoType) {
 			case INFO:
@@ -117,7 +117,7 @@ public class InfoWebSocket extends WebSocket {
 			case ASK_LIST:
 				break;
 			case LIST:
-				FileListSummary fileListSummary = (FileListSummary) info.getArgs();
+				FileListSummary fileListSummary = objectMapper.convertValue(info.getArgs(), FileListSummary.class);
 				fileListSummaryCompletableFuture.complete(fileListSummary);
 				break;
 			case DELETE:
