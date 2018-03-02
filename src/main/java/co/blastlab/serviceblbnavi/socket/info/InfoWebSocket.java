@@ -92,9 +92,13 @@ public class InfoWebSocket extends WebSocket {
 			System.out.println(bytes.length);
 			System.out.println("----------------------------------------------");
 			if (fileListSummary.freeSpace >= bytes.length) {
-				getServerSessions().forEach(serverSession -> {
-//						serverSession.getBasicRemote().sendObject();
-				});
+				for (Session session : getServerSessions()) {
+					try {
+						session.getBasicRemote().sendText("");
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
 			} else {
 				removeRedundantFile(fileListSummary);
 				doUpload(fileListSummaryCompletableFuture, message);
