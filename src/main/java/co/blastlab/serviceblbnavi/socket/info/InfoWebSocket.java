@@ -22,6 +22,7 @@ import javax.xml.bind.DatatypeConverter;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 @ServerEndpoint("/info")
 @Singleton
@@ -52,7 +53,7 @@ public class InfoWebSocket extends WebSocket {
 	}
 
 	@OnMessage
-	public void handleMessage(String message, Session session) throws IOException {
+	public void handleMessage(String message, Session session) throws IOException, ExecutionException, InterruptedException {
 		CompletableFuture<FileListSummary> fileListSummaryCompletableFuture = new CompletableFuture<>();
 		if (isServerSession(session)) {
 			System.out.println(message);
@@ -84,26 +85,25 @@ public class InfoWebSocket extends WebSocket {
 		}
 	}
 
-	private void doUpload(CompletableFuture<FileListSummary> fileListSummaryCompletableFuture, String message) {
+	private void doUpload(CompletableFuture<FileListSummary> fileListSummaryCompletableFuture, String message) throws ExecutionException, InterruptedException {
 		askForFileList();
-		fileListSummaryCompletableFuture.thenAccept(fileListSummary -> {
-			byte[] bytes = DatatypeConverter.parseBase64Binary(message.split(",")[1]);
-			System.out.println("----------------------------------------------");
-			System.out.println(bytes.length);
-			System.out.println("----------------------------------------------");
-			if (fileListSummary.freeSpace >= bytes.length) {
-				for (Session session : getServerSessions()) {
-					try {
-						session.getBasicRemote().sendText("");
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
+		FileListSummary fileListSummary = fileListSummaryCompletableFuture.get();
+		byte[] bytes = DatatypeConverter.parseBase64Binary(message.split(",")[1]);
+		System.out.println("----------------------------------------------");
+		System.out.println(bytes.length);
+		System.out.println("----------------------------------------------");
+		if (fileListSummary.freeSpace >= bytes.length) {
+			for (Session session : getServerSessions()) {
+				try {
+					session.getBasicRemote().sendText("");
+				} catch (IOException e) {
+					e.printStackTrace();
 				}
-			} else {
-				removeRedundantFile(fileListSummary);
-				doUpload(fileListSummaryCompletableFuture, message);
 			}
-		});
+		} else {
+			removeRedundantFile(fileListSummary);
+			doUpload(fileListSummaryCompletableFuture, message);
+		}
 	}
 
 	private void handleFileMessage(CompletableFuture<FileListSummary> fileListSummaryCompletableFuture, Info info) {
