@@ -88,6 +88,9 @@ public class InfoWebSocket extends WebSocket {
 		askForFileList();
 		fileListSummaryCompletableFuture.thenAccept(fileListSummary -> {
 			byte[] bytes = DatatypeConverter.parseBase64Binary(message.split(",")[1]);
+			System.out.println("----------------------------------------------");
+			System.out.println(bytes.length);
+			System.out.println("----------------------------------------------");
 			if (fileListSummary.freeSpace >= bytes.length) {
 				getServerSessions().forEach(serverSession -> {
 //						serverSession.getBasicRemote().sendObject();
