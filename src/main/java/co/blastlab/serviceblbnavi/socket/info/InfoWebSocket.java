@@ -130,6 +130,7 @@ public class InfoWebSocket extends WebSocket {
 				if (fileListSummary.getFreeSpace() >= bytes.length) {
 					futureWrapper.getSession().getBasicRemote().sendText("");
 				} else {
+					futureWrapper.getFileDeletionStatus().cancel(false);
 					removeRedundantFile(futureWrapper.getSession(), fileListSummary);
 					futureWrapper.getFileDeletionStatus().whenComplete((deleted, deleteException) -> {
 						if (deleted.getSuccess()) {
@@ -138,6 +139,7 @@ public class InfoWebSocket extends WebSocket {
 							} catch (IOException e) {
 								e.printStackTrace();
 							}
+							futureWrapper.getFileListSummaryFuture().cancel(false);
 							doUpload(futureWrapper, bytes);
 						} else {
 							// TODO inform user that deletion has been failed
