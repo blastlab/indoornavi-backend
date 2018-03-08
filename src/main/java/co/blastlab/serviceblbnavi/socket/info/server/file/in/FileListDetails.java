@@ -1,6 +1,6 @@
-package co.blastlab.serviceblbnavi.socket.info.in;
+package co.blastlab.serviceblbnavi.socket.info.server.file.in;
 
-import co.blastlab.serviceblbnavi.socket.info.Info;
+import co.blastlab.serviceblbnavi.socket.info.server.Info;
 import lombok.Getter;
 import lombok.Setter;
 

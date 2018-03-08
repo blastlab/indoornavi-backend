@@ -35,6 +35,16 @@ public abstract class WebSocket extends WebSocketCommunication {
 		}
 	}
 
+	protected void close(Session session, Runnable doForClients, Runnable doForServers) {
+		if (Objects.equals(session.getQueryString(), CLIENT)) {
+			getClientSessions().remove(session);
+			doForClients.run();
+		} else if (Objects.equals(session.getQueryString(), SERVER)) {
+			getServerSessions().remove(session);
+			doForServers.run();
+		}
+	}
+
 	protected abstract Set<Session> getClientSessions();
 	protected abstract Set<Session> getServerSessions();
 }

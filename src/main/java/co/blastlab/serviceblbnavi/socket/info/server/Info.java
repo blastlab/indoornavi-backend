@@ -1,4 +1,4 @@
-package co.blastlab.serviceblbnavi.socket.info;
+package co.blastlab.serviceblbnavi.socket.info.server;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,12 +22,11 @@ public class Info extends InfoCode {
 
 	public enum InfoType {
 		INFO(0),
-		STATION_WAKE_UP(1),
-		STATION_SLEEP(2),
-		SINK_DID(3),
-		VERSION(4),
-		NEW_DEVICE(5),
-		STATUS(6),
+		NEW_DEVICE(1),
+		VERSION(2),
+		STATUS(3),
+		STATION_WAKE_UP(4),
+		STATION_SLEEP(5),
 		FIRMWARE_UPGRADE(20),
 		FILE(21);
 
