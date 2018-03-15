@@ -1,5 +1,6 @@
 package co.blastlab.serviceblbnavi.socket.info.future;
 
+import co.blastlab.serviceblbnavi.socket.info.server.file.in.Acknowledge;
 import co.blastlab.serviceblbnavi.socket.info.server.file.in.Deleted;
 import co.blastlab.serviceblbnavi.socket.info.server.file.in.FileListSummary;
 import lombok.Getter;
@@ -38,6 +39,11 @@ public class FutureController {
 	public void resolve(Session session, Deleted deleted) {
 		Optional<FutureWrapper> first = this.futures.stream().filter(futureWrapper -> session.getId().equals(futureWrapper.getSession().getId())).findFirst();
 		first.ifPresent(futureWrapper -> futureWrapper.getFileDeletionStatus().complete(deleted));
+	}
+
+	public void resolve(Session session, Acknowledge ack) {
+		Optional<FutureWrapper> first = this.futures.stream().filter(futureWrapper -> session.getId().equals(futureWrapper.getSession().getId())).findFirst();
+		first.ifPresent(futureWrapper -> futureWrapper.getFileUploadFuture().complete(ack));
 	}
 
 }
