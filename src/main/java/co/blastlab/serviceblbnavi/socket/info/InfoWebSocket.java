@@ -9,23 +9,28 @@ import co.blastlab.serviceblbnavi.socket.WebSocket;
 import co.blastlab.serviceblbnavi.socket.info.client.UpdateRequest;
 import co.blastlab.serviceblbnavi.socket.info.future.FutureController;
 import co.blastlab.serviceblbnavi.socket.info.future.FutureWrapper;
+import co.blastlab.serviceblbnavi.socket.info.helper.Helper;
 import co.blastlab.serviceblbnavi.socket.info.server.Info;
 import co.blastlab.serviceblbnavi.socket.info.server.Info.InfoType;
 import co.blastlab.serviceblbnavi.socket.info.server.InfoCode;
 import co.blastlab.serviceblbnavi.socket.info.server.file.FileInfo;
 import co.blastlab.serviceblbnavi.socket.info.server.file.FileInfo.FileInfoType;
+import co.blastlab.serviceblbnavi.socket.info.server.file.in.Acknowledge;
 import co.blastlab.serviceblbnavi.socket.info.server.file.in.Deleted;
 import co.blastlab.serviceblbnavi.socket.info.server.file.in.FileListDetails;
 import co.blastlab.serviceblbnavi.socket.info.server.file.in.FileListSummary;
 import co.blastlab.serviceblbnavi.socket.info.server.file.out.AskList;
 import co.blastlab.serviceblbnavi.socket.info.server.file.out.Delete;
+import co.blastlab.serviceblbnavi.socket.info.server.file.out.Upload;
 import co.blastlab.serviceblbnavi.socket.info.server.version.Version;
 import co.blastlab.serviceblbnavi.socket.wrappers.InfoWrapper;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import javax.annotation.Resource;
 import javax.ejb.Singleton;
+import javax.enterprise.concurrent.ManagedExecutorService;
 import javax.inject.Inject;
 import javax.websocket.OnClose;
 import javax.websocket.OnMessage;
@@ -35,16 +40,25 @@ import javax.websocket.server.ServerEndpoint;
 import javax.xml.bind.DatatypeConverter;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 @ServerEndpoint("/info")
 @Singleton
 public class InfoWebSocket extends WebSocket {
+
+	private static long TIMEOUT_SECONDS_ACK = 30;
 
 	@Inject
 	private DeviceRepository deviceRepository;
 
 	@Inject
 	private FutureController futureController;
+
+	@Resource
+	private ManagedExecutorService managedExecutorService;
 
 	private static Set<Session> clientSessions = Collections.synchronizedSet(new HashSet<Session>());
 	private static Set<Session> serverSessions = Collections.synchronizedSet(new HashSet<Session>());
@@ -119,37 +133,93 @@ public class InfoWebSocket extends WebSocket {
 		for (Integer sinkShortId : sinksShortIds) {
 			Optional<FutureWrapper> futureWrapperOptional = futureController.getBySinkShortId(sinkShortId);
 			futureWrapperOptional.ifPresent(futureWrapper -> {
-				doUpload(futureWrapper, bytes);
+				applyOnAskListResponse(futureWrapper, bytes);
 			});
 		}
 	}
 
-	private void doUpload(FutureWrapper futureWrapper, byte[] bytes) {
+	private void applyOnAskListResponse(FutureWrapper futureWrapper, byte[] bytes) {
 		futureWrapper.getFileListSummaryFuture().whenComplete(((fileListSummary, fileListException) -> {
 			try {
 				if (fileListSummary.getFreeSpace() >= bytes.length) {
-					futureWrapper.getSession().getBasicRemote().sendText("");
+					doUpload(futureWrapper, fileListSummary, bytes);
 				} else {
-					futureWrapper.getFileDeletionStatus().cancel(false);
-					removeRedundantFile(futureWrapper.getSession(), fileListSummary);
-					futureWrapper.getFileDeletionStatus().whenComplete((deleted, deleteException) -> {
-						if (deleted.getSuccess()) {
-							try {
-								sendAskForFileList(futureWrapper);
-							} catch (IOException e) {
-								e.printStackTrace();
-							}
-							futureWrapper.getFileListSummaryFuture().cancel(false);
-							doUpload(futureWrapper, bytes);
-						} else {
-							// TODO inform user that deletion has been failed
-						}
-					});
+					futureWrapper.setFileDeletionStatus(new CompletableFuture<>());
+					applyOnDelete(futureWrapper, bytes);
+					removeRedundantFile(futureWrapper, fileListSummary);
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}));
+	}
+
+	private void applyOnDelete(FutureWrapper futureWrapper, byte[] bytes) {
+		futureWrapper.getFileDeletionStatus().whenComplete((deleted, deleteException) -> {
+			if (deleted != null && deleted.getSuccess()) {
+				try {
+					futureWrapper.setFileListSummaryFuture(new CompletableFuture<>());
+					applyOnAskListResponse(futureWrapper, bytes);
+					sendAskForFileList(futureWrapper);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			} else {
+				// TODO inform user that deletion has been failed
+			}
+		});
+	}
+
+	private void doUpload(FutureWrapper futureWrapper, FileListSummary fileListSummary, byte[] bytes) throws IOException {
+		List<Upload> uploads = prepareToSendFile(fileListSummary, bytes);
+		managedExecutorService.execute(() -> {
+			try {
+				sendFilePart(futureWrapper, uploads, 0);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		});
+	}
+
+	private List<Upload> prepareToSendFile(FileListSummary fileListSummary, byte[] bytes) throws IOException {
+		int buffSize = fileListSummary.getBuffSize();
+		int stepSize = -1, offset = 0;
+		List<Upload> uploads = new ArrayList<>();
+		for (int i = 0; stepSize != 0; i += stepSize) {
+			Upload upload = new Upload("test", bytes.length, offset, 0, "");
+			stepSize = buffSize - Helper.calculateJsonLength(objectMapper.writeValueAsString(upload), i);
+			stepSize = stepSize * 3/4; // -4
+			stepSize -= (int) Math.ceil(Math.log10(stepSize));
+			if (offset + stepSize > bytes.length) {
+				stepSize = bytes.length - offset;
+			}
+			upload.setDataSize(stepSize);
+			offset += upload.getDataSize();
+			upload.setData(DatatypeConverter.printBase64Binary(Arrays.copyOfRange(bytes, i, i + stepSize)));
+			uploads.add(upload);
+		}
+		return uploads;
+	}
+
+	private void sendFilePart(FutureWrapper futureWrapper, List<Upload> uploads, int currentIndex) throws IOException {
+		String dataToSend = objectMapper.writeValueAsString(Collections.singletonList(uploads.get(currentIndex)));
+		futureWrapper.getSession().getBasicRemote().sendText(dataToSend);
+		try {
+//			CompletableFuture<Acknowledge> acknowledgeFuture = CompletableFuture
+//				.supplyAsync(futureWrapper::getFileUploadFuture)
+//				.get(InfoWebSocket.TIMEOUT_SECONDS_ACK, TimeUnit.SECONDS);
+			Acknowledge acknowledge = futureWrapper.getFileUploadFuture().get(InfoWebSocket.TIMEOUT_SECONDS_ACK, TimeUnit.SECONDS);
+			futureWrapper.setFileUploadFuture(new CompletableFuture<>());
+			if (uploads.size() < currentIndex) {
+				try {
+					sendFilePart(futureWrapper, uploads, currentIndex + 1);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		} catch (InterruptedException | TimeoutException | ExecutionException e) {
+			e.printStackTrace();
+		}
 	}
 
 	private void handleVersionMessage(Session session, Info info) {
@@ -179,15 +249,19 @@ public class InfoWebSocket extends WebSocket {
 				Deleted deleted = objectMapper.convertValue(info.getArgs(), Deleted.class);
 				futureController.resolve(session, deleted);
 				break;
+			case ACK:
+				Acknowledge acknowledge = objectMapper.convertValue(info.getArgs(), Acknowledge.class);
+				futureController.resolve(session, acknowledge);
+				break;
 		}
 	}
 
-	private void removeRedundantFile(Session session, FileListSummary fileListSummary) throws IOException {
+	private void removeRedundantFile(FutureWrapper futureWrapper, FileListSummary fileListSummary) throws IOException {
 		fileListSummary.getFiles().sort(Comparator.comparing(FileListDetails::getCreatedUTC).reversed());
 		String path = fileListSummary.getFiles().get(0).getPath();
 		Info info = new FileInfo();
 		info.setArgs(new Delete(path));
-		session.getBasicRemote().sendText(objectMapper.writeValueAsString(Collections.singletonList(info)));
+		futureWrapper.getSession().getBasicRemote().sendText(objectMapper.writeValueAsString(Collections.singletonList(info)));
 	}
 
 	private Set<Integer> askForFileList(UpdateRequest updateRequest) throws IOException {
