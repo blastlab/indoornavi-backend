@@ -189,7 +189,7 @@ public class InfoWebSocket extends WebSocket {
 		for (int i = 0; stepSize != 0; i += stepSize) {
 			Upload upload = new Upload("test", bytes.length, offset, 0, "");
 			stepSize = buffSize - Helper.calculateJsonLength(objectMapper.writeValueAsString(upload), i);
-			stepSize = stepSize * 3/4; // -4
+			stepSize = stepSize * 3/4 - 4;
 			stepSize -= (int) Math.ceil(Math.log10(stepSize));
 			if (offset + stepSize > bytes.length) {
 				stepSize = bytes.length - offset;
