@@ -44,6 +44,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.stream.Collectors;
 
 @ServerEndpoint("/info")
 @Singleton
@@ -171,7 +172,7 @@ public class InfoWebSocket extends WebSocket {
 	}
 
 	private void doUpload(FutureWrapper futureWrapper, FileListSummary fileListSummary, byte[] bytes) throws IOException {
-		List<Upload> uploads = prepareToSendFile(fileListSummary, bytes);
+		List<FileInfo> uploads = prepareToSendFile(fileListSummary, bytes);
 		managedExecutorService.execute(() -> {
 			try {
 				sendFilePart(futureWrapper, uploads, 0);
@@ -181,7 +182,7 @@ public class InfoWebSocket extends WebSocket {
 		});
 	}
 
-	private List<Upload> prepareToSendFile(FileListSummary fileListSummary, byte[] bytes) throws IOException {
+	private List<FileInfo> prepareToSendFile(FileListSummary fileListSummary, byte[] bytes) throws IOException {
 		int buffSize = fileListSummary.getBuffSize();
 		int stepSize = -1, offset = 0;
 		List<Upload> uploads = new ArrayList<>();
@@ -198,10 +199,14 @@ public class InfoWebSocket extends WebSocket {
 			upload.setData(DatatypeConverter.printBase64Binary(Arrays.copyOfRange(bytes, i, i + stepSize)));
 			uploads.add(upload);
 		}
-		return uploads;
+		return uploads.stream().map(upload -> {
+			FileInfo info = new FileInfo();
+			info.setArgs(upload);
+			return info;
+		}).collect(Collectors.toList());
 	}
 
-	private void sendFilePart(FutureWrapper futureWrapper, List<Upload> uploads, int currentIndex) throws IOException {
+	private void sendFilePart(FutureWrapper futureWrapper, List<FileInfo> uploads, int currentIndex) throws IOException {
 		String dataToSend = objectMapper.writeValueAsString(Collections.singletonList(uploads.get(currentIndex)));
 		futureWrapper.getSession().getBasicRemote().sendText(dataToSend);
 		try {
