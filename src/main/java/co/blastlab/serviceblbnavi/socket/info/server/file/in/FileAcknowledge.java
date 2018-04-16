@@ -7,9 +7,9 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class Acknowledge extends InfoCode {
+public class FileAcknowledge extends InfoCode {
 	private String file;
 	private Integer offset;
 	@JsonProperty("dsize")
-	private Integer batchSize;
+	private Integer dataSize;
 }

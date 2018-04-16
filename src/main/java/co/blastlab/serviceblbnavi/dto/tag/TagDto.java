@@ -10,8 +10,8 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class TagDto extends DeviceDto {
-	public TagDto(Long id, Integer shortId, Long longId, String name, Long floorId, Boolean verified) {
-		super(id, shortId, longId, name, floorId, verified);
+	public TagDto(Long id, Integer shortId, Long longId, String name, Long floorId, Boolean verified, String firmwareVersion) {
+		super(id, shortId, longId, name, floorId, verified, firmwareVersion);
 	}
 
 	public TagDto(Tag tag) {

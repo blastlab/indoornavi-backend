@@ -22,12 +22,12 @@ public class Info extends InfoCode {
 
 	public enum InfoType {
 		INFO(0),
-		NEW_DEVICE(1),
+		BROADCAST(1),
 		VERSION(2),
 		STATUS(3),
 		STATION_WAKE_UP(4),
 		STATION_SLEEP(5),
-		FIRMWARE_UPGRADE(20),
+		FIRMWARE_UPDATE(20),
 		FILE(21);
 
 		private final int value;

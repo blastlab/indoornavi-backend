@@ -1,18 +1,19 @@
 package co.blastlab.serviceblbnavi.socket.wrappers;
 
+import co.blastlab.serviceblbnavi.socket.info.controller.DeviceStatus;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
 public class InfoWrapper extends MessageWrapper {
 
-	private List<Integer> devicesIds;
+	private Set<DeviceStatus> devices;
 
-	public InfoWrapper(List<Integer> devicesIds) {
+	public InfoWrapper(Set<DeviceStatus> devices) {
 		super(MessageType.INFO);
-		this.devicesIds = devicesIds;
+		this.devices = devices;
 	}
 }

@@ -36,6 +36,9 @@ public class DeviceDto {
 	@ApiModelProperty(example = "false")
 	private Boolean verified;
 
+	@ApiModelProperty(example = "")
+	private String firmwareVersion;
+
 	public DeviceDto(Device device) {
 		this.setId(device.getId());
 		this.setShortId(device.getShortId());
@@ -43,5 +46,6 @@ public class DeviceDto {
 		this.setName(device.getName());
 		this.setFloorId(device.getFloor() != null ? device.getFloor().getId() : null);
 		this.setVerified(device.getVerified());
+		this.setFirmwareVersion(device.getFirmwareVersion());
 	}
 }

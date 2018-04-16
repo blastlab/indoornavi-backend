@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -25,6 +27,15 @@ public abstract class Device extends TrackedEntity {
 	private Floor floor;
 
 	private Boolean verified = false;
+
+	// firmware
+	private byte AorB;
+
+	@OneToMany(mappedBy = "owner", cascade = CascadeType.MERGE)
+	private Set<RoutePart> route = new HashSet<>();
+
+	private String firmwareVersion;
+	// end of firmware
 
 	@PostPersist
 	@PostUpdate
