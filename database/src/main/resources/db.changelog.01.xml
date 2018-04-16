@@ -541,4 +541,36 @@
 			<column name="saveDraftDate" type="datetime"/>
 		</addColumn>
 	</changeSet>
+
+	<changeSet author="kgebert (generated)" id="navi-195-1">
+		<createTable tableName="RoutePart">
+			<column autoIncrement="true" name="id" type="BIGINT">
+				<constraints primaryKey="true" primaryKeyName="RoutePartPK"/>
+			</column>
+			<column name="creationDate" type="datetime"/>
+			<column name="modificationDate" type="datetime"/>
+			<column name="sortIndex" type="INT"/>
+			<column name="deviceShortId" type="INT"/>
+		</createTable>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-195-2">
+		<addColumn tableName="Device">
+			<column name="AorB" type="tinyint">
+				<constraints nullable="false"/>
+			</column>
+		</addColumn>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-195-4">
+		<addColumn tableName="RoutePart">
+			<column name="owner_id" type="bigint"/>
+		</addColumn>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-195-5">
+		<addForeignKeyConstraint baseColumnNames="owner_id" baseTableName="RoutePart" constraintName="FK_RoutePart_Owner" referencedColumnNames="id" referencedTableName="Device"/>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-195-6">
+		<addColumn tableName="Device">
+			<column name="firmwareVersion" type="varchar(255)"/>
+		</addColumn>
+	</changeSet>
 </databaseChangeLog>

@@ -5,8 +5,11 @@ public class Helper {
 		return (int) Math.ceil(json.length() + Math.log10(offset + 1));
 	}
 
-//	public static int calculateStep(int bufferSize, int jsonLength) {
-//		currentStep -= currentStep % 4;
-//		return currentStep;
-//	}
+	public static byte getNextAorB(int minorVersion) {
+		return (byte) ((minorVersion + 1) % 2);
+	}
+
+	public static byte getAorB(Integer minorVersion) {
+		return (byte) (minorVersion % 2);
+	}
 }

@@ -25,6 +25,13 @@ public class HelperTest {
 		assertThat(Helper.calculateJsonLength(jsonString, 100), is(jsonLengthWitoutOffset + 3));
 	}
 
+	@Test
+	public void getAorB() {
+		assertThat(Helper.getNextAorB(1), is((byte) 0));
+		assertThat(Helper.getNextAorB(120), is((byte) 1));
+		assertThat(Helper.getNextAorB(341), is((byte) 0));
+	}
+
 	@Getter
 	@Setter
 	private class TestModel {
