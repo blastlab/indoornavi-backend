@@ -612,8 +612,7 @@ public class InfoWebSocket extends WebSocket {
 		if (toUpdateOptional.isPresent()) {
 			Device toUpdate = toUpdateOptional.get();
 			List<Integer> route = toUpdate.getRoute().stream().map(RoutePart::getDeviceShortId).collect(Collectors.toList());
-			route.add(0, ((Anchor) toUpdate).getSink().getShortId());
-			info.setArgs(new Start(toUpdate.getShortId(), new ArrayList<>(), path, Helper.getNextAorB(toUpdate.getAorB())));
+			info.setArgs(new Start(toUpdate.getShortId(), route, path, Helper.getNextAorB(toUpdate.getAorB())));
 			Session session = network.getSession();
 			session.getBasicRemote().sendText(objectMapper.writeValueAsString(Collections.singletonList(info)));
 			Optional<DeviceStatus> deviceStatusOptional = networkController.getDeviceStatus(toUpdate.getShortId());
