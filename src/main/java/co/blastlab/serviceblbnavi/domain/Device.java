@@ -29,12 +29,20 @@ public abstract class Device extends TrackedEntity {
 	private Boolean verified = false;
 
 	// firmware
-	private byte AorB;
+	@Enumerated(EnumType.ORDINAL)
+	private Partition partition;
 
 	@OneToMany(mappedBy = "owner", cascade = CascadeType.MERGE)
 	private Set<RoutePart> route = new HashSet<>();
 
-	private String firmwareVersion;
+	private Integer major;
+	private Integer minor;
+	private String commitHash;
+
+	public String getFirmwareVersion() {
+		return String.format("%d.%d.%s", major, minor, commitHash);
+	}
+
 	// end of firmware
 
 	@PostPersist
@@ -42,4 +50,28 @@ public abstract class Device extends TrackedEntity {
 	void broadcast() throws JsonProcessingException {
 		DeviceRegistrationWebSocket.broadcastDevice(this);
 	}
+
+	public static Partition getPartition(Integer minor) {
+		return minor % 2 == 0 ? Partition.A : Partition.B;
+	}
+
+	public Partition getReversedPartition() {
+		return this.partition == Partition.A ? Partition.B : Partition.A;
+	}
+
+	public enum Partition {
+		A(0),
+		B(1);
+
+		private final int value;
+		Partition(int value) {
+			this.value = value;
+		}
+
+		public int getValue() {
+			return value;
+		}
+	}
 }
+
+

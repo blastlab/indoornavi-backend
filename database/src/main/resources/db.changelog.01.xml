@@ -573,4 +573,30 @@
 			<column name="firmwareVersion" type="varchar(255)"/>
 		</addColumn>
 	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-195-7">
+		<addColumn tableName="Device">
+			<column name="commitHash" type="varchar(255)"/>
+		</addColumn>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-195-8">
+		<addColumn tableName="Device">
+			<column name="major" type="integer"/>
+		</addColumn>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-195-9">
+		<addColumn tableName="Device">
+			<column name="minor" type="integer"/>
+		</addColumn>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-195-10">
+		<addColumn tableName="Device">
+			<column name="partition" type="integer"/>
+		</addColumn>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-195-11">
+		<dropColumn columnName="AorB" tableName="device"/>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-195-12">
+		<dropColumn columnName="firmwareVersion" tableName="device"/>
+	</changeSet>
 </databaseChangeLog>

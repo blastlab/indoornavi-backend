@@ -1,6 +1,5 @@
 package co.blastlab.serviceblbnavi.socket.info.server.update;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,10 +9,8 @@ import java.util.Map;
 @Getter
 @Setter
 public class UpdateInfoCode {
-	@JsonProperty("icode")
 	private Short iCode;
 
-	@JsonProperty("did")
 	private Integer shortId;
 
 	public enum UpdateInfoCodeType {

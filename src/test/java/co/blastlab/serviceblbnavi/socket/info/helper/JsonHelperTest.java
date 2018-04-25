@@ -9,7 +9,7 @@ import org.junit.Test;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
-public class HelperTest {
+public class JsonHelperTest {
 
 	@Test
 	public void calculateJsonLength() throws JsonProcessingException {
@@ -20,16 +20,9 @@ public class HelperTest {
 		int jsonLengthWitoutOffset = 24;
 		String jsonString = objectMapper.writeValueAsString(testModel);
 
-		assertThat(Helper.calculateJsonLength(jsonString, 1), is(jsonLengthWitoutOffset + 1));
-		assertThat(Helper.calculateJsonLength(jsonString, 10), is(jsonLengthWitoutOffset + 2));
-		assertThat(Helper.calculateJsonLength(jsonString, 100), is(jsonLengthWitoutOffset + 3));
-	}
-
-	@Test
-	public void getAorB() {
-		assertThat(Helper.getNextAorB(1), is((byte) 0));
-		assertThat(Helper.getNextAorB(120), is((byte) 1));
-		assertThat(Helper.getNextAorB(341), is((byte) 0));
+		assertThat(JsonHelper.calculateJsonLength(jsonString, 1), is(jsonLengthWitoutOffset + 1));
+		assertThat(JsonHelper.calculateJsonLength(jsonString, 10), is(jsonLengthWitoutOffset + 2));
+		assertThat(JsonHelper.calculateJsonLength(jsonString, 100), is(jsonLengthWitoutOffset + 3));
 	}
 
 	@Getter

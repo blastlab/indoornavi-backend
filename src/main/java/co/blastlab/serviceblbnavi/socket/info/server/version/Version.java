@@ -1,6 +1,5 @@
 package co.blastlab.serviceblbnavi.socket.info.server.version;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,12 +10,9 @@ import java.util.Map;
 @Setter
 public class Version {
 
-	@JsonProperty("did")
 	private Integer shortId;
 	private Role role;
-	@JsonProperty("hVersion")
 	private String hardwareVersion;
-	@JsonProperty("fVersion")
 	private String firmwareVersion;
 
 	public enum Role {
