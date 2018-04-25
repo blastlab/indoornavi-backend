@@ -590,7 +590,7 @@
 	</changeSet>
 	<changeSet author="kgebert (generated)" id="navi-195-10">
 		<addColumn tableName="Device">
-			<column name="partition" type="integer"/>
+			<column name="firmwarePartition" type="integer"/>
 		</addColumn>
 	</changeSet>
 	<changeSet author="kgebert (generated)" id="navi-195-11">
