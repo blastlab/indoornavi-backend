@@ -30,6 +30,7 @@ public abstract class Device extends TrackedEntity {
 
 	// firmware
 	@Enumerated(EnumType.ORDINAL)
+	@Column(name = "firmwarePartition")
 	private Partition partition;
 
 	@OneToMany(mappedBy = "owner", cascade = CascadeType.MERGE)
