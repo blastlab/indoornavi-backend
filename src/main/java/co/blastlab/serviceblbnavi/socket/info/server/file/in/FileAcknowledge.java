@@ -1,7 +1,6 @@
 package co.blastlab.serviceblbnavi.socket.info.server.file.in;
 
 import co.blastlab.serviceblbnavi.socket.info.server.InfoCode;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,6 +9,5 @@ import lombok.Setter;
 public class FileAcknowledge extends InfoCode {
 	private String file;
 	private Integer offset;
-	@JsonProperty("dsize")
 	private Integer dataSize;
 }

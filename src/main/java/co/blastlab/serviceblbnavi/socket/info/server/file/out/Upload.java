@@ -1,7 +1,6 @@
 package co.blastlab.serviceblbnavi.socket.info.server.file.out;
 
 import co.blastlab.serviceblbnavi.socket.info.server.InfoCode;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,12 +9,9 @@ import static co.blastlab.serviceblbnavi.socket.info.server.file.FileInfo.FileIn
 @Getter
 @Setter
 public class Upload extends InfoCode {
-	@JsonProperty("file")
 	private String fileName;
-	@JsonProperty("fsize")
 	private int fileSize;
 	private int offset;
-	@JsonProperty("dsize")
 	private int dataSize;
 	private String data;
 

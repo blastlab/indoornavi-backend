@@ -10,7 +10,7 @@ import co.blastlab.serviceblbnavi.socket.info.controller.DeviceStatus;
 import co.blastlab.serviceblbnavi.socket.info.controller.Network;
 import co.blastlab.serviceblbnavi.socket.info.controller.NetworkController;
 import co.blastlab.serviceblbnavi.socket.info.helper.Crc16;
-import co.blastlab.serviceblbnavi.socket.info.helper.Helper;
+import co.blastlab.serviceblbnavi.socket.info.helper.JsonHelper;
 import co.blastlab.serviceblbnavi.socket.info.server.Info;
 import co.blastlab.serviceblbnavi.socket.info.server.Info.InfoType;
 import co.blastlab.serviceblbnavi.socket.info.server.InfoCode;
@@ -94,8 +94,8 @@ public class InfoWebSocket extends WebSocket {
 	@Resource
 	private ManagedExecutorService managedExecutorService;
 
-	private static Set<Session> clientSessions = Collections.synchronizedSet(new HashSet<Session>());
-	private static Set<Session> serverSessions = Collections.synchronizedSet(new HashSet<Session>());
+	private static Set<Session> clientSessions = Collections.synchronizedSet(new HashSet<>());
+	private static Set<Session> serverSessions = Collections.synchronizedSet(new HashSet<>());
 
 	private ObjectMapper objectMapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
@@ -295,7 +295,7 @@ public class InfoWebSocket extends WebSocket {
 			FileInfo info = new FileInfo();
 			Upload upload = new Upload(fileName, bytes.length, offset, 0, "");
 			info.setArgs(upload);
-			stepSize = buffSize - Helper.calculateJsonLength(objectMapper.writeValueAsString(Collections.singletonList(info)), i);
+			stepSize = buffSize - JsonHelper.calculateJsonLength(objectMapper.writeValueAsString(Collections.singletonList(info)), i);
 			stepSize = stepSize * 3 / 4 - 4;
 			stepSize -= (int) Math.ceil(Math.log10(stepSize + 1));
 			if (offset + stepSize > bytes.length) {
@@ -363,7 +363,7 @@ public class InfoWebSocket extends WebSocket {
 			if (isProperFirmwareVersion(deviceConnected)) {
 				Optional<? extends Device> optionalByShortId = deviceService.findOptionalByShortId(deviceConnected.getShortId());
 				if (optionalByShortId.isPresent()) {
-					optionalByShortId.get().setAorB(Helper.getAorB(deviceConnected.getFirmwareMinor()));
+					optionalByShortId.get().setPartition(Device.getPartition(deviceConnected.getFirmwareMinor()));
 					deviceRepository.save(optionalByShortId.get());
 					deviceStatusOptional.get().getUpdateFinished().complete(null);
 				}
@@ -426,18 +426,22 @@ public class InfoWebSocket extends WebSocket {
 		Version version = objectMapper.convertValue(info.getArgs(), Version.class);
 		Optional<? extends Device> optionalByShortId = deviceService.findOptionalByShortId(version.getShortId());
 		if (optionalByShortId.isPresent()) {
-			Device device = optionalByShortId.get();
-			device.setFirmwareVersion(version.getFirmwareVersion());
+			final Device device = optionalByShortId.get();
+			String[] firmwareVersion = version.getFirmwareVersion().split(".");
+			device.setMajor(Integer.parseInt(firmwareVersion[0]));
+			device.setMinor(Integer.parseInt(firmwareVersion[1]));
+			device.setCommitHash(firmwareVersion[2]);
 			deviceRepository.save(device);
+			Optional<DeviceStatus> deviceStatus = networkController.getDeviceStatus(device.getShortId());
+			deviceStatus.ifPresent(ds -> ds.setDevice(new DeviceDto(device)));
 		}
 	}
 
 	private boolean isProperFirmwareVersion(DeviceConnected deviceConnected) {
 		Optional<? extends Device> deviceOptional = deviceService.findOptionalByShortId(deviceConnected.getShortId());
-		byte newFirmwareAorB = Helper.getAorB(deviceConnected.getFirmwareMinor());
 		if (deviceOptional.isPresent()) {
 			Device device = deviceOptional.get();
-			return device.getAorB() != newFirmwareAorB;
+			return device.getPartition() == Device.getPartition(deviceConnected.getFirmwareMinor());
 		}
 		return false;
 	}
@@ -462,6 +466,7 @@ public class InfoWebSocket extends WebSocket {
 						}
 						deviceStatus.setStatus(DeviceStatus.Status.ONLINE);
 						deviceStatus.setLastTimeUpdated(new Date());
+
 						Optional<Network> bySession = networkController.getBySession(session);
 
 						if (bySession.isPresent()) {
@@ -508,7 +513,7 @@ public class InfoWebSocket extends WebSocket {
 					deviceStatus = null;
 				}
 			}
-			device.setAorB(Helper.getAorB(deviceConnected.getFirmwareMinor()));
+			device.setPartition(Device.getPartition(deviceConnected.getFirmwareMinor()));
 			for (int i = 0; i < route.size(); i++) {
 				Optional<? extends Device> routeDeviceOptional = deviceService.findOptionalByShortId(route.get(i));
 				if (routeDeviceOptional.isPresent()) {
@@ -612,7 +617,7 @@ public class InfoWebSocket extends WebSocket {
 		if (toUpdateOptional.isPresent()) {
 			Device toUpdate = toUpdateOptional.get();
 			List<Integer> route = toUpdate.getRoute().stream().map(RoutePart::getDeviceShortId).collect(Collectors.toList());
-			info.setArgs(new Start(toUpdate.getShortId(), route, path, Helper.getNextAorB(toUpdate.getAorB())));
+			info.setArgs(new Start(toUpdate.getShortId(), route, path, toUpdate.getReversedPartition().getValue()));
 			Session session = network.getSession();
 			session.getBasicRemote().sendText(objectMapper.writeValueAsString(Collections.singletonList(info)));
 			Optional<DeviceStatus> deviceStatusOptional = networkController.getDeviceStatus(toUpdate.getShortId());

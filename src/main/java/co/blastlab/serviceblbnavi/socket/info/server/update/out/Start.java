@@ -1,7 +1,6 @@
 package co.blastlab.serviceblbnavi.socket.info.server.update.out;
 
 import co.blastlab.serviceblbnavi.socket.info.server.InfoCode;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,18 +11,16 @@ import static co.blastlab.serviceblbnavi.socket.info.server.update.UpdateInfo.Up
 @Getter
 @Setter
 public class Start extends InfoCode {
-	@JsonProperty("did")
 	private Integer shortId;
 	private List<Integer> route;
-	@JsonProperty("file")
 	private String fileName;
-	private byte AorB;
+	private Integer partition;
 
-	public Start(Integer shortId, List<Integer> route, String fileName, byte AorB) {
+	public Start(Integer shortId, List<Integer> route, String fileName, Integer partition) {
 		super(UpdateInfoType.START.getValue());
 		this.shortId = shortId;
 		this.route = route;
 		this.fileName = fileName;
-		this.AorB = AorB;
+		this.partition = partition;
 	}
 }
