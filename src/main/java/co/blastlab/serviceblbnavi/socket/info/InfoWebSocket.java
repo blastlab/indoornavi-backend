@@ -50,6 +50,7 @@ import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 import javax.xml.bind.DatatypeConverter;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
@@ -76,6 +77,7 @@ public class InfoWebSocket extends WebSocket {
 		IWS_009 - The device didn't update due to abort on hardware side.
 		IWS_010 - Other error that the user itself can not resolve.
 		IWS_011 - The firmware is invalid.
+		IWS_012 - The file format is invalid. Only IHS files are allowed.
 	 */
 
 	private static long TIMEOUT_SECONDS_ACK = 30;
@@ -112,27 +114,7 @@ public class InfoWebSocket extends WebSocket {
 	@OnOpen
 	public void open(Session session) {
 		super.open(session, () -> {
-			try {
-				final Set<DeviceStatus> devices = new HashSet<>();
-				if (session.getRequestParameterMap().containsKey("sinks")) {
-					for (Network network : networkController.getNetworks()) {
-						devices.add(network.getSink());
-					}
-				} else if (session.getRequestParameterMap().containsKey("anchors")) {
-					for (Network network : networkController.getNetworks()) {
-						devices.addAll(network.getAnchors());
-					}
-				} else if (session.getRequestParameterMap().containsKey("tags")) {
-					for (Network network : networkController.getNetworks()) {
-						devices.addAll(network.getTags());
-					}
-				}
-				session.getBasicRemote().sendText(objectMapper.writeValueAsString(
-					new InfoWrapper(devices))
-				);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			sendInfoAboutConnectedDevices(session);
 		}, () -> {});
 	}
 
@@ -185,6 +167,7 @@ public class InfoWebSocket extends WebSocket {
 				checkOutdatedDeviceStatus(tagStatus);
 			}
 		});
+		getClientSessions().forEach(this::sendInfoAboutConnectedDevices);
 	}
 
 	private void checkOutdatedDeviceStatus(DeviceStatus deviceStatus) {
@@ -194,19 +177,47 @@ public class InfoWebSocket extends WebSocket {
 		}
 	}
 
+	private void sendInfoAboutConnectedDevices(Session session) {
+		try {
+			final Set<DeviceStatus> devices = new HashSet<>();
+			if (session.getRequestParameterMap().containsKey("sinks")) {
+				for (Network network : networkController.getNetworks()) {
+					devices.add(network.getSink());
+				}
+			} else if (session.getRequestParameterMap().containsKey("anchors")) {
+				for (Network network : networkController.getNetworks()) {
+					devices.addAll(network.getAnchors());
+				}
+			} else if (session.getRequestParameterMap().containsKey("tags")) {
+				for (Network network : networkController.getNetworks()) {
+					devices.addAll(network.getTags());
+				}
+			}
+			session.getBasicRemote().sendText(objectMapper.writeValueAsString(
+				new InfoWrapper(devices))
+			);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
 	private void prepareUpload(String message) throws IOException {
 		UpdateRequest updateRequest = objectMapper.readValue(message, UpdateRequest.class);
 		Map<Integer, Set<Integer>> sinkToDevicesMap = askForFileList(updateRequest);
 
 		byte[] bytes = DatatypeConverter.parseBase64Binary(updateRequest.getBase64file().split(",")[1]);
-		for (Map.Entry<Integer, Set<Integer>> entry : sinkToDevicesMap.entrySet()) {
-			Optional<Network> networkOptional = networkController.getBySinkShortId(entry.getKey());
-			networkOptional.ifPresent(network -> {
-				entry.getValue().forEach((Integer shortId) -> {
-					network.getToUpdateIds().add(shortId);
+		if (isProperFileExtension(bytes)) {
+			for (Map.Entry<Integer, Set<Integer>> entry : sinkToDevicesMap.entrySet()) {
+				Optional<Network> networkOptional = networkController.getBySinkShortId(entry.getKey());
+				networkOptional.ifPresent(network -> {
+					entry.getValue().forEach((Integer shortId) -> {
+						network.getToUpdateIds().add(shortId);
+					});
+					applyOnAskListResponse(network, bytes);
 				});
-				applyOnAskListResponse(network, bytes);
-			});
+			}
+		} else {
+			sendErrorCode("IWS_012");
 		}
 	}
 
@@ -631,6 +642,13 @@ public class InfoWebSocket extends WebSocket {
 				}
 			);
 		}
+	}
+
+	private boolean isProperFileExtension(byte[] data) {
+		byte[] filePrefix = Arrays.copyOfRange(data, 2, 6);
+		int current = ByteBuffer.wrap(filePrefix).getInt();
+		int expected = Integer.reverseBytes(0x852A456F);
+		return current == expected;
 	}
 
 	private void sendErrorCode(String code) {
