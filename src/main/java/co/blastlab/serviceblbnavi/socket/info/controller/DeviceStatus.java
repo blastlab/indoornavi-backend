@@ -19,6 +19,7 @@ public class DeviceStatus {
 	private Date lastTimeUpdated;
 	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	private CompletableFuture<Void> updateFinished = new CompletableFuture<>();
+	private Integer restartCount = 0;
 
 	public DeviceStatus(DeviceDto device, Status status) {
 		this.device = device;

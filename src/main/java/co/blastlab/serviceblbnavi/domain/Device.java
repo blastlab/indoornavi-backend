@@ -31,7 +31,7 @@ public abstract class Device extends TrackedEntity {
 	// firmware
 	@Enumerated(EnumType.ORDINAL)
 	@Column(name = "firmwarePartition")
-	private Partition partition;
+	private Partition partition = Partition.A;
 
 	@OneToMany(mappedBy = "owner", cascade = CascadeType.MERGE)
 	private Set<RoutePart> route = new HashSet<>();
@@ -41,7 +41,8 @@ public abstract class Device extends TrackedEntity {
 	private String commitHash;
 
 	public String getFirmwareVersion() {
-		return String.format("%d.%d.%s", major, minor, commitHash);
+		return major == null || minor == null || commitHash == null ?
+			null : String.format("%d.%d.%s", major, minor, commitHash);
 	}
 
 	// end of firmware
@@ -65,6 +66,7 @@ public abstract class Device extends TrackedEntity {
 		B(1);
 
 		private final int value;
+
 		Partition(int value) {
 			this.value = value;
 		}
