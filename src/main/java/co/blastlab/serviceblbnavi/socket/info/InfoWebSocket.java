@@ -360,15 +360,19 @@ public class InfoWebSocket extends WebSocket {
 		DeviceConnected deviceConnected = objectMapper.convertValue(info.getArgs(), DeviceConnected.class);
 		Optional<DeviceStatus> deviceStatusOptional = networkController.getDeviceStatus(deviceConnected.getShortId());
 		if (deviceStatusOptional.isPresent() && deviceStatusOptional.get().getStatus() == DeviceStatus.Status.RESTARTING) {
-			if (isProperFirmwareVersion(deviceConnected)) {
+			DeviceStatus deviceStatus = deviceStatusOptional.get();
+			deviceStatus.setRestartCount(deviceStatus.getRestartCount() + 1);
+			if (isProperFirmwareVersion(deviceConnected) && deviceStatus.getRestartCount() == 2) {
+				deviceStatus.setRestartCount(0);
 				Optional<? extends Device> optionalByShortId = deviceService.findOptionalByShortId(deviceConnected.getShortId());
 				if (optionalByShortId.isPresent()) {
 					optionalByShortId.get().setPartition(Device.getPartition(deviceConnected.getFirmwareMinor()));
 					deviceRepository.save(optionalByShortId.get());
-					deviceStatusOptional.get().getUpdateFinished().complete(null);
+					deviceStatus.getUpdateFinished().complete(null);
 				}
-			} else {
-				deviceStatusOptional.get().setStatus(DeviceStatus.Status.ONLINE);
+			} else if (deviceStatus.getRestartCount() == 2) {
+				deviceStatus.setStatus(DeviceStatus.Status.ONLINE);
+				deviceStatus.setRestartCount(0);
 				sendErrorCode("IWS_011");
 			}
 		} else {
@@ -427,7 +431,7 @@ public class InfoWebSocket extends WebSocket {
 		Optional<? extends Device> optionalByShortId = deviceService.findOptionalByShortId(version.getShortId());
 		if (optionalByShortId.isPresent()) {
 			final Device device = optionalByShortId.get();
-			String[] firmwareVersion = version.getFirmwareVersion().split(".");
+			String[] firmwareVersion = version.getFirmwareVersion().split("\\.");
 			device.setMajor(Integer.parseInt(firmwareVersion[0]));
 			device.setMinor(Integer.parseInt(firmwareVersion[1]));
 			device.setCommitHash(firmwareVersion[2]);
@@ -441,7 +445,7 @@ public class InfoWebSocket extends WebSocket {
 		Optional<? extends Device> deviceOptional = deviceService.findOptionalByShortId(deviceConnected.getShortId());
 		if (deviceOptional.isPresent()) {
 			Device device = deviceOptional.get();
-			return device.getPartition() == Device.getPartition(deviceConnected.getFirmwareMinor());
+			return device.getPartition() != Device.getPartition(deviceConnected.getFirmwareMinor());
 		}
 		return false;
 	}
@@ -634,6 +638,9 @@ public class InfoWebSocket extends WebSocket {
 	}
 
 	private void sendErrorCode(String code, DeviceStatus deviceStatus) {
+		if (deviceStatus != null) {
+			deviceStatus.setStatus(DeviceStatus.Status.ONLINE);
+		}
 		for (Session clientSession : clientSessions) {
 			try {
 				InfoErrorWrapper infoErrorWrapper;
