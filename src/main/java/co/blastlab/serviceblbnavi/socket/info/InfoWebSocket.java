@@ -81,7 +81,7 @@ public class InfoWebSocket extends WebSocket {
 	 */
 
 	private static long TIMEOUT_SECONDS_ACK = 30;
-	private static long AFTER_UPDATE_WAIT_TIME_SECONDS = 15;
+	private static long AFTER_UPDATE_WAIT_TIME_SECONDS = 10;
 	private static long OUTDATED_DEVICE_STATUS_MILISECONDS = 150000;
 
 	@Inject
@@ -221,6 +221,10 @@ public class InfoWebSocket extends WebSocket {
 		}
 	}
 
+	/**
+	 * This method is applied in early stage of update process.
+	 * It will check free disk space on the sink and if there is no free space it will recursively remove files to let the update process to continue.
+	 */
 	private void applyOnAskListResponse(Network network, byte[] bytes) {
 		network.getFileListSummaryFuture().whenComplete(((fileListSummary, fileListException) -> {
 			try {
@@ -244,6 +248,11 @@ public class InfoWebSocket extends WebSocket {
 		}));
 	}
 
+	/**
+	 * This method is applied in late stage of update process.
+	 * It will check md5 and crc16 of the uploaded file to make sure that uploading process has been finishied successfully.
+	 * If everything is fine, it will send a command to start an update.
+	 */
 	private void applyOnAskListResponse(Network network) {
 		network.getFileListSummaryFuture().whenComplete(((fileListSummary, fileListException) -> {
 			if (fileListSummary != null) {
@@ -296,6 +305,9 @@ public class InfoWebSocket extends WebSocket {
 		sendFilePart(network, uploads, 0);
 	}
 
+	/**
+	 * This method split the firmware file into small batches. Batch size is calculated by buffor size of the sink and the json frame size.
+	 */
 	private List<FileInfo> prepareToSendFile(FileListSummary fileListSummary, byte[] bytes, Network network) throws IOException {
 		int buffSize = fileListSummary.getBuffSize();
 		int stepSize = -1, offset = 0;
@@ -346,6 +358,15 @@ public class InfoWebSocket extends WebSocket {
 		});
 	}
 
+	/**
+	 * case LIST goes here when resolved:
+		 * @see InfoWebSocket#applyOnAskListResponse(Network) or
+		 * @see InfoWebSocket#applyOnAskListResponse(Network, byte[]) it depends on which one is currently applied
+	 * case DELETED goes here when resolved:
+	    * @see InfoWebSocket#applyOnDelete(Network, byte[])
+	 * case ACK goes here when resolved:
+	    * @see InfoWebSocket#sendFilePart(Network, List, int)
+	 */
 	private void handleFileMessage(Session session, Info info) {
 		InfoCode infoCode = objectMapper.convertValue(info.getArgs(), InfoCode.class);
 		FileInfoType fileInfoType = FileInfoType.from(infoCode.getCode());
@@ -367,6 +388,10 @@ public class InfoWebSocket extends WebSocket {
 		}
 	}
 
+	/**
+	 * When update is finished for specific device `getUpdateFinished` promise will be resolved and handled here:
+	 * @see InfoWebSocket#handleFirmwareAck(Session, UpdateAcknowledge)
+	 */
 	private void handleBroadcast(Session session, Info info) {
 		DeviceConnected deviceConnected = objectMapper.convertValue(info.getArgs(), DeviceConnected.class);
 		Optional<DeviceStatus> deviceStatusOptional = networkController.getDeviceStatus(deviceConnected.getShortId());
@@ -555,8 +580,10 @@ public class InfoWebSocket extends WebSocket {
 		List<Integer> notConnectedDevices = new ArrayList<>();
 		List<Integer> anchorsThatAreNotAssignedToAnySink = new ArrayList<>();
 		Map<Integer, Set<Integer>> sinkToDevicesMap = new HashMap<>();
+
 		Info info = new FileInfo();
 		info.setArgs(new AskList(""));
+
 		for (Integer shortId : updateRequest.getDevicesShortIds()) {
 			Optional<? extends Device> optionalDevice = deviceService.findOptionalByShortId(shortId);
 			if (optionalDevice.isPresent()) {
