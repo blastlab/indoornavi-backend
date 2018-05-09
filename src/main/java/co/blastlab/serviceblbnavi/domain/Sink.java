@@ -21,6 +21,14 @@ public class Sink extends Anchor {
 	@OneToMany(mappedBy = "sink")
 	private List<Anchor> anchors = new ArrayList<>();
 
+	public void unassign() {
+		this.setConfigured(false);
+		this.setFloor(null);
+		this.getAnchors().forEach(anchor -> {
+			anchor.setSink(null);
+		});
+	}
+
 	@PostPersist
 	@PostUpdate
 	@Override

@@ -2,8 +2,11 @@ package co.blastlab.serviceblbnavi.rest.facade.building;
 
 import co.blastlab.serviceblbnavi.dao.repository.BuildingRepository;
 import co.blastlab.serviceblbnavi.dao.repository.ComplexRepository;
+import co.blastlab.serviceblbnavi.dao.repository.SinkRepository;
 import co.blastlab.serviceblbnavi.domain.Building;
 import co.blastlab.serviceblbnavi.domain.Complex;
+import co.blastlab.serviceblbnavi.domain.Floor;
+import co.blastlab.serviceblbnavi.domain.Sink;
 import co.blastlab.serviceblbnavi.dto.building.BuildingDto;
 import org.apache.http.HttpStatus;
 
@@ -11,6 +14,7 @@ import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
 import javax.ws.rs.core.Response;
+import java.util.List;
 import java.util.Optional;
 
 @Stateless
@@ -21,6 +25,9 @@ public class BuildingBean implements BuildingFacade {
 
 	@Inject
 	private ComplexRepository complexRepository;
+
+	@Inject
+	private SinkRepository sinkRepository;
 
 	@Override
 	public BuildingDto create(BuildingDto building) {
@@ -54,6 +61,13 @@ public class BuildingBean implements BuildingFacade {
 	public Response delete(Long id) {
 		Optional<Building> building = buildingRepository.findOptionalById(id);
 		if (building.isPresent()) {
+			for (Floor floor : building.get().getFloors()) {
+				List<Sink> byFloor = sinkRepository.findByFloor(floor);
+				for (Sink sink : byFloor) {
+					sink.unassign();
+					sinkRepository.save(sink);
+				}
+			}
 			buildingRepository.remove(building.get());
 			return Response.status(HttpStatus.SC_NO_CONTENT).build();
 		}
