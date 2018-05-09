@@ -102,10 +102,7 @@ public class FloorBean implements FloorFacade {
 			}
 			List<Sink> sinks = sinkRepository.findByFloor(floor);
 			sinks.forEach(sink -> {
-				sink.setConfigured(false);
-				sink.getAnchors().forEach(anchor -> {
-					anchor.setSink(null);
-				});
+				sink.unassign();
 				sinkRepository.save(sink);
 			});
 			floorRepository.remove(floor);
