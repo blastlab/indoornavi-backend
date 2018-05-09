@@ -33,7 +33,7 @@ public abstract class Device extends TrackedEntity {
 	@Column(name = "firmwarePartition")
 	private Partition partition = Partition.A;
 
-	@OneToMany(mappedBy = "owner", cascade = CascadeType.MERGE)
+	@OneToMany(mappedBy = "owner", cascade = {CascadeType.MERGE, CascadeType.REMOVE})
 	private Set<RoutePart> route = new HashSet<>();
 
 	private Integer major;

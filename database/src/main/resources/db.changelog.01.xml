@@ -498,10 +498,10 @@
 		</addColumn>
 	</changeSet>
 	<changeSet author="kgebert (generated)" id="navi-166-3">
-		<addForeignKeyConstraint baseColumnNames="floor_id" baseTableName="Coordinates" constraintName="FK_Coordiantes_Floor" referencedColumnNames="id" referencedTableName="Floor"/>
+		<addForeignKeyConstraint onUpdate="CASCADE" onDelete="CASCADE" baseColumnNames="floor_id" baseTableName="Coordinates" constraintName="FK_Coordiantes_Floor" referencedColumnNames="id" referencedTableName="Floor"/>
 	</changeSet>
 	<changeSet author="kgebert (generated)" id="navi-166-4">
-		<addForeignKeyConstraint baseColumnNames="tag_id" baseTableName="Coordinates" constraintName="FK_Coordiantes_Tag" referencedColumnNames="id" referencedTableName="Tag"/>
+		<addForeignKeyConstraint onUpdate="CASCADE" onDelete="CASCADE" baseColumnNames="tag_id" baseTableName="Coordinates" constraintName="FK_Coordiantes_Tag" referencedColumnNames="id" referencedTableName="Tag"/>
 	</changeSet>
 	<changeSet author="kgebert (generated)" id="navi-166-5">
 		<dropColumn columnName="device" tableName="coordinates"/>
@@ -566,7 +566,7 @@
 		</addColumn>
 	</changeSet>
 	<changeSet author="kgebert (generated)" id="navi-195-5">
-		<addForeignKeyConstraint baseColumnNames="owner_id" baseTableName="RoutePart" constraintName="FK_RoutePart_Owner" referencedColumnNames="id" referencedTableName="Device"/>
+		<addForeignKeyConstraint onUpdate="CASCADE" onDelete="CASCADE" baseColumnNames="owner_id" baseTableName="RoutePart" constraintName="FK_RoutePart_Owner" referencedColumnNames="id" referencedTableName="Device"/>
 	</changeSet>
 	<changeSet author="kgebert (generated)" id="navi-195-6">
 		<addColumn tableName="Device">
