@@ -26,6 +26,8 @@ public class Sink extends Anchor {
 		this.setFloor(null);
 		this.getAnchors().forEach(anchor -> {
 			anchor.setSink(null);
+			anchor.setX(null);
+			anchor.setY(null);
 		});
 	}
 
