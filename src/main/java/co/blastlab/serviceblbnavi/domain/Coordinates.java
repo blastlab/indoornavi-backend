@@ -3,6 +3,7 @@ package co.blastlab.serviceblbnavi.domain;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 
@@ -12,8 +13,8 @@ import javax.persistence.ManyToOne;
 public class Coordinates extends TrackedEntity {
 	private int x;
 	private int y;
-	@ManyToOne
+	@ManyToOne(cascade = {CascadeType.REMOVE})
 	private Tag tag;
-	@ManyToOne
+	@ManyToOne(cascade = {CascadeType.REMOVE})
 	private Floor floor;
 }
