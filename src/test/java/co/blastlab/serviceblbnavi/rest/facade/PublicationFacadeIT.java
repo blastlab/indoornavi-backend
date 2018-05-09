@@ -40,8 +40,8 @@ public class PublicationFacadeIT extends BaseIT {
 	public void update() {
 		String body = new RequestBodyBuilder("Publication.json")
 			.setParameter("tags", ImmutableList.of(
-				new TagDto(4L, null, null, null, null, null),
-				new TagDto(5L, null, null, null, null, null))
+				new TagDto(4L, null, null, null, null, null, null),
+				new TagDto(5L, null, null, null, null, null, null))
 			)
 			.setParameter("users", ImmutableList.of())
 			.build();

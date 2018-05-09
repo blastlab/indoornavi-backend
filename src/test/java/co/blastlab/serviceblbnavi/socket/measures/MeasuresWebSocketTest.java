@@ -10,6 +10,9 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import javax.websocket.Session;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -39,7 +42,9 @@ public class MeasuresWebSocketTest {
 
 	@Test
 	public void handleMessageWhenMeasureIsSent() throws Exception {
-		when(session.getQueryString()).thenReturn("server");
+		when(session.getRequestParameterMap()).thenReturn(new HashMap<String, List<String>>(){{
+			this.put("server", new ArrayList<>());
+		}});
 
 		measuresWebSocket.handleMessage("[{\"did1\": 1, \"did2\": 100501, \"dist\": 100}]", session);
 
@@ -48,7 +53,9 @@ public class MeasuresWebSocketTest {
 
 	@Test
 	public void handleMessageWhenMeasureIsSentAndBothDevicesAreAnchors() throws Exception {
-		when(session.getQueryString()).thenReturn("server");
+		when(session.getRequestParameterMap()).thenReturn(new HashMap<String, List<String>>(){{
+			this.put("server", new ArrayList<>());
+		}});
 
 		measuresWebSocket.handleMessage("[{\"did1\": 100502, \"did2\": 100501, \"dist\": 100}]", session);
 

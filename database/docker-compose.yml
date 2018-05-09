@@ -9,11 +9,6 @@ services:
       MYSQL_ALLOW_EMPTY_PASSWORD: "true"
       TZ: Europe/Warsaw
 
-  liquibase:
-    build: .
-    volumes:
-      - maven_liquibase:/root/.m2
-    entrypoint: ["wait-for-it", "db:3306", "-t", "0", "--", "/liquibase/update-database.sh", "-h", "db", "-s", "Navi", "-u", "root", "--test"]
 
 volumes:
   # To prevent fetching all the Maven packages at every run store local repository in persistent named volume.
