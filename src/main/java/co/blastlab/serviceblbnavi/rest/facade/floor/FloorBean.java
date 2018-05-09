@@ -1,9 +1,6 @@
 package co.blastlab.serviceblbnavi.rest.facade.floor;
 
-import co.blastlab.serviceblbnavi.dao.repository.BuildingRepository;
-import co.blastlab.serviceblbnavi.dao.repository.ConfigurationRepostiory;
-import co.blastlab.serviceblbnavi.dao.repository.FloorRepository;
-import co.blastlab.serviceblbnavi.dao.repository.PublicationRepository;
+import co.blastlab.serviceblbnavi.dao.repository.*;
 import co.blastlab.serviceblbnavi.domain.*;
 import co.blastlab.serviceblbnavi.dto.floor.FloorDto;
 import co.blastlab.serviceblbnavi.dto.floor.ScaleDto;
@@ -31,6 +28,9 @@ public class FloorBean implements FloorFacade {
 
 	@Inject
 	private PublicationRepository publicationRepository;
+
+	@Inject
+	private SinkRepository sinkRepository;
 
 	@Override
 	public FloorDto get(Long id) {
@@ -100,6 +100,11 @@ public class FloorBean implements FloorFacade {
 					publicationRepository.remove(publication);
 				}
 			}
+			List<Sink> sinks = sinkRepository.findByFloor(floor);
+			sinks.forEach(sink -> {
+				sink.unassign();
+				sinkRepository.save(sink);
+			});
 			floorRepository.remove(floor);
 			return Response.status(HttpStatus.SC_NO_CONTENT).build();
 		}

@@ -58,8 +58,7 @@ public class ComplexBean implements ComplexFacade {
 			for (Floor floor : building.getFloors()) {
 				List<Sink> byFloor = sinkRepository.findByFloor(floor);
 				for (Sink sink : byFloor) {
-					sink.setConfigured(false);
-					sink.setFloor(null);
+					sink.unassign();
 					sinkRepository.save(sink);
 				}
 			}
