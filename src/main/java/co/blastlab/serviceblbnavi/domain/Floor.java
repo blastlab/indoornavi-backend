@@ -15,6 +15,7 @@ import java.util.List;
 	uniqueConstraints = @UniqueConstraint(columnNames = {"level", "building_id"})
 )
 @EqualsAndHashCode(callSuper = true)
+@Cacheable
 public class Floor extends TrackedEntity {
 
 	private Integer level;

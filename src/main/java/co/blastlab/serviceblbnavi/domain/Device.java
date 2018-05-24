@@ -13,6 +13,7 @@ import java.util.Set;
 @Getter
 @Setter
 @Inheritance(strategy = InheritanceType.JOINED)
+@Cacheable
 public abstract class Device extends TrackedEntity {
 
 	@Column(unique = true)

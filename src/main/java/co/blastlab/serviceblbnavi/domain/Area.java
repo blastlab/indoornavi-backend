@@ -12,6 +12,7 @@ import java.util.List;
 @Entity
 @Getter
 @Setter
+@Cacheable
 public class Area extends TrackedEntity {
 
 	private String name;
