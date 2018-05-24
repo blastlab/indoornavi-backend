@@ -1,6 +1,5 @@
 package co.blastlab.serviceblbnavi.rest.facade.tag;
 
-import co.blastlab.serviceblbnavi.dao.repository.FloorRepository;
 import co.blastlab.serviceblbnavi.dao.repository.TagRepository;
 import co.blastlab.serviceblbnavi.domain.Tag;
 import co.blastlab.serviceblbnavi.dto.tag.TagDto;
@@ -20,9 +19,6 @@ public class TagBean extends DeviceBean implements TagFacade {
 
 	@Inject
 	private TagRepository tagRepository;
-
-	@Inject
-	private FloorRepository floorRepository;
 
 	@Override
 	public TagDto create(TagDto tag) {
