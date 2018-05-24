@@ -2,6 +2,7 @@ package co.blastlab.serviceblbnavi.socket.measures;
 
 import co.blastlab.serviceblbnavi.dao.repository.AnchorRepository;
 import co.blastlab.serviceblbnavi.domain.Anchor;
+import co.blastlab.serviceblbnavi.domain.Floor;
 import co.blastlab.serviceblbnavi.dto.report.CoordinatesDto;
 import com.google.common.collect.Range;
 import org.junit.Test;
@@ -28,9 +29,12 @@ public class CoordinatesCalculatorTest {
 
 	@Test
 	public void calculateTagPosition() throws Exception {
-		when(anchorRepository.findOptionalByShortIdAndPositionNotNull(32768)).thenReturn(Optional.of(new Anchor(0, 0)));
-		when(anchorRepository.findOptionalByShortIdAndPositionNotNull(32769)).thenReturn(Optional.of(new Anchor(100, 0)));
-		when(anchorRepository.findOptionalByShortIdAndPositionNotNull(32770)).thenReturn(Optional.of(new Anchor(0, 100)));
+		Floor floor = new Floor();
+		floor.setId(1L);
+		when(anchorRepository.findOptionalByShortIdAndPositionNotNull(32768)).thenReturn(Optional.of(new Anchor(0, 0, floor)));
+		when(anchorRepository.findOptionalByShortIdAndPositionNotNull(32769)).thenReturn(Optional.of(new Anchor(100, 0, floor)));
+		when(anchorRepository.findOptionalByShortIdAndPositionNotNull(32770)).thenReturn(Optional.of(new Anchor(0, 100, floor)));
+		when(anchorRepository.findByShortId(32770)).thenReturn(Optional.of(new Anchor(0, 100, floor)));
 
 		Optional<CoordinatesDto> coordinatesDto = coordinatesCalculator.calculateTagPosition(1, 32768, 300);
 		assertThat(coordinatesDto.isPresent(), is(false));

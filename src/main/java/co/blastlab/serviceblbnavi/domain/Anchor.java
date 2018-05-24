@@ -28,9 +28,10 @@ public class Anchor extends Device {
 	@ManyToOne
 	private Sink sink;
 
-	public Anchor(Integer x, Integer y) {
+	public Anchor(Integer x, Integer y, Floor floor) {
 		this.x = x;
 		this.y = y;
+		this.setFloor(floor);
 	}
 
 	public static final String BY_SHORT_ID_AND_POSITION_NOT_NULL = "byShortIdAndPositionIsNotNull";
