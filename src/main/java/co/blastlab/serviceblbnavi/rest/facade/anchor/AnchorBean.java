@@ -1,7 +1,6 @@
 package co.blastlab.serviceblbnavi.rest.facade.anchor;
 
 import co.blastlab.serviceblbnavi.dao.repository.AnchorRepository;
-import co.blastlab.serviceblbnavi.dao.repository.FloorRepository;
 import co.blastlab.serviceblbnavi.domain.Anchor;
 import co.blastlab.serviceblbnavi.domain.Sink;
 import co.blastlab.serviceblbnavi.dto.anchor.AnchorDto;
@@ -21,9 +20,6 @@ public class AnchorBean extends DeviceBean implements AnchorFacade {
 
 	@Inject
 	private AnchorRepository anchorRepository;
-
-	@Inject
-	private FloorRepository floorRepository;
 
 	public AnchorDto create(AnchorDto anchor) {
 		Anchor anchorEntity = new Anchor();

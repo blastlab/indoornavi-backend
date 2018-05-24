@@ -3,6 +3,7 @@ package co.blastlab.serviceblbnavi.dao.repository;
 import co.blastlab.serviceblbnavi.domain.Anchor;
 import co.blastlab.serviceblbnavi.domain.Floor;
 import org.apache.deltaspike.data.api.EntityRepository;
+import org.apache.deltaspike.data.api.Query;
 import org.apache.deltaspike.data.api.Repository;
 
 import java.util.List;
@@ -16,6 +17,9 @@ public interface AnchorRepository extends EntityRepository<Anchor, Long> {
 	Optional<Anchor> findByShortId(Integer shortId);
 
 	Optional<Anchor> findOptionalByShortId(Integer shortId);
+
+	@Query(named = Anchor.BY_SHORT_ID_AND_POSITION_NOT_NULL)
+	Optional<Anchor> findOptionalByShortIdAndPositionNotNull(Integer shortId);
 
 	List<Anchor> findByFloor(Floor floor);
 

@@ -11,6 +11,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.ejb.Singleton;
 import javax.inject.Inject;
@@ -27,13 +29,16 @@ public class CoordinatesCalculator {
 
 	private Map<Integer, PointAndTime> previousCoorinates = new HashMap<>();
 
+	private static Logger LOGGER = LoggerFactory.getLogger(CoordinatesCalculator.class);
+
 	@Inject
 	private AnchorRepository anchorRepository;
 
-	public Optional<CoordinatesDto> calculateTagPosition(int firstDeviceId, int secondDeviceId, int distance) {
+	Optional<CoordinatesDto> calculateTagPosition(int firstDeviceId, int secondDeviceId, int distance) {
 		Integer tagId = getTagId(firstDeviceId, secondDeviceId);
 		Integer anchorId = getAnchorId(firstDeviceId, secondDeviceId);
 		if (tagId == null || anchorId == null) {
+			LOGGER.debug(String.format("One of the devices' ids is out of range. Ids are: %s, %s and range is (1, %s)", firstDeviceId, secondDeviceId, Short.MAX_VALUE));
 			return Optional.empty();
 		}
 
@@ -41,26 +46,33 @@ public class CoordinatesCalculator {
 
 		Set<Integer> connectedAnchors = getConnectedAnchors(tagId);
 		if (connectedAnchors.size() < 3) {
+			LOGGER.debug(String.format("Not enough connected anchors to calculate position. Currently connected anchors: %s", connectedAnchors.size()));
 			return Optional.empty();
 		}
 
 		Set<Pair<AnchorDistance, AnchorDistance>> pairs = getAnchorDistancePairs(connectedAnchors, tagId);
 		List<Point> intersectionPoints = new ArrayList<>();
+		int validAnchorsCount = 0;
 		for (Pair<AnchorDistance, AnchorDistance> pair : pairs) {
-			Optional<Anchor> left = anchorRepository.findByShortId(pair.getLeft().getAnchorId());
-			Optional<Anchor> right = anchorRepository.findByShortId(pair.getRight().getAnchorId());
+			Optional<Anchor> left = anchorRepository.findOptionalByShortIdAndPositionNotNull(pair.getLeft().getAnchorId());
+			Optional<Anchor> right = anchorRepository.findOptionalByShortIdAndPositionNotNull(pair.getRight().getAnchorId());
 			if (!left.isPresent() || !right.isPresent()) {
-				return Optional.empty();
+				continue;
 			}
+			validAnchorsCount++;
 			intersectionPoints.addAll(IntersectionsCalculator.getIntersections(
 				left.get(), pair.getLeft().getDistance(),
 				right.get(), pair.getRight().getDistance()
 			));
 		}
 
+		if (validAnchorsCount < 3) {
+			LOGGER.debug(String.format("Not enough valid anchors to calculate position. Currently valid anchors: %s", validAnchorsCount));
+			return Optional.empty();
+		}
 
 		List<Double> intersectionPointsDistance = IntersectionsCalculator.calculateSumDistanceBetweenIntersectionPoints(intersectionPoints);
-		Double thres = calculateThres(intersectionPointsDistance, connectedAnchors.size());
+		Double thres = calculateThres(intersectionPointsDistance, validAnchorsCount);
 		int x = 0, y = 0, j = 0;
 		for (int ip = 0; ip < intersectionPoints.size(); ++ip) {
 			if (intersectionPointsDistance.get(ip) <= thres) {
@@ -71,11 +83,15 @@ public class CoordinatesCalculator {
 		}
 		x /= j;
 		y /= j;
+
 		Optional<PointAndTime> previousPoint = Optional.ofNullable(previousCoorinates.get(tagId));
 		Long floorId = null;
 		Optional<Anchor> anchor = anchorRepository.findByShortId(anchorId);
 		if (anchor.isPresent()) {
 			floorId = anchor.get().getFloor() != null ? anchor.get().getFloor().getId() : null;
+		}
+		if (floorId == null) {
+			return Optional.empty();
 		}
 		Date currentDate = new Date();
 		if (previousPoint.isPresent()) {
@@ -91,8 +107,7 @@ public class CoordinatesCalculator {
 	}
 
 	private Double calculateThres(List<Double> intersectionPointsDistances, int connectedAnchorsCount) {
-		List<Double> sortedIntersectionPointsDistance = new ArrayList<>();
-		sortedIntersectionPointsDistance.addAll(intersectionPointsDistances);
+		List<Double> sortedIntersectionPointsDistance = new ArrayList<>(intersectionPointsDistances);
 		Collections.sort(sortedIntersectionPointsDistance);
 		Double thresBase = sortedIntersectionPointsDistance.get(connectedAnchorsCount - 1);
 		Double thres = thresBase;
@@ -109,7 +124,7 @@ public class CoordinatesCalculator {
 	/**
 	 * Remove old data, older than OLD_DATA_IN_MILISECONDS
 	 */
-	public void cleanTables() {
+	void cleanTables() {
 		long now = new Date().getTime();
 
 		Iterator<Table.Cell<Integer, Integer, List<Measure>>> measureIterator = measureTable.cellSet().iterator();
@@ -186,21 +201,16 @@ public class CoordinatesCalculator {
 
 	private Set<Pair<AnchorDistance, AnchorDistance>> getAnchorDistancePairs(Set<Integer> connectedAnchors, Integer tagId) {
 		Set<Pair<AnchorDistance, AnchorDistance>> pairs = new HashSet<>();
-		Integer[] connectedAnchorsArray = connectedAnchors.toArray(new Integer[connectedAnchors.size()]);
+		Integer[] connectedAnchorsArray = connectedAnchors.toArray(new Integer[0]);
 		for (int i = 0; i < connectedAnchors.size() - 1; i++) {
-			pairs.add(new ImmutablePair<>(
-					new AnchorDistance(connectedAnchorsArray[i], getDistance(tagId, connectedAnchorsArray[i])),
-					new AnchorDistance(connectedAnchorsArray[i + 1], getDistance(tagId, connectedAnchorsArray[i + 1]))
-				)
-			);
+			for (int j = i + 1; j < connectedAnchors.size(); j++) {
+				pairs.add(new ImmutablePair<>(
+						new AnchorDistance(connectedAnchorsArray[i], getDistance(tagId, connectedAnchorsArray[i])),
+						new AnchorDistance(connectedAnchorsArray[j], getDistance(tagId, connectedAnchorsArray[j]))
+					)
+				);
+			}
 		}
-		Integer firstAnchorId = connectedAnchorsArray[0];
-		Integer lastAnchorId = connectedAnchorsArray[connectedAnchors.size() - 1];
-		pairs.add(new ImmutablePair<>(
-				new AnchorDistance(firstAnchorId, getDistance(tagId, firstAnchorId)),
-				new AnchorDistance(lastAnchorId, getDistance(tagId, lastAnchorId))
-			)
-		);
 		return pairs;
 	}
 

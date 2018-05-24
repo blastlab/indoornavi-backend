@@ -25,7 +25,6 @@ class IntersectionsCalculator {
 			x = (firstAnchor.getX() + secondAnchor.getX() - dx * lenI * rsum) / 2;
 			y = (firstAnchor.getY() + secondAnchor.getY() - dy * lenI * rsum) / 2;
 			res.add(new Point((int)x, (int)y));
-			res.add(new Point((int)x, (int)y));
 		}
 		else if(rsum*rsum < L2)
 		{
@@ -33,7 +32,6 @@ class IntersectionsCalculator {
 			// rozlaczne zewnetrznie
 			x = (firstAnchor.getX() + secondAnchor.getX() + dx * lenI * rdiff) / 2;
 			y = (firstAnchor.getY() + secondAnchor.getY() + dy * lenI * rdiff) / 2;
-			res.add(new Point((int)x, (int)y));
 			res.add(new Point((int)x, (int)y));
 		}
 		// gdy odleglosci sie przecinaja z pewnym zapasem
