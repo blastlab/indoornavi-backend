@@ -34,11 +34,11 @@ public class CoordinatesCalculator {
 	@Inject
 	private AnchorRepository anchorRepository;
 
-	Optional<CoordinatesDto> calculateTagPosition(int firstDeviceId, int secondDeviceId, int distance) {
+	public Optional<CoordinatesDto> calculateTagPosition(int firstDeviceId, int secondDeviceId, int distance) {
 		Integer tagId = getTagId(firstDeviceId, secondDeviceId);
 		Integer anchorId = getAnchorId(firstDeviceId, secondDeviceId);
 		if (tagId == null || anchorId == null) {
-			LOGGER.debug(String.format("One of the devices' ids is out of range. Ids are: %s, %s and range is (1, %s)", firstDeviceId, secondDeviceId, Short.MAX_VALUE));
+			LOGGER.info(String.format("One of the devices' ids is out of range. Ids are: %s, %s and range is (1, %s)", firstDeviceId, secondDeviceId, Short.MAX_VALUE));
 			return Optional.empty();
 		}
 
@@ -46,7 +46,7 @@ public class CoordinatesCalculator {
 
 		Set<Integer> connectedAnchors = getConnectedAnchors(tagId);
 		if (connectedAnchors.size() < 3) {
-			LOGGER.debug(String.format("Not enough connected anchors to calculate position. Currently connected anchors: %s", connectedAnchors.size()));
+			LOGGER.info(String.format("Not enough connected anchors to calculate position. Currently connected anchors: %s", connectedAnchors.size()));
 			return Optional.empty();
 		}
 
@@ -67,7 +67,7 @@ public class CoordinatesCalculator {
 		}
 
 		if (validAnchorsCount < 3) {
-			LOGGER.debug(String.format("Not enough valid anchors to calculate position. Currently valid anchors: %s", validAnchorsCount));
+			LOGGER.info(String.format("Not enough valid anchors to calculate position. Currently valid anchors: %s", validAnchorsCount));
 			return Optional.empty();
 		}
 
@@ -124,7 +124,7 @@ public class CoordinatesCalculator {
 	/**
 	 * Remove old data, older than OLD_DATA_IN_MILISECONDS
 	 */
-	void cleanTables() {
+	public void cleanTables() {
 		long now = new Date().getTime();
 
 		Iterator<Table.Cell<Integer, Integer, List<Measure>>> measureIterator = measureTable.cellSet().iterator();
