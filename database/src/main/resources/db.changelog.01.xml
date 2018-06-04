@@ -240,7 +240,7 @@
 		</addColumn>
 	</changeSet>
 	<changeSet author="kgebert (generated)" id="navi-59-3">
-		<addForeignKeyConstraint onUpdate="CASCADE" onDelete="SET NULL" baseColumnNames="scale_id" baseTableName="Floor" constraintName="FK_Floor_Scale_Id" referencedColumnNames="id" referencedTableName="Scale"/>
+		<addForeignKeyConstraint onUpdate="CASCADE" onDelete="CASCADE" baseColumnNames="scale_id" baseTableName="Floor" constraintName="FK_Floor_Scale_Id" referencedColumnNames="id" referencedTableName="Scale"/>
 	</changeSet>
 	<changeSet author="kgebert (generated)" id="navi-128-1">
 		<createTable tableName="Sink">
