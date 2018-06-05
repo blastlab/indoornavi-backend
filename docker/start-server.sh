@@ -1,6 +1,6 @@
 #!/bin/bash
 
-: ${APP_ENVIRONMENT:=production}
+: ${APP_ENVIRONMENT:=development}
 
 if [ $APP_ENVIRONMENT = "development" ]; then
 	OPT_MANAGEMENT="-bmanagement 0.0.0.0"
