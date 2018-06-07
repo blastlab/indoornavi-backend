@@ -1,6 +1,7 @@
 package co.blastlab.serviceblbnavi.rest.facade.area;
 
 import co.blastlab.serviceblbnavi.dto.area.AreaConfigurationDto;
+import co.blastlab.serviceblbnavi.ext.filter.AuthorizedAccess;
 import io.swagger.annotations.*;
 
 import javax.validation.Valid;
@@ -14,11 +15,13 @@ import java.util.List;
 public interface AreaConfigurationFacade {
 	@POST
 	@ApiOperation(value = "create area configuration", response = AreaConfigurationDto.class)
+	@AuthorizedAccess("FLOOR_UPDATE")
 	AreaConfigurationDto create(@ApiParam(value = "areaConfiguration", required = true) @Valid AreaConfigurationDto areaConfiguration);
 
 	@PUT
 	@Path("/{id: \\d+}")
 	@ApiOperation(value = "update area configuration by id", response = AreaConfigurationDto.class)
+	@AuthorizedAccess("FLOOR_UPDATE")
 	AreaConfigurationDto update(@ApiParam(value = "id", required = true) @PathParam("id") @Valid @NotNull Long id,
 	               @ApiParam(value = "areaConfiguration", required = true) @Valid AreaConfigurationDto areaConfiguration);
 
@@ -29,9 +32,11 @@ public interface AreaConfigurationFacade {
 		@ApiResponse(code = 404, message = "Area configuration id empty or area configuration does not exist"),
 		@ApiResponse(code = 204, message = "Deleted successfully but there is no new information to return")
 	})
+	@AuthorizedAccess("FLOOR_UPDATE")
 	Response delete(@ApiParam(value = "id", required = true) @PathParam("id") @Valid @NotNull Long id);
 
 	@GET
 	@ApiOperation(value = "find all area configurations", response = AreaConfigurationDto.class, responseContainer = "List")
+	@AuthorizedAccess("FLOOR_READ")
 	List<AreaConfigurationDto> findAll();
 }

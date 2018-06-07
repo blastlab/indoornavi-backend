@@ -1,9 +1,6 @@
 package co.blastlab.serviceblbnavi.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 
@@ -19,6 +16,7 @@ import javax.persistence.*;
 		hints = {@QueryHint(name = "org.hibernate.cacheable", value = "true")}
 	)
 })
+@ToString(callSuper = true)
 public class Anchor extends Device {
 
 	private Integer x;

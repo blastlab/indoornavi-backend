@@ -8,6 +8,8 @@ import co.blastlab.serviceblbnavi.domain.AreaConfiguration;
 import co.blastlab.serviceblbnavi.domain.Floor;
 import co.blastlab.serviceblbnavi.domain.Tag;
 import co.blastlab.serviceblbnavi.dto.area.AreaDto;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
@@ -16,6 +18,8 @@ import java.util.List;
 import java.util.Optional;
 
 public class AreaService {
+	private final static Logger LOGGER = LoggerFactory.getLogger(AreaService.class);
+
 	@Inject
 	private TagRepository tagRepository;
 	@Inject
@@ -43,6 +47,7 @@ public class AreaService {
 		areaEntity.setPolygon(area.toPolygon());
 		areaEntity.setFloor(floor);
 		areaEntity = areaRepository.save(areaEntity);
+		LOGGER.debug("Area created/updated");
 		return new AreaDto(areaEntity);
 	}
 }

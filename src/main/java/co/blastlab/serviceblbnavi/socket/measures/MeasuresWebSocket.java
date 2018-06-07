@@ -193,7 +193,7 @@ public class MeasuresWebSocket extends WebSocket {
 
 	@Schedule(minute = "*/5", hour = "*", persistent = false)
 	public void cleanMeasureTable() {
-		LOGGER.info("Checking if there are any old measures in table and cleaning it.");
+		LOGGER.trace("Checking if there are any old measures in table and cleaning it.");
 		managedExecutorService.execute(() -> coordinatesCalculator.cleanTables());
 	}
 }

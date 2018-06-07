@@ -4,6 +4,7 @@ import co.blastlab.serviceblbnavi.socket.device.DeviceRegistrationWebSocket;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.util.HashSet;
@@ -14,6 +15,7 @@ import java.util.Set;
 @Setter
 @Inheritance(strategy = InheritanceType.JOINED)
 @Cacheable
+@ToString
 public abstract class Device extends TrackedEntity {
 
 	@Column(unique = true)

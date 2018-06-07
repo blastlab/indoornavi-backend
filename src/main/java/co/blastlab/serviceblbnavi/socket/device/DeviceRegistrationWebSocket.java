@@ -14,6 +14,8 @@ import co.blastlab.serviceblbnavi.dto.sink.SinkDto;
 import co.blastlab.serviceblbnavi.socket.WebSocketCommunication;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -26,9 +28,11 @@ import java.util.*;
 @ServerEndpoint("/devices/registration")
 public class DeviceRegistrationWebSocket extends WebSocketCommunication {
 
-	private static Set<Session> anchorSessions = Collections.synchronizedSet(new HashSet<Session>());
-	private static Set<Session> tagSessions = Collections.synchronizedSet(new HashSet<Session>());
-	private static Set<Session> sinkSessions = Collections.synchronizedSet(new HashSet<Session>());
+	private final static Logger LOGGER = LoggerFactory.getLogger(DeviceRegistrationWebSocket.class);
+
+	private static Set<Session> anchorSessions = Collections.synchronizedSet(new HashSet<>());
+	private static Set<Session> tagSessions = Collections.synchronizedSet(new HashSet<>());
+	private static Set<Session> sinkSessions = Collections.synchronizedSet(new HashSet<>());
 
 	@Inject
 	private AnchorRepository anchorRepository;
@@ -56,6 +60,7 @@ public class DeviceRegistrationWebSocket extends WebSocketCommunication {
 
 	@OnOpen
 	public void registerSession(Session session) throws JsonProcessingException {
+		LOGGER.debug("Session opened {}, query params = {}", session.getId(), session.getRequestParameterMap());
 		String queryString = session.getQueryString();
 		List<DeviceDto> devices = new ArrayList<>();
 		ObjectMapper objectMapper = new ObjectMapper();
@@ -83,6 +88,7 @@ public class DeviceRegistrationWebSocket extends WebSocketCommunication {
 
 	@OnClose
 	public void unregisterSession(Session session) {
+		LOGGER.debug("Session closed id = {}, query params = {}", session.getId(), session.getRequestParameterMap());
 		String queryString = session.getQueryString();
 		if (SessionType.SINK.getName().equals(queryString)) {
 			sinkSessions.remove(session);
