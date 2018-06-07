@@ -30,6 +30,11 @@ public class FloorService {
 	private FloorRepository floorRepository;
 
 	public void remove(Floor floor) {
+		removeNoCommit(floor);
+		floorRepository.remove(floor);
+	}
+
+	public void removeNoCommit(Floor floor ) {
 		List<Configuration> configurations = configurationRepostiory.findByFloor(floor);
 		LOGGER.debug("Removing all configurations: {}", configurations.size());
 		for (Configuration configuration : configurations) {
@@ -49,6 +54,5 @@ public class FloorService {
 			sink.unassign();
 			sinkRepository.save(sink);
 		});
-		floorRepository.remove(floor);
 	}
 }
