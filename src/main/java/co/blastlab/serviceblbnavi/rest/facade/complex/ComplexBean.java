@@ -68,7 +68,7 @@ public class ComplexBean implements ComplexFacade {
 		Complex complex = complexRepository.findById(id).orElseThrow(EntityNotFoundException::new);
 		for (Building building : complex.getBuildings()) {
 			for (Floor floor : building.getFloors()) {
-				floorService.remove(floor);
+				floorService.removeNoCommit(floor);
 			}
 		}
 		complexRepository.remove(complex);

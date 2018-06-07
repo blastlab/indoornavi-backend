@@ -70,7 +70,7 @@ public class BuildingBean implements BuildingFacade {
 		Optional<Building> building = buildingRepository.findOptionalById(id);
 		if (building.isPresent()) {
 			for (Floor floor : building.get().getFloors()) {
-				floorService.remove(floor);
+				floorService.removeNoCommit(floor);
 			}
 			buildingRepository.remove(building.get());
 			LOGGER.debug("Building removed");
