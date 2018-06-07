@@ -89,16 +89,7 @@
 			<logger category="com.arjuna">
 				<level name="WARN"/>
 			</logger>
-			<logger category="org.jboss.as">
-				<level name="WARN"/>
-			</logger>
-			<logger category="org.jboss.resteasy">
-				<level name="WARN"/>
-			</logger>
-			<logger category="org.jboss.weld">
-				<level name="WARN"/>
-			</logger>
-			<logger category="org.jboss.ejb">
+			<logger category="org.jboss">
 				<level name="WARN"/>
 			</logger>
 			<logger category="io.swagger">
@@ -110,11 +101,20 @@
 			<logger category="org.hibernate">
 				<level name="WARN"/>
 			</logger>
+			<logger category="org.apache.deltaspike">
+				<level name="WARN"/>
+			</logger>
 			<logger category="javax.enterprise">
 				<level name="WARN"/>
 			</logger>
+			<logger category="org.wildfly">
+				<level name="WARN"/>
+			</logger>
 			<logger category="org.infinispan">
-				<level name="DEBUG" />
+				<level name="WARN" />
+			</logger>
+			<logger category="net.sf.jmimemagic">
+				<level name="WARN" />
 			</logger>
 			<root-logger>
 				<level name="${app.log.level}"/>

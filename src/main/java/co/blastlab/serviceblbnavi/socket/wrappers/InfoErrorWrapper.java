@@ -3,9 +3,11 @@ package co.blastlab.serviceblbnavi.socket.wrappers;
 import co.blastlab.serviceblbnavi.socket.info.controller.DeviceStatus;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 @Getter
 @Setter
+@ToString(callSuper = true)
 public class InfoErrorWrapper extends MessageWrapper {
 
 	private String code;

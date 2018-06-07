@@ -1,9 +1,14 @@
 package co.blastlab.serviceblbnavi.socket;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.websocket.Session;
 import java.util.Set;
 
 public abstract class WebSocket extends WebSocketCommunication {
+
+	private final static Logger LOGGER = LoggerFactory.getLogger(WebSocket.class);
 
 	private final static String CLIENT = "client";
 	private final static String SERVER = "server";
@@ -17,6 +22,7 @@ public abstract class WebSocket extends WebSocketCommunication {
 	}
 
 	protected void open(Session session, Runnable doForClients, Runnable doForServers) {
+		LOGGER.debug("Session opened {}, query params = {}", session.getId(), session.getRequestParameterMap());
 		if (session.getRequestParameterMap().containsKey(CLIENT)) {
 			getClientSessions().add(session);
 			doForClients.run();
@@ -31,6 +37,7 @@ public abstract class WebSocket extends WebSocketCommunication {
 	}
 
 	protected void close(Session session, Runnable doForClients, Runnable doForServers) {
+		LOGGER.debug("Session closed id = {}, query params = {}", session.getId(), session.getRequestParameterMap());
 		if (session.getRequestParameterMap().containsKey(CLIENT)) {
 			getClientSessions().remove(session);
 			doForClients.run();

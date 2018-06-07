@@ -12,6 +12,8 @@ import net.sf.jmimemagic.*;
 import org.apache.commons.io.IOUtils;
 import org.apache.deltaspike.core.api.config.ConfigProperty;
 import org.apache.http.HttpStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.ejb.Stateless;
 import javax.imageio.ImageIO;
@@ -32,6 +34,8 @@ import static co.blastlab.serviceblbnavi.ext.mapper.accessory.FileMessagePack.FI
 @Stateless
 public class ImageBean implements ImageFacade {
 
+	private final static Logger LOGGER = LoggerFactory.getLogger(ImageBean.class);
+
 	@Inject
 	private ImageRepository imageRepository;
 
@@ -47,16 +51,19 @@ public class ImageBean implements ImageFacade {
 	private String allowedTypes;
 
 	@Override
-	public Response uploadImage(Long floorId, ImageUpload imageUpload) throws IOException, MagicParseException, MagicException, MagicMatchNotFoundException {
+	public Response uploadImage(Long floorId, ImageUpload imageUpload) throws IOException {
+		LOGGER.debug("Trying to upload image to floor id {}", floorId);
 		Floor floor = floorRepository.findOptionalById(floorId).orElseThrow(EntityNotFoundException::new);
 		if (floor.getImage() == null) {
 			Image imageEntity = new Image();
 			byte[] image = imageUpload.getImage();
 
+			LOGGER.debug("Checking file size");
 			if (!isProperFileSize(image)) {
 				return Response.status(HttpStatus.SC_BAD_REQUEST).entity(new FileViolationContent(FILE_002)).build();
 			}
 
+			LOGGER.debug("Checking file extension");
 			if (!isProperFileExtension(image)) {
 				return Response.status(HttpStatus.SC_BAD_REQUEST).entity(new FileViolationContent(FILE_001)).build();
 			}
@@ -67,13 +74,16 @@ public class ImageBean implements ImageFacade {
 			imageEntity.setBitmap(image);
 			imageRepository.save(imageEntity);
 			floor.setImage(imageEntity);
+			LOGGER.debug("Image uploaded");
 			return Response.ok(new FloorDto(floor)).build();
 		}
+		LOGGER.debug("Floor id {} has already an image", floorId);
 		return Response.status(HttpStatus.SC_CONFLICT).build();
 	}
 
 	@Override
 	public Response downloadImage(Long id) {
+		LOGGER.debug("Trying to download image id {}", id);
 		Optional<Image> imageOptional = imageRepository.findOptionalById(id);
 		if (imageOptional.isPresent()) {
 			byte[] image = imageOptional.get().getBitmap();

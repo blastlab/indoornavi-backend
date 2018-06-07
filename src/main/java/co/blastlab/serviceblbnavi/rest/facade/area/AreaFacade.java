@@ -1,6 +1,7 @@
 package co.blastlab.serviceblbnavi.rest.facade.area;
 
 import co.blastlab.serviceblbnavi.dto.area.AreaDto;
+import co.blastlab.serviceblbnavi.ext.filter.AuthorizedAccess;
 import io.swagger.annotations.*;
 
 import javax.validation.Valid;
@@ -17,6 +18,7 @@ public interface AreaFacade {
 	@ApiResponses({
 		@ApiResponse(code = 404, message = "Floor with given id does not exist")
 	})
+	@AuthorizedAccess("FLOOR_UPDATE")
 	AreaDto create(@ApiParam(value = "anchor", required = true) @Valid AreaDto area);
 
 	@PUT
@@ -25,6 +27,7 @@ public interface AreaFacade {
 	@ApiResponses({
 		@ApiResponse(code = 404, message = "Floor or area with given id does not exist")
 	})
+	@AuthorizedAccess("FLOOR_UPDATE")
 	AreaDto update(@ApiParam(value = "id", required = true) @PathParam("id") @Valid @NotNull Long id,
 	                 @ApiParam(value = "area", required = true) @Valid AreaDto area);
 
@@ -35,10 +38,12 @@ public interface AreaFacade {
 		@ApiResponse(code = 404, message = "Area id empty or area does not exist"),
 		@ApiResponse(code = 204, message = "Deleted successfully but there is no new information to return")
 	})
+	@AuthorizedAccess("FLOOR_UPDATE")
 	Response delete(@ApiParam(value = "id", required = true) @PathParam("id") @Valid @NotNull Long id);
 
 	@GET
 	@ApiOperation(value = "find all areas", response = AreaDto.class, responseContainer = "List")
+	@AuthorizedAccess("FLOOR_READ")
 	List<AreaDto> findAll();
 
 	@GET
@@ -47,5 +52,6 @@ public interface AreaFacade {
 	@ApiResponses({
 		@ApiResponse(code = 404, message = "Floor id empty or floor does not exist")
 	})
+	@AuthorizedAccess("FLOOR_READ")
 	List<AreaDto> findAllByFloor(@PathParam("floorId") @Valid @NotNull Long floorId);
 }

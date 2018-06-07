@@ -1,12 +1,11 @@
 #!/bin/bash
 
+: ${APP_LOG_LEVEL:=INFO}
+
 : ${APP_ENVIRONMENT:=development}
 
 if [ $APP_ENVIRONMENT = "development" ]; then
 	OPT_MANAGEMENT="-bmanagement 0.0.0.0"
-	APP_LOG_LEVEL="DEBUG"
-else
-	APP_LOG_LEVEL="INFO"
 fi
 
 exec $JBOSS_HOME/bin/standalone.sh \

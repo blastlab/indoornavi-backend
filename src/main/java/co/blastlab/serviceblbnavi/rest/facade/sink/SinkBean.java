@@ -7,6 +7,8 @@ import co.blastlab.serviceblbnavi.domain.Anchor;
 import co.blastlab.serviceblbnavi.domain.Sink;
 import co.blastlab.serviceblbnavi.dto.sink.SinkDto;
 import org.apache.http.HttpStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
@@ -18,6 +20,8 @@ import java.util.stream.Collectors;
 
 @Stateless
 public class SinkBean implements SinkFacade {
+
+	private final static Logger LOGGER = LoggerFactory.getLogger(SinkBean.class);
 
 	@Inject
 	private SinkRepository sinkRepository;
@@ -35,20 +39,24 @@ public class SinkBean implements SinkFacade {
 
 	@Override
 	public SinkDto create(SinkDto sink) {
+		LOGGER.debug("Trying to create sink {}", sink);
 		Sink sinkEntity = new Sink();
 		return createOrUpdate(sinkEntity, sink);
 	}
 
 	@Override
 	public SinkDto update(Long id, SinkDto sink) {
+		LOGGER.debug("Trying to update sink {}", sink);
 		Sink sinkEntity = sinkRepository.findOptionalById(id).orElseThrow(EntityNotFoundException::new);
 		return createOrUpdate(sinkEntity, sink);
 	}
 
 	@Override
 	public Response delete(Long id) {
+		LOGGER.debug("Trying to remove sink id {}", id);
 		Sink sink = sinkRepository.findOptionalById(id).orElseThrow(EntityNotFoundException::new);
 		sinkRepository.remove(sink);
+		LOGGER.debug("Sink removed");
 		return Response.status(HttpStatus.SC_NO_CONTENT).build();
 	}
 
@@ -65,6 +73,7 @@ public class SinkBean implements SinkFacade {
 		sinkEntity.setAnchors(anchors);
 		sinkEntity.setConfigured(sink.getConfigured() != null ? sink.getConfigured() : false);
 		sinkRepository.save(sinkEntity);
+		LOGGER.debug("Sink created/updated");
 		return new SinkDto(sinkEntity);
 	}
 }
