@@ -4,6 +4,7 @@ import co.blastlab.serviceblbnavi.dto.map.OriginChecker;
 import co.blastlab.serviceblbnavi.dto.map.PublicationDto;
 import co.blastlab.serviceblbnavi.dto.tag.TagDto;
 import co.blastlab.serviceblbnavi.ext.filter.AuthorizedAccess;
+import co.blastlab.serviceblbnavi.ext.filter.GenerateOperationID;
 import io.swagger.annotations.*;
 
 import javax.validation.Valid;
@@ -14,6 +15,7 @@ import java.util.List;
 
 @Path("/publications")
 @Api("/publications")
+@GenerateOperationID
 public interface PublicationFacade {
 
 	@POST

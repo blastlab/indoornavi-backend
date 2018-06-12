@@ -2,6 +2,7 @@ package co.blastlab.serviceblbnavi.rest.facade.complex;
 
 import co.blastlab.serviceblbnavi.dto.complex.ComplexDto;
 import co.blastlab.serviceblbnavi.ext.filter.AuthorizedAccess;
+import co.blastlab.serviceblbnavi.ext.filter.GenerateOperationID;
 import io.swagger.annotations.*;
 
 import javax.validation.Valid;
@@ -12,6 +13,7 @@ import java.util.List;
 
 @Path("/complexes")
 @Api("/complexes")
+@GenerateOperationID
 public interface ComplexFacade {
 
 	@POST

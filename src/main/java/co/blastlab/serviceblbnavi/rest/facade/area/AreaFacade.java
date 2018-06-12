@@ -2,6 +2,7 @@ package co.blastlab.serviceblbnavi.rest.facade.area;
 
 import co.blastlab.serviceblbnavi.dto.area.AreaDto;
 import co.blastlab.serviceblbnavi.ext.filter.AuthorizedAccess;
+import co.blastlab.serviceblbnavi.ext.filter.GenerateOperationID;
 import io.swagger.annotations.*;
 
 import javax.validation.Valid;
@@ -12,6 +13,7 @@ import java.util.List;
 
 @Path("/areas")
 @Api("/areas")
+@GenerateOperationID
 public interface AreaFacade {
 	@POST
 	@ApiOperation(value = "create area", response = AreaDto.class)

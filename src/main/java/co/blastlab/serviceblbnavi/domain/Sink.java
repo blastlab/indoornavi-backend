@@ -28,7 +28,7 @@ public class Sink extends Anchor {
 	private List<Anchor> anchors = new ArrayList<>();
 
 	public void unassign() {
-		LOGGER.debug("Trying to unassign {} from map", this);
+		LOGGER.debug("Unassigning {} from map", this);
 		this.setConfigured(false);
 		this.setFloor(null);
 		this.getAnchors().forEach(anchor -> {
@@ -36,7 +36,6 @@ public class Sink extends Anchor {
 			anchor.setX(null);
 			anchor.setY(null);
 		});
-		LOGGER.debug("Unassigned successfully", this);
 	}
 
 	@PostPersist

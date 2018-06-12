@@ -19,10 +19,9 @@ import co.blastlab.serviceblbnavi.socket.wrappers.AnchorsWrapper;
 import co.blastlab.serviceblbnavi.socket.wrappers.AreaEventWrapper;
 import co.blastlab.serviceblbnavi.socket.wrappers.CoordinatesWrapper;
 import co.blastlab.serviceblbnavi.socket.wrappers.TagsWrapper;
+import co.blastlab.serviceblbnavi.utils.Logger;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
@@ -41,10 +40,8 @@ import java.util.stream.Collectors;
 @Singleton
 public class MeasuresWebSocket extends WebSocket {
 
-	private static Logger LOGGER = LoggerFactory.getLogger(MeasuresWebSocket.class);
-
-	private static Set<Session> clientSessions = Collections.synchronizedSet(new HashSet<Session>());
-	private static Set<Session> serverSessions = Collections.synchronizedSet(new HashSet<Session>());
+	private static Set<Session> clientSessions = Collections.synchronizedSet(new HashSet<>());
+	private static Set<Session> serverSessions = Collections.synchronizedSet(new HashSet<>());
 
 	private ObjectMapper objectMapper;
 
@@ -52,6 +49,9 @@ public class MeasuresWebSocket extends WebSocket {
 	public void init() {
 		objectMapper = new ObjectMapper();
 	}
+
+	@Inject
+	private Logger logger;
 
 	@Inject
 	private CoordinatesRepository coordinatesRepository;
@@ -193,7 +193,7 @@ public class MeasuresWebSocket extends WebSocket {
 
 	@Schedule(minute = "*/5", hour = "*", persistent = false)
 	public void cleanMeasureTable() {
-		LOGGER.trace("Checking if there are any old measures in table and cleaning it.");
+		logger.trace("Checking if there are any old measures in table and cleaning it.");
 		managedExecutorService.execute(() -> coordinatesCalculator.cleanTables());
 	}
 }
