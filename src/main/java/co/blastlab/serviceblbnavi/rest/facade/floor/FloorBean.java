@@ -8,9 +8,8 @@ import co.blastlab.serviceblbnavi.domain.Scale;
 import co.blastlab.serviceblbnavi.dto.floor.FloorDto;
 import co.blastlab.serviceblbnavi.dto.floor.ScaleDto;
 import co.blastlab.serviceblbnavi.service.FloorService;
+import co.blastlab.serviceblbnavi.utils.Logger;
 import org.apache.http.HttpStatus;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
@@ -23,7 +22,8 @@ import static co.blastlab.serviceblbnavi.domain.Scale.scale;
 @Stateless
 public class FloorBean implements FloorFacade {
 
-	private final static Logger LOGGER = LoggerFactory.getLogger(FloorBean.class);
+	@Inject
+	private Logger logger;
 
 	@Inject
 	private FloorRepository floorRepository;
@@ -45,36 +45,36 @@ public class FloorBean implements FloorFacade {
 
 	@Override
 	public FloorDto create(FloorDto floor) {
-		LOGGER.debug("Trying to create floor {}", floor);
+		logger.debug("Trying to create floor {}", floor);
 		Building building = buildingRepository.findOptionalById(floor.getBuilding().getId()).orElseThrow(EntityNotFoundException::new);
 		Floor floorEntity = new Floor();
 		floorEntity.setLevel(floor.getLevel());
 		floorEntity.setName(floor.getName());
 		floorEntity.setBuilding(building);
 		floorEntity = floorRepository.save(floorEntity);
-		LOGGER.debug("Floor created");
+		logger.debug("Floor created");
 		return new FloorDto(floorEntity);
 	}
 
 	@Override
 	public FloorDto update(Long id, FloorDto floor) {
-		LOGGER.debug("Trying to update floor {}", floor);
+		logger.debug("Trying to update floor {}", floor);
 		Floor floorEntity = floorRepository.findOptionalById(id).orElseThrow(EntityNotFoundException::new);
 		floorEntity.setLevel(floor.getLevel());
 		floorEntity.setName(floor.getName());
 		Floor floorDb = floorRepository.save(floorEntity);
-		LOGGER.debug("Floor updated");
+		logger.debug("Floor updated");
 		return new FloorDto(floorDb);
 	}
 
 	@Override
 	public Response delete(Long id) {
-		LOGGER.debug("Trying to remove floor id = {}", id);
+		logger.debug("Trying to remove floor id = {}", id);
 		Optional<Floor> floorOptional = floorRepository.findOptionalById(id);
 		if (floorOptional.isPresent()) {
 			Floor floor = floorOptional.get();
 			floorService.remove(floor);
-			LOGGER.debug("Floor removed");
+			logger.debug("Floor removed");
 			return Response.status(HttpStatus.SC_NO_CONTENT).build();
 		}
 		throw new EntityNotFoundException();
@@ -82,7 +82,7 @@ public class FloorBean implements FloorFacade {
 
 	@Override
 	public FloorDto setScale(Long id, ScaleDto scaleDto) {
-		LOGGER.debug("Trying to set scale {} to floor id {}", scaleDto, id);
+		logger.debug("Trying to set scale {} to floor id {}", scaleDto, id);
 		Floor floor = floorRepository.findOptionalById(id).orElseThrow(EntityNotFoundException::new);
 		Scale scale = scale(floor.getScale())
 			.measure(scaleDto.getMeasure())
@@ -93,7 +93,7 @@ public class FloorBean implements FloorFacade {
 			.stopY(scaleDto.getStop().getY());
 		floor.setScale(scale);
 		floor = floorRepository.save(floor);
-		LOGGER.debug("Scale set");
+		logger.debug("Scale set");
 		return new FloorDto(floor);
 	}
 }

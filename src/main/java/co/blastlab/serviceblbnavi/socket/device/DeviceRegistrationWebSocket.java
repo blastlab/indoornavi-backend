@@ -12,10 +12,9 @@ import co.blastlab.serviceblbnavi.dto.anchor.AnchorDto;
 import co.blastlab.serviceblbnavi.dto.device.DeviceDto;
 import co.blastlab.serviceblbnavi.dto.sink.SinkDto;
 import co.blastlab.serviceblbnavi.socket.WebSocketCommunication;
+import co.blastlab.serviceblbnavi.utils.Logger;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -28,7 +27,8 @@ import java.util.*;
 @ServerEndpoint("/devices/registration")
 public class DeviceRegistrationWebSocket extends WebSocketCommunication {
 
-	private final static Logger LOGGER = LoggerFactory.getLogger(DeviceRegistrationWebSocket.class);
+	@Inject
+	private Logger logger;
 
 	private static Set<Session> anchorSessions = Collections.synchronizedSet(new HashSet<>());
 	private static Set<Session> tagSessions = Collections.synchronizedSet(new HashSet<>());
@@ -46,7 +46,6 @@ public class DeviceRegistrationWebSocket extends WebSocketCommunication {
 	@Inject
 	private SinkRepository sinkRepository;
 
-	// TODO: przerobić na CDI events (strona 55. Beginning Java EE 7)
 	public static void broadcastDevice(Device device) throws JsonProcessingException {
 		ObjectMapper objectMapper = new ObjectMapper();
 		if (device instanceof Sink) {
@@ -60,7 +59,7 @@ public class DeviceRegistrationWebSocket extends WebSocketCommunication {
 
 	@OnOpen
 	public void registerSession(Session session) throws JsonProcessingException {
-		LOGGER.debug("Session opened {}, query params = {}", session.getId(), session.getRequestParameterMap());
+		logger.trace("Device registration session opened {}, query params = {}", session.getId(), session.getRequestParameterMap());
 		String queryString = session.getQueryString();
 		List<DeviceDto> devices = new ArrayList<>();
 		ObjectMapper objectMapper = new ObjectMapper();
@@ -88,7 +87,7 @@ public class DeviceRegistrationWebSocket extends WebSocketCommunication {
 
 	@OnClose
 	public void unregisterSession(Session session) {
-		LOGGER.debug("Session closed id = {}, query params = {}", session.getId(), session.getRequestParameterMap());
+		logger.trace("Device registartion session closed id = {}, query params = {}", session.getId(), session.getRequestParameterMap());
 		String queryString = session.getQueryString();
 		if (SessionType.SINK.getName().equals(queryString)) {
 			sinkSessions.remove(session);

@@ -4,6 +4,7 @@ import co.blastlab.serviceblbnavi.dao.repository.AnchorRepository;
 import co.blastlab.serviceblbnavi.domain.Anchor;
 import co.blastlab.serviceblbnavi.domain.Floor;
 import co.blastlab.serviceblbnavi.dto.report.CoordinatesDto;
+import co.blastlab.serviceblbnavi.utils.Logger;
 import com.google.common.collect.Range;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -26,6 +27,9 @@ public class CoordinatesCalculatorTest {
 
 	@Mock
 	private AnchorRepository anchorRepository;
+
+	@Mock
+	private Logger logger;
 
 	@Test
 	public void shouldCalculateProperPositionInSimpleScenario() {

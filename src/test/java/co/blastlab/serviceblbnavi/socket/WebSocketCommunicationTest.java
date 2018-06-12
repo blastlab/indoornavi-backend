@@ -23,12 +23,14 @@ public class WebSocketCommunicationTest {
 
 	@Test
 	public void broadCastMessage() throws Exception {
-
+		// GIVEN
 		when(session.isOpen()).thenReturn(true);
 		when(session.getBasicRemote()).thenReturn(basic);
 
+		// WHEN
 		WebSocketCommunication.broadCastMessage(Collections.singleton(session), "test");
 
+		// THEN
 		verify(session).isOpen();
 		verify(session).getBasicRemote();
 		verify(basic).sendText("test");
