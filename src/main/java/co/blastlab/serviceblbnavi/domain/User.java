@@ -2,6 +2,7 @@ package co.blastlab.serviceblbnavi.domain;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.security.Principal;
@@ -11,6 +12,7 @@ import java.util.stream.Collectors;
 @Entity
 @Getter
 @Setter
+@ToString
 public class User extends TrackedEntity implements Principal {
 
 	@Column(unique = true)

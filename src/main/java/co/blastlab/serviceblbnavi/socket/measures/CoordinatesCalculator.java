@@ -4,6 +4,7 @@ import co.blastlab.serviceblbnavi.dao.repository.AnchorRepository;
 import co.blastlab.serviceblbnavi.domain.Anchor;
 import co.blastlab.serviceblbnavi.dto.Point;
 import co.blastlab.serviceblbnavi.dto.report.CoordinatesDto;
+import co.blastlab.serviceblbnavi.utils.Logger;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 import lombok.AllArgsConstructor;
@@ -11,8 +12,6 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.ejb.Singleton;
 import javax.inject.Inject;
@@ -29,7 +28,8 @@ public class CoordinatesCalculator {
 
 	private Map<Integer, PointAndTime> previousCoorinates = new HashMap<>();
 
-	private static Logger LOGGER = LoggerFactory.getLogger(CoordinatesCalculator.class);
+	@Inject
+	private Logger logger;
 
 	@Inject
 	private AnchorRepository anchorRepository;
@@ -38,7 +38,7 @@ public class CoordinatesCalculator {
 		Integer tagId = getTagId(firstDeviceId, secondDeviceId);
 		Integer anchorId = getAnchorId(firstDeviceId, secondDeviceId);
 		if (tagId == null || anchorId == null) {
-			LOGGER.info(String.format("One of the devices' ids is out of range. Ids are: %s, %s and range is (1, %s)", firstDeviceId, secondDeviceId, Short.MAX_VALUE));
+			logger.trace(String.format("One of the devices' ids is out of range. Ids are: %s, %s and range is (1, %s)", firstDeviceId, secondDeviceId, Short.MAX_VALUE));
 			return Optional.empty();
 		}
 
@@ -46,7 +46,7 @@ public class CoordinatesCalculator {
 
 		Set<Integer> connectedAnchors = getConnectedAnchors(tagId);
 		if (connectedAnchors.size() < 3) {
-			LOGGER.info(String.format("Not enough connected anchors to calculate position. Currently connected anchors: %s", connectedAnchors.size()));
+			logger.trace(String.format("Not enough connected anchors to calculate position. Currently connected anchors: %s", connectedAnchors.size()));
 			return Optional.empty();
 		}
 
@@ -67,7 +67,7 @@ public class CoordinatesCalculator {
 		}
 
 		if (validAnchorsCount < 3) {
-			LOGGER.info(String.format("Not enough valid anchors to calculate position. Currently valid anchors: %s", validAnchorsCount));
+			logger.trace(String.format("Not enough valid anchors to calculate position. Currently valid anchors: %s", validAnchorsCount));
 			return Optional.empty();
 		}
 

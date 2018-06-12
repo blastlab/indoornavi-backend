@@ -4,6 +4,9 @@ import co.blastlab.serviceblbnavi.socket.wizard.WizardWebSocket;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
@@ -15,13 +18,17 @@ import java.util.List;
 @Getter
 @Setter
 @Entity
+@ToString(callSuper = true)
 public class Sink extends Anchor {
+	private final static Logger LOGGER = LoggerFactory.getLogger(Sink.class);
+
 	private boolean configured = false;
 
 	@OneToMany(mappedBy = "sink")
 	private List<Anchor> anchors = new ArrayList<>();
 
 	public void unassign() {
+		LOGGER.debug("Unassigning {} from map", this);
 		this.setConfigured(false);
 		this.setFloor(null);
 		this.getAnchors().forEach(anchor -> {

@@ -10,9 +10,7 @@ import org.apache.http.HttpStatus;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.util.Arrays;
 
-import static co.blastlab.serviceblbnavi.rest.facade.util.matcher.FloorMatcher.floorDtoCustomMatcher;
 import static co.blastlab.serviceblbnavi.rest.facade.util.violation.ViolationMatcher.validViolation;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -249,31 +247,6 @@ public class FloorFacadeIT extends BaseIT {
 		assertThat(violationResponse.getError(), is(VALIDATION_ERROR_NAME));
 		assertThat(violationResponse.getViolations().size(), is(2));
 		assertViolations(violationResponse);
-	}
-
-	@Test
-	public void shouldChangeOrderOfFloors() {
-		FloorDto[] floors = givenUser()
-			.body(
-				new RequestBodyBuilder("Floors.json")
-				.setParameter("id", 4, 0)
-				.setParameter("level", 1, 0)
-				.setParameter("id", 5, 1)
-				.setParameter("level", 0, 1)
-				.build()
-			)
-			.when().put(FLOOR_PATH)
-			.then().statusCode(HttpStatus.SC_OK)
-			.extract()
-			.as(FloorDto[].class);
-
-		BuildingDto building = new BuildingDto();
-		building.setId(1L);
-
-		assertThat(Arrays.asList(floors), containsInAnyOrder(
-			floorDtoCustomMatcher(new FloorDto(4L, 1, "", building, null, null)),
-			floorDtoCustomMatcher(new FloorDto(5L, 0, "", building, null, null))
-		));
 	}
 
 	@Test

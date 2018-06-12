@@ -2,10 +2,7 @@ package co.blastlab.serviceblbnavi.dto.device;
 
 import co.blastlab.serviceblbnavi.domain.Device;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.validation.constraints.NotNull;
 
@@ -13,6 +10,7 @@ import javax.validation.constraints.NotNull;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 public class DeviceDto {
 
 	@ApiModelProperty(example = "1", readOnly = true)

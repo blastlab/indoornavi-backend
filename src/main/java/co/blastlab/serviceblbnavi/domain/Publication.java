@@ -2,6 +2,7 @@ package co.blastlab.serviceblbnavi.domain;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import javax.persistence.Entity;
 import javax.persistence.ManyToMany;
@@ -11,6 +12,7 @@ import java.util.List;
 @Entity
 @Getter
 @Setter
+@ToString
 public class Publication extends TrackedEntity {
 	@ManyToMany
 	private List<Floor> floors = new ArrayList<>();

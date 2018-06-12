@@ -5,8 +5,8 @@ import co.blastlab.serviceblbnavi.dao.repository.FloorRepository;
 import co.blastlab.serviceblbnavi.domain.Area;
 import co.blastlab.serviceblbnavi.domain.Floor;
 import co.blastlab.serviceblbnavi.dto.area.AreaDto;
-import co.blastlab.serviceblbnavi.ext.filter.AuthorizedAccess;
 import co.blastlab.serviceblbnavi.service.AreaService;
+import co.blastlab.serviceblbnavi.utils.Logger;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
@@ -19,6 +19,9 @@ import java.util.stream.Collectors;
 public class AreaBean implements AreaFacade {
 
 	@Inject
+	private Logger logger;
+
+	@Inject
 	private AreaRepository areaRepository;
 
 	@Inject
@@ -28,37 +31,36 @@ public class AreaBean implements AreaFacade {
 	private AreaService areaService;
 
 	@Override
-	@AuthorizedAccess("FLOOR_UPDATE")
 	public AreaDto create(AreaDto area) {
+		logger.debug("Trying to create area {}", area);
 		Area areaEntity = new Area();
 		Floor floor = floorRepository.findOptionalById(area.getFloorId()).orElseThrow(EntityNotFoundException::new);
 		return areaService.createOrUpdate(areaEntity, area, floor);
 	}
 
 	@Override
-	@AuthorizedAccess("FLOOR_UPDATE")
 	public AreaDto update(Long id, AreaDto area) {
+		logger.debug("Trying to update area {}", area);
 		Area areaEntity = areaRepository.findOptionalById(id).orElseThrow(EntityNotFoundException::new);
 		Floor floor = floorRepository.findOptionalById(area.getFloorId()).orElseThrow(EntityNotFoundException::new);
 		return areaService.createOrUpdate(areaEntity, area, floor);
 	}
 
 	@Override
-	@AuthorizedAccess("FLOOR_UPDATE")
 	public Response delete(Long id) {
+		logger.debug("Trying to remove area id {}", id);
 		Area areaEntity = areaRepository.findOptionalById(id).orElseThrow(EntityNotFoundException::new);
 		areaRepository.remove(areaEntity);
+		logger.debug("Area removed");
 		return Response.noContent().build();
 	}
 
 	@Override
-	@AuthorizedAccess("FLOOR_READ")
 	public List<AreaDto> findAll() {
 		return areaRepository.findAll().stream().map(AreaDto::new).collect(Collectors.toList());
 	}
 
 	@Override
-	@AuthorizedAccess("FLOOR_READ")
 	public List<AreaDto> findAllByFloor(Long floorId) {
 		Floor floor = floorRepository.findOptionalById(floorId).orElseThrow(EntityNotFoundException::new);
 		List<Area> areas = areaRepository.findByFloor(floor);

@@ -5,12 +5,14 @@ import co.blastlab.serviceblbnavi.dto.Point;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 import javax.validation.constraints.NotNull;
 
 @Getter
 @Setter
 @NoArgsConstructor
+@ToString
 public class ScaleDto {
 	@NotNull
 	private Point start;
