@@ -2,6 +2,7 @@ package co.blastlab.serviceblbnavi.rest.facade.image;
 
 import co.blastlab.serviceblbnavi.dto.floor.ImageUpload;
 import co.blastlab.serviceblbnavi.ext.filter.AuthorizedAccess;
+import co.blastlab.serviceblbnavi.ext.filter.GenerateOperationID;
 import co.blastlab.serviceblbnavi.properties.Properties;
 import io.swagger.annotations.*;
 import net.sf.jmimemagic.MagicException;
@@ -18,6 +19,7 @@ import java.io.IOException;
 
 @Path("/images")
 @Api("/images")
+@GenerateOperationID
 public interface ImageFacade {
 
 	@POST

@@ -6,8 +6,7 @@ import co.blastlab.serviceblbnavi.domain.Area;
 import co.blastlab.serviceblbnavi.domain.Floor;
 import co.blastlab.serviceblbnavi.dto.area.AreaDto;
 import co.blastlab.serviceblbnavi.service.AreaService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import co.blastlab.serviceblbnavi.utils.Logger;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
@@ -19,7 +18,8 @@ import java.util.stream.Collectors;
 @Stateless
 public class AreaBean implements AreaFacade {
 
-	private final static Logger LOGGER = LoggerFactory.getLogger(AreaBean.class);
+	@Inject
+	private Logger logger;
 
 	@Inject
 	private AreaRepository areaRepository;
@@ -32,7 +32,7 @@ public class AreaBean implements AreaFacade {
 
 	@Override
 	public AreaDto create(AreaDto area) {
-		LOGGER.debug("Trying to create area {}", area);
+		logger.debug("Trying to create area {}", area);
 		Area areaEntity = new Area();
 		Floor floor = floorRepository.findOptionalById(area.getFloorId()).orElseThrow(EntityNotFoundException::new);
 		return areaService.createOrUpdate(areaEntity, area, floor);
@@ -40,7 +40,7 @@ public class AreaBean implements AreaFacade {
 
 	@Override
 	public AreaDto update(Long id, AreaDto area) {
-		LOGGER.debug("Trying to update area {}", area);
+		logger.debug("Trying to update area {}", area);
 		Area areaEntity = areaRepository.findOptionalById(id).orElseThrow(EntityNotFoundException::new);
 		Floor floor = floorRepository.findOptionalById(area.getFloorId()).orElseThrow(EntityNotFoundException::new);
 		return areaService.createOrUpdate(areaEntity, area, floor);
@@ -48,10 +48,10 @@ public class AreaBean implements AreaFacade {
 
 	@Override
 	public Response delete(Long id) {
-		LOGGER.debug("Trying to remove area id {}", id);
+		logger.debug("Trying to remove area id {}", id);
 		Area areaEntity = areaRepository.findOptionalById(id).orElseThrow(EntityNotFoundException::new);
 		areaRepository.remove(areaEntity);
-		LOGGER.debug("Area removed");
+		logger.debug("Area removed");
 		return Response.noContent().build();
 	}
 
