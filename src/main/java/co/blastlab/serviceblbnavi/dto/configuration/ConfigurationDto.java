@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -18,6 +19,7 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
+@ToString
 public class ConfigurationDto {
 	private Long id;
 	private Long floorId;
@@ -38,6 +40,7 @@ public class ConfigurationDto {
 
 	@Getter
 	@Setter
+	@ToString
 	public static class Data {
 		private List<SinkDto> sinks = new ArrayList<>();
 		private List<AnchorDto> anchors = new ArrayList<>();

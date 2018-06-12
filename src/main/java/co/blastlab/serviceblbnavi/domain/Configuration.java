@@ -1,9 +1,6 @@
 package co.blastlab.serviceblbnavi.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.Entity;
 import javax.persistence.Lob;
@@ -15,6 +12,7 @@ import java.util.Date;
 @AllArgsConstructor
 @Getter
 @Setter
+@ToString
 public class Configuration extends TrackedEntity {
 	@ManyToOne
 	private Floor floor;

@@ -6,6 +6,7 @@ import co.blastlab.serviceblbnavi.domain.Floor;
 import co.blastlab.serviceblbnavi.domain.Publication;
 import co.blastlab.serviceblbnavi.dto.configuration.ConfigurationDto;
 import co.blastlab.serviceblbnavi.utils.ConfigurationExtractor;
+import co.blastlab.serviceblbnavi.utils.Logger;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.ejb.Stateless;
@@ -19,6 +20,9 @@ import java.util.Optional;
 
 @Stateless
 public class ConfigurationBean implements ConfigurationFacade {
+
+	@Inject
+	private Logger logger;
 
 	@Inject
 	private ConfigurationExtractor configurationExtractor;
@@ -40,9 +44,11 @@ public class ConfigurationBean implements ConfigurationFacade {
 
 	@Override
 	public ConfigurationDto.Data publish(Long floorId) throws IOException {
+		logger.debug("Trying to publish configuration of the floor id {}", floorId);
 		final Floor floor = floorRepository.findOptionalById(floorId).orElseThrow(EntityNotFoundException::new);
 		List<Publication> publications = publicationRepository.findAllContainingFloor(floor);
 		if (publications.isEmpty()) {
+			logger.debug("No publications yet. Trying to create one");
 			Publication publication = new Publication();
 			publication.getFloors().add(floor);
 			publication.setTags(tagRepository.findAll());
@@ -53,9 +59,12 @@ public class ConfigurationBean implements ConfigurationFacade {
 		ObjectMapper objectMapper = new ObjectMapper();
 		ConfigurationDto.Data configurationData = objectMapper.readValue(configurationEntity.getData(), ConfigurationDto.Data.class);
 
+		logger.debug("Configuration data to extract: {}", configurationData);
+
 		configurationExtractor.resetAnchors(floor);
 		configurationExtractor.resetSinks(floor);
 		configurationExtractor.resetAreas(floor);
+
 		configurationExtractor.extractSinks(configurationData, floor);
 		configurationExtractor.extractAnchors(configurationData, floor);
 		configurationExtractor.extractScale(configurationData, floor);
@@ -67,11 +76,13 @@ public class ConfigurationBean implements ConfigurationFacade {
 
 	@Override
 	public ConfigurationDto.Data saveDraft(ConfigurationDto configuration) throws IOException {
+		logger.debug("Trying to save draft {}", configuration);
 		Floor floor = floorRepository.findOptionalById(configuration.getFloorId()).orElseThrow(EntityNotFoundException::new);
 		Optional<Configuration> configurationOptional = configurationRepostiory.findTop1ByFloorOrderByVersionDesc(floor);
 		Configuration latestConfiguration = configurationOptional.orElse(new Configuration(floor, 0));
 		ObjectMapper objectMapper = new ObjectMapper();
 		if (latestConfiguration.getPublishedDate() != null) {
+			logger.debug("Creating new draft because last one has been published {}", latestConfiguration.getPublishedDate());
 			Integer latestVersion = configurationRepostiory.getLatestVersion(floor);
 			latestConfiguration = new Configuration(
 				floor,
@@ -81,15 +92,18 @@ public class ConfigurationBean implements ConfigurationFacade {
 				new Date()
 			);
 		} else {
+			logger.debug("Updating previously created draft");
 			latestConfiguration.setSaveDraftDate(new Date());
 			latestConfiguration.setData(objectMapper.writeValueAsString(configuration.getData()));
 		}
 		latestConfiguration = configurationRepostiory.save(latestConfiguration);
+		logger.debug("Draft saved");
 		return objectMapper.readValue(latestConfiguration.getData(), ConfigurationDto.Data.class);
 	}
 
 	@Override
 	public ConfigurationDto undo(Long floorId) throws IOException {
+		logger.debug("Trying to undo configuration to previous state");
 		Floor floor = floorRepository.findOptionalById(floorId).orElseThrow(EntityNotFoundException::new);
 
 		List<Configuration> latestConfigurations = configurationRepostiory.findByFloorOrderByVersionDesc(floor);
@@ -99,6 +113,7 @@ public class ConfigurationBean implements ConfigurationFacade {
 		} else {
 			Configuration configuration = latestConfigurations.get(0);
 			if (latestConfigurations.size() == 1) {
+				logger.debug("There is only one configuration, so it's inital state");
 				ObjectMapper objectMapper = new ObjectMapper();
 				configuration.setPublishedDate(null);
 				configuration.setSaveDraftDate(null);
@@ -106,6 +121,7 @@ public class ConfigurationBean implements ConfigurationFacade {
 				configurationRepostiory.save(configuration);
 				return new ConfigurationDto(configuration);
 			} else {
+				logger.debug("Removing previous configuration");
 				configurationRepostiory.remove(configuration);
 				return new ConfigurationDto(latestConfigurations.get(1));
 			}

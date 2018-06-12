@@ -4,6 +4,7 @@ import co.blastlab.serviceblbnavi.dao.repository.UserRepository;
 import co.blastlab.serviceblbnavi.domain.User;
 import co.blastlab.serviceblbnavi.dto.user.CredentialsDto;
 import co.blastlab.serviceblbnavi.utils.AuthUtils;
+import co.blastlab.serviceblbnavi.utils.Logger;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,6 +25,9 @@ import java.util.Set;
 public class AuthenticationBean implements AuthenticationFacade {
 
 	@Inject
+	private Logger logger;
+
+	@Inject
 	private UserRepository userRepository;
 
 	@Context
@@ -32,16 +36,20 @@ public class AuthenticationBean implements AuthenticationFacade {
 	@Override
 	public Response authenticate(CredentialsDto credentials) {
 		try {
+			logger.debug("Authenticating...");
 			User user = this.authenticateUser(credentials);
 
 			String token = RandomStringUtils.randomAlphanumeric(16).toUpperCase();
 			user.setToken(token);
 			user.setTokenExpires(DateUtils.addMinutes(new Date(), 5));
 			userRepository.save(user);
+			logger.debug("Authenticated");
 			return Response.ok(new AutorizationResponse(token, user.getPermissionSet()), MediaType.APPLICATION_JSON).build();
 		} catch (AuthUtils.AuthenticationException e) {
+			logger.debug(e.getLocalizedMessage());
 			return Response.status(Response.Status.NOT_FOUND).build();
 		} catch (AuthUtils.InvalidPasswordException e) {
+			logger.debug(e.getLocalizedMessage());
 			return Response.status(Response.Status.BAD_REQUEST).build();
 		}
 	}
