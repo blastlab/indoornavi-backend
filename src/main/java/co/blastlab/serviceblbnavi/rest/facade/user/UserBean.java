@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
 
 @Stateless
 public class UserBean implements UserFacade {
+	@Inject
 	private Logger logger;
 
 	@Inject
