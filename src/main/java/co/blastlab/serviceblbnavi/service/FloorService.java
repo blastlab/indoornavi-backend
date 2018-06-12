@@ -8,14 +8,14 @@ import co.blastlab.serviceblbnavi.domain.Configuration;
 import co.blastlab.serviceblbnavi.domain.Floor;
 import co.blastlab.serviceblbnavi.domain.Publication;
 import co.blastlab.serviceblbnavi.domain.Sink;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import co.blastlab.serviceblbnavi.utils.Logger;
 
 import javax.inject.Inject;
 import java.util.List;
 
 public class FloorService {
-	private final static Logger LOGGER = LoggerFactory.getLogger(FloorService.class);
+	@Inject
+	private Logger logger;
 
 	@Inject
 	private ConfigurationRepostiory configurationRepostiory;
@@ -36,16 +36,16 @@ public class FloorService {
 
 	public void removeNoCommit(Floor floor ) {
 		List<Configuration> configurations = configurationRepostiory.findByFloor(floor);
-		LOGGER.debug("Removing all configurations: {}", configurations.size());
+		logger.debug("Removing all configurations: {}", configurations.size());
 		for (Configuration configuration : configurations) {
-			LOGGER.debug("Removing configuration {}", configuration);
+			logger.debug("Removing configuration {}", configuration);
 			configurationRepostiory.remove(configuration);
 		}
 		List<Publication> publications = publicationRepository.findAllContainingFloor(floor);
 		for (Publication publication : publications) {
 			// if this is the last floor in this publication, we have to remove it
 			if (publication.getFloors().size() == 1) {
-				LOGGER.debug("It was the last floor in this publication {}, so removing it", publication);
+				logger.debug("It was the last floor in this publication {}, so removing it", publication);
 				publicationRepository.remove(publication);
 			}
 		}

@@ -4,8 +4,7 @@ import co.blastlab.serviceblbnavi.dao.repository.FloorRepository;
 import co.blastlab.serviceblbnavi.domain.Device;
 import co.blastlab.serviceblbnavi.domain.Floor;
 import co.blastlab.serviceblbnavi.dto.device.DeviceDto;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import co.blastlab.serviceblbnavi.utils.Logger;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
@@ -15,17 +14,18 @@ import java.util.Optional;
 @Stateless
 public class DeviceBean {
 
-	private final static Logger LOGGER = LoggerFactory.getLogger(DeviceBean.class);
+	@Inject
+	private Logger logger;
 
 	@Inject
 	private FloorRepository floorRepository;
 
 	public void setFloor(DeviceDto deviceDto, Device device) {
-		LOGGER.debug("Trying to assign floor to device {}", deviceDto);
+		logger.debug("Trying to assign floor to device {}", deviceDto);
 		Optional<Floor> floor = floorRepository.findOptionalById(deviceDto.getFloorId());
 		if (floor.isPresent()) {
 			device.setFloor(floor.get());
-			LOGGER.debug("Assigned floor");
+			logger.debug("Floor assigned");
 		} else {
 			throw new EntityNotFoundException();
 		}

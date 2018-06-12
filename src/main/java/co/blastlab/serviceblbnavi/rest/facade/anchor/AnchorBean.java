@@ -5,9 +5,8 @@ import co.blastlab.serviceblbnavi.domain.Anchor;
 import co.blastlab.serviceblbnavi.domain.Sink;
 import co.blastlab.serviceblbnavi.dto.anchor.AnchorDto;
 import co.blastlab.serviceblbnavi.rest.facade.device.DeviceBean;
+import co.blastlab.serviceblbnavi.utils.Logger;
 import org.apache.http.HttpStatus;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
@@ -20,13 +19,14 @@ import java.util.Optional;
 @Stateless
 public class AnchorBean extends DeviceBean implements AnchorFacade {
 
-	private final static Logger LOGGER = LoggerFactory.getLogger(AnchorBean.class);
+	@Inject
+	private Logger logger;
 
 	@Inject
 	private AnchorRepository anchorRepository;
 
 	public AnchorDto create(AnchorDto anchor) {
-		LOGGER.debug("Trying to create anchor {}", anchor);
+		logger.debug("Trying to create anchor {}", anchor);
 		Anchor anchorEntity = new Anchor();
 		anchorEntity.setShortId(anchor.getShortId());
 		anchorEntity.setLongId(anchor.getLongId());
@@ -38,12 +38,12 @@ public class AnchorBean extends DeviceBean implements AnchorFacade {
 			super.setFloor(anchor, anchorEntity);
 		}
 		anchorRepository.save(anchorEntity);
-		LOGGER.debug("Anchor created");
+		logger.debug("Anchor created");
 		return new AnchorDto(anchorEntity);
 	}
 
 	public AnchorDto update(Long id, AnchorDto anchor) {
-		LOGGER.debug("Trying to update anchor {}", anchor);
+		logger.debug("Trying to update anchor {}", anchor);
 		Optional<Anchor> anchorOptional = anchorRepository.findById(id);
 		if (anchorOptional.isPresent()) {
 			Anchor anchorEntity = anchorOptional.get();
@@ -60,7 +60,7 @@ public class AnchorBean extends DeviceBean implements AnchorFacade {
 				anchorEntity.setFloor(null);
 			}
 			anchorRepository.save(anchorEntity);
-			LOGGER.debug("Anchor updated");
+			logger.debug("Anchor updated");
 			return new AnchorDto(anchorEntity);
 		}
 		throw new EntityNotFoundException();
@@ -78,11 +78,11 @@ public class AnchorBean extends DeviceBean implements AnchorFacade {
 	}
 
 	public Response delete(Long id) {
-		LOGGER.debug("Trying to remove anchor id = {}", id);
+		logger.debug("Trying to remove anchor id = {}", id);
 		Optional<Anchor> anchor = anchorRepository.findById(id);
 		if (anchor.isPresent()) {
 			anchorRepository.remove(anchor.get());
-			LOGGER.debug("Anchor removed");
+			logger.debug("Anchor removed");
 			return Response.status(HttpStatus.SC_NO_CONTENT).build();
 		}
 		throw new EntityNotFoundException();

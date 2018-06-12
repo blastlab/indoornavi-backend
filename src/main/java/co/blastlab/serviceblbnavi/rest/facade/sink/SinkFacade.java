@@ -2,6 +2,7 @@ package co.blastlab.serviceblbnavi.rest.facade.sink;
 
 import co.blastlab.serviceblbnavi.dto.sink.SinkDto;
 import co.blastlab.serviceblbnavi.ext.filter.AuthorizedAccess;
+import co.blastlab.serviceblbnavi.ext.filter.GenerateOperationID;
 import io.swagger.annotations.*;
 
 import javax.validation.Valid;
@@ -12,6 +13,7 @@ import java.util.List;
 
 @Path("/sinks")
 @Api("/sinks")
+@GenerateOperationID
 public interface SinkFacade {
 	@GET
 	@ApiOperation(value = "find all sinks", response = SinkDto.class, responseContainer = "List")
