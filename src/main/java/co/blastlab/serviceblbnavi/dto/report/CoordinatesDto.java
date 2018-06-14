@@ -2,10 +2,7 @@ package co.blastlab.serviceblbnavi.dto.report;
 
 import co.blastlab.serviceblbnavi.domain.Coordinates;
 import co.blastlab.serviceblbnavi.dto.Point;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.Date;
 
@@ -13,6 +10,7 @@ import java.util.Date;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString
 public class CoordinatesDto {
 	private Integer tagShortId;
 	private Integer anchorShortId;

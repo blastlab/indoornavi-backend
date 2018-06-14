@@ -10,6 +10,7 @@ import co.blastlab.serviceblbnavi.socket.bridge.AnchorDistance;
 import co.blastlab.serviceblbnavi.socket.bridge.AnchorPoints;
 import co.blastlab.serviceblbnavi.socket.bridge.AnchorPositionBridge;
 import co.blastlab.serviceblbnavi.socket.bridge.SinkAnchorsDistanceBridge;
+import co.blastlab.serviceblbnavi.utils.Logger;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -50,6 +51,9 @@ public class WizardWebSocket extends WebSocketCommunication {
 	@Inject
 	private FloorRepository floorRepository;
 
+	@Inject
+	private Logger logger;
+
 	private ObjectMapper objectMapper;
 
 	@PostConstruct
@@ -62,6 +66,8 @@ public class WizardWebSocket extends WebSocketCommunication {
 		if (session == null) {
 			session = sessionToOpen;
 
+			logger.setId(sessionToOpen.getId()).trace("Wizard websocket opened");
+
 			List<Sink> sinks = sinkRepository.findByConfigured(false);
 			broadCastMessage(Collections.singleton(sessionToOpen), objectMapper.writeValueAsString(sinks.stream().map(SinkDto::new).collect(toList())));
 		}
@@ -70,6 +76,9 @@ public class WizardWebSocket extends WebSocketCommunication {
 	@OnClose
 	public void close(Session sessionToClose) {
 		if (sessionToClose.equals(session)) {
+
+			logger.setId(sessionToClose.getId()).trace("Wizard websocket closed");
+
 			session = null;
 			if (this.sinkShortId != null) {
 				sinkAnchorsDistanceController.stopListening(this.sinkShortId);
@@ -98,16 +107,20 @@ public class WizardWebSocket extends WebSocketCommunication {
 	@OnMessage
 	public void handleMessage(String message, Session arrivedSession) throws IOException {
 		if (arrivedSession.equals(session)) {
+
 			WizardStep wizardStep = objectMapper.readValue(message, WizardStep.class);
+			logger.setId(arrivedSession.getId()).trace("Received step: {}", wizardStep);
 
 			if (wizardStep.getStep().equals(Step.FIRST)) {
 				FirstStep firstStep = objectMapper.readValue(message, FirstStep.class);
 				this.sinkShortId = firstStep.getSinkShortId();
 				this.floorId = firstStep.getFloorId();
+				logger.trace("Start listening to sink to anchors' distances");
 				sinkAnchorsDistanceController.startListening(this.sinkShortId);
 			} else if (wizardStep.getStep().equals(Step.SECOND)) {
 				SecondStep secondStep = objectMapper.readValue(message, SecondStep.class);
 				this.firstAnchorShortId = secondStep.getAnchorShortId();
+				logger.trace("Start listening to anchors to anchors' distances");
 				anchorPositionCalculator.startListening(this.sinkShortId, this.firstAnchorShortId, secondStep.getSinkPosition(), secondStep.getDegree());
 			} else if (wizardStep.getStep().equals(Step.THIRD)) {
 				Optional<Sink> sinkOptional = sinkRepository.findOptionalByShortId(this.sinkShortId);
@@ -116,6 +129,7 @@ public class WizardWebSocket extends WebSocketCommunication {
 					sink.setConfigured(true);
 					Optional<Floor> floorOptional = floorRepository.findOptionalById(this.floorId);
 					floorOptional.ifPresent(sink::setFloor);
+					logger.trace("Wizard completed. Saving sink");
 					sinkRepository.save(sink);
 				}
 			}

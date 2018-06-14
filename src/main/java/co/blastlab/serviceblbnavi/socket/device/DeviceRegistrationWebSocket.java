@@ -103,8 +103,10 @@ public class DeviceRegistrationWebSocket extends WebSocketCommunication {
 		error.printStackTrace();
 	}
 
+	// TODO: trzeba tę metodę wykorzystać, Karol T. musi wysłać info o nowym urządzeniu
 	@OnMessage
 	public void handleMessage(String message, Session session) throws IOException {
+		logger.trace("Received message {}", message);
 		ObjectMapper objectMapper = new ObjectMapper();
 		if (Objects.equals(session.getQueryString(), SessionType.SINK.getName())) {
 			DeviceDto deviceDto = objectMapper.readValue(message, DeviceDto.class);
@@ -118,7 +120,14 @@ public class DeviceRegistrationWebSocket extends WebSocketCommunication {
 			deviceEntity.setLongId(deviceDto.getLongId());
 			deviceEntity.setVerified(false);
 			deviceEntity = deviceRepository.save(deviceEntity);
-			broadCastMessage(anchorSessions, objectMapper.writeValueAsString(Collections.singletonList(new DeviceDto(deviceEntity))));
+
+			Set<Session> sessions;
+			if (deviceEntity instanceof Tag) {
+				sessions = anchorSessions;
+			} else {
+				sessions = tagSessions;
+			}
+			broadCastMessage(sessions, objectMapper.writeValueAsString(Collections.singletonList(new DeviceDto(deviceEntity))));
 		}
 	}
 

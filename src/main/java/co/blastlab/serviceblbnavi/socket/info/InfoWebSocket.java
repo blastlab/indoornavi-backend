@@ -33,14 +33,17 @@ import co.blastlab.serviceblbnavi.socket.info.server.update.out.Start;
 import co.blastlab.serviceblbnavi.socket.info.server.version.Version;
 import co.blastlab.serviceblbnavi.socket.wrappers.InfoErrorWrapper;
 import co.blastlab.serviceblbnavi.socket.wrappers.InfoWrapper;
+import co.blastlab.serviceblbnavi.utils.Logger;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.ImmutableSet;
 import org.apache.commons.codec.binary.Hex;
 
 import javax.annotation.Resource;
 import javax.ejb.Schedule;
 import javax.ejb.Singleton;
+import javax.ejb.Startup;
 import javax.enterprise.concurrent.ManagedExecutorService;
 import javax.inject.Inject;
 import javax.websocket.OnClose;
@@ -62,7 +65,11 @@ import java.util.stream.Collectors;
 
 @ServerEndpoint("/info")
 @Singleton
+@Startup
 public class InfoWebSocket extends WebSocket {
+
+	@Inject
+	private Logger logger;
 
 	/*
 		Error codes and explanation:
@@ -80,9 +87,9 @@ public class InfoWebSocket extends WebSocket {
 		IWS_012 - The file format is invalid. Only IHS files are allowed.
 	 */
 
-	private static long TIMEOUT_SECONDS_ACK = 30;
-	private static long AFTER_UPDATE_WAIT_TIME_SECONDS = 10;
-	private static long OUTDATED_DEVICE_STATUS_MILISECONDS = 150000;
+	private final static long TIMEOUT_SECONDS_ACK = 30;
+	private final static long AFTER_UPDATE_WAIT_TIME_SECONDS = 10;
+	private final static long OUTDATED_DEVICE_STATUS_MILISECONDS = 150000;
 
 	@Inject
 	private DeviceRepository deviceRepository;
@@ -96,6 +103,8 @@ public class InfoWebSocket extends WebSocket {
 	@Resource
 	private ManagedExecutorService managedExecutorService;
 
+	// key: thread id, value: session id
+	private Map<Long, String> threadIdToSessionId = Collections.synchronizedMap(new HashMap<>());
 	private static Set<Session> clientSessions = Collections.synchronizedSet(new HashSet<>());
 	private static Set<Session> serverSessions = Collections.synchronizedSet(new HashSet<>());
 
@@ -109,6 +118,11 @@ public class InfoWebSocket extends WebSocket {
 	@Override
 	protected Set<Session> getServerSessions() {
 		return serverSessions;
+	}
+
+	@Override
+	protected Map<Long, String> getThreadToSessionMap() {
+		return threadIdToSessionId;
 	}
 
 	@OnOpen
@@ -127,7 +141,11 @@ public class InfoWebSocket extends WebSocket {
 
 	@OnMessage
 	public void handleMessage(String message, Session session) throws IOException {
+		setSessionThread(session);
+		logger.setId(getSessionId());
+
 		if (isServerSession(session)) {
+			logger.trace("Received message from server {}", message);
 			List<Info> infos = objectMapper.readValue(message, new TypeReference<List<Info>>() {});
 			for (Info info : infos) {
 				InfoType infoType = InfoType.from(info.getCode());
@@ -153,12 +171,14 @@ public class InfoWebSocket extends WebSocket {
 				}
 			}
 		} else if (isClientSession(session)) {
+			logger.trace("[{}] Received message from client {}", getSessionId(), message);
 			prepareUpload(message);
 		}
 	}
 
-	@Schedule(second = "*/5", minute = "*", hour = "*", persistent = false)
+	@Schedule(second = "*/5", minute = "*", hour = "*", persistent = false, info = "Every 5 seconds")
 	public void updateStatuses() {
+		logger.trace("Updating device statuses");
 		networkController.getNetworks().forEach(network -> {
 			for (DeviceStatus anchorStatus : network.getAnchors()) {
 				checkOutdatedDeviceStatus(anchorStatus);
@@ -178,31 +198,29 @@ public class InfoWebSocket extends WebSocket {
 	}
 
 	private void sendInfoAboutConnectedDevices(Session session) {
-		try {
-			final Set<DeviceStatus> devices = new HashSet<>();
-			if (session.getRequestParameterMap().containsKey("sinks")) {
-				for (Network network : networkController.getNetworks()) {
-					devices.add(network.getSink());
-				}
-			} else if (session.getRequestParameterMap().containsKey("anchors")) {
-				for (Network network : networkController.getNetworks()) {
-					devices.addAll(network.getAnchors());
-				}
-			} else if (session.getRequestParameterMap().containsKey("tags")) {
-				for (Network network : networkController.getNetworks()) {
-					devices.addAll(network.getTags());
-				}
+		final Set<DeviceStatus> devices = new HashSet<>();
+		if (session.getRequestParameterMap().containsKey("sinks")) {
+			for (Network network : networkController.getNetworks()) {
+				devices.add(network.getSink());
 			}
-			session.getBasicRemote().sendText(objectMapper.writeValueAsString(
-				new InfoWrapper(devices))
-			);
-		} catch (IOException e) {
-			e.printStackTrace();
+		} else if (session.getRequestParameterMap().containsKey("anchors")) {
+			for (Network network : networkController.getNetworks()) {
+				devices.addAll(network.getAnchors());
+			}
+		} else if (session.getRequestParameterMap().containsKey("tags")) {
+			for (Network network : networkController.getNetworks()) {
+				devices.addAll(network.getTags());
+			}
 		}
+
+		broadCastMessage(ImmutableSet.of(session), new InfoWrapper(devices));
 	}
 
 	private void prepareUpload(String message) throws IOException {
+		logger.setId(getSessionId());
+		logger.trace("Trying to prepare upload");
 		UpdateRequest updateRequest = objectMapper.readValue(message, UpdateRequest.class);
+		logger.trace("Update request is: {}", updateRequest);
 		Map<Integer, Set<Integer>> sinkToDevicesMap = askForFileList(updateRequest);
 
 		byte[] bytes = DatatypeConverter.parseBase64Binary(updateRequest.getBase64file().split(",")[1]);
@@ -226,9 +244,11 @@ public class InfoWebSocket extends WebSocket {
 	 * It will check free disk space on the sink and if there is no free space it will recursively remove files to let the update process to continue.
 	 */
 	private void applyOnAskListResponse(Network network, byte[] bytes) {
+		logger.trace("Waiting for the file list summary to decide if next step is update or free up space on device");
 		network.getFileListSummaryFuture().whenComplete(((fileListSummary, fileListException) -> {
 			try {
 				if (fileListSummary != null) {
+					logger.trace("The file list summary received");
 					if (fileListSummary.getFreeSpace() >= bytes.length) {
 						doUpload(network, fileListSummary, bytes);
 					} else {
@@ -254,6 +274,7 @@ public class InfoWebSocket extends WebSocket {
 	 * If everything is fine, it will send a command to start an update.
 	 */
 	private void applyOnAskListResponse(Network network) {
+		logger.trace("Waiting for the file list summary to make sure uploaded file has correct crc and md5");
 		network.getFileListSummaryFuture().whenComplete(((fileListSummary, fileListException) -> {
 			if (fileListSummary != null) {
 				Optional<FileListDetails> fileOptional = fileListSummary.getFiles().stream()
@@ -338,7 +359,7 @@ public class InfoWebSocket extends WebSocket {
 		managedExecutorService.execute(() -> {
 			try {
 				String dataToSend = objectMapper.writeValueAsString(Collections.singletonList(uploads.get(currentIndex)));
-				network.getSession().getBasicRemote().sendText(dataToSend);
+				broadCastMessage(ImmutableSet.of(network.getSession()), dataToSend);
 
 				FileAcknowledge acknowledge = network.getFileUploadFuture().get(InfoWebSocket.TIMEOUT_SECONDS_ACK, TimeUnit.SECONDS);
 				network.setFileUploadFuture(new CompletableFuture<>());
@@ -394,9 +415,11 @@ public class InfoWebSocket extends WebSocket {
 	 */
 	private void handleBroadcast(Session session, Info info) {
 		DeviceConnected deviceConnected = objectMapper.convertValue(info.getArgs(), DeviceConnected.class);
+		logger.trace("Device connected {}", deviceConnected);
 		Optional<DeviceStatus> deviceStatusOptional = networkController.getDeviceStatus(deviceConnected.getShortId());
 		if (deviceStatusOptional.isPresent() && deviceStatusOptional.get().getStatus() == DeviceStatus.Status.RESTARTING) {
 			DeviceStatus deviceStatus = deviceStatusOptional.get();
+			logger.trace("Device is restarting after update ({})", deviceStatus.getRestartCount());
 			deviceStatus.setRestartCount(deviceStatus.getRestartCount() + 1);
 			if (isProperFirmwareVersion(deviceConnected) && deviceStatus.getRestartCount() == 2) {
 				deviceStatus.setRestartCount(0);
@@ -405,26 +428,20 @@ public class InfoWebSocket extends WebSocket {
 					optionalByShortId.get().setPartition(Device.getPartition(deviceConnected.getFirmwareMinor()));
 					deviceRepository.save(optionalByShortId.get());
 					deviceStatus.getUpdateFinished().complete(null);
+					logger.trace("Device {} has been updated", deviceStatus.getDevice());
 				}
 			} else if (deviceStatus.getRestartCount() == 2) {
+				logger.trace("Device restarted 2 times but has wrong firmware");
 				deviceStatus.setStatus(DeviceStatus.Status.ONLINE);
 				deviceStatus.setRestartCount(0);
 				sendErrorCode("IWS_011");
 			}
 		} else {
+			logger.trace("Trying to register new device");
 			final Optional<DeviceStatus> newDeviceOptional = registerNewDevice(session, deviceConnected);
-			getClientSessions().forEach(clientSession -> {
-				try {
-					if (newDeviceOptional.isPresent()) {
-						clientSession.getBasicRemote().sendText(objectMapper.writeValueAsString(
-							new InfoWrapper(Collections.singleton(newDeviceOptional.get()))
-						));
-					}
-				} catch (IOException e) {
-					sendErrorCode("IWS_010");
-					e.printStackTrace();
-				}
-			});
+			newDeviceOptional.ifPresent(deviceStatus -> broadCastMessage(getClientSessions(), new InfoWrapper(Collections.singleton(deviceStatus)), () -> {
+				sendErrorCode("IWS_010");
+			}));
 		}
 	}
 
@@ -441,17 +458,8 @@ public class InfoWebSocket extends WebSocket {
 					if (deviceStatusOptional.isPresent()) {
 						DeviceStatus deviceStatus = deviceStatusOptional.get();
 						deviceStatus.setStatus(DeviceStatus.Status.ONLINE);
-						getClientSessions().forEach(clientSession -> {
-							try {
-								clientSession.getBasicRemote().sendText(objectMapper.writeValueAsString(
-									new InfoWrapper(Collections.singleton(deviceStatus))
-								));
-								sendErrorCode("IWS_009", deviceStatus);
-							} catch (IOException e) {
-								sendErrorCode("IWS_010");
-								e.printStackTrace();
-							}
-						});
+						broadCastMessage(getClientSessions(), new InfoWrapper(Collections.singleton(deviceStatus)));
+						sendErrorCode("IWS_009", deviceStatus);
 					}
 				}
 			break;
@@ -464,6 +472,7 @@ public class InfoWebSocket extends WebSocket {
 
 	private void handleVersion(Info info) {
 		Version version = objectMapper.convertValue(info.getArgs(), Version.class);
+		logger.trace("Received message about device version {}", version);
 		Optional<? extends Device> optionalByShortId = deviceService.findOptionalByShortId(version.getShortId());
 		if (optionalByShortId.isPresent()) {
 			final Device device = optionalByShortId.get();
@@ -487,6 +496,7 @@ public class InfoWebSocket extends WebSocket {
 	}
 
 	private void handleFirmwareAck(Session session, UpdateAcknowledge updateAcknowledge) {
+		logger.setId(session.getId()).trace("Received ACK: {}", updateAcknowledge);
 		if (updateAcknowledge.getToward() == 0) {
 			Optional<DeviceStatus> deviceStatusOptional = networkController.getDeviceStatus(updateAcknowledge.getShortId());
 			managedExecutorService.execute(() -> {
@@ -495,17 +505,16 @@ public class InfoWebSocket extends WebSocket {
 					try {
 						deviceStatus.setStatus(DeviceStatus.Status.RESTARTING);
 
+						logger.trace("Waiting for device to finish restarting process: {}", deviceStatus.getDevice());
 						// if after AFTER_UPDATE_WAIT_TIME_SECONDS future is completed then it means update successfuly applied
 						deviceStatus.getUpdateFinished().get(AFTER_UPDATE_WAIT_TIME_SECONDS, TimeUnit.SECONDS);
 
 						deviceStatus.setStatus(DeviceStatus.Status.UPDATED);
-						for (Session clientSession : getClientSessions()) {
-							clientSession.getBasicRemote().sendText(
-								objectMapper.writeValueAsString(new InfoWrapper(Collections.singleton(deviceStatus)))
-							);
-						}
+						broadCastMessage(getClientSessions(), new InfoWrapper(Collections.singleton(deviceStatus)));
 						deviceStatus.setStatus(DeviceStatus.Status.ONLINE);
 						deviceStatus.setLastTimeUpdated(new Date());
+
+						logger.trace("Device {} updated", deviceStatus.getDevice());
 
 						Optional<Network> bySession = networkController.getBySession(session);
 
@@ -537,10 +546,12 @@ public class InfoWebSocket extends WebSocket {
 			List<Integer> route = deviceConnected.getRoute();
 			DeviceStatus deviceStatus = new DeviceStatus(new DeviceDto(device), DeviceStatus.Status.ONLINE);
 			if (device instanceof Sink) {
+				logger.trace("Registering sink {}", device);
 				networkController.registerSink(session, deviceStatus);
 			} else if (device instanceof Tag) {
 				Optional<Network> networkOptional = networkController.getBySession(session);
 				if (networkOptional.isPresent()) {
+					logger.trace("Registering tag {}", device);
 					networkOptional.get().getTags().add(deviceStatus);
 				} else {
 					deviceStatus = null;
@@ -548,11 +559,13 @@ public class InfoWebSocket extends WebSocket {
 			} else if (device instanceof Anchor) {
 				Optional<Network> networkOptional = networkController.getBySession(session);
 				if (networkOptional.isPresent()) {
+					logger.trace("Registering anchor {}", device);
 					networkOptional.get().getAnchors().add(deviceStatus);
 				} else {
 					deviceStatus = null;
 				}
 			}
+			logger.trace("Setting partition and route");
 			device.setPartition(Device.getPartition(deviceConnected.getFirmwareMinor()));
 			for (int i = 0; i < route.size(); i++) {
 				Optional<? extends Device> routeDeviceOptional = deviceService.findOptionalByShortId(route.get(i));
@@ -564,6 +577,7 @@ public class InfoWebSocket extends WebSocket {
 			deviceRepository.save(device);
 			return Optional.ofNullable(deviceStatus);
 		}
+		logger.trace("Device not found in database");
 		return Optional.empty();
 	}
 
@@ -572,7 +586,7 @@ public class InfoWebSocket extends WebSocket {
 		String path = fileListSummary.getFiles().get(0).getPath();
 		Info info = new FileInfo();
 		info.setArgs(new Delete(path));
-		network.getSession().getBasicRemote().sendText(objectMapper.writeValueAsString(Collections.singletonList(info)));
+		broadCastMessage(ImmutableSet.of(network.getSession()), objectMapper.writeValueAsString(Collections.singletonList(info)));
 	}
 
 	private Map<Integer, Set<Integer>> askForFileList(UpdateRequest updateRequest) throws IOException {
@@ -636,10 +650,11 @@ public class InfoWebSocket extends WebSocket {
 	}
 
 	private void sendAskForFileList(Integer shortId, Info info, List<Integer> notConnectedDevicesShortIds) throws IOException {
+		logger.setId(getSessionId()).trace("Sending ask for file list");
 		Optional<Network> networkOptional = networkController.getBySinkShortId(shortId);
 		if (networkOptional.isPresent()) {
 			Session session = networkOptional.get().getSession();
-			session.getBasicRemote().sendText(objectMapper.writeValueAsString(Collections.singletonList(info)));
+			broadCastMessage(ImmutableSet.of(session), objectMapper.writeValueAsString(Collections.singletonList(info)));
 		} else {
 			notConnectedDevicesShortIds.add(shortId);
 		}
@@ -649,10 +664,12 @@ public class InfoWebSocket extends WebSocket {
 		Info info = new FileInfo();
 		info.setArgs(new AskList(""));
 		Session session = network.getSession();
-		session.getBasicRemote().sendText(objectMapper.writeValueAsString(Collections.singletonList(info)));
+		broadCastMessage(ImmutableSet.of(session), objectMapper.writeValueAsString(Collections.singletonList(info)));
 	}
 
 	private void sendStartUpgrade(Network network, String path) throws IOException {
+		Session session = network.getSession();
+		logger.setId(session.getId()).trace("Trying to send start upgrade command");
 		Info info = new UpdateInfo();
 		Integer toUpdateId = network.getToUpdateIds().poll();
 		Optional<? extends Device> toUpdateOptional = deviceService.findOptionalByShortId(toUpdateId);
@@ -660,14 +677,14 @@ public class InfoWebSocket extends WebSocket {
 			Device toUpdate = toUpdateOptional.get();
 			List<Integer> route = toUpdate.getRoute().stream().map(RoutePart::getDeviceShortId).collect(Collectors.toList());
 			info.setArgs(new Start(toUpdate.getShortId(), route, path, toUpdate.getReversedPartition().getValue()));
-			Session session = network.getSession();
-			session.getBasicRemote().sendText(objectMapper.writeValueAsString(Collections.singletonList(info)));
+			broadCastMessage(ImmutableSet.of(session), objectMapper.writeValueAsString(Collections.singletonList(info)));
 			Optional<DeviceStatus> deviceStatusOptional = networkController.getDeviceStatus(toUpdate.getShortId());
 			deviceStatusOptional.ifPresent((deviceStatus) -> {
 					deviceStatus.setStatus(DeviceStatus.Status.UPDATING);
 					deviceStatus.setLastTimeUpdated(new Date());
 				}
 			);
+			logger.trace("Start upgrade command sent");
 		}
 	}
 
@@ -683,17 +700,14 @@ public class InfoWebSocket extends WebSocket {
 	}
 
 	private void sendErrorCode(String code, DeviceStatus deviceStatus) {
+		logger.setId(getSessionId()).warn("Sending error code: {}", code);
 		if (deviceStatus != null) {
 			deviceStatus.setStatus(DeviceStatus.Status.ONLINE);
 		}
-		for (Session clientSession : clientSessions) {
-			try {
-				InfoErrorWrapper infoErrorWrapper;
-				infoErrorWrapper = Optional.ofNullable(deviceStatus).map(ds -> new InfoErrorWrapper(code, ds)).orElseGet(() -> new InfoErrorWrapper(code));
-				clientSession.getBasicRemote().sendText(objectMapper.writeValueAsString(infoErrorWrapper));
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
+		InfoErrorWrapper infoErrorWrapper;
+		infoErrorWrapper = Optional.ofNullable(deviceStatus).map(ds -> new InfoErrorWrapper(code, ds)).orElseGet(() -> new InfoErrorWrapper(code));
+		broadCastMessage(getClientSessions(), infoErrorWrapper);
 	}
+
+
 }

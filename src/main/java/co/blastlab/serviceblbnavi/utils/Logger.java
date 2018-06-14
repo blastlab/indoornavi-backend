@@ -1,11 +1,9 @@
 package co.blastlab.serviceblbnavi.utils;
 
-import lombok.Setter;
 import org.slf4j.LoggerFactory;
 
 import javax.enterprise.context.ApplicationScoped;
 
-@Setter
 @ApplicationScoped
 public class Logger {
 
@@ -23,6 +21,11 @@ public class Logger {
 
 	public void trace(String msg, Object... params) {
 		LOGGER.trace(addMetadata(msg), params);
+	}
+
+	public Logger setId(String id) {
+		this.id = id;
+		return this;
 	}
 
 	private String addMetadata(String msg) {
