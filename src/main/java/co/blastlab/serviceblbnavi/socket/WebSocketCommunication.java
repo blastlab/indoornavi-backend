@@ -11,7 +11,11 @@ import java.util.Set;
 
 public abstract class WebSocketCommunication {
 
-	protected static void broadCastMessage(final Set<Session> sessions, final MessageWrapper message) {
+	protected void broadCastMessage(final Set<Session> sessions, final MessageWrapper message) {
+		broadCastMessage(sessions, message, () -> {});
+	}
+
+	protected void broadCastMessage(final Set<Session> sessions, final MessageWrapper message, Runnable onError) {
 		ObjectMapper objectMapper = new ObjectMapper();
 		Logger logger = new Logger();
 		try {
@@ -20,6 +24,7 @@ public abstract class WebSocketCommunication {
 		} catch (JsonProcessingException e) {
 			logger.warn("Could not parse message wrapper: {}", message);
 			e.printStackTrace();
+			onError.run();
 		}
 	}
 

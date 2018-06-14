@@ -42,6 +42,8 @@ public class MeasuresWebSocket extends WebSocket {
 
 	private static Set<Session> clientSessions = Collections.synchronizedSet(new HashSet<>());
 	private static Set<Session> serverSessions = Collections.synchronizedSet(new HashSet<>());
+	// key: thread id, value: session id
+	private Map<Long, String> threadIdToSessionId = Collections.synchronizedMap(new HashMap<>());
 
 	private ObjectMapper objectMapper;
 
@@ -112,6 +114,11 @@ public class MeasuresWebSocket extends WebSocket {
 		return serverSessions;
 	}
 
+	@Override
+	protected Map<Long, String> getThreadToSessionMap() {
+		return threadIdToSessionId;
+	}
+
 	@OnError
 	public void onError(Throwable error) {
 		error.printStackTrace();
@@ -119,8 +126,10 @@ public class MeasuresWebSocket extends WebSocket {
 
 	@OnMessage
 	public void handleMessage(String message, Session session) throws IOException {
+		setSessionThread(session);
 		if (isClientSession(session)) {
 			Command command = objectMapper.readValue(message, Command.class);
+			logger.trace("Received command: {}", command);
 			if (Command.Type.TOGGLE_TAG.equals(command.getType())) {
 				activeFilters.get(FilterType.TAG).update(session, objectMapper.readValue(command.getArgs(), Integer.class));
 			}
@@ -139,15 +148,19 @@ public class MeasuresWebSocket extends WebSocket {
 	}
 
 	private void handleMeasures(List<DistanceMessage> measures) {
+		logger.setId(getSessionId());
 		measures.forEach(distanceMessage -> {
+			logger.trace("Will analyze distance message: {}", distanceMessage);
 			if (bothDevicesAreAnchors(distanceMessage)) {
 				try {
+					logger.trace("Distance message is about two anchors. Transfering it to wizard bridges.");
 					sinkAnchorsDistanceBridge.addDistance(distanceMessage.getDid1(), distanceMessage.getDid2(), distanceMessage.getDist());
 					anchorPositionBridge.addDistance(distanceMessage.getDid1(), distanceMessage.getDid2(), distanceMessage.getDist());
 				} catch (UnrecognizedDeviceException unrecognizedDevice) {
 					unrecognizedDevice.printStackTrace();
 				}
 			} else {
+				logger.trace("Trying to calculate coordinates");
 				Optional<CoordinatesDto> coords = coordinatesCalculator.calculateTagPosition(distanceMessage.getDid1(), distanceMessage.getDid2(), distanceMessage.getDist());
 				if (coords.isPresent()) {
 					this.saveCoordinates(coords.get());
@@ -191,7 +204,7 @@ public class MeasuresWebSocket extends WebSocket {
 		}
 	}
 
-	@Schedule(minute = "*/5", hour = "*", persistent = false)
+	@Schedule(minute = "*/5", hour = "*", persistent = false, info = "Every 5 minues")
 	public void cleanMeasureTable() {
 		logger.trace("Checking if there are any old measures in table and cleaning it.");
 		managedExecutorService.execute(() -> coordinatesCalculator.cleanTables());
