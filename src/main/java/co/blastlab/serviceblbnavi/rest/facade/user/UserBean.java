@@ -58,9 +58,6 @@ public class UserBean implements UserFacade {
 		logger.debug("Trying to update user {}", userDto);
 		User user = userRepository.findOptionalById(id).orElseThrow(EntityNotFoundException::new);
 		user.setUsername(userDto.getUsername());
-		if (userDto.getPassword() != null) {
-			setPassword(user, userDto.getPassword());
-		}
 		user.getPermissionGroups().clear();
 		for (PermissionGroupDto permissionGroupDto : userDto.getPermissionGroups()) {
 			user.getPermissionGroups().add(permissionGroupRepository.findBy(permissionGroupDto.getId()));
