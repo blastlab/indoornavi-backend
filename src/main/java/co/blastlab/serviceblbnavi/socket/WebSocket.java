@@ -22,7 +22,7 @@ public abstract class WebSocket extends WebSocketCommunication {
 	}
 
 	protected void open(Session session, Runnable doForClients, Runnable doForServers) {
-		logger.trace("Session opened {}, query params = {}", session.getId(), session.getRequestParameterMap());
+		logger.setId(getSessionId()).trace("Session opened {}, query params = {}", session.getId(), session.getRequestParameterMap());
 		if (session.getRequestParameterMap().containsKey(CLIENT)) {
 			getClientSessions().add(session);
 			doForClients.run();
@@ -37,7 +37,7 @@ public abstract class WebSocket extends WebSocketCommunication {
 	}
 
 	protected void close(Session session, Runnable doForClients, Runnable doForServers) {
-		logger.trace("Session closed id = {}, query params = {}", session.getId(), session.getRequestParameterMap());
+		logger.setId(getSessionId()).trace("Session closed id = {}, query params = {}", session.getId(), session.getRequestParameterMap());
 		if (session.getRequestParameterMap().containsKey(CLIENT)) {
 			getClientSessions().remove(session);
 			doForClients.run();

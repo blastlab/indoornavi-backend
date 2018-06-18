@@ -2,7 +2,7 @@ package co.blastlab.serviceblbnavi.rest.facade.tag;
 
 import co.blastlab.serviceblbnavi.dto.tag.TagDto;
 import co.blastlab.serviceblbnavi.ext.filter.AuthorizedAccess;
-import co.blastlab.serviceblbnavi.ext.filter.GenerateOperationID;
+import co.blastlab.serviceblbnavi.ext.filter.SetOperationId;
 import io.swagger.annotations.*;
 
 import javax.validation.Valid;
@@ -13,7 +13,7 @@ import java.util.List;
 
 @Path("/tags")
 @Api("/tags")
-@GenerateOperationID
+@SetOperationId
 public interface TagFacade {
 
 	@POST

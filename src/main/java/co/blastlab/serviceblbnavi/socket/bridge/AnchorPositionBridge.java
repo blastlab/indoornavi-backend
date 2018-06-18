@@ -56,7 +56,10 @@ public class AnchorPositionBridge implements Bridge {
 	public void addDistance(Integer firstDeviceId, Integer secondDeviceId, Integer distance) throws UnrecognizedDeviceException {
 		if (this.sinkId != null && this.firstAnchorId != null) {
 
-			logger.trace("Trying to find anchors' distances");
+			logger.trace(
+				"Trying to find anchors' distances. Received first device = {}, second device = {}, distance = {}",
+				firstDeviceId, secondDeviceId, distance
+			);
 
 			Integer sinkId = getSinkId(firstDeviceId, secondDeviceId);
 			Integer firstAnchorId = getFirstAnchorId(firstDeviceId, secondDeviceId);

@@ -3,7 +3,7 @@ package co.blastlab.serviceblbnavi.rest.facade.report;
 import co.blastlab.serviceblbnavi.dto.report.CoordinatesDto;
 import co.blastlab.serviceblbnavi.dto.report.ReportFilterDto;
 import co.blastlab.serviceblbnavi.ext.filter.AuthorizedAccess;
-import co.blastlab.serviceblbnavi.ext.filter.GenerateOperationID;
+import co.blastlab.serviceblbnavi.ext.filter.SetOperationId;
 import co.blastlab.serviceblbnavi.socket.area.AreaEvent;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -16,7 +16,7 @@ import java.util.List;
 
 @Path("/reports")
 @Api("/reports")
-@GenerateOperationID
+@SetOperationId
 public interface ReportFacade {
 	@POST
 	@Path("/coordinates")

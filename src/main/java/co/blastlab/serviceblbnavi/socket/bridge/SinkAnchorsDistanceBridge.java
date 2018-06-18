@@ -9,6 +9,7 @@ import java.util.*;
 
 @Singleton
 public class SinkAnchorsDistanceBridge implements Bridge {
+
 	@Inject
 	private Logger logger;
 
@@ -32,12 +33,15 @@ public class SinkAnchorsDistanceBridge implements Bridge {
 
 	/**
 	 * When anchor distance is not null then event is fired to:
-	 {@link co.blastlab.serviceblbnavi.socket.wizard.WizardWebSocket#anchorDistanceAdded(AnchorDistance)}
+	 * {@link co.blastlab.serviceblbnavi.socket.wizard.WizardWebSocket#anchorDistanceAdded(AnchorDistance)}
 	 */
 	@Override
 	public void addDistance(Integer firstDevice, Integer secondDevice, Integer distance) {
 		if (this.sinkId != null) {
-			logger.trace("Trying to calculate distance between sink and connected anchors");
+			logger.trace(
+				"Trying to calculate distance between sink and connected anchors. Received: first device = {}, second device = {}, distance = {}",
+				firstDevice, secondDevice, distance
+			);
 			AnchorDistance anchorDistance = null;
 			if (firstDevice.equals(this.sinkId)) {
 				anchorDistance = new AnchorDistance(secondDevice, distance);
@@ -50,7 +54,7 @@ public class SinkAnchorsDistanceBridge implements Bridge {
 				} else {
 					distancesPerAnchor.put(anchorDistance.getAnchorId(), new ArrayList<>(Collections.singletonList(anchorDistance.getDistance())));
 				}
-				logger.trace("Got {} distances for anchor id {}" , distancesPerAnchor.size(), anchorDistance.getAnchorId());
+				logger.trace("Got {} distances for anchor id {}", distancesPerAnchor.size(), anchorDistance.getAnchorId());
 				if (distancesPerAnchor.get(anchorDistance.getAnchorId()).size() == 10) {
 					logger.trace("Got all required distances for anchor id {}", anchorDistance.getAnchorId());
 					anchorDistance.setDistance(
@@ -61,5 +65,4 @@ public class SinkAnchorsDistanceBridge implements Bridge {
 			}
 		}
 	}
-
 }
