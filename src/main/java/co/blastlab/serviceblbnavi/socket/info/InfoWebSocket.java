@@ -244,11 +244,11 @@ public class InfoWebSocket extends WebSocket {
 	 * It will check free disk space on the sink and if there is no free space it will recursively remove files to let the update process to continue.
 	 */
 	private void applyOnAskListResponse(Network network, byte[] bytes) {
-		logger.trace("Waiting for the file list summary to decide if next step is update or free up space on device");
+		logger.setId(getSessionId()).trace("Waiting for the file list summary to decide if next step is update or free up space on device");
 		network.getFileListSummaryFuture().whenComplete(((fileListSummary, fileListException) -> {
 			try {
 				if (fileListSummary != null) {
-					logger.trace("The file list summary received");
+					logger.setId(getSessionId()).trace("The file list summary received");
 					if (fileListSummary.getFreeSpace() >= bytes.length) {
 						doUpload(network, fileListSummary, bytes);
 					} else {
@@ -274,7 +274,7 @@ public class InfoWebSocket extends WebSocket {
 	 * If everything is fine, it will send a command to start an update.
 	 */
 	private void applyOnAskListResponse(Network network) {
-		logger.trace("Waiting for the file list summary to make sure uploaded file has correct crc and md5");
+		logger.setId(getSessionId()).trace("Waiting for the file list summary to make sure uploaded file has correct crc and md5");
 		network.getFileListSummaryFuture().whenComplete(((fileListSummary, fileListException) -> {
 			if (fileListSummary != null) {
 				Optional<FileListDetails> fileOptional = fileListSummary.getFiles().stream()
@@ -415,7 +415,7 @@ public class InfoWebSocket extends WebSocket {
 	 */
 	private void handleBroadcast(Session session, Info info) {
 		DeviceConnected deviceConnected = objectMapper.convertValue(info.getArgs(), DeviceConnected.class);
-		logger.trace("Device connected {}", deviceConnected);
+		logger.setId(getSessionId()).trace("Device connected {}", deviceConnected);
 		Optional<DeviceStatus> deviceStatusOptional = networkController.getDeviceStatus(deviceConnected.getShortId());
 		if (deviceStatusOptional.isPresent() && deviceStatusOptional.get().getStatus() == DeviceStatus.Status.RESTARTING) {
 			DeviceStatus deviceStatus = deviceStatusOptional.get();
@@ -472,7 +472,7 @@ public class InfoWebSocket extends WebSocket {
 
 	private void handleVersion(Info info) {
 		Version version = objectMapper.convertValue(info.getArgs(), Version.class);
-		logger.trace("Received message about device version {}", version);
+		logger.setId(getSessionId()).trace("Received message about device version {}", version);
 		Optional<? extends Device> optionalByShortId = deviceService.findOptionalByShortId(version.getShortId());
 		if (optionalByShortId.isPresent()) {
 			final Device device = optionalByShortId.get();
@@ -540,6 +540,7 @@ public class InfoWebSocket extends WebSocket {
 	}
 
 	private Optional<DeviceStatus> registerNewDevice(Session session, DeviceConnected deviceConnected) {
+		logger.setId(getSessionId());
 		Optional<? extends Device> deviceOptional = deviceService.findOptionalByShortId(deviceConnected.getShortId());
 		if (deviceOptional.isPresent()) {
 			Device device = deviceOptional.get();

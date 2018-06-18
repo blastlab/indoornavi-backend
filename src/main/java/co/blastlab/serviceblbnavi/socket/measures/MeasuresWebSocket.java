@@ -129,7 +129,7 @@ public class MeasuresWebSocket extends WebSocket {
 		setSessionThread(session);
 		if (isClientSession(session)) {
 			Command command = objectMapper.readValue(message, Command.class);
-			logger.trace("Received command: {}", command);
+			logger.setId(getSessionId()).trace("Received command: {}", command);
 			if (Command.Type.TOGGLE_TAG.equals(command.getType())) {
 				activeFilters.get(FilterType.TAG).update(session, objectMapper.readValue(command.getArgs(), Integer.class));
 			}
