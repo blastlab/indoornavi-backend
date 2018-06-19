@@ -16,19 +16,16 @@ import co.blastlab.serviceblbnavi.utils.Logger;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
 import java.util.*;
 
-@ApplicationScoped
+@Singleton
 @ServerEndpoint("/devices/registration")
 public class DeviceRegistrationWebSocket extends WebSocketCommunication {
-
-	@Inject
-	private Logger logger;
 
 	private static Set<Session> anchorSessions = Collections.synchronizedSet(new HashSet<>());
 	private static Set<Session> tagSessions = Collections.synchronizedSet(new HashSet<>());
@@ -59,7 +56,8 @@ public class DeviceRegistrationWebSocket extends WebSocketCommunication {
 
 	@OnOpen
 	public void registerSession(Session session) throws JsonProcessingException {
-		logger.trace("Device registration session opened {}, query params = {}", session.getId(), session.getRequestParameterMap());
+		Logger logger = new Logger();
+		logger.setId(session.getId()).trace("Device registration session opened, query params = {}", session.getRequestParameterMap());
 		String queryString = session.getQueryString();
 		List<DeviceDto> devices = new ArrayList<>();
 		ObjectMapper objectMapper = new ObjectMapper();
@@ -87,7 +85,8 @@ public class DeviceRegistrationWebSocket extends WebSocketCommunication {
 
 	@OnClose
 	public void unregisterSession(Session session) {
-		logger.trace("Device registartion session closed id = {}, query params = {}", session.getId(), session.getRequestParameterMap());
+		Logger logger = new Logger();
+		logger.setId(session.getId()).trace("Device registartion session closed, query params = {}", session.getRequestParameterMap());
 		String queryString = session.getQueryString();
 		if (SessionType.SINK.getName().equals(queryString)) {
 			sinkSessions.remove(session);
@@ -106,7 +105,8 @@ public class DeviceRegistrationWebSocket extends WebSocketCommunication {
 	// TODO: trzeba tę metodę wykorzystać, Karol T. musi wysłać info o nowym urządzeniu
 	@OnMessage
 	public void handleMessage(String message, Session session) throws IOException {
-		logger.trace("Received message {}", message);
+		Logger logger = new Logger();
+		logger.setId(session.getId()).trace("Received message {}", message);
 		ObjectMapper objectMapper = new ObjectMapper();
 		if (Objects.equals(session.getQueryString(), SessionType.SINK.getName())) {
 			DeviceDto deviceDto = objectMapper.readValue(message, DeviceDto.class);
