@@ -1,12 +1,14 @@
 package co.blastlab.serviceblbnavi.utils;
 
-import lombok.Setter;
+import lombok.Getter;
 import org.slf4j.LoggerFactory;
 
-import javax.enterprise.context.ApplicationScoped;
+import javax.annotation.PostConstruct;
+import javax.enterprise.context.RequestScoped;
+import java.util.UUID;
 
-@Setter
-@ApplicationScoped
+@Getter
+@RequestScoped
 public class Logger {
 
 	private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(Logger.class);
@@ -23,6 +25,16 @@ public class Logger {
 
 	public void trace(String msg, Object... params) {
 		LOGGER.trace(addMetadata(msg), params);
+	}
+
+	@PostConstruct
+	public void init() {
+		this.id = UUID.randomUUID().toString();
+	}
+
+	public Logger setId(String id) {
+		this.id = id;
+		return this;
 	}
 
 	private String addMetadata(String msg) {

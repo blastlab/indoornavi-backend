@@ -2,6 +2,7 @@ package co.blastlab.serviceblbnavi.socket.measures;
 
 import co.blastlab.serviceblbnavi.socket.bridge.AnchorPositionBridge;
 import co.blastlab.serviceblbnavi.socket.bridge.SinkAnchorsDistanceBridge;
+import co.blastlab.serviceblbnavi.utils.Logger;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -35,8 +36,12 @@ public class MeasuresWebSocketTest {
 	@Mock
 	private AnchorPositionBridge anchorPositionBridge;
 
+	@Mock
+	private Logger logger;
+
 	@Before
 	public void setUp() {
+		when(session.getId()).thenReturn("sessionId");
 		measuresWebSocket.init();
 	}
 

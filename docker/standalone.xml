@@ -116,6 +116,9 @@
 			<logger category="net.sf.jmimemagic">
 				<level name="WARN" />
 			</logger>
+			<logger category="org.xnio">
+				<level name="WARN" />
+			</logger>
 			<root-logger>
 				<level name="${app.log.level}"/>
 				<handlers>
@@ -126,7 +129,7 @@
 				<pattern-formatter pattern="%d{yyyy-MM-dd HH:mm:ss,SSS} %-5p [%c] (%t) %s%e%n"/>
 			</formatter>
 			<formatter name="COLOR-PATTERN">
-				<pattern-formatter pattern="%K{level}%d{HH:mm:ss,SSS} %-5p [%c] (%t) %s%e%n"/>
+				<pattern-formatter pattern="%K{level}%d{HH:mm:ss,SSS} %-5p [%c] (%t) %s%e%n" color-map="trace:cyan,debug:green,warn:yellow,error:red,info:white"/>
 			</formatter>
 		</subsystem>
 		<subsystem xmlns="urn:jboss:domain:batch-jberet:1.0">

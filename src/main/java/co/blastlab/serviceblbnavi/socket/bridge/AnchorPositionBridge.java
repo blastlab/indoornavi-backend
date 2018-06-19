@@ -1,6 +1,7 @@
 package co.blastlab.serviceblbnavi.socket.bridge;
 
 import co.blastlab.serviceblbnavi.dto.Point;
+import co.blastlab.serviceblbnavi.utils.Logger;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,6 +19,9 @@ import java.util.Map;
 
 @Singleton
 public class AnchorPositionBridge implements Bridge {
+	@Inject
+	private Logger logger;
+
 	private Integer sinkId;
 	private Point sinkPosition;
 	private Integer firstAnchorId;
@@ -52,6 +56,11 @@ public class AnchorPositionBridge implements Bridge {
 	public void addDistance(Integer firstDeviceId, Integer secondDeviceId, Integer distance) throws UnrecognizedDeviceException {
 		if (this.sinkId != null && this.firstAnchorId != null) {
 
+			logger.trace(
+				"Trying to find anchors' distances. Received first device = {}, second device = {}, distance = {}",
+				firstDeviceId, secondDeviceId, distance
+			);
+
 			Integer sinkId = getSinkId(firstDeviceId, secondDeviceId);
 			Integer firstAnchorId = getFirstAnchorId(firstDeviceId, secondDeviceId);
 			Integer otherAnchorId;
@@ -60,14 +69,17 @@ public class AnchorPositionBridge implements Bridge {
 
 			if (sinkId != null && firstAnchorId != null) {
 				L10 = Double.valueOf(distance);
+				logger.trace("Found distance between first anchor and sink {}", distance);
 			} else {
 
 				if (sinkId != null) {
 					otherAnchorId = firstDeviceId.equals(sinkId) ? secondDeviceId : firstDeviceId;
 					L20 = Double.valueOf(distance);
+					logger.trace("Found distance between second anchor and sink {}", distance);
 				} else if (firstAnchorId != null) {
 					otherAnchorId = firstDeviceId.equals(firstAnchorId) ? secondDeviceId : firstDeviceId;
 					L21 = Double.valueOf(distance);
+					logger.trace("Found distance between second anchor and first anchor {}", distance);
 				} else {
 					throw new UnrecognizedDeviceException();
 				}
@@ -84,7 +96,9 @@ public class AnchorPositionBridge implements Bridge {
 					}
 
 					if (distancePair.getL20() != null && distancePair.getL21() != null) {
+						logger.trace("Found all distances, trying to calculate positions");
 						List<Point> points = calculateAnchorPositions(distancePair);
+						logger.trace("Calculated points {}, {}", points.get(0), points.get(1));
 						anchorPositionEvent.fire(new AnchorPoints(otherAnchorId, points));
 					}
 				}
@@ -102,7 +116,9 @@ public class AnchorPositionBridge implements Bridge {
 	}
 
 	List<Point> calculateAnchorPositions(DistancePair distancePair) {
+		logger.trace("Trying to calculate second anchor position");
 		Point point = calculateSecondAnchorPosition(distancePair);
+		logger.trace("Second anchor position is {}", point);
 
 		Point2D.Double mirrored = new Point2D.Double();
 		Point2D.Double secondAnchorPosition = new Point2D.Double(point.getX(), point.getY());
