@@ -61,7 +61,10 @@ public class AreaEventController {
 
 	private void updateData() {
 		Iterator<Table.Cell<Integer, Area, Date>> iterator = this.tagCoordinatesHistory.cellSet().iterator();
-		logger.trace("Removing outdated tag cooridnates history");
+		// need to create new logger here because this method is called outside request context
+		Logger logger = new Logger();
+
+		logger.trace("[AreaEventController] Removing outdated tag cooridnates history");
 
 		Date now = new Date();
 		iterator.forEachRemaining(cell -> {

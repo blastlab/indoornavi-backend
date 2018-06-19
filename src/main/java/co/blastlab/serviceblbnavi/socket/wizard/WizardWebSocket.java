@@ -107,9 +107,9 @@ public class WizardWebSocket extends WebSocketCommunication {
 	@OnMessage
 	public void handleMessage(String message, Session arrivedSession) throws IOException {
 		if (arrivedSession.equals(session)) {
+			logger.setId(arrivedSession.getId()).trace("Received step: {}", message);
 
 			WizardStep wizardStep = objectMapper.readValue(message, WizardStep.class);
-			logger.setId(arrivedSession.getId()).trace("Received step: {}", wizardStep);
 
 			if (wizardStep.getStep().equals(Step.FIRST)) {
 				FirstStep firstStep = objectMapper.readValue(message, FirstStep.class);
