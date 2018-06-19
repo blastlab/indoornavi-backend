@@ -3,7 +3,7 @@ package co.blastlab.serviceblbnavi.rest.facade.floor;
 import co.blastlab.serviceblbnavi.dto.floor.FloorDto;
 import co.blastlab.serviceblbnavi.dto.floor.ScaleDto;
 import co.blastlab.serviceblbnavi.ext.filter.AuthorizedAccess;
-import co.blastlab.serviceblbnavi.ext.filter.GenerateOperationID;
+import co.blastlab.serviceblbnavi.ext.filter.SetOperationId;
 import io.swagger.annotations.*;
 
 import javax.validation.Valid;
@@ -13,7 +13,7 @@ import javax.ws.rs.core.Response;
 
 @Path("/floors")
 @Api("/floors")
-@GenerateOperationID
+@SetOperationId
 public interface FloorFacade {
 
 	@GET

@@ -1,24 +1,35 @@
 package co.blastlab.serviceblbnavi.socket.bridge;
 
 import co.blastlab.serviceblbnavi.dto.Point;
+import co.blastlab.serviceblbnavi.utils.Logger;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.List;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
+@RunWith(MockitoJUnitRunner.class)
 public class AnchorPositionBridgeTest {
+
+	@InjectMocks
+	private AnchorPositionBridge anchorPositionBridge;
+
+	@Mock
+	private Logger logger;
 
 	@Test
 	public void calculatePointsWithoutRotationButWithMove() throws Exception {
-		AnchorPositionBridge anchorPositionCalculator = new AnchorPositionBridge();
 
-		anchorPositionCalculator.startListening(1, 2, new Point(10, 10), 0d);
+		anchorPositionBridge.startListening(1, 2, new Point(10, 10), 0d);
 
-		anchorPositionCalculator.addDistance(1, 2, 100);
+		anchorPositionBridge.addDistance(1, 2, 100);
 
-		List<Point> points = anchorPositionCalculator.calculateAnchorPositions(new AnchorPositionBridge.DistancePair(100d, 100d));
+		List<Point> points = anchorPositionBridge.calculateAnchorPositions(new AnchorPositionBridge.DistancePair(100d, 100d));
 
 		assertThat(points.size(), is(2));
 		assertThat(points.get(0).getX(), is(60));
@@ -29,13 +40,12 @@ public class AnchorPositionBridgeTest {
 
 	@Test
 	public void calculatePointsWithRotationButWithoutMove() throws Exception {
-		AnchorPositionBridge anchorPositionCalculator = new AnchorPositionBridge();
 
-		anchorPositionCalculator.startListening(1, 2, new Point(0, 0), 45d);
+		anchorPositionBridge.startListening(1, 2, new Point(0, 0), 45d);
 
-		anchorPositionCalculator.addDistance(1, 2, 100);
+		anchorPositionBridge.addDistance(1, 2, 100);
 
-		List<Point> points = anchorPositionCalculator.calculateAnchorPositions(new AnchorPositionBridge.DistancePair(100d, 100d));
+		List<Point> points = anchorPositionBridge.calculateAnchorPositions(new AnchorPositionBridge.DistancePair(100d, 100d));
 
 		assertThat(points.size(), is(2));
 		assertThat(points.get(0).getX(), is(-25));
@@ -46,13 +56,12 @@ public class AnchorPositionBridgeTest {
 
 	@Test
 	public void calculatePointsWithRotationAndWithMove() throws Exception {
-		AnchorPositionBridge anchorPositionCalculator = new AnchorPositionBridge();
 
-		anchorPositionCalculator.startListening(1, 2, new Point(10, -10), 43d);
+		anchorPositionBridge.startListening(1, 2, new Point(10, -10), 43d);
 
-		anchorPositionCalculator.addDistance(1, 2, 100);
+		anchorPositionBridge.addDistance(1, 2, 100);
 
-		List<Point> points = anchorPositionCalculator.calculateAnchorPositions(new AnchorPositionBridge.DistancePair(100d, 100d));
+		List<Point> points = anchorPositionBridge.calculateAnchorPositions(new AnchorPositionBridge.DistancePair(100d, 100d));
 
 		assertThat(points.size(), is(2));
 		assertThat(points.get(0).getX(), is(-12));

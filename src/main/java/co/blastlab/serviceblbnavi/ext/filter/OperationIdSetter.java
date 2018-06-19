@@ -7,19 +7,16 @@ import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.ext.Provider;
-import java.util.UUID;
 
-@GenerateOperationID
+@SetOperationId
 @Provider
-public class OperationIdGenerator implements ContainerResponseFilter {
+public class OperationIdSetter implements ContainerResponseFilter {
 
 	@Inject
 	private Logger logger;
 
 	@Override
 	public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) {
-		String id = UUID.randomUUID().toString();
-		responseContext.getHeaders().add("UUID", id);
-		logger.setId(id);
+		responseContext.getHeaders().add("UUID", logger.getId());
 	}
 }

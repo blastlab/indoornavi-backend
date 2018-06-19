@@ -3,7 +3,7 @@ package co.blastlab.serviceblbnavi.rest.facade.user;
 import co.blastlab.serviceblbnavi.dto.user.ChangePasswordDto;
 import co.blastlab.serviceblbnavi.dto.user.UserDto;
 import co.blastlab.serviceblbnavi.ext.filter.AuthorizedAccess;
-import co.blastlab.serviceblbnavi.ext.filter.GenerateOperationID;
+import co.blastlab.serviceblbnavi.ext.filter.SetOperationId;
 import io.swagger.annotations.*;
 
 import javax.validation.Valid;
@@ -14,7 +14,7 @@ import java.util.List;
 
 @Path("/users")
 @Api("/users")
-@GenerateOperationID
+@SetOperationId
 public interface UserFacade {
 
 	@GET

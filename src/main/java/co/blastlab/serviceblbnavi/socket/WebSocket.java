@@ -3,6 +3,7 @@ package co.blastlab.serviceblbnavi.socket;
 import co.blastlab.serviceblbnavi.utils.Logger;
 
 import javax.websocket.Session;
+import java.util.Map;
 import java.util.Set;
 
 public abstract class WebSocket extends WebSocketCommunication {
@@ -21,7 +22,7 @@ public abstract class WebSocket extends WebSocketCommunication {
 	}
 
 	protected void open(Session session, Runnable doForClients, Runnable doForServers) {
-		logger.trace("Session opened {}, query params = {}", session.getId(), session.getRequestParameterMap());
+		logger.setId(getSessionId()).trace("Session opened {}, query params = {}", session.getId(), session.getRequestParameterMap());
 		if (session.getRequestParameterMap().containsKey(CLIENT)) {
 			getClientSessions().add(session);
 			doForClients.run();
@@ -36,7 +37,7 @@ public abstract class WebSocket extends WebSocketCommunication {
 	}
 
 	protected void close(Session session, Runnable doForClients, Runnable doForServers) {
-		logger.trace("Session closed id = {}, query params = {}", session.getId(), session.getRequestParameterMap());
+		logger.setId(getSessionId()).trace("Session closed id = {}, query params = {}", session.getId(), session.getRequestParameterMap());
 		if (session.getRequestParameterMap().containsKey(CLIENT)) {
 			getClientSessions().remove(session);
 			doForClients.run();
@@ -46,6 +47,15 @@ public abstract class WebSocket extends WebSocketCommunication {
 		}
 	}
 
+	protected void setSessionThread(Session session) {
+		getThreadToSessionMap().put(Thread.currentThread().getId(), session.getId());
+	}
+
+	protected String getSessionId() {
+		return getThreadToSessionMap().get(Thread.currentThread().getId());
+	}
+
 	protected abstract Set<Session> getClientSessions();
 	protected abstract Set<Session> getServerSessions();
+	protected abstract Map<Long, String> getThreadToSessionMap();
 }
