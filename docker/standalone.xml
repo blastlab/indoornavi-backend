@@ -119,9 +119,6 @@
 			<logger category="org.xnio">
 				<level name="WARN" />
 			</logger>
-			<logger category="io.undertow">
-				<level name="WARN" />
-			</logger>
 			<root-logger>
 				<level name="${app.log.level}"/>
 				<handlers>
