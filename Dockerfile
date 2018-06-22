@@ -22,6 +22,7 @@ RUN $JBOSS_HOME/bin/add-user.sh -a api api --group Manager --silent
 
 COPY docker/wait-for-container-end.sh /usr/local/bin/
 COPY docker/standalone.xml $JBOSS_HOME/standalone/configuration/
+COPY docker/standalone.conf $JBOSS_HOME/bin/
 COPY docker/mariadb-module.xml $JBOSS_HOME/modules/system/layers/base/org/mariadb/jdbc/main/module.xml
 COPY docker/mariadb-xa-module.xml $JBOSS_HOME/modules/system/layers/base/org/mariadb/jdbc/xaMaria/module.xml
 RUN cd $JBOSS_HOME/modules/system/layers/base/org/mariadb/jdbc/main/ \
@@ -32,4 +33,3 @@ RUN cp $JBOSS_HOME/modules/system/layers/base/org/mariadb/jdbc/main/mariadb-java
 COPY docker/start-server.sh /
 
 CMD ["/start-server.sh"]
-
