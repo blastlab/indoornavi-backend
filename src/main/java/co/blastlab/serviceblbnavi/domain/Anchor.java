@@ -23,6 +23,8 @@ public class Anchor extends Device {
 
 	private Integer y;
 
+	private Integer z;
+
 	@ManyToOne
 	private Sink sink;
 
