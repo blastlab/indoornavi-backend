@@ -22,6 +22,10 @@ public class Area extends TrackedEntity {
 	@ManyToOne
 	private Floor floor;
 
+	private Integer hMax;
+
+	private Integer hMin;
+
 	@ManyToMany
 	@JoinTable(
 		name = "area_areaconfiguration",

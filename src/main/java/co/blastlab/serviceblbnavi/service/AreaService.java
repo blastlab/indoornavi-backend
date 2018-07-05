@@ -45,6 +45,8 @@ public class AreaService {
 		areaEntity.setConfigurations(areaConfigurations);
 		areaEntity.setPolygon(area.toPolygon());
 		areaEntity.setFloor(floor);
+		areaEntity.setHMax(area.getHMax());
+		areaEntity.setHMin(area.getHMin());
 		areaEntity = areaRepository.save(areaEntity);
 		logger.debug("Area created/updated");
 		return new AreaDto(areaEntity);
