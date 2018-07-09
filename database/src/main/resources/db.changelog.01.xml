@@ -604,4 +604,14 @@
 			<column name="z" type="integer"/>
 		</addColumn>
 	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-313-1">
+		<addColumn tableName="Area">
+			<column name="hMax" type="integer"/>
+		</addColumn>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-313-2">
+		<addColumn tableName="Area">
+			<column name="hMin" type="integer"/>
+		</addColumn>
+	</changeSet>
 </databaseChangeLog>

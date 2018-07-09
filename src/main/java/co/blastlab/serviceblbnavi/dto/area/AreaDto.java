@@ -25,6 +25,8 @@ public class AreaDto {
 	private List<Point> points = new ArrayList<>();
 	private List<AreaConfigurationDto> configurations = new ArrayList<>();
 	private List<Point> buffer = new ArrayList<>();
+	private Integer heightMax;
+	private Integer heightMin;
 
 	public AreaDto(Area area) {
 		this.setId(area.getId());
@@ -33,6 +35,8 @@ public class AreaDto {
 		this.setPoints(this.toPoints(area.getPolygon()));
 		this.setBuffer(this.toPoints(((Polygon) area.getPolygon().buffer(50))));
 		this.setConfigurations(area.getConfigurations().stream().map(AreaConfigurationDto::new).collect(Collectors.toList()));
+		this.setHeightMax(area.getHMax());
+		this.setHeightMin(area.getHMin());
 	}
 
 	public Polygon toPolygon() {
