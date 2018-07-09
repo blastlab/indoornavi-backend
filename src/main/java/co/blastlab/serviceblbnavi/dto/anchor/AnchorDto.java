@@ -15,9 +15,12 @@ public class AnchorDto extends DeviceDto {
 
 	private Integer y;
 
+	private Integer z;
+
 	public AnchorDto(Anchor anchor) {
 		super(anchor);
 		this.setX(anchor.getX());
 		this.setY(anchor.getY());
+		this.setZ(anchor.getZ());
 	}
 }
