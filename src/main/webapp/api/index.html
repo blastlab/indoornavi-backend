@@ -75,29 +75,33 @@
 			});
 
 			function addApiKeyAuthorization() {
-//				var key = encodeURIComponent($('#input_apiKey')[0].value);
-//				log(key);
-//				log("key: " + key);
-//				if (!!key && key.trim() !== "") {
-//					var apiKeyAuth = new SwaggerClient.ApiKeyAuthorization("Authorization", "Bearer " + key, "header");
-//					window.swaggerUi.api.clientAuthorizations.add("Authorization", apiKeyAuth);
-//					log("added key " + key);
-//				}
+				var key = encodeURIComponent($('#input_apiKey')[0].value);
+				log("key: " + key);
+				if (!!key && key.trim() !== "") {
+					var apiKeyAuth = new SwaggerClient.ApiKeyAuthorization("Authorization", "Bearer " + key, "header");
+					window.swaggerUi.api.clientAuthorizations.add("Authorization", apiKeyAuth);
+					log("added key " + key);
+				}
 			}
 
-			$('#input_apiKey').on('keydown', function(event) {
-				var x = event.which;
-				if (x === 13) {
-					log(x);
+			function preventEnter(event) {
+				if (event.which === 13) {
 					event.preventDefault();
+					return false;
 				}
-			}).on('keyup', function(event) {
-				var x = event.which;
-				if (x === 13) {
-					log(x);
-					event.preventDefault();
-				}
-			}).change(addApiKeyAuthorization);
+			}
+
+			function preventSubmit(event) {
+				event.preventDefault();
+				return false;
+			}
+
+			$('#input_apiKey')
+				.on('submit', preventSubmit)
+				.on('keypress', preventEnter)
+				.on('keydown', preventEnter)
+				.on('keyup', preventEnter)
+				.change(addApiKeyAuthorization);
 
 			window.swaggerUi.load();
 
