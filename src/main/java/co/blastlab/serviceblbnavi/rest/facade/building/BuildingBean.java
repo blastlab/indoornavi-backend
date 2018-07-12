@@ -4,7 +4,10 @@ import co.blastlab.serviceblbnavi.dao.repository.BuildingRepository;
 import co.blastlab.serviceblbnavi.dao.repository.ComplexRepository;
 import co.blastlab.serviceblbnavi.domain.Building;
 import co.blastlab.serviceblbnavi.domain.Complex;
+import co.blastlab.serviceblbnavi.domain.Floor;
 import co.blastlab.serviceblbnavi.dto.building.BuildingDto;
+import co.blastlab.serviceblbnavi.service.FloorService;
+import co.blastlab.serviceblbnavi.utils.Logger;
 import org.apache.http.HttpStatus;
 
 import javax.ejb.Stateless;
@@ -17,19 +20,27 @@ import java.util.Optional;
 public class BuildingBean implements BuildingFacade {
 
 	@Inject
+	private Logger logger;
+
+	@Inject
 	private BuildingRepository buildingRepository;
 
 	@Inject
 	private ComplexRepository complexRepository;
 
+	@Inject
+	private FloorService floorService;
+
 	@Override
 	public BuildingDto create(BuildingDto building) {
-		Optional<Complex> complex = complexRepository.findById(building.getComplexId());
+		logger.debug("Trying to create building {}", building);
+		Optional<Complex> complex = complexRepository.findById(building.getComplex().getId());
 		if (complex.isPresent()) {
 			Building buildingEntity = new Building();
 			buildingEntity.setComplex(complex.get());
 			buildingEntity.setName(building.getName());
 			buildingEntity = buildingRepository.save(buildingEntity);
+			logger.debug("Building created");
 			return new BuildingDto(buildingEntity);
 		}
 		throw new EntityNotFoundException();
@@ -37,13 +48,16 @@ public class BuildingBean implements BuildingFacade {
 
 	@Override
 	public BuildingDto update(Long id, BuildingDto building) {
+		logger.debug("Trying to update building {}", building);
 		Optional<Complex> complex = complexRepository.findByBuildingId(id);
 		if (complex.isPresent()) {
+			logger.debug("Complex found");
 			Optional<Building> buildingEntity = buildingRepository.findOptionalById(id);
 			if (buildingEntity.isPresent()) {
 				buildingEntity.get().setComplex(complex.get());
 				buildingEntity.get().setName(building.getName());
 				Building buildingDb = buildingRepository.save(buildingEntity.get());
+				logger.debug("Building updated");
 				return new BuildingDto(buildingDb);
 			}
 		}
@@ -52,9 +66,14 @@ public class BuildingBean implements BuildingFacade {
 
 	@Override
 	public Response delete(Long id) {
+		logger.debug("Trying to remove building id = {}", id);
 		Optional<Building> building = buildingRepository.findOptionalById(id);
 		if (building.isPresent()) {
+			for (Floor floor : building.get().getFloors()) {
+				floorService.removeNoCommit(floor);
+			}
 			buildingRepository.remove(building.get());
+			logger.debug("Building removed");
 			return Response.status(HttpStatus.SC_NO_CONTENT).build();
 		}
 		throw new EntityNotFoundException();

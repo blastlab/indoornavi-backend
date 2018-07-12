@@ -240,7 +240,7 @@
 		</addColumn>
 	</changeSet>
 	<changeSet author="kgebert (generated)" id="navi-59-3">
-		<addForeignKeyConstraint onUpdate="CASCADE" onDelete="SET NULL" baseColumnNames="scale_id" baseTableName="Floor" constraintName="FK_Floor_Scale_Id" referencedColumnNames="id" referencedTableName="Scale"/>
+		<addForeignKeyConstraint onUpdate="CASCADE" onDelete="CASCADE" baseColumnNames="scale_id" baseTableName="Floor" constraintName="FK_Floor_Scale_Id" referencedColumnNames="id" referencedTableName="Scale"/>
 	</changeSet>
 	<changeSet author="kgebert (generated)" id="navi-128-1">
 		<createTable tableName="Sink">
@@ -261,7 +261,7 @@
 		</addColumn>
 	</changeSet>
 	<changeSet author="kgebert (generated)" id="navi-128-4">
-		<addForeignKeyConstraint baseColumnNames="sink_id" baseTableName="Anchor" constraintName="FK_Anchor_Sink_Id" referencedColumnNames="id" referencedTableName="Sink"/>
+		<addForeignKeyConstraint onDelete="SET NULL" baseColumnNames="sink_id" baseTableName="Anchor" constraintName="FK_Anchor_Sink_Id" referencedColumnNames="id" referencedTableName="Sink"/>
 	</changeSet>
 	<changeSet author="kgebert (generated)" id="1496754768263-1">
 		<createTable tableName="Area">
@@ -419,9 +419,9 @@
 	</changeSet>
 
 	<changeSet author="kgebert (generated)" id="navi-142-1">
-		<createTable tableName="Map">
+		<createTable tableName="Publication">
 			<column autoIncrement="true" name="id" type="BIGINT">
-				<constraints primaryKey="true" primaryKeyName="MapPK"/>
+				<constraints primaryKey="true" primaryKeyName="PublicationPK"/>
 			</column>
 			<column name="creationDate" type="datetime"/>
 			<column name="modificationDate" type="datetime"/>
@@ -429,8 +429,8 @@
 		</createTable>
 	</changeSet>
 	<changeSet author="kgebert (generated)" id="navi-142-2">
-		<createTable tableName="Map_Tag">
-			<column name="Map_id" type="BIGINT">
+		<createTable tableName="Publication_Tag">
+			<column name="Publication_id" type="BIGINT">
 				<constraints nullable="false"/>
 			</column>
 			<column name="tags_id" type="BIGINT">
@@ -439,8 +439,8 @@
 		</createTable>
 	</changeSet>
 	<changeSet author="kgebert (generated)" id="navi-142-3">
-		<createTable tableName="Map_User">
-			<column name="Map_id" type="BIGINT">
+		<createTable tableName="Publication_User">
+			<column name="Publication_id" type="BIGINT">
 				<constraints nullable="false"/>
 			</column>
 			<column name="users_id" type="BIGINT">
@@ -449,19 +449,19 @@
 		</createTable>
 	</changeSet>
 	<changeSet author="kgebert (generated)" id="navi-142-6">
-		<addForeignKeyConstraint onDelete="CASCADE" baseColumnNames="Map_id" baseTableName="Map_User" constraintName="FK_MapUser_Map_Id" referencedColumnNames="id" referencedTableName="Map"/>
+		<addForeignKeyConstraint baseColumnNames="Publication_id" baseTableName="Publication_User" constraintName="FK_PublicationUser_Publication_Id" referencedColumnNames="id" referencedTableName="Publication"/>
 	</changeSet>
 	<changeSet author="kgebert (generated)" id="navi-142-7">
-		<addForeignKeyConstraint baseColumnNames="users_id" baseTableName="Map_User" constraintName="FK_MapUser_User_Id" referencedColumnNames="id" referencedTableName="User"/>
+		<addForeignKeyConstraint onDelete="CASCADE" baseColumnNames="users_id" baseTableName="Publication_User" constraintName="FK_PublicationUser_User_Id" referencedColumnNames="id" referencedTableName="User"/>
 	</changeSet>
 	<changeSet author="kgebert (generated)" id="navi-142-8">
-		<addForeignKeyConstraint onDelete="CASCADE" baseColumnNames="Map_id" baseTableName="Map_Tag" constraintName="FK_MapTag_Map_Id" referencedColumnNames="id" referencedTableName="Map"/>
+		<addForeignKeyConstraint baseColumnNames="Publication_id" baseTableName="Publication_Tag" constraintName="FK_PublicationTag_Publication_Id" referencedColumnNames="id" referencedTableName="Publication"/>
 	</changeSet>
 	<changeSet author="kgebert (generated)" id="navi-142-11">
-		<addForeignKeyConstraint baseColumnNames="tags_id" baseTableName="Map_Tag" constraintName="FK_MapTag_Tag_Id" referencedColumnNames="id" referencedTableName="Tag"/>
+		<addForeignKeyConstraint onDelete="CASCADE" baseColumnNames="tags_id" baseTableName="Publication_Tag" constraintName="FK_PublicationTag_Tag_Id" referencedColumnNames="id" referencedTableName="Tag"/>
 	</changeSet>
 	<changeSet author="kgebert (generated)" id="navi-142-12">
-		<addForeignKeyConstraint onDelete="CASCADE" baseColumnNames="floor_id" baseTableName="Map" constraintName="FK_Map_Floor_Id" referencedColumnNames="id" referencedTableName="Floor"/>
+		<addForeignKeyConstraint onDelete="CASCADE" baseColumnNames="floor_id" baseTableName="Publication" constraintName="FK_Publication_Floor_Id" referencedColumnNames="id" referencedTableName="Floor"/>
 	</changeSet>
 	<changeSet author="kgebert (generated)" id="navi-118-1">
 		<createTable tableName="ApiKey">
@@ -484,6 +484,134 @@
 		</addColumn>
 	</changeSet>
 	<changeSet author="kgebert (generated)" id="navi-152-2">
-		<addForeignKeyConstraint baseColumnNames="floor_id" baseTableName="Area" constraintName="FK_Area_Floor_Id" referencedColumnNames="id" referencedTableName="Floor"/>
+		<addForeignKeyConstraint onDelete="CASCADE" baseColumnNames="floor_id" baseTableName="Area" constraintName="FK_Area_Floor_Id" referencedColumnNames="id" referencedTableName="Floor"/>
+	</changeSet>
+
+	<changeSet author="kgebert (generated)" id="navi-166-1">
+		<addColumn tableName="Coordinates">
+			<column name="floor_id" type="bigint"/>
+		</addColumn>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-166-2">
+		<addColumn tableName="Coordinates">
+			<column name="tag_id" type="bigint"/>
+		</addColumn>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-166-3">
+		<addForeignKeyConstraint onUpdate="CASCADE" onDelete="CASCADE" baseColumnNames="floor_id" baseTableName="Coordinates" constraintName="FK_Coordiantes_Floor" referencedColumnNames="id" referencedTableName="Floor"/>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-166-4">
+		<addForeignKeyConstraint onUpdate="CASCADE" onDelete="CASCADE" baseColumnNames="tag_id" baseTableName="Coordinates" constraintName="FK_Coordiantes_Tag" referencedColumnNames="id" referencedTableName="Tag"/>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-166-5">
+		<dropColumn columnName="device" tableName="coordinates"/>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-187-1">
+		<createTable tableName="Publication_Floor">
+			<column name="Publication_id" type="BIGINT">
+				<constraints nullable="false"/>
+			</column>
+			<column name="floors_id" type="BIGINT">
+				<constraints nullable="false"/>
+			</column>
+		</createTable>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-187-2">
+		<addForeignKeyConstraint baseColumnNames="Publication_id" baseTableName="Publication_Floor" constraintName="FK_Publication_Floor_Publication_Id" referencedColumnNames="id" referencedTableName="Publication"/>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-187-3">
+		<addForeignKeyConstraint onDelete="CASCADE" baseColumnNames="floors_id" baseTableName="Publication_Floor" constraintName="FK_Publication_Floor_Floor_Id" referencedColumnNames="id" referencedTableName="Floor"/>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-187-4">
+		<dropForeignKeyConstraint baseTableName="publication" constraintName="FK_Publication_Floor_Id"/>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-187-5">
+		<dropColumn columnName="floor_id" tableName="publication"/>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-184-1">
+		<addColumn tableName="Configuration">
+			<column name="publishedDate" type="datetime"/>
+		</addColumn>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-184-2">
+		<dropColumn columnName="published" tableName="configuration"/>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-184-3">
+		<addColumn tableName="Configuration">
+			<column name="saveDraftDate" type="datetime"/>
+		</addColumn>
+	</changeSet>
+
+	<changeSet author="kgebert (generated)" id="navi-195-1">
+		<createTable tableName="RoutePart">
+			<column autoIncrement="true" name="id" type="BIGINT">
+				<constraints primaryKey="true" primaryKeyName="RoutePartPK"/>
+			</column>
+			<column name="creationDate" type="datetime"/>
+			<column name="modificationDate" type="datetime"/>
+			<column name="sortIndex" type="INT"/>
+			<column name="deviceShortId" type="INT"/>
+		</createTable>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-195-2">
+		<addColumn tableName="Device">
+			<column name="AorB" type="tinyint">
+				<constraints nullable="false"/>
+			</column>
+		</addColumn>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-195-4">
+		<addColumn tableName="RoutePart">
+			<column name="owner_id" type="bigint"/>
+		</addColumn>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-195-5">
+		<addForeignKeyConstraint onUpdate="CASCADE" onDelete="CASCADE" baseColumnNames="owner_id" baseTableName="RoutePart" constraintName="FK_RoutePart_Owner" referencedColumnNames="id" referencedTableName="Device"/>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-195-6">
+		<addColumn tableName="Device">
+			<column name="firmwareVersion" type="varchar(255)"/>
+		</addColumn>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-195-7">
+		<addColumn tableName="Device">
+			<column name="commitHash" type="varchar(255)"/>
+		</addColumn>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-195-8">
+		<addColumn tableName="Device">
+			<column name="major" type="integer"/>
+		</addColumn>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-195-9">
+		<addColumn tableName="Device">
+			<column name="minor" type="integer"/>
+		</addColumn>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-195-10">
+		<addColumn tableName="Device">
+			<column name="firmwarePartition" type="integer"/>
+		</addColumn>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-195-11">
+		<dropColumn columnName="AorB" tableName="device"/>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-195-12">
+		<dropColumn columnName="firmwareVersion" tableName="device"/>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-312-1">
+		<addColumn tableName="Anchor">
+			<column name="z" type="integer"/>
+		</addColumn>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-313-1">
+		<addColumn tableName="Area">
+			<column name="hMax" type="integer"/>
+		</addColumn>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-313-2">
+		<addColumn tableName="Area">
+			<column name="hMin" type="integer"/>
+		</addColumn>
 	</changeSet>
 </databaseChangeLog>

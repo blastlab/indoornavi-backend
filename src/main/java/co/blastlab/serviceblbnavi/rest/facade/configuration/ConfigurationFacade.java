@@ -2,6 +2,7 @@ package co.blastlab.serviceblbnavi.rest.facade.configuration;
 
 import co.blastlab.serviceblbnavi.dto.configuration.ConfigurationDto;
 import co.blastlab.serviceblbnavi.ext.filter.AuthorizedAccess;
+import co.blastlab.serviceblbnavi.ext.filter.SetOperationId;
 import io.swagger.annotations.*;
 
 import javax.validation.Valid;
@@ -12,6 +13,7 @@ import java.util.List;
 
 @Path("/configurations")
 @Api("/configurations")
+@SetOperationId
 public interface ConfigurationFacade {
 	@Path("/{floorId: \\d+}")
 	@POST

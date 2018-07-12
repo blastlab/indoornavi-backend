@@ -1,9 +1,8 @@
 package co.blastlab.serviceblbnavi.socket.measures;
 
-import co.blastlab.serviceblbnavi.dao.repository.SinkRepository;
-import co.blastlab.serviceblbnavi.domain.Sink;
 import co.blastlab.serviceblbnavi.socket.bridge.AnchorPositionBridge;
 import co.blastlab.serviceblbnavi.socket.bridge.SinkAnchorsDistanceBridge;
+import co.blastlab.serviceblbnavi.utils.Logger;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -12,8 +11,10 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import javax.websocket.Session;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -22,9 +23,6 @@ public class MeasuresWebSocketTest {
 
 	@InjectMocks
 	private MeasuresWebSocket measuresWebSocket;
-
-	@Mock
-	private SinkRepository sinkRepository;
 
 	@Mock
 	private CoordinatesCalculator coordinatesCalculator;
@@ -38,35 +36,33 @@ public class MeasuresWebSocketTest {
 	@Mock
 	private AnchorPositionBridge anchorPositionBridge;
 
+	@Mock
+	private Logger logger;
+
 	@Before
-	public void setUp() throws Exception {
+	public void setUp() {
+		when(session.getId()).thenReturn("sessionId");
 		measuresWebSocket.init();
 	}
 
 	@Test
-	public void handleMessageWhenInfoIsSent() throws Exception {
-		when(session.getQueryString()).thenReturn("server");
-
-		measuresWebSocket.handleMessage("{\"measures\": [], \"info\": [{\"code\": 2, \"args\": \"{\\\"did\\\": 100012, \\\"eui\\\": 100005912391}\"}]}", session);
-
-		verify(sinkRepository).findOptionalByShortId(100012);
-		verify(sinkRepository).save(any(Sink.class));
-	}
-
-	@Test
 	public void handleMessageWhenMeasureIsSent() throws Exception {
-		when(session.getQueryString()).thenReturn("server");
+		when(session.getRequestParameterMap()).thenReturn(new HashMap<String, List<String>>(){{
+			this.put("server", new ArrayList<>());
+		}});
 
-		measuresWebSocket.handleMessage("{\"measures\": [{\"did1\": 1, \"did2\": 100501, \"dist\": 100}], \"info\": []}", session);
+		measuresWebSocket.handleMessage("[{\"did1\": 1, \"did2\": 100501, \"dist\": 100}]", session);
 
 		verify(coordinatesCalculator).calculateTagPosition(1, 100501, 100);
 	}
 
 	@Test
 	public void handleMessageWhenMeasureIsSentAndBothDevicesAreAnchors() throws Exception {
-		when(session.getQueryString()).thenReturn("server");
+		when(session.getRequestParameterMap()).thenReturn(new HashMap<String, List<String>>(){{
+			this.put("server", new ArrayList<>());
+		}});
 
-		measuresWebSocket.handleMessage("{\"measures\": [{\"did1\": 100502, \"did2\": 100501, \"dist\": 100}], \"info\": []}", session);
+		measuresWebSocket.handleMessage("[{\"did1\": 100502, \"did2\": 100501, \"dist\": 100}]", session);
 
 		verify(anchorPositionBridge).addDistance(100502, 100501, 100);
 		verify(sinkAnchorsDistanceBridge).addDistance(100502, 100501, 100);

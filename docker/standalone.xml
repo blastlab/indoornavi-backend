@@ -89,14 +89,38 @@
 			<logger category="com.arjuna">
 				<level name="WARN"/>
 			</logger>
-			<logger category="org.jboss.as.config">
-				<level name="DEBUG"/>
+			<logger category="org.jboss">
+				<level name="WARN"/>
+			</logger>
+			<logger category="io.swagger">
+				<level name="WARN"/>
 			</logger>
 			<logger category="sun.rmi">
 				<level name="WARN"/>
 			</logger>
+			<logger category="org.hibernate">
+				<level name="WARN"/>
+			</logger>
+			<logger category="org.apache.deltaspike">
+				<level name="WARN"/>
+			</logger>
+			<logger category="javax.enterprise">
+				<level name="WARN"/>
+			</logger>
+			<logger category="org.wildfly">
+				<level name="WARN"/>
+			</logger>
+			<logger category="org.infinispan">
+				<level name="WARN" />
+			</logger>
+			<logger category="net.sf.jmimemagic">
+				<level name="WARN" />
+			</logger>
+			<logger category="org.xnio">
+				<level name="WARN" />
+			</logger>
 			<root-logger>
-				<level name="INFO"/>
+				<level name="${app.log.level}"/>
 				<handlers>
 					<handler name="CONSOLE"/>
 				</handlers>
@@ -105,7 +129,7 @@
 				<pattern-formatter pattern="%d{yyyy-MM-dd HH:mm:ss,SSS} %-5p [%c] (%t) %s%e%n"/>
 			</formatter>
 			<formatter name="COLOR-PATTERN">
-				<pattern-formatter pattern="%K{level}%d{HH:mm:ss,SSS} %-5p [%c] (%t) %s%e%n"/>
+				<pattern-formatter pattern="%K{level}%d{HH:mm:ss,SSS} %-5p [%c] (%t) %s%e%n" color-map="trace:cyan,debug:green,warn:yellow,error:red,info:white"/>
 			</formatter>
 		</subsystem>
 		<subsystem xmlns="urn:jboss:domain:batch-jberet:1.0">

@@ -2,6 +2,7 @@ package co.blastlab.serviceblbnavi.rest.facade.auth;
 
 import co.blastlab.serviceblbnavi.dto.user.CredentialsDto;
 import co.blastlab.serviceblbnavi.ext.filter.AuthorizedAccess;
+import co.blastlab.serviceblbnavi.ext.filter.SetOperationId;
 import io.swagger.annotations.*;
 
 import javax.validation.Valid;
@@ -11,6 +12,7 @@ import javax.ws.rs.core.Response;
 
 @Path("/auth")
 @Api("/auth")
+@SetOperationId
 public interface AuthenticationFacade {
 	@POST
 	@ApiOperation(value = "authenticate", response = Response.class)

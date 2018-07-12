@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+	<meta charset="UTF-8">
+	<title>Title</title>
 </head>
 <body>
 </body>
 <script
-    src="https://code.jquery.com/jquery-3.1.1.min.js"
-    integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
-    crossorigin="anonymous"></script>
+	src="https://code.jquery.com/jquery-3.1.1.min.js"
+	integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+	crossorigin="anonymous"></script>
 <script>
 	$(document).ready(function () {
 		var isConnectionOpen = false;
@@ -29,13 +29,13 @@
 		socket.onopen = function () {
 			console.log('connection opened');
 			isConnectionOpen = true;
-			sendPath(sinInterval, coordsSin, 10999);
-			sendPath(lineInterval, coordsLine, 11999);
-			sendPath(circleInterval, coordsCircle, 12999);
-			sendPath(line2Interval, coordsLine2, 13999);
+//			sendPath(sinInterval, coordsSin, 10999);
+//			sendPath(lineInterval, coordsLine, 11999);
+//			sendPath(circleInterval, coordsCircle, 12999);
+//			sendPath(line2Interval, coordsLine2, 13999);
 		};
 
-		socket.onclose = function() {
+		socket.onclose = function () {
 			isConnectionOpen = false;
 		};
 
@@ -48,17 +48,21 @@
 		};
 
 		function sendPath(interval, coordinates, tagId) {
-			interval = setInterval(function() {
-				if (anchors.length === 0) return;
+			interval = setInterval(function () {
+				if (anchors.length === 0) {
+					return;
+				}
 				if (counter >= coordinates.length) {
 					clearInterval(interval);
 					return;
 				}
-				var data = JSON.stringify({measures: getDistances({
-					shortId: tagId,
-					x: coordinates[counter].x,
-					y: coordinates[counter].y
-				}), info: info});
+				var data = JSON.stringify({
+					measures: getDistances({
+						shortId: tagId,
+						x: coordinates[counter].x,
+						y: coordinates[counter].y
+					}), info: info
+				});
 				console.log("sending: ");
 				console.log(data);
 				socket.send(data);
@@ -72,7 +76,7 @@
 			var y, counter = 0;
 
 			for (var x = start; x <= stop; x += 10) {
-				y =  180 - Math.sin(counter) * 120;
+				y = 180 - Math.sin(counter) * 120;
 				coordinates.push({x: x, y: y});
 				counter += increase;
 			}
@@ -146,13 +150,12 @@
 		}
 
 		// data for wizard
-		setInterval(function() {
-			var distances = {
-				measures: [
-					{"did1": 999999, "did2": 111111, "dist": Math.floor(100)},
-					{"did1": 999999, "did2": 222222, "dist": Math.floor(70)},
-					{"did1": 111111, "did2": 222222, "dist": Math.floor(60)}
-				], info: []};
+		setInterval(function () {
+			var distances = [
+				{"did1": 999999, "did2": 111111, "dist": Math.floor(100)},
+				{"did1": 999999, "did2": 222222, "dist": Math.floor(70)},
+				{"did1": 111111, "did2": 222222, "dist": Math.floor(60)}
+			];
 			console.log("sending x, y ", JSON.stringify(distances));
 			socket.send(JSON.stringify(distances));
 		}, 3000);

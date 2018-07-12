@@ -21,8 +21,8 @@ public class AnchorFacadeIT extends BaseIT {
 	private static final String ANCHOR_PATH = "/anchors";
 	private static final String ANCHOR_PATH_WITH_ID = "/anchors/{id}";
 
-	private static final Float X = 3.14159f;
-	private static final Float Y = 2.71828f;
+	private static final Integer X = 3;
+	private static final Integer Y = 2;
 	private static final String NAME = "Anker  $ \\\" \\\\ ążśźęćółń ĄŻŚŹĘĆŃÓŁ `~!@#%^&*()-_=+{}[]:;'|><,.?";
 	private static final int FLOOR_EXISTING = 4;
 	private static final int ANCHOR_ID_NONEXISTING = 666;
@@ -192,8 +192,8 @@ public class AnchorFacadeIT extends BaseIT {
 	@Test
 	public void updateAnchor() {
 		String body = new RequestBodyBuilder("Anchor.json")
-			.setParameter("shortId", ANCHOR_SHORT_ID_EXISTING - 1)
-			.setParameter("longId", ANCHOR_LONG_ID_EXISTING + 5)
+			.setParameter("shortId", ANCHOR_SHORT_ID_EXISTING)
+			.setParameter("longId", ANCHOR_LONG_ID_EXISTING)
 			.setParameter("name", NAME)
 			.setParameter("floorId", FLOOR_EXISTING)
 			.setParameter("x", X)
@@ -207,8 +207,8 @@ public class AnchorFacadeIT extends BaseIT {
 			.when().put(ANCHOR_PATH_WITH_ID)
 			.then().statusCode(HttpStatus.SC_OK)
 			.body(
-				"shortId", equalTo(ANCHOR_SHORT_ID_EXISTING - 1),
-				"longId", equalTo(ANCHOR_LONG_ID_EXISTING + 5),
+				"shortId", equalTo(ANCHOR_SHORT_ID_EXISTING),
+				"longId", equalTo(ANCHOR_LONG_ID_EXISTING),
 				"name", equalTo(NAME),
 				"floorId", equalTo(FLOOR_EXISTING),
 				"x", equalTo(X),
@@ -354,8 +354,8 @@ public class AnchorFacadeIT extends BaseIT {
 				"longId", equalTo(Arrays.asList(ANCHOR_LONG_ID_EXISTING, 22222222, 33333333, 9090909090L)),
 				"name", equalTo(Arrays.asList("LeftBottomAnchor", "TopRightAnchor", "BottomRightAnchor", "Sink")),
 				"floorId", equalTo(Arrays.asList(2, 2, 2, 2)),
-				"x", equalTo(Arrays.asList(0.0f, 500.0f, 500.0f, 0.0f)),
-				"y", equalTo(Arrays.asList(500.0f, 0.0f, 500.0f, 0.0f)),
+				"x", equalTo(Arrays.asList(0, 500, 500, 0)),
+				"y", equalTo(Arrays.asList(500, 0, 500, 0)),
 				"verified", equalTo(Arrays.asList(true, true, true, true))
 			);
 	}

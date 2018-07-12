@@ -2,6 +2,7 @@ package co.blastlab.serviceblbnavi.rest.facade.user;
 
 import co.blastlab.serviceblbnavi.dto.user.PermissionGroupDto;
 import co.blastlab.serviceblbnavi.ext.filter.AuthorizedAccess;
+import co.blastlab.serviceblbnavi.ext.filter.SetOperationId;
 import io.swagger.annotations.*;
 
 import javax.validation.Valid;
@@ -12,6 +13,7 @@ import java.util.List;
 
 @Path("/permissionGroups")
 @Api("/permissionGroups")
+@SetOperationId
 public interface PermissionGroupFacade {
 	@GET
 	@ApiOperation(value = "get list of permission groups", response = PermissionGroupDto.class, responseContainer = "list")

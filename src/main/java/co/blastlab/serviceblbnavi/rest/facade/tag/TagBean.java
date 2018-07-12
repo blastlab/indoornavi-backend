@@ -1,10 +1,10 @@
 package co.blastlab.serviceblbnavi.rest.facade.tag;
 
-import co.blastlab.serviceblbnavi.dao.repository.FloorRepository;
 import co.blastlab.serviceblbnavi.dao.repository.TagRepository;
 import co.blastlab.serviceblbnavi.domain.Tag;
 import co.blastlab.serviceblbnavi.dto.tag.TagDto;
 import co.blastlab.serviceblbnavi.rest.facade.device.DeviceBean;
+import co.blastlab.serviceblbnavi.utils.Logger;
 import org.apache.http.HttpStatus;
 
 import javax.ejb.Stateless;
@@ -19,13 +19,14 @@ import java.util.Optional;
 public class TagBean extends DeviceBean implements TagFacade {
 
 	@Inject
-	private TagRepository tagRepository;
+	private Logger logger;
 
 	@Inject
-	private FloorRepository floorRepository;
+	private TagRepository tagRepository;
 
 	@Override
 	public TagDto create(TagDto tag) {
+		logger.debug("Trying to create tag {}", tag);
 		Tag tagEntity = new Tag();
 		tagEntity.setShortId(tag.getShortId());
 		tagEntity.setLongId(tag.getLongId());
@@ -36,11 +37,13 @@ public class TagBean extends DeviceBean implements TagFacade {
 			super.setFloor(tag, tagEntity);
 		}
 		tagEntity = tagRepository.save(tagEntity);
+		logger.debug("Tag created");
 		return new TagDto(tagEntity);
 	}
 
 	@Override
 	public TagDto update(Long id, TagDto tag) {
+		logger.debug("Trying to update tag {}", tag);
 		Optional<Tag> tagOptional = tagRepository.findOptionalById(id);
 		if (tagOptional.isPresent()){
 			Tag tagEntity = tagOptional.get();
@@ -55,6 +58,7 @@ public class TagBean extends DeviceBean implements TagFacade {
 				tagEntity.setFloor(null);
 			}
 			tagRepository.save(tagEntity);
+			logger.debug("Tag updated");
 			return new TagDto(tagEntity);
 		}
 		throw new EntityNotFoundException();
@@ -70,9 +74,11 @@ public class TagBean extends DeviceBean implements TagFacade {
 
 	@Override
 	public Response delete(Long id) {
+		logger.debug("Trying to remove tag id = {}", id);
 		Optional<Tag> tag = tagRepository.findOptionalById(id);
 		if (tag.isPresent()) {
 			tagRepository.remove(tag.get());
+			logger.debug("Tag removed");
 			return Response.status(HttpStatus.SC_NO_CONTENT).build();
 		}
 		throw new EntityNotFoundException();

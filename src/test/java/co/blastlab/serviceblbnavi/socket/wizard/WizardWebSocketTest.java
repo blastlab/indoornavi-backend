@@ -4,6 +4,7 @@ import co.blastlab.serviceblbnavi.dao.repository.SinkRepository;
 import co.blastlab.serviceblbnavi.dto.Point;
 import co.blastlab.serviceblbnavi.socket.bridge.AnchorPositionBridge;
 import co.blastlab.serviceblbnavi.socket.bridge.SinkAnchorsDistanceBridge;
+import co.blastlab.serviceblbnavi.utils.Logger;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -17,6 +18,7 @@ import javax.websocket.Session;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class WizardWebSocketTest {
@@ -34,10 +36,15 @@ public class WizardWebSocketTest {
 	private AnchorPositionBridge anchorPositionBridge;
 
 	@Mock
+	private Logger logger;
+
+	@Mock
 	private Session session;
 
 	@Before
 	public void setUp() throws Exception {
+		when(session.getId()).thenReturn("sessionId");
+		when(logger.setId(any())).thenReturn(logger);
 		wizardWebSocket.init();
 		wizardWebSocket.open(session);
 	}

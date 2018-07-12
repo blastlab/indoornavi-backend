@@ -6,13 +6,15 @@
 	<!-- This file is used in test enviroment -->
 	<changeSet id="Clear" author="kgebert" context="test" runOnChange="true" labels="Clear" runAlways="true">
 		<delete tableName="configuration" />
-		<delete tableName="map_tag" />
-		<delete tableName="map_user" />
-		<delete tableName="map" />
+		<delete tableName="publication_tag" />
+		<delete tableName="publication_floor" />
+		<delete tableName="publication_user" />
+		<delete tableName="publication" />
 		<delete tableName="areaconfiguration_tag" />
 		<delete tableName="area_areaconfiguration" />
 		<delete tableName="area" />
 		<delete tableName="areaconfiguration" />
+		<delete tableName="coordinates"/>
 		<delete tableName="tag"/>
 		<delete tableName="sink"/>
 		<delete tableName="anchor"/>
@@ -28,29 +30,29 @@
 		<delete tableName="user"/>
 	</changeSet>
 
-	<changeSet id="Permission" author="kgebert" runOnChange="true" labels="Permission" runAlways="true">
+	<changeSet context="test" id="Permission" author="kgebert" runOnChange="true" labels="Permission" runAlways="true">
 		<loadUpdateData tableName="permission" file="test/Permission.csv" primaryKey="id" relativeToChangelogFile="true" />
 		<loadUpdateData tableName="permission" file="test/navi-142/Permission.csv" primaryKey="id" relativeToChangelogFile="true" />
 		<loadUpdateData tableName="permission" file="test/navi-73/Permission.csv" primaryKey="id" relativeToChangelogFile="true" />
 	</changeSet>
 
-	<changeSet id="PermissionGroup" author="kgebert" runOnChange="true" labels="PermissionGroup" runAlways="true">
+	<changeSet context="test" id="PermissionGroup" author="kgebert" runOnChange="true" labels="PermissionGroup" runAlways="true">
 		<loadUpdateData tableName="permissiongroup" file="test/PermissionGroup.csv" primaryKey="id" relativeToChangelogFile="true" />
 	</changeSet>
 
-	<changeSet id="PermissionGroup_Permission" author="kgebert" runOnChange="true" labels="PermissionGroup_Permission" runAlways="true">
+	<changeSet context="test" id="PermissionGroup_Permission" author="kgebert" runOnChange="true" labels="PermissionGroup_Permission" runAlways="true">
 		<loadData tableName="permissiongroup_permission" file="test/PermissionGroupPermission.csv" relativeToChangelogFile="true" />
 		<loadData tableName="permissiongroup_permission" file="test/navi-142/PermissionGroupPermission.csv" relativeToChangelogFile="true" />
 		<loadData tableName="permissiongroup_permission" file="test/navi-73/PermissionGroupPermission.csv" relativeToChangelogFile="true" />
 	</changeSet>
 
-	<changeSet id="User" author="kgebert" runOnChange="true" labels="User" runAlways="true">
+	<changeSet context="test" id="User" author="kgebert" runOnChange="true" labels="User" runAlways="true">
 		<loadUpdateData tableName="user" file="test/User.csv" primaryKey="id" relativeToChangelogFile="true">
 			<column name="superuser" type="boolean" />
 		</loadUpdateData>
 	</changeSet>
 
-	<changeSet id="User_PermissionGroup" author="kgebert" runOnChange="true" labels="User_PermissionGroup" runAlways="true">
+	<changeSet context="test" id="User_PermissionGroup" author="kgebert" runOnChange="true" labels="User_PermissionGroup" runAlways="true">
 		<loadData tableName="user_permissiongroup" file="test/UserPermissionGroup.csv" relativeToChangelogFile="true" />
 	</changeSet>
 
@@ -93,6 +95,7 @@
 	<changeSet id="Area" author="kgebert" context="test" runOnChange="true" labels="Area" runAlways="true">
 		<sql>
 			insert into area (id, polygon, name, floor_id) VALUES (1, GeomFromText('POLYGON(( 190 750, 580 750, 580 980, 190 980, 190 750 ))'), 'test', 2);
+			insert into area (id, polygon, name, floor_id) VALUES (2, GeomFromText('POLYGON(( 15 50, 25 50, 25 90, 15 90, 15 50 ))'), 'test2', 2);
 		</sql>
 	</changeSet>
 
@@ -110,19 +113,30 @@
 
 	<changeSet id="Configuration" author="kgebert" context="test" runOnChange="true" labels="Configuration" runAlways="true">
 		<loadUpdateData quotchar="'" tableName="configuration" file="test/Configuration.csv" primaryKey="id" relativeToChangelogFile="true">
-			<column name="published" type="boolean" />
+			<column name="publishedDate" type="DATE" />
+			<column name="saveDraftDate" type="DATE" />
 		</loadUpdateData>
 	</changeSet>
 
-	<changeSet id="Map" author="kgebert" context="test" runOnChange="true" labels="Map" runAlways="true">
-		<loadUpdateData tableName="map" file="test/Map.csv" primaryKey="id" relativeToChangelogFile="true" />
+	<changeSet id="Publication" author="kgebert" context="test" runOnChange="true" labels="Publication" runAlways="true">
+		<loadUpdateData tableName="publication" file="test/Publication.csv" primaryKey="id" relativeToChangelogFile="true" />
 	</changeSet>
 
-	<changeSet id="Map_Tag" author="kgebert" context="test" runOnChange="true" labels="Map_Tag" runAlways="true">
-		<loadData tableName="map_tag" file="test/MapTag.csv" relativeToChangelogFile="true" />
+	<changeSet id="Publication_Tag" author="kgebert" context="test" runOnChange="true" labels="Publication_Tag" runAlways="true">
+		<loadData tableName="publication_tag" file="test/PublicationTag.csv" relativeToChangelogFile="true" />
 	</changeSet>
 
-	<changeSet id="Map_User" author="kgebert" context="test" runOnChange="true" labels="Map_User" runAlways="true">
-		<loadData tableName="map_user" file="test/MapUser.csv" relativeToChangelogFile="true" />
+	<changeSet id="Publication_User" author="kgebert" context="test" runOnChange="true" labels="Publication_User" runAlways="true">
+		<loadData tableName="publication_user" file="test/PublicationUser.csv" relativeToChangelogFile="true" />
+	</changeSet>
+
+	<changeSet id="Publication_Floor" author="kgebert" context="test" runOnChange="true" labels="Publication_Floor" runAlways="true">
+		<loadData tableName="publication_floor" file="test/PublicationFloor.csv" relativeToChangelogFile="true" />
+	</changeSet>
+	
+	<changeSet id="Coordinates" author="kgebert" context="test" runOnChange="true" labels="Coordinates" runAlways="true">
+		<loadData tableName="coordinates" file="test/Coordinates.csv" relativeToChangelogFile="true">
+			<column name="creation_date" type="DATE" />
+		</loadData>
 	</changeSet>
 </databaseChangeLog>

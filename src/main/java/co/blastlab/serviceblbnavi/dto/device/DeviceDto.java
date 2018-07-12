@@ -2,10 +2,7 @@ package co.blastlab.serviceblbnavi.dto.device;
 
 import co.blastlab.serviceblbnavi.domain.Device;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.validation.constraints.NotNull;
 
@@ -13,6 +10,7 @@ import javax.validation.constraints.NotNull;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 public class DeviceDto {
 
 	@ApiModelProperty(example = "1", readOnly = true)
@@ -36,6 +34,9 @@ public class DeviceDto {
 	@ApiModelProperty(example = "false")
 	private Boolean verified;
 
+	@ApiModelProperty(example = "")
+	private String firmwareVersion;
+
 	public DeviceDto(Device device) {
 		this.setId(device.getId());
 		this.setShortId(device.getShortId());
@@ -43,5 +44,6 @@ public class DeviceDto {
 		this.setName(device.getName());
 		this.setFloorId(device.getFloor() != null ? device.getFloor().getId() : null);
 		this.setVerified(device.getVerified());
+		this.setFirmwareVersion(device.getFirmwareVersion());
 	}
 }

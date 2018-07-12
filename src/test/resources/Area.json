@@ -1,5 +1,6 @@
 {
 	"name": "string",
+	"floorId": 1,
 	"points": [
 		{
 			"x": 0,
@@ -23,6 +24,8 @@
 		}
 	],
 	"configurations": [
-		1
+		{
+			"id": 1
+		}
 	]
 }
