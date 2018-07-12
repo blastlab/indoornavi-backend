@@ -4,7 +4,7 @@
 : ${PORT:=3306}
 : ${COMMAND:="update"}
 
-JDBC_URL="jdbc:mysql://$HOST:$PORT/$SCHEMA?createDatabaseIfNotExist=true&useUnicode=true&characterEncoding=utf-8&connectionCollation=utf8_unicode_ci"
+JDBC_URL="jdbc:mysql://$HOST:$PORT/$SCHEMA?createDatabaseIfNotExist=true&useUnicode=true&characterEncoding=utf-8&connectionCollation=utf8_unicode_ci&serverTimezone=UTC"
 
 function liq {
 	cd /liquibase
@@ -23,7 +23,7 @@ if [ "$COMMAND" == "update" ]; then
 	liq dbDoc /www/liquibase
 
 	GRAPH_FILE="/www/graph.png"
-	SC_ARGS="-url=jdbc:mysql://$HOST:$PORT/$SCHEMA?nullNamePatternMatchesAll=true -user=$USER -password=$PASSWORD -command=schema -infolevel=detailed -portablenames -c=graph -outputformat png -outputfile=$GRAPH_FILE -tables=.*\.(?!DATABASECHANGELOG).*"
+	SC_ARGS="-url=jdbc:mysql://$HOST:$PORT/$SCHEMA?nullNamePatternMatchesAll=true&serverTimezone=UTC -user=$USER -password=$PASSWORD -command=schema -loglevel=CONFIG -infolevel=detailed -portablenames -c=graph -outputformat png -outputfile=$GRAPH_FILE -tables=.*\.(?!DATABASECHANGELOG).*"
 	cd /schemacrawler
 	./schemacrawler.sh ${SC_ARGS}
 
