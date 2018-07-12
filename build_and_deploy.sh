@@ -30,7 +30,9 @@ for app in ${apps[*]}
 	do
 		go_to_app_directory ${app}
 		docker build -t ${app}:${version} .
+		docker tag ${app}:${version} indoornavi.azurecr.io/${app}:latest
 		docker tag ${app}:${version} indoornavi.azurecr.io/${app}:${version}
+		docker push indoornavi.azurecr.io/${app}:latest
 		docker push indoornavi.azurecr.io/${app}:${version}
 	done
 
