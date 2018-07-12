@@ -44,6 +44,7 @@ public abstract class BaseIT extends RestAssuredIT {
 	@Before
 	public void setUp() throws LiquibaseException, SQLException, ClassNotFoundException {
 		try (Connection connection = DriverManager.getConnection(DATABASE_URL, "root", "")) {
+			System.out.println(getAdditionalLabels());
 			Class.forName(JDBC_DRIVER_CLASS);
 			Database database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(new JdbcConnection(connection));
 			Liquibase liquibase = new Liquibase(CHANGELOG_FILE, new FileSystemResourceAccessor(), database);

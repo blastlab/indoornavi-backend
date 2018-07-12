@@ -6,7 +6,8 @@ import co.blastlab.serviceblbnavi.domain.Area;
 import co.blastlab.serviceblbnavi.domain.AreaConfiguration;
 import co.blastlab.serviceblbnavi.domain.Floor;
 import co.blastlab.serviceblbnavi.domain.Tag;
-import co.blastlab.serviceblbnavi.socket.measures.CoordinatesDto;
+import co.blastlab.serviceblbnavi.dto.report.CoordinatesDto;
+import co.blastlab.serviceblbnavi.utils.Logger;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 import com.vividsolutions.jts.geom.Coordinate;
@@ -34,6 +35,9 @@ import static co.blastlab.serviceblbnavi.domain.AreaConfiguration.Mode.ON_LEAVE;
 public class AreaEventController {
 
 	@Inject
+	private Logger logger;
+
+	@Inject
 	private AreaRepository areaRepository;
 
 	@Inject
@@ -52,11 +56,15 @@ public class AreaEventController {
 
 	@PostConstruct
 	public void init() {
-		scheduledExecutorService.scheduleWithFixedDelay(this::updateData, 1, 30, TimeUnit.SECONDS);
+		scheduledExecutorService.scheduleAtFixedRate(this::updateData, 0, 30, TimeUnit.SECONDS);
 	}
 
 	private void updateData() {
 		Iterator<Table.Cell<Integer, Area, Date>> iterator = this.tagCoordinatesHistory.cellSet().iterator();
+		// need to create new logger here because this method is called outside request context
+		Logger logger = new Logger();
+
+		logger.trace("[AreaEventController] Removing outdated tag cooridnates history");
 
 		Date now = new Date();
 		iterator.forEachRemaining(cell -> {
@@ -69,21 +77,27 @@ public class AreaEventController {
 	public List<AreaEvent> checkCoordinates(CoordinatesDto coordinatesData) {
 		List<AreaEvent> events = new ArrayList<>();
 		try {
+			logger.trace("Checking if coordinates {} are within any areas", coordinatesData);
 			Map<Area, List<AreaConfiguration>> areas = getFilteredAreas(coordinatesData);
+			logger.trace("Areas found: {}", areas.size());
 			if (areas.size() > 0) {
 				Point point = (Point) wktReader.read(buildPoint(coordinatesData));
 
 				for (Map.Entry<Area, List<AreaConfiguration>> areaEntry : areas.entrySet()) {
 					for (AreaConfiguration areaConfiguration : areaEntry.getValue()) {
 						if (point.isWithinDistance(areaEntry.getKey().getPolygon(), areaConfiguration.getOffset())) {
+							logger.trace("The point is within area {}", areaEntry.getKey().getName());
 							if (shouldSendOnEnterEvent(coordinatesData, areaConfiguration)) {
+								logger.trace("Sending event area {}", areaConfiguration.getMode());
 								events.add(createEvent(coordinatesData, areaEntry.getKey(), areaConfiguration));
 								tagCoordinatesHistory.put(coordinatesData.getTagShortId(), areaEntry.getKey(), new Date());
 							} else if (tagCoordinatesHistory.containsRow(coordinatesData.getTagShortId())) {
+								logger.trace("Updating coordinates history");
 								updateTime(coordinatesData, areaEntry.getKey());
 							}
 						} else {
 							if (shouldSendOnLeaveEvent(coordinatesData, areaConfiguration)) {
+								logger.trace("Tag has left area {}", areaEntry.getKey().getName());
 								events.add(createEvent(coordinatesData, areaEntry.getKey(), areaConfiguration));
 								tagCoordinatesHistory.remove(coordinatesData.getTagShortId(), areaEntry.getKey());
 							}

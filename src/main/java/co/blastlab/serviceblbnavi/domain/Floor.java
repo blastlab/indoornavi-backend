@@ -3,6 +3,7 @@ package co.blastlab.serviceblbnavi.domain;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -15,6 +16,8 @@ import java.util.List;
 	uniqueConstraints = @UniqueConstraint(columnNames = {"level", "building_id"})
 )
 @EqualsAndHashCode(callSuper = true)
+@Cacheable
+@ToString
 public class Floor extends TrackedEntity {
 
 	private Integer level;
@@ -31,10 +34,10 @@ public class Floor extends TrackedEntity {
 	@OneToOne
 	private Image image;
 
-	@OneToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
+	@OneToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REMOVE})
 	private Scale scale;
 
-	@OneToMany(mappedBy = "floor")
+	@OneToMany(mappedBy = "floor", cascade = {CascadeType.ALL})
 	private List<Area> areas;
 
 }

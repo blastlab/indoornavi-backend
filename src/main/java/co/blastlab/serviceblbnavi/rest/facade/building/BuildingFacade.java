@@ -2,6 +2,7 @@ package co.blastlab.serviceblbnavi.rest.facade.building;
 
 import co.blastlab.serviceblbnavi.dto.building.BuildingDto;
 import co.blastlab.serviceblbnavi.ext.filter.AuthorizedAccess;
+import co.blastlab.serviceblbnavi.ext.filter.SetOperationId;
 import io.swagger.annotations.*;
 
 import javax.validation.Valid;
@@ -11,6 +12,7 @@ import javax.ws.rs.core.Response;
 
 @Path("/buildings")
 @Api("/buildings")
+@SetOperationId
 public interface BuildingFacade {
 
 	@POST

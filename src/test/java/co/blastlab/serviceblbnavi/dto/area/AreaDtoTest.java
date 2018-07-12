@@ -24,13 +24,15 @@ public class AreaDtoTest {
 
 		AreaDto areaDto = new AreaDto(area);
 
-		assertThat(areaDto.getPoints().size(), is(5));
+		assertThat(areaDto.getPoints().size(), is(4));
 		assertThat(areaDto.getPoints().get(0).getX(), is(0));
 		assertThat(areaDto.getPoints().get(0).getY(), is(0));
+		assertThat(areaDto.getPoints().get(1).getX(), is(20));
+		assertThat(areaDto.getPoints().get(1).getY(), is(0));
 		assertThat(areaDto.getPoints().get(2).getX(), is(20));
 		assertThat(areaDto.getPoints().get(2).getY(), is(20));
 		assertThat(areaDto.getPoints().get(3).getX(), is(0));
-		assertThat(areaDto.getPoints().get(4).getY(), is(0));
+		assertThat(areaDto.getPoints().get(3).getY(), is(20));
 	}
 
 	@Test
@@ -40,7 +42,6 @@ public class AreaDtoTest {
 		points.add(new Point(0, 0));
 		points.add(new Point(0, 10));
 		points.add(new Point(10, 10));
-		points.add(new Point(0, 0));
 		areaDto.setPoints(points);
 
 		assertThat(areaDto.toPolygon().toText(), is("POLYGON ((0 0, 0 10, 10 10, 0 0))"));

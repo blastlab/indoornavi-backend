@@ -1,11 +1,12 @@
 package co.blastlab.serviceblbnavi.rest.facade.configuration;
 
-import co.blastlab.serviceblbnavi.dao.repository.ConfigurationRepostiory;
-import co.blastlab.serviceblbnavi.dao.repository.FloorRepository;
+import co.blastlab.serviceblbnavi.dao.repository.*;
 import co.blastlab.serviceblbnavi.domain.Configuration;
 import co.blastlab.serviceblbnavi.domain.Floor;
+import co.blastlab.serviceblbnavi.domain.Publication;
 import co.blastlab.serviceblbnavi.dto.configuration.ConfigurationDto;
 import co.blastlab.serviceblbnavi.utils.ConfigurationExtractor;
+import co.blastlab.serviceblbnavi.utils.Logger;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.ejb.Stateless;
@@ -13,11 +14,15 @@ import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
 @Stateless
 public class ConfigurationBean implements ConfigurationFacade {
+
+	@Inject
+	private Logger logger;
 
 	@Inject
 	private ConfigurationExtractor configurationExtractor;
@@ -28,47 +33,99 @@ public class ConfigurationBean implements ConfigurationFacade {
 	@Inject
 	private ConfigurationRepostiory configurationRepostiory;
 
+	@Inject
+	private PublicationRepository publicationRepository;
+
+	@Inject
+	private TagRepository tagRepository;
+
+	@Inject
+	private UserRepository userRepository;
+
 	@Override
 	public ConfigurationDto.Data publish(Long floorId) throws IOException {
+		logger.debug("Trying to publish configuration of the floor id {}", floorId);
 		final Floor floor = floorRepository.findOptionalById(floorId).orElseThrow(EntityNotFoundException::new);
+		List<Publication> publications = publicationRepository.findAllContainingFloor(floor);
+		if (publications.isEmpty()) {
+			logger.debug("No publications yet. Trying to create one");
+			Publication publication = new Publication();
+			publication.getFloors().add(floor);
+			publication.setTags(tagRepository.findAll());
+			publication.setUsers(userRepository.findAll());
+			publicationRepository.save(publication);
+		}
 		Configuration configurationEntity = configurationRepostiory.findTop1ByFloorOrderByVersionDesc(floor).orElseThrow(EntityNotFoundException::new);
 		ObjectMapper objectMapper = new ObjectMapper();
 		ConfigurationDto.Data configurationData = objectMapper.readValue(configurationEntity.getData(), ConfigurationDto.Data.class);
 
-		configurationExtractor.extractSinks(configurationData, floor);
-		configurationExtractor.extractScale(configurationData, floor);
+		logger.debug("Configuration data to extract: {}", configurationData);
 
-		configurationEntity.setPublished(true);
+		configurationExtractor.resetAnchors(floor);
+		configurationExtractor.resetSinks(floor);
+		configurationExtractor.resetAreas(floor);
+
+		configurationExtractor.extractSinks(configurationData, floor);
+		configurationExtractor.extractAnchors(configurationData, floor);
+		configurationExtractor.extractScale(configurationData, floor);
+		configurationExtractor.extractAreas(configurationData, floor);
+
+		configurationEntity.setPublishedDate(new Date());
 		return objectMapper.readValue(configurationEntity.getData(), ConfigurationDto.Data.class);
 	}
 
 	@Override
 	public ConfigurationDto.Data saveDraft(ConfigurationDto configuration) throws IOException {
+		logger.debug("Trying to save draft {}", configuration);
 		Floor floor = floorRepository.findOptionalById(configuration.getFloorId()).orElseThrow(EntityNotFoundException::new);
 		Optional<Configuration> configurationOptional = configurationRepostiory.findTop1ByFloorOrderByVersionDesc(floor);
-		Configuration latestConfiguration = configurationOptional.orElse(new Configuration(floor, 0, false));
+		Configuration latestConfiguration = configurationOptional.orElse(new Configuration(floor, 0));
 		ObjectMapper objectMapper = new ObjectMapper();
-		if (latestConfiguration.getPublished()) {
+		if (latestConfiguration.getPublishedDate() != null) {
+			logger.debug("Creating new draft because last one has been published {}", latestConfiguration.getPublishedDate());
 			Integer latestVersion = configurationRepostiory.getLatestVersion(floor);
-			latestConfiguration = new Configuration(floor, latestVersion + 1, objectMapper.writeValueAsString(configuration.getData()), false);
+			latestConfiguration = new Configuration(
+				floor,
+				latestVersion + 1,
+				objectMapper.writeValueAsString(configuration.getData()),
+				null,
+				new Date()
+			);
 		} else {
+			logger.debug("Updating previously created draft");
+			latestConfiguration.setSaveDraftDate(new Date());
 			latestConfiguration.setData(objectMapper.writeValueAsString(configuration.getData()));
 		}
 		latestConfiguration = configurationRepostiory.save(latestConfiguration);
+		logger.debug("Draft saved");
 		return objectMapper.readValue(latestConfiguration.getData(), ConfigurationDto.Data.class);
 	}
 
 	@Override
 	public ConfigurationDto undo(Long floorId) throws IOException {
+		logger.debug("Trying to undo configuration to previous state");
 		Floor floor = floorRepository.findOptionalById(floorId).orElseThrow(EntityNotFoundException::new);
 
-		Optional<Configuration> configurationOptional = configurationRepostiory.findTop1ByFloorAndPublishedOrderByVersionDesc(floor, false);
-		configurationOptional.ifPresent(configuration -> configurationRepostiory.remove(configuration));
+		List<Configuration> latestConfigurations = configurationRepostiory.findByFloorOrderByVersionDesc(floor);
 
-		ObjectMapper objectMapper = new ObjectMapper();
-		Configuration latestConfiguration = configurationRepostiory.findTop1ByFloorOrderByVersionDesc(floor)
-			.orElse(new Configuration(floor, 0, objectMapper.writeValueAsString(new ConfigurationDto.Data()),false));
-		return new ConfigurationDto(latestConfiguration);
+		if (latestConfigurations.size() == 0) {
+			throw new EntityNotFoundException();
+		} else {
+			Configuration configuration = latestConfigurations.get(0);
+			if (latestConfigurations.size() == 1) {
+				logger.debug("There is only one configuration, so it's inital state");
+				ObjectMapper objectMapper = new ObjectMapper();
+				configuration.setPublishedDate(null);
+				configuration.setSaveDraftDate(null);
+				configuration.setData(objectMapper.writeValueAsString(new ConfigurationDto.Data()));
+				configurationRepostiory.save(configuration);
+				return new ConfigurationDto(configuration);
+			} else {
+				logger.debug("Removing previous configuration");
+				configurationRepostiory.remove(configuration);
+				return new ConfigurationDto(latestConfigurations.get(1));
+			}
+		}
 	}
 
 	@Override

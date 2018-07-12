@@ -32,10 +32,9 @@ public class BuildingFacadeIT extends BaseIT {
 
 	@Test
 	public void createNewBuilding(){
-		Integer complexId = 1;
+		Integer complexId = 2;
 		String body = new RequestBodyBuilder("Building.json")
 			.setParameter("name", NAME_BUILDING)
-			.setParameter("complexId", complexId)
 			.build();
 
 		givenUser()
@@ -43,7 +42,7 @@ public class BuildingFacadeIT extends BaseIT {
 			.when().post(BUILDING_PATH)
 			.then().statusCode(HttpStatus.SC_OK)
 			.body(
-				"complexId", equalTo(complexId),
+				"complex.id", equalTo(complexId),
 				"name", equalTo(NAME_BUILDING)
 			);
 	}
@@ -53,7 +52,6 @@ public class BuildingFacadeIT extends BaseIT {
 		Integer complexId = 2;
 		String body = new RequestBodyBuilder("Building.json")
 			.setParameter("name", EXISTING_NAME_BUILDING)
-			.setParameter("complexId", complexId)
 			.build();
 
 		givenUser()
@@ -61,7 +59,7 @@ public class BuildingFacadeIT extends BaseIT {
 			.when().post(BUILDING_PATH)
 			.then().statusCode(HttpStatus.SC_OK)
 			.body(
-				"complexId", equalTo(complexId),
+				"complex.id", equalTo(complexId),
 				"name", equalTo(EXISTING_NAME_BUILDING)
 			);
 	}
@@ -90,7 +88,6 @@ public class BuildingFacadeIT extends BaseIT {
 		Integer complexId = 2;
 		Integer buildingId = 1;
 		String body = new RequestBodyBuilder("Building.json")
-			.setParameter("complexId", complexId)
 			.setParameter("name", NAME_BUILDING)
 			.build();
 
@@ -101,7 +98,7 @@ public class BuildingFacadeIT extends BaseIT {
 			.then().statusCode(HttpStatus.SC_OK)
 			.body(
 				"id", equalTo(buildingId),
-				"complexId", equalTo(complexId),
+				"complex.id", equalTo(complexId),
 				"name", equalTo(NAME_BUILDING)
 			);
 	}
@@ -190,7 +187,7 @@ public class BuildingFacadeIT extends BaseIT {
 
 		assertThat(buildingWithFloors.getId(), equalTo(2L));
 		assertThat(buildingWithFloors.getName(), equalTo("AABBCCDDFFFFF"));
-		assertThat(buildingWithFloors.getComplexId(), equalTo(2L));
+		assertThat(buildingWithFloors.getComplex().getId(), equalTo(2L));
 		assertThat(buildingWithFloors.getFloors(), containsInAnyOrder(
 			floorDtoCustomMatcher(new FloorDto(1L, 1,"P.1", buildingDto, null, null)),
 			floorDtoCustomMatcher(new FloorDto(2L, 2, "", buildingDto, null, null)),
@@ -208,7 +205,7 @@ public class BuildingFacadeIT extends BaseIT {
 			.body(
 				"id", equalTo(3),
 				"name", equalTo("GPP"),
-				"complexId", equalTo(3),
+				"complex.id", equalTo(3),
 				"floors", equalTo(Collections.emptyList())
 			);
 	}
@@ -239,7 +236,7 @@ public class BuildingFacadeIT extends BaseIT {
 		assertThat(violationResponse.getViolations(),
 			containsInAnyOrder(
 				validViolation("name", "may not be null", "may not be empty"),
-				validViolation("complexId", "may not be null")
+				validViolation("complex", "may not be null")
 			)
 		);
 	}
@@ -261,6 +258,6 @@ public class BuildingFacadeIT extends BaseIT {
 		assertThat(violationResponse.getViolations().size(), is(2));
 		assertThat(violationResponse.getViolations(), containsInAnyOrder(
 			validViolation("name", "may not be empty", "may not be null"),
-			validViolation("complexId", "may not be null")));
+			validViolation("complex", "may not be null")));
 	}
 }

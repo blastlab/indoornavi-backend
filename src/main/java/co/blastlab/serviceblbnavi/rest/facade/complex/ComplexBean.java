@@ -1,12 +1,12 @@
 package co.blastlab.serviceblbnavi.rest.facade.complex;
 
 import co.blastlab.serviceblbnavi.dao.repository.ComplexRepository;
-import co.blastlab.serviceblbnavi.dao.repository.SinkRepository;
 import co.blastlab.serviceblbnavi.domain.Building;
 import co.blastlab.serviceblbnavi.domain.Complex;
 import co.blastlab.serviceblbnavi.domain.Floor;
-import co.blastlab.serviceblbnavi.domain.Sink;
 import co.blastlab.serviceblbnavi.dto.complex.ComplexDto;
+import co.blastlab.serviceblbnavi.service.FloorService;
+import co.blastlab.serviceblbnavi.utils.Logger;
 import org.apache.http.HttpStatus;
 
 import javax.ejb.Stateless;
@@ -20,31 +20,38 @@ import java.util.Optional;
 @Stateless
 public class ComplexBean implements ComplexFacade {
 
+	@Inject
+	private Logger logger;
+
 	private final ComplexRepository complexRepository;
 
-	private final SinkRepository sinkRepository;
+	private final FloorService floorService;
 
 	@Inject
-	public ComplexBean(ComplexRepository complexRepository, SinkRepository sinkRepository) {
+	public ComplexBean(ComplexRepository complexRepository, FloorService floorService) {
 		this.complexRepository = complexRepository;
-		this.sinkRepository = sinkRepository;
+		this.floorService = floorService;
 	}
 
 	@Override
 	public ComplexDto create(ComplexDto complex) {
+		logger.debug("Trying to create complex {}", complex);
 		Complex complexEntity = new Complex();
 		complexEntity.setName(complex.getName());
 		complexEntity = complexRepository.save(complexEntity);
+		logger.debug("Complex created");
 		return new ComplexDto(complexEntity);
 	}
 
 
 	@Override
 	public ComplexDto update(Long id, ComplexDto complex) {
+		logger.debug("Trying to update complex {}", complex);
 		Optional<Complex> complexEntity = complexRepository.findById(id);
 		if (complexEntity.isPresent()){
 			complexEntity.get().setName(complex.getName());
 			Complex complexDb = complexRepository.save(complexEntity.get());
+			logger.debug("Complex updated");
 			return new ComplexDto(complexDb);
 		}
 		throw new EntityNotFoundException();
@@ -53,18 +60,15 @@ public class ComplexBean implements ComplexFacade {
 
 	@Override
 	public Response delete(Long id) {
+		logger.debug("Trying to remove complex id = {}", id);
 		Complex complex = complexRepository.findById(id).orElseThrow(EntityNotFoundException::new);
 		for (Building building : complex.getBuildings()) {
 			for (Floor floor : building.getFloors()) {
-				List<Sink> byFloor = sinkRepository.findByFloor(floor);
-				for (Sink sink : byFloor) {
-					sink.setConfigured(false);
-					sink.setFloor(null);
-					sinkRepository.save(sink);
-				}
+				floorService.removeNoCommit(floor);
 			}
 		}
 		complexRepository.remove(complex);
+		logger.debug("Complex removed");
 		return Response.status(HttpStatus.SC_NO_CONTENT).build();
 	}
 

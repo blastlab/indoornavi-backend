@@ -6,5 +6,4 @@ import org.apache.deltaspike.data.api.Repository;
 
 @Repository
 public interface DeviceRepository extends EntityRepository<Device, Long> {
-
 }

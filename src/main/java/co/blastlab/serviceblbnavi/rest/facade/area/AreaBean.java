@@ -1,12 +1,12 @@
 package co.blastlab.serviceblbnavi.rest.facade.area;
 
-import co.blastlab.serviceblbnavi.dao.repository.AreaConfigurationRepository;
 import co.blastlab.serviceblbnavi.dao.repository.AreaRepository;
 import co.blastlab.serviceblbnavi.dao.repository.FloorRepository;
 import co.blastlab.serviceblbnavi.domain.Area;
-import co.blastlab.serviceblbnavi.domain.AreaConfiguration;
 import co.blastlab.serviceblbnavi.domain.Floor;
 import co.blastlab.serviceblbnavi.dto.area.AreaDto;
+import co.blastlab.serviceblbnavi.service.AreaService;
+import co.blastlab.serviceblbnavi.utils.Logger;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
@@ -19,38 +19,43 @@ import java.util.stream.Collectors;
 public class AreaBean implements AreaFacade {
 
 	@Inject
+	private Logger logger;
+
+	@Inject
 	private AreaRepository areaRepository;
 
 	@Inject
 	private FloorRepository floorRepository;
 
 	@Inject
-	private AreaConfigurationRepository areaConfigurationRepository;
+	private AreaService areaService;
 
 	@Override
-	// TODO: AutorizedAccess
 	public AreaDto create(AreaDto area) {
+		logger.debug("Trying to create area {}", area);
 		Area areaEntity = new Area();
-		return createOrUpdate(areaEntity, area);
+		Floor floor = floorRepository.findOptionalById(area.getFloorId()).orElseThrow(EntityNotFoundException::new);
+		return areaService.createOrUpdate(areaEntity, area, floor);
 	}
 
 	@Override
-	// TODO: AutorizedAccess
 	public AreaDto update(Long id, AreaDto area) {
+		logger.debug("Trying to update area {}", area);
 		Area areaEntity = areaRepository.findOptionalById(id).orElseThrow(EntityNotFoundException::new);
-		return createOrUpdate(areaEntity, area);
+		Floor floor = floorRepository.findOptionalById(area.getFloorId()).orElseThrow(EntityNotFoundException::new);
+		return areaService.createOrUpdate(areaEntity, area, floor);
 	}
 
 	@Override
-	// TODO: AutorizedAccess
 	public Response delete(Long id) {
+		logger.debug("Trying to remove area id {}", id);
 		Area areaEntity = areaRepository.findOptionalById(id).orElseThrow(EntityNotFoundException::new);
 		areaRepository.remove(areaEntity);
+		logger.debug("Area removed");
 		return Response.noContent().build();
 	}
 
 	@Override
-	// TODO: AutorizedAccess
 	public List<AreaDto> findAll() {
 		return areaRepository.findAll().stream().map(AreaDto::new).collect(Collectors.toList());
 	}
@@ -60,14 +65,5 @@ public class AreaBean implements AreaFacade {
 		Floor floor = floorRepository.findOptionalById(floorId).orElseThrow(EntityNotFoundException::new);
 		List<Area> areas = areaRepository.findByFloor(floor);
 		return areas.stream().map(AreaDto::new).collect(Collectors.toList());
-	}
-
-	private AreaDto createOrUpdate(Area areaEntity, AreaDto area) {
-		areaEntity.setName(area.getName());
-		List<AreaConfiguration> areaConfigurations = area.getConfigurations().stream().map(id -> areaConfigurationRepository.findBy(id)).collect(Collectors.toList());
-		areaEntity.setConfigurations(areaConfigurations);
-		areaEntity.setPolygon(area.toPolygon());
-		areaEntity = areaRepository.save(areaEntity);
-		return new AreaDto(areaEntity);
 	}
 }

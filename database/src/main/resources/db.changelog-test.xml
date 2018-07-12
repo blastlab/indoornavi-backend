@@ -6,13 +6,15 @@
 	<changeSet id="Clear" author="kgebert" context="test" runOnChange="true" labels="Clear" runAlways="true">
 		<delete tableName="apikey" />
 		<delete tableName="configuration" />
-		<delete tableName="map_tag" />
-		<delete tableName="map_user" />
-		<delete tableName="map" />
+		<delete tableName="publication_tag" />
+		<delete tableName="publication_user" />
+		<delete tableName="publication_floor" />
+		<delete tableName="publication" />
 		<delete tableName="areaconfiguration_tag" />
 		<delete tableName="area_areaconfiguration" />
 		<delete tableName="area" />
 		<delete tableName="areaconfiguration" />
+		<delete tableName="coordinates"/>
 		<delete tableName="tag"/>
 		<delete tableName="sink"/>
 		<delete tableName="anchor"/>
@@ -77,16 +79,20 @@
 		<loadData tableName="areaconfiguration_tag" file="test/AreaConfigurationTag.csv" />
 	</changeSet>
 
-	<changeSet id="Map" author="kgebert" context="test" runOnChange="true" labels="Map" runAlways="true">
-		<loadUpdateData tableName="map" file="test/Map.csv" primaryKey="id" />
+	<changeSet id="Publication" author="kgebert" context="test" runOnChange="true" labels="Publication" runAlways="true">
+		<loadUpdateData tableName="publication" file="test/Publication.csv" primaryKey="id" />
 	</changeSet>
 
-	<changeSet id="Map_Tag" author="kgebert" context="test" runOnChange="true" labels="Map_Tag" runAlways="true">
-		<loadData tableName="map_tag" file="test/MapTag.csv" />
+	<changeSet id="Publication_Tag" author="kgebert" context="test" runOnChange="true" labels="Publication_Tag" runAlways="true">
+		<loadData tableName="publication_tag" file="test/PublicationTag.csv" />
 	</changeSet>
 
-	<changeSet id="Map_User" author="kgebert" context="test" runOnChange="true" labels="Map_User" runAlways="true">
-		<loadData tableName="map_user" file="test/MapUser.csv" />
+	<changeSet id="Publication_User" author="kgebert" context="test" runOnChange="true" labels="Publication_User" runAlways="true">
+		<loadData tableName="publication_user" file="test/PublicationUser.csv" />
+	</changeSet>
+
+	<changeSet id="Publication_Floor" author="kgebert" context="test" runOnChange="true" labels="Publication_Floor" runAlways="true">
+		<loadData tableName="publication_floor" file="test/PublicationFloor.csv" />
 	</changeSet>
 
 	<changeSet id="ApiKey" author="kgebert" context="test" runOnChange="true" labels="ApiKey" runAlways="true">
