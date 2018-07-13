@@ -17,6 +17,8 @@ go_to_app_directory() {
 	fi
 }
 
+echo Previous version was: $(git describe --tags --abbrev=0)
+
 echo Please, provide next version...
 
 read version
