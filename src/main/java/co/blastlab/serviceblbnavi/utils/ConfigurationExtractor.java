@@ -51,6 +51,7 @@ public class ConfigurationExtractor {
 			sink.setFloor(floor);
 			sink.setX(sinkDto.getX());
 			sink.setY(sinkDto.getY());
+			sink.setZ(sinkDto.getZ());
 			sinkRepository.save(sink);
 			logger.debug("Sink saved {}", sink);
 
@@ -60,6 +61,7 @@ public class ConfigurationExtractor {
 				anchor.setFloor(floor);
 				anchor.setX(anchorDto.getX());
 				anchor.setY(anchorDto.getY());
+				anchor.setZ(anchorDto.getZ());
 				anchor.setSink(sink);
 				anchorRepository.save(anchor);
 				logger.debug("Sink's anchor saved {}", anchor);
@@ -74,6 +76,7 @@ public class ConfigurationExtractor {
 			anchor.setFloor(floor);
 			anchor.setX(anchorDto.getX());
 			anchor.setY(anchorDto.getY());
+			anchor.setZ(anchorDto.getZ());
 			anchorRepository.save(anchor);
 			logger.debug("Anchor saved {}", anchor);
 		}));
@@ -93,6 +96,7 @@ public class ConfigurationExtractor {
 			sink.setFloor(null);
 			sink.setX(null);
 			sink.setY(null);
+			sink.setZ(null);
 			sinkRepository.save(sink);
 			logger.debug("Sink reseted {}", sink);
 		}));
@@ -105,6 +109,7 @@ public class ConfigurationExtractor {
 			anchor.setFloor(null);
 			anchor.setX(null);
 			anchor.setY(null);
+			anchor.setZ(null);
 			anchor.setSink(null);
 			anchorRepository.save(anchor);
 			logger.debug("Anchor reseted {}", anchor);

@@ -17,7 +17,7 @@ import java.util.List;
 )
 @EqualsAndHashCode(callSuper = true)
 @Cacheable
-@ToString
+@ToString(exclude = "devices")
 public class Floor extends TrackedEntity {
 
 	private Integer level;
