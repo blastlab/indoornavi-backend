@@ -1,2 +1,3 @@
 [client]
 database = "Navi"
+bind-address = db

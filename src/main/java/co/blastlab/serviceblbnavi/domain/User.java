@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 @Entity
 @Getter
 @Setter
-@ToString
+@ToString(exclude = {"password", "token", "salt"})
 public class User extends TrackedEntity implements Principal {
 
 	@Column(unique = true)
