@@ -32993,6 +32993,7 @@
 
 		// Create an api and render
 		load: function () {
+
 			// Initialize the API object
 			if (this.mainView) {
 				this.mainView.clear();

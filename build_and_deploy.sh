@@ -17,6 +17,8 @@ go_to_app_directory() {
 	fi
 }
 
+echo Previous version was: $(git describe --tags --abbrev=0)
+
 echo Please, provide next version...
 
 read version
@@ -30,7 +32,9 @@ for app in ${apps[*]}
 	do
 		go_to_app_directory ${app}
 		docker build -t ${app}:${version} .
+		docker tag ${app}:${version} indoornavi.azurecr.io/${app}:latest
 		docker tag ${app}:${version} indoornavi.azurecr.io/${app}:${version}
+		docker push indoornavi.azurecr.io/${app}:latest
 		docker push indoornavi.azurecr.io/${app}:${version}
 	done
 
