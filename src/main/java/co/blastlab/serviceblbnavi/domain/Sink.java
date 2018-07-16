@@ -18,7 +18,7 @@ import java.util.List;
 @Getter
 @Setter
 @Entity
-@ToString(callSuper = true)
+@ToString(callSuper = true, exclude = "anchors")
 public class Sink extends Anchor {
 	private final static Logger LOGGER = LoggerFactory.getLogger(Sink.class);
 
