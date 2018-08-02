@@ -23,8 +23,8 @@ public class CoordinatesCalculator {
 	// <tagId, anchorShortId, measure>
 	private Table<Integer, Integer, List<Measure>> measureTable = HashBasedTable.create();
 
-	// 30 minutes
-	private final static long OLD_DATA_IN_MILISECONDS = 1_800_000;
+	// 10 seconds
+	private final static long OLD_DATA_IN_MILISECONDS = 10_000;
 
 	private Map<Integer, PointAndTime> previousCoorinates = new HashMap<>();
 
