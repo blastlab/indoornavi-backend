@@ -48,3 +48,4 @@ scp -r database/src/main/resources/ ${USER}@${HOST}:${DESTINATION}/database/src/
 
 # copy war
 scp deployments/serviceblbnavi-1.0.war ${USER}@${HOST}:${DESTINATION}/deployments
+
