@@ -69,19 +69,6 @@ public class ConfigurationExtractor {
 		});
 	}
 
-	public void extractAnchors(ConfigurationDto.Data configuration, Floor floor) throws EntityNotFoundException {
-		logger.debug("Trying to extract anchors from configuration ({})", configuration.getAnchors().size());
-		configuration.getAnchors().forEach((anchorDto -> {
-			Anchor anchor = anchorRepository.findOptionalByShortId(anchorDto.getShortId()).orElseThrow(EntityNotFoundException::new);
-			anchor.setFloor(floor);
-			anchor.setX(anchorDto.getX());
-			anchor.setY(anchorDto.getY());
-			anchor.setZ(anchorDto.getZ());
-			anchorRepository.save(anchor);
-			logger.debug("Anchor saved {}", anchor);
-		}));
-	}
-
 	public void extractAreas(ConfigurationDto.Data configuration, Floor floor) {
 		logger.debug("Trying to extract areas from configuration");
 		configuration.getAreas().forEach((areaDto -> {
