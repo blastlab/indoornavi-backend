@@ -24,10 +24,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
-import javax.ejb.Schedule;
 import javax.ejb.Singleton;
-import javax.enterprise.concurrent.ManagedExecutorService;
 import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
 import javax.websocket.*;
@@ -78,9 +75,6 @@ public class MeasuresWebSocket extends WebSocket {
 
 	@Inject
 	private AreaEventController areaEventController;
-
-	@Resource
-	private ManagedExecutorService managedExecutorService;
 
 	private Map<FilterType, Filter> activeFilters = new HashMap<>();
 
@@ -202,11 +196,5 @@ public class MeasuresWebSocket extends WebSocket {
 		for (AreaEvent event : events) {
 			broadCastMessage(this.getClientSessions(), new AreaEventWrapper(event));
 		}
-	}
-
-	@Schedule(second = "*/10", minute = "*", hour = "*", persistent = false, info = "Every 10 seconds")
-	public void cleanMeasureTable() {
-		logger.trace("Checking if there are any old measures in table and cleaning it.");
-		managedExecutorService.execute(() -> coordinatesCalculator.cleanTables());
 	}
 }
