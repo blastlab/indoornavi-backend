@@ -18,16 +18,11 @@ import java.util.*;
 @Singleton
 public class CoordinatesCalculator {
 
-	// <tagId, anchorShortId, measure>
-//	private Table<Integer, Integer, List<Measure>> measureTable = HashBasedTable.create();
-
+	// tag short id, anchor short id, measure list
 	private Map<Integer, Map<Integer, List<Measure>>> measureStorage = new LinkedHashMap<>();
 
 	// 10 seconds
 	private final static long OLD_DATA_IN_MILISECONDS = 10_000;
-
-	// 30 seconds
-	private final static long OLD_COORDINATES = 10_000;
 
 	private Map<Integer, PointAndTime> previousCoorinates = new HashMap<>();
 
@@ -138,27 +133,6 @@ public class CoordinatesCalculator {
 	}
 
 	/**
-	 * Remove old data, older than OLD_DATA_IN_MILISECONDS
-	 */
-	public void cleanTables() {
-//		long now = new Date().getTime();
-//
-//		Iterator<Table.Cell<Integer, Integer, List<Measure>>> measureIterator = measureTable.cellSet().iterator();
-//
-//		measureIterator.forEachRemaining(cell -> {
-//			cell.getValue().removeIf(measure -> new Date((now - OLD_DATA_IN_MILISECONDS)).after(new Date(measure.getTimestamp())));
-//		});
-//
-//		Iterator<Map.Entry<Integer, PointAndTime>> pointsIterator = previousCoorinates.entrySet().iterator();
-//
-//		pointsIterator.forEachRemaining(point -> {
-//			if (new Date((now - OLD_COORDINATES)).after(new Date(point.getValue().getTimestamp()))) {
-//				pointsIterator.remove();
-//			}
-//		});
-	}
-
-	/**
 	 * Choose tag id from two devices ids. Tags have id lower than 32767.
 	 *
 	 * @param firstDeviceId id of the first device
@@ -205,16 +179,6 @@ public class CoordinatesCalculator {
 			anchorsMeasures.put(anchorId, new LinkedList<>(Collections.singletonList(new Measure(distance, now))));
 			measureStorage.put(tagId, anchorsMeasures);
 		}
-
-//		if (measureTable.contains(tagId, anchorId)) {
-//			Measure measure = new Measure(distance, new Date().getTime());
-//			if (measureTable.get(tagId, anchorId).size() >= 5) {
-//				measureTable.get(tagId, anchorId).remove(0);
-//			}
-//			measureTable.get(tagId, anchorId).add(measure);
-//		} else {
-//			measureTable.put(tagId, anchorId, new ArrayList<>(Collections.singletonList(new Measure(distance, new Date().getTime()))));
-//		}
 	}
 
 	private void cleanOldData() {
@@ -233,10 +197,6 @@ public class CoordinatesCalculator {
 		if (measureStorage.containsKey(tagId)) {
 			connectedAnchors.addAll(measureStorage.get(tagId).keySet());
 		}
-//		if (measureTable.containsRow(tagId)) {
-//			Map<Integer, List<Measure>> row = measureTable.row(tagId);
-//			connectedAnchors = row.keySet();
-//		}
 		return connectedAnchors;
 	}
 
@@ -250,7 +210,6 @@ public class CoordinatesCalculator {
 			}
 		}
 		return meanDistance;
-//		return measureTable.get(tagId, anchorId).stream().mapToDouble(Measure::getDistance).sum() / measureTable.get(tagId, anchorId).size();
 	}
 
 	private Set<Pair<AnchorDistance, AnchorDistance>> getAnchorDistancePairs(Set<Integer> connectedAnchors, Integer tagId) {
