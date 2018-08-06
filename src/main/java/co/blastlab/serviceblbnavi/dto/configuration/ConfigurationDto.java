@@ -4,6 +4,7 @@ import co.blastlab.serviceblbnavi.domain.Configuration;
 import co.blastlab.serviceblbnavi.dto.anchor.AnchorDto;
 import co.blastlab.serviceblbnavi.dto.area.AreaDto;
 import co.blastlab.serviceblbnavi.dto.floor.ScaleDto;
+import co.blastlab.serviceblbnavi.dto.path.Path;
 import co.blastlab.serviceblbnavi.dto.sink.SinkDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
@@ -46,5 +47,6 @@ public class ConfigurationDto {
 		private List<AnchorDto> anchors = new ArrayList<>();
 		private ScaleDto scale;
 		private List<AreaDto> areas = new ArrayList<>();
+		private List<Path> paths = new ArrayList<>();
 	}
 }
