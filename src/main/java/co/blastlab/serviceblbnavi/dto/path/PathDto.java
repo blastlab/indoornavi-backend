@@ -6,7 +6,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class Path {
+public class PathDto {
 	private Point startPoint;
 	private Point endPoint;
 }
