@@ -32,7 +32,7 @@ public class PathBean implements PathFacade {
 		Floor floor = floorRepository.findOptionalById(floorId).orElseThrow(EntityNotFoundException::new);
 		logger.debug("Trying to get latest configuration");
 		Configuration configuration = configurationRepostiory
-			.findTop1ByFloorAndPublishedDateNotNullOrderByVersionDesc(floor)
+			.findTop1ByFloorAndPublishedDateIsNotNullOrderByVersionDesc(floor)
 			.orElseThrow(EntityNotFoundException::new);
 		try {
 			logger.debug("Trying to read data from configration json string {}", configuration.getData());
