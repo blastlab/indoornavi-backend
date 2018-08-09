@@ -34,7 +34,7 @@ public class ReportBean implements ReportFacade {
 		logger.debug("Trying to retrive coordinates in date range {} - {}", filter.getFrom(), filter.getTo());
 		LocalDateTime from = filter.getFrom() != null ? filter.getFrom() : LocalDateTime.ofInstant(new Date().toInstant(), ZoneId.systemDefault()).minusYears(50);
 		LocalDateTime to = filter.getTo() != null ? filter.getTo() : LocalDateTime.ofInstant(new Date().toInstant(), ZoneId.systemDefault());
-		Range<LocalDateTime> range = Range.open(from, to);
+		Range<LocalDateTime> range = Range.openClosed(from, to);
 		return coordinatesRepository.findByFloorIdAndInRange(filter.getFloorId(), range)
 			.stream().map(CoordinatesDto::new).collect(Collectors.toList());
 	}
