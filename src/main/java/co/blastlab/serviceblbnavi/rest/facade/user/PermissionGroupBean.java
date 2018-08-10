@@ -49,7 +49,7 @@ public class PermissionGroupBean implements PermissionGroupFacade {
 		logger.debug("Trying to remove permission group id {}", id);
 		PermissionGroup permissionGroupEntity = permissionGroupRepository.findOptionalById(id).orElseThrow(EntityNotFoundException::new);
 		permissionGroupRepository.remove(permissionGroupEntity);
-		logger.debug("Permission groun removed");
+		logger.debug("Permission group removed");
 		return Response.noContent().build();
 	}
 
