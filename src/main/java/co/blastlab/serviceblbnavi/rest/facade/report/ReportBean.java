@@ -9,9 +9,11 @@ import co.blastlab.serviceblbnavi.dto.report.ReportFilterDto;
 import co.blastlab.serviceblbnavi.socket.area.AreaEvent;
 import co.blastlab.serviceblbnavi.utils.Logger;
 import com.google.common.collect.Range;
+import org.apache.http.HttpStatus;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
+import javax.ws.rs.WebApplicationException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
@@ -34,6 +36,9 @@ public class ReportBean implements ReportFacade {
 		logger.debug("Trying to retrive coordinates in date range {} - {}", filter.getFrom(), filter.getTo());
 		LocalDateTime from = filter.getFrom() != null ? filter.getFrom() : LocalDateTime.ofInstant(new Date().toInstant(), ZoneId.systemDefault()).minusYears(50);
 		LocalDateTime to = filter.getTo() != null ? filter.getTo() : LocalDateTime.ofInstant(new Date().toInstant(), ZoneId.systemDefault());
+		if (from.isAfter(to)) {
+			throw new WebApplicationException("Invalid date range: `from` can not be after `to`", HttpStatus.SC_UNPROCESSABLE_ENTITY);
+		}
 		Range<LocalDateTime> range = Range.openClosed(from, to);
 		return coordinatesRepository.findByFloorIdAndInRange(filter.getFloorId(), range)
 			.stream().map(CoordinatesDto::new).collect(Collectors.toList());
