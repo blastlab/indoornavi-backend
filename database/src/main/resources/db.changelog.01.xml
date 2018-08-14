@@ -379,7 +379,7 @@
 		</createTable>
 	</changeSet>
 	<changeSet author="kgebert (generated)" id="navi-77-7">
-		<addForeignKeyConstraint baseColumnNames="permissionGroups_id" baseTableName="User_PermissionGroup" constraintName="FK_User_PermissionGroup_Id" referencedColumnNames="id" referencedTableName="PermissionGroup"/>
+		<addForeignKeyConstraint onDelete="CASCADE" baseColumnNames="permissionGroups_id" baseTableName="User_PermissionGroup" constraintName="FK_User_PermissionGroup_Id" referencedColumnNames="id" referencedTableName="PermissionGroup"/>
 	</changeSet>
 	<changeSet author="kgebert (generated)" id="navi-77-8">
 		<addForeignKeyConstraint baseColumnNames="permissions_id" baseTableName="PermissionGroup_Permission" constraintName="FK_PermissionGroup_Permission_Id" referencedColumnNames="id" referencedTableName="Permission"/>
