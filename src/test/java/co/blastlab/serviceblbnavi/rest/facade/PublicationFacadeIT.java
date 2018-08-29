@@ -38,11 +38,10 @@ public class PublicationFacadeIT extends BaseIT {
 
 	@Test
 	public void update() {
+		TagDto tag1 = new TagDto();
+		TagDto tag2 = new TagDto();
 		String body = new RequestBodyBuilder("Publication.json")
-			.setParameter("tags", ImmutableList.of(
-				new TagDto(4L, null, null, null, null, null, null),
-				new TagDto(5L, null, null, null, null, null, null))
-			)
+			.setParameter("tags", ImmutableList.of(tag1, tag2))
 			.setParameter("users", ImmutableList.of())
 			.build();
 

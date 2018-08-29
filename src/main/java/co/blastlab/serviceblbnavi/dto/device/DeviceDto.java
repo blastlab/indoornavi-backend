@@ -4,46 +4,25 @@ import co.blastlab.serviceblbnavi.domain.Device;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 
-import javax.validation.constraints.NotNull;
-
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
 public class DeviceDto {
-
 	@ApiModelProperty(example = "1", readOnly = true)
 	private Long id;
-
-	@NotNull
-	@ApiModelProperty(example = "14733")
-	private Integer shortId;
-
-	@NotNull
-	@ApiModelProperty(example = "87367834748864600")
-	private Long longId;
-
 	@ApiModelProperty(example = "Name")
 	private String name;
-
-	@ApiModelProperty(example = "1")
-	private Long floorId;
-
-	@NotNull
 	@ApiModelProperty(example = "false")
 	private Boolean verified;
-
-	@ApiModelProperty(example = "")
-	private String firmwareVersion;
+	@ApiModelProperty(example = "0a:14:22:0d:23:45")
+	private String macAddress;
 
 	public DeviceDto(Device device) {
 		this.setId(device.getId());
-		this.setShortId(device.getShortId());
-		this.setLongId(device.getLongId());
+		this.setMacAddress(device.getMac());
 		this.setName(device.getName());
-		this.setFloorId(device.getFloor() != null ? device.getFloor().getId() : null);
 		this.setVerified(device.getVerified());
-		this.setFirmwareVersion(device.getFirmwareVersion());
 	}
 }

@@ -38,7 +38,7 @@ public class TagFacadeIT extends BaseIT {
 
 	@Override
 	public ImmutableList<String> getAdditionalLabels() {
-		return ImmutableList.of("Tag", "Device", "Floor", "Building");
+		return ImmutableList.of("Tag", "Device", "Floor", "Building", "Uwb");
 	}
 
 	@Test
