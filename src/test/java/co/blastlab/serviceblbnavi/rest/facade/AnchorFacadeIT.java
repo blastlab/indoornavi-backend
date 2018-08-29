@@ -37,7 +37,7 @@ public class AnchorFacadeIT extends BaseIT {
 
 	@Override
 	public ImmutableList<String> getAdditionalLabels() {
-		return ImmutableList.of("Anchor", "Device", "Floor", "Building");
+		return ImmutableList.of("Anchor", "Device", "Floor", "Building", "Uwb");
 	}
 
 	@Test

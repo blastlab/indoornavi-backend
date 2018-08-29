@@ -4,13 +4,12 @@ import co.blastlab.serviceblbnavi.dao.repository.AnchorRepository;
 import co.blastlab.serviceblbnavi.dao.repository.DeviceRepository;
 import co.blastlab.serviceblbnavi.dao.repository.SinkRepository;
 import co.blastlab.serviceblbnavi.dao.repository.TagRepository;
-import co.blastlab.serviceblbnavi.domain.Anchor;
-import co.blastlab.serviceblbnavi.domain.Device;
-import co.blastlab.serviceblbnavi.domain.Sink;
-import co.blastlab.serviceblbnavi.domain.Tag;
+import co.blastlab.serviceblbnavi.domain.*;
 import co.blastlab.serviceblbnavi.dto.anchor.AnchorDto;
-import co.blastlab.serviceblbnavi.dto.device.DeviceDto;
+import co.blastlab.serviceblbnavi.dto.bluetooth.BluetoothDto;
 import co.blastlab.serviceblbnavi.dto.sink.SinkDto;
+import co.blastlab.serviceblbnavi.dto.tag.TagDto;
+import co.blastlab.serviceblbnavi.dto.uwb.UwbDto;
 import co.blastlab.serviceblbnavi.socket.WebSocketCommunication;
 import co.blastlab.serviceblbnavi.utils.Logger;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -49,8 +48,10 @@ public class DeviceRegistrationWebSocket extends WebSocketCommunication {
 			broadCastMessage(sinkSessions, objectMapper.writeValueAsString(Collections.singletonList(new SinkDto((Sink) device))));
 		} else if (device instanceof Anchor){
 			broadCastMessage(anchorSessions, objectMapper.writeValueAsString(Collections.singletonList(new AnchorDto((Anchor) device))));
-		} else {
-			broadCastMessage(tagSessions, objectMapper.writeValueAsString(Collections.singletonList(new DeviceDto(device))));
+		} else if (device instanceof Tag) {
+			broadCastMessage(tagSessions, objectMapper.writeValueAsString(Collections.singletonList(new TagDto((Tag) device))));
+		} else if (device instanceof Bluetooth){
+			broadCastMessage(tagSessions, objectMapper.writeValueAsString(Collections.singletonList(new BluetoothDto((Bluetooth) device))));
 		}
 	}
 
@@ -59,7 +60,7 @@ public class DeviceRegistrationWebSocket extends WebSocketCommunication {
 		Logger logger = new Logger();
 		logger.setId(session.getId()).trace("Device registration session opened, query params = {}", session.getRequestParameterMap());
 		String queryString = session.getQueryString();
-		List<DeviceDto> devices = new ArrayList<>();
+		List<UwbDto> devices = new ArrayList<>();
 		ObjectMapper objectMapper = new ObjectMapper();
 
 		if (SessionType.SINK.getName().equals(queryString)) {
@@ -76,7 +77,7 @@ public class DeviceRegistrationWebSocket extends WebSocketCommunication {
 			broadCastMessage(anchorSessions, objectMapper.writeValueAsString(devices));
 		} else if (SessionType.TAG.getName().equals(queryString)) {
 			tagRepository.findAll().forEach((tag) -> {
-				devices.add(new DeviceDto(tag));
+				devices.add(new UwbDto(tag));
 			});
 			tagSessions.add(session);
 			broadCastMessage(tagSessions, objectMapper.writeValueAsString(devices));
@@ -108,27 +109,27 @@ public class DeviceRegistrationWebSocket extends WebSocketCommunication {
 		Logger logger = new Logger();
 		logger.setId(session.getId()).trace("Received message {}", message);
 		ObjectMapper objectMapper = new ObjectMapper();
-		if (Objects.equals(session.getQueryString(), SessionType.SINK.getName())) {
-			DeviceDto deviceDto = objectMapper.readValue(message, DeviceDto.class);
-			Device deviceEntity;
-			if (deviceDto.getShortId() <= Short.MAX_VALUE) {
-				deviceEntity = new Tag();
-			} else {
-				deviceEntity = new Anchor();
-			}
-			deviceEntity.setShortId(deviceDto.getShortId());
-			deviceEntity.setLongId(deviceDto.getLongId());
-			deviceEntity.setVerified(false);
-			deviceEntity = deviceRepository.save(deviceEntity);
-
-			Set<Session> sessions;
-			if (deviceEntity instanceof Tag) {
-				sessions = anchorSessions;
-			} else {
-				sessions = tagSessions;
-			}
-			broadCastMessage(sessions, objectMapper.writeValueAsString(Collections.singletonList(new DeviceDto(deviceEntity))));
-		}
+//		if (Objects.equals(session.getQueryString(), SessionType.SINK.getName())) {
+//			AnchorDto anchorDto = objectMapper.readValue(message, AnchorDto.class);
+//			Uwb deviceEntity;
+//			if (anchorDto.getShortId() <= Short.MAX_VALUE) {
+//				deviceEntity = new Tag();
+//			} else {
+//				deviceEntity = new Anchor();
+//			}
+//			deviceEntity.setShortId(anchorDto.getShortId());
+//			deviceEntity.setMac(anchorDto.getMac());
+//			deviceEntity.setVerified(false);
+//			deviceEntity = deviceRepository.save(deviceEntity);
+//
+//			Set<Session> sessions;
+//			if (deviceEntity instanceof Tag) {
+//				sessions = anchorSessions;
+//			} else {
+//				sessions = tagSessions;
+//			}
+//			broadCastMessage(sessions, objectMapper.writeValueAsString(Collections.singletonList(new UwbDto(deviceEntity))));
+//		}
 	}
 
 

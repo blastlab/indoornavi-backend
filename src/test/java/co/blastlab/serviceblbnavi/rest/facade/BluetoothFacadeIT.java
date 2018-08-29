@@ -7,12 +7,12 @@ import org.junit.Test;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 
-public class SinkFacadeIT extends BaseIT {
+public class BluetoothFacadeIT extends BaseIT {
 
 	@Override
 	public ImmutableList<String> getAdditionalLabels() {
 		return ImmutableList.of(
-			"Building", "Floor", "Device", "Uwb", "Anchor", "Sink"
+			"Building", "Floor", "Device", "Bluetooth"
 		);
 	}
 
@@ -20,67 +20,65 @@ public class SinkFacadeIT extends BaseIT {
 	public void getAll() {
 		givenUser()
 			.when()
-			.get("/sinks")
+			.get("/bluetooths")
 			.then()
 			// assertions
 			.statusCode(200)
 			.body("size()", is(1))
 			.root("get(0)")
-			.body("name", is("Sink"))
-			.body("floorId", is(2))
-			.body("configured", is(false))
-			.body("anchors.size()", is(0));
+			.body("name", is("Bluetooth"))
+			.body("verified", is(true));
 	}
 
 	@Test
 	public void create() {
-		String body = new RequestBodyBuilder("Sink.json")
-			.setParameter("name", "Sink name")
-			.setParameter("shortId", 999998)
-			.setParameter("longId", 999998901)
+		String body = new RequestBodyBuilder("Bluetooth.json")
+			.setParameter("name", "Bluetooth #2")
+			.setParameter("major", 3200)
+			.setParameter("minor", 12345)
 			.build();
 
 		givenUser()
 			.when()
 			.body(body)
-			.post("/sinks")
+			.post("/bluetooths")
 			.then()
 			// assertions
 			.statusCode(200)
-			.body("name", is("Sink name"))
-			.body("shortId", is(999998))
-			.body("longId", is(999998901))
+			.body("name", is("Bluetooth #2"))
+			.body("major", is(3200))
+			.body("minor", is(12345))
 			.body("id", is(notNullValue()));
 	}
 
 	@Test
 	public void update() {
-		String body = new RequestBodyBuilder("Sink.json")
-			.setParameter("name", "Sink updated name")
-			.setParameter("shortId", 666666)
-			.setParameter("longId", 666666666)
+		String body = new RequestBodyBuilder("Bluetooth.json")
+			.setParameter("name", "Bluetooth updated name")
+			.setParameter("major", 314)
+			.setParameter("minor", 909)
 			.build();
 
 		givenUser()
-			.pathParam("id", 8)
+			.pathParam("id", 9)
 			.when()
 			.body(body)
-			.put("/sinks/{id}")
+			.put("/bluetooths/{id}")
 			.then()
 			// assertions
 			.statusCode(200)
-			.body("name", is("Sink updated name"))
-			.body("shortId", is(666666))
-			.body("longId", is(666666666))
+			.body("name", is("Bluetooth updated name"))
+			.body("major", is(314))
+			.body("minor", is(909))
 			.body("id", is(notNullValue()));
 	}
 
 	@Test
 	public void delete() {
 		givenUser()
-			.pathParam("id", 8)
+			.pathParam("id", 9)
 			.when()
-			.delete("/sinks/{id}")
+			.delete("/bluetooths/{id}")
 			.then()
 			.statusCode(204);
 	}
