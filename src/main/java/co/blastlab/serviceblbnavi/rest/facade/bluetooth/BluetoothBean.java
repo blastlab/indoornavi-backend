@@ -31,6 +31,7 @@ public class BluetoothBean implements BluetoothFacade {
 		bluetoothEntity.setMajor(bluetooth.getMajor());
 		bluetoothEntity.setMinor(bluetooth.getMinor());
 		bluetoothEntity.setPower(bluetooth.getPowerTransmission());
+		bluetoothEntity.setVerified(bluetooth.getVerified());
 		bluetoothRepository.save(bluetoothEntity);
 		logger.debug("Bluetooth created");
 		return new BluetoothDto(bluetoothEntity);
@@ -45,6 +46,7 @@ public class BluetoothBean implements BluetoothFacade {
 		bluetoothEntity.setMajor(bluetooth.getMajor());
 		bluetoothEntity.setMinor(bluetooth.getMinor());
 		bluetoothEntity.setPower(bluetooth.getPowerTransmission());
+		bluetoothEntity.setVerified(bluetooth.getVerified());
 		bluetoothRepository.save(bluetoothEntity);
 		logger.debug("Bluetooth updated");
 		return new BluetoothDto(bluetoothEntity);
