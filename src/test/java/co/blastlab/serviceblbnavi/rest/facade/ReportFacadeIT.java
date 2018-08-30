@@ -12,7 +12,7 @@ public class ReportFacadeIT extends BaseIT {
 	@Override
 	public ImmutableList<String> getAdditionalLabels() {
 		return ImmutableList.of(
-			"Building", "Floor", "Device", "Tag", "Coordinates",
+			"Building", "Floor", "Device", "Tag", "Uwb", "Coordinates",
 			"Area", "AreaConfiguration", "Area_AreaConfiguration", "AreaConfiguration_Tag"
 		);
 	}
@@ -172,13 +172,13 @@ public class ReportFacadeIT extends BaseIT {
 			.body(
 				"size()", equalTo(4),
 				"get(0).mode", equalTo("ON_ENTER"),
-				"get(0).tagId", equalTo(10999),
+				"get(0).tagId", equalTo(11999),
 				"get(1).mode", equalTo("ON_LEAVE"),
-				"get(1).tagId", equalTo(10999),
+				"get(1).tagId", equalTo(11999),
 				"get(2).mode", equalTo("ON_ENTER"),
-				"get(2).tagId", equalTo(11999),
+				"get(2).tagId", equalTo(12000),
 				"get(3).mode", equalTo("ON_LEAVE"),
-				"get(3).tagId", equalTo(11999)
+				"get(3).tagId", equalTo(12000)
 			);
 	}
 
@@ -201,16 +201,16 @@ public class ReportFacadeIT extends BaseIT {
 				"size()", equalTo(4),
 				"get(0).mode", equalTo("ON_ENTER"),
 				"get(0).areaName", equalTo("test"),
-				"get(0).tagId", equalTo(11999),
+				"get(0).tagId", equalTo(12000),
 				"get(1).mode", equalTo("ON_LEAVE"),
 				"get(1).areaName", equalTo("test"),
-				"get(1).tagId", equalTo(11999),
+				"get(1).tagId", equalTo(12000),
 				"get(2).mode", equalTo("ON_ENTER"),
 				"get(2).areaName", equalTo("test"),
-				"get(2).tagId", equalTo(12999),
+				"get(2).tagId", equalTo(12001),
 				"get(3).mode", equalTo("ON_LEAVE"),
 				"get(3).areaName", equalTo("test"),
-				"get(3).tagId", equalTo(12999)
+				"get(3).tagId", equalTo(12001)
 			);
 	}
 
@@ -233,7 +233,7 @@ public class ReportFacadeIT extends BaseIT {
 				"size()", equalTo(1),
 				"get(0).mode", equalTo("ON_ENTER"),
 				"get(0).areaName", equalTo("test"),
-				"get(0).tagId", equalTo(10999)
+				"get(0).tagId", equalTo(11999)
 			);
 	}
 
@@ -257,10 +257,10 @@ public class ReportFacadeIT extends BaseIT {
 				"size()", equalTo(2),
 				"get(0).mode", equalTo("ON_ENTER"),
 				"get(0).areaName", equalTo("test"),
-				"get(0).tagId", equalTo(10999),
+				"get(0).tagId", equalTo(11999),
 				"get(1).mode", equalTo("ON_LEAVE"),
 				"get(1).areaName", equalTo("test"),
-				"get(1).tagId", equalTo(10999)
+				"get(1).tagId", equalTo(11999)
 			);
 	}
 }

@@ -19,7 +19,7 @@ public class AreaConfigurationIT extends BaseIT {
 	@Override
 	public ImmutableList<String> getAdditionalLabels() {
 		return ImmutableList.of(
-			"Building", "Floor", "Device", "Tag",
+			"Building", "Floor", "Device", "Tag", "Uwb",
 			"Area", "AreaConfiguration", "Area_AreaConfiguration", "AreaConfiguration_Tag"
 		);
 	}

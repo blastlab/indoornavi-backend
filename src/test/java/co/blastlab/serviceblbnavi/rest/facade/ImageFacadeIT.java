@@ -37,7 +37,7 @@ public class ImageFacadeIT extends BaseIT {
 		File myFile = new File(classLoader.getResource(fileName).getFile());
 
 		givenUser()
-			.pathParam("floorId", 1)
+			.pathParam("floorId", 5)
 			.multiPart("image", myFile)
 			.contentType("multipart/form-data")
 			.when().post(IMAGE_PATH_WITH_FLOOR_ID)
@@ -51,7 +51,7 @@ public class ImageFacadeIT extends BaseIT {
 		File myFile = new File(classLoader.getResource(fileName).getFile());
 
 		givenUser()
-			.pathParam("floorId", 2)
+			.pathParam("floorId", 5)
 			.multiPart("image", myFile)
 			.contentType("multipart/form-data")
 			.when().post(IMAGE_PATH_WITH_FLOOR_ID)
@@ -65,7 +65,7 @@ public class ImageFacadeIT extends BaseIT {
 		File myFile = new File(classLoader.getResource(fileName).getFile());
 
 		ExtViolationResponse extViolationResponse = givenUser()
-			.pathParam("floorId", 2)
+			.pathParam("floorId", 4)
 			.multiPart("image", myFile)
 			.contentType("multipart/form-data")
 			.when().post(IMAGE_PATH_WITH_FLOOR_ID)
@@ -84,7 +84,7 @@ public class ImageFacadeIT extends BaseIT {
 		File myFile = new File(classLoader.getResource(fileName).getFile());
 
 		ExtViolationResponse extViolationResponse = givenUser()
-			.pathParam("floorId", 2)
+			.pathParam("floorId", 4)
 			.multiPart("image", myFile)
 			.contentType("multipart/form-data")
 			.when().post(IMAGE_PATH_WITH_FLOOR_ID)
@@ -103,7 +103,7 @@ public class ImageFacadeIT extends BaseIT {
 		File myFile = new File(classLoader.getResource(fileName).getFile());
 
 		ExtViolationResponse extViolationResponse = givenUser()
-			.pathParam("floorId", 3)
+			.pathParam("floorId", 4)
 			.multiPart("image", myFile)
 			.contentType("multipart/form-data")
 			.when().post(IMAGE_PATH_WITH_FLOOR_ID)

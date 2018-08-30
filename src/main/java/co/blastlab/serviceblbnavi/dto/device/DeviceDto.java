@@ -4,6 +4,8 @@ import co.blastlab.serviceblbnavi.domain.Device;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 
+import javax.validation.constraints.NotNull;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -15,6 +17,7 @@ public class DeviceDto {
 	@ApiModelProperty(example = "Name")
 	private String name;
 	@ApiModelProperty(example = "false")
+	@NotNull
 	private Boolean verified;
 	@ApiModelProperty(example = "0a:14:22:0d:23:45")
 	private String macAddress;

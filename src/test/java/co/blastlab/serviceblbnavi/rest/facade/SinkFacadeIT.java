@@ -12,7 +12,7 @@ public class SinkFacadeIT extends BaseIT {
 	@Override
 	public ImmutableList<String> getAdditionalLabels() {
 		return ImmutableList.of(
-			"Building", "Floor", "Device", "Uwb", "Anchor", "Sink"
+			"Building", "Floor", "Device", "Uwb", "Anchor", "Sink", "Image"
 		);
 	}
 
@@ -27,7 +27,7 @@ public class SinkFacadeIT extends BaseIT {
 			.body("size()", is(1))
 			.root("get(0)")
 			.body("name", is("Sink"))
-			.body("floorId", is(2))
+			.body("floorId", is(1))
 			.body("configured", is(false))
 			.body("anchors.size()", is(0));
 	}
@@ -37,7 +37,7 @@ public class SinkFacadeIT extends BaseIT {
 		String body = new RequestBodyBuilder("Sink.json")
 			.setParameter("name", "Sink name")
 			.setParameter("shortId", 999998)
-			.setParameter("longId", 999998901)
+			.setParameter("macAddress", "9908987")
 			.build();
 
 		givenUser()
@@ -49,7 +49,7 @@ public class SinkFacadeIT extends BaseIT {
 			.statusCode(200)
 			.body("name", is("Sink name"))
 			.body("shortId", is(999998))
-			.body("longId", is(999998901))
+			.body("macAddress", is("9908987"))
 			.body("id", is(notNullValue()));
 	}
 
@@ -58,7 +58,7 @@ public class SinkFacadeIT extends BaseIT {
 		String body = new RequestBodyBuilder("Sink.json")
 			.setParameter("name", "Sink updated name")
 			.setParameter("shortId", 666666)
-			.setParameter("longId", 666666666)
+			.setParameter("macAddress", "666666666")
 			.build();
 
 		givenUser()
@@ -71,7 +71,7 @@ public class SinkFacadeIT extends BaseIT {
 			.statusCode(200)
 			.body("name", is("Sink updated name"))
 			.body("shortId", is(666666))
-			.body("longId", is(666666666))
+			.body("macAddress", is("666666666"))
 			.body("id", is(notNullValue()));
 	}
 
