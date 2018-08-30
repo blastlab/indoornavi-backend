@@ -34,8 +34,8 @@ public class BluetoothFacadeIT extends BaseIT {
 	public void create() {
 		String body = new RequestBodyBuilder("Bluetooth.json")
 			.setParameter("name", "Bluetooth #2")
-			.setParameter("major", 3200)
-			.setParameter("minor", 12345)
+			.setParameter("major", 62000)
+			.setParameter("minor", 52345)
 			.build();
 
 		givenUser()
@@ -46,8 +46,8 @@ public class BluetoothFacadeIT extends BaseIT {
 			// assertions
 			.statusCode(200)
 			.body("name", is("Bluetooth #2"))
-			.body("major", is(3200))
-			.body("minor", is(12345))
+			.body("major", is(62000))
+			.body("minor", is(52345))
 			.body("id", is(notNullValue()));
 	}
 
@@ -55,8 +55,8 @@ public class BluetoothFacadeIT extends BaseIT {
 	public void update() {
 		String body = new RequestBodyBuilder("Bluetooth.json")
 			.setParameter("name", "Bluetooth updated name")
-			.setParameter("major", 314)
-			.setParameter("minor", 909)
+			.setParameter("major", 35010)
+			.setParameter("minor", 36010)
 			.build();
 
 		givenUser()
@@ -68,8 +68,8 @@ public class BluetoothFacadeIT extends BaseIT {
 			// assertions
 			.statusCode(200)
 			.body("name", is("Bluetooth updated name"))
-			.body("major", is(314))
-			.body("minor", is(909))
+			.body("major", is(35010))
+			.body("minor", is(36010))
 			.body("id", is(notNullValue()));
 	}
 
