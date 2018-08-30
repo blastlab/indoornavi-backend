@@ -1,7 +1,7 @@
 package co.blastlab.serviceblbnavi.socket.device;
 
 import co.blastlab.serviceblbnavi.dao.repository.AnchorRepository;
-import co.blastlab.serviceblbnavi.dao.repository.DeviceRepository;
+import co.blastlab.serviceblbnavi.dao.repository.BluetoothRepository;
 import co.blastlab.serviceblbnavi.dao.repository.SinkRepository;
 import co.blastlab.serviceblbnavi.dao.repository.TagRepository;
 import co.blastlab.serviceblbnavi.domain.*;
@@ -9,7 +9,6 @@ import co.blastlab.serviceblbnavi.dto.anchor.AnchorDto;
 import co.blastlab.serviceblbnavi.dto.bluetooth.BluetoothDto;
 import co.blastlab.serviceblbnavi.dto.sink.SinkDto;
 import co.blastlab.serviceblbnavi.dto.tag.TagDto;
-import co.blastlab.serviceblbnavi.dto.uwb.UwbDto;
 import co.blastlab.serviceblbnavi.socket.WebSocketCommunication;
 import co.blastlab.serviceblbnavi.utils.Logger;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -20,7 +19,10 @@ import javax.inject.Singleton;
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Singleton
 @ServerEndpoint("/devices/registration")
@@ -29,6 +31,7 @@ public class DeviceRegistrationWebSocket extends WebSocketCommunication {
 	private static Set<Session> anchorSessions = Collections.synchronizedSet(new HashSet<>());
 	private static Set<Session> tagSessions = Collections.synchronizedSet(new HashSet<>());
 	private static Set<Session> sinkSessions = Collections.synchronizedSet(new HashSet<>());
+	private static Set<Session> bluetoothSessions = Collections.synchronizedSet(new HashSet<>());
 
 	@Inject
 	private AnchorRepository anchorRepository;
@@ -37,21 +40,21 @@ public class DeviceRegistrationWebSocket extends WebSocketCommunication {
 	private TagRepository tagRepository;
 
 	@Inject
-	private DeviceRepository deviceRepository;
+	private SinkRepository sinkRepository;
 
 	@Inject
-	private SinkRepository sinkRepository;
+	private BluetoothRepository bluetoothRepository;
 
 	public static void broadcastDevice(Device device) throws JsonProcessingException {
 		ObjectMapper objectMapper = new ObjectMapper();
 		if (device instanceof Sink) {
 			broadCastMessage(sinkSessions, objectMapper.writeValueAsString(Collections.singletonList(new SinkDto((Sink) device))));
-		} else if (device instanceof Anchor){
+		} else if (device instanceof Anchor) {
 			broadCastMessage(anchorSessions, objectMapper.writeValueAsString(Collections.singletonList(new AnchorDto((Anchor) device))));
 		} else if (device instanceof Tag) {
 			broadCastMessage(tagSessions, objectMapper.writeValueAsString(Collections.singletonList(new TagDto((Tag) device))));
-		} else if (device instanceof Bluetooth){
-			broadCastMessage(tagSessions, objectMapper.writeValueAsString(Collections.singletonList(new BluetoothDto((Bluetooth) device))));
+		} else if (device instanceof Bluetooth) {
+			broadCastMessage(bluetoothSessions, objectMapper.writeValueAsString(Collections.singletonList(new BluetoothDto((Bluetooth) device))));
 		}
 	}
 
@@ -60,27 +63,33 @@ public class DeviceRegistrationWebSocket extends WebSocketCommunication {
 		Logger logger = new Logger();
 		logger.setId(session.getId()).trace("Device registration session opened, query params = {}", session.getRequestParameterMap());
 		String queryString = session.getQueryString();
-		List<UwbDto> devices = new ArrayList<>();
 		ObjectMapper objectMapper = new ObjectMapper();
 
 		if (SessionType.SINK.getName().equals(queryString)) {
-			sinkRepository.findAll().forEach((sink) -> {
-				devices.add(new SinkDto(sink));
-			});
 			sinkSessions.add(session);
-			broadCastMessage(sinkSessions, objectMapper.writeValueAsString(devices));
+			broadCastMessage(
+				sinkSessions,
+				objectMapper.writeValueAsString(sinkRepository.findAll().stream().map(SinkDto::new).collect(Collectors.toList()))
+			);
 		} else if (SessionType.ANCHOR.getName().equals(queryString)) {
-			anchorRepository.findAll().stream().filter((anchor -> !(anchor instanceof Sink))).forEach((Anchor anchor) -> {
-				devices.add(new AnchorDto(anchor));
-			});
 			anchorSessions.add(session);
-			broadCastMessage(anchorSessions, objectMapper.writeValueAsString(devices));
+			broadCastMessage(
+				anchorSessions,
+				objectMapper.writeValueAsString(anchorRepository.findAll().stream().filter((anchor -> !(anchor instanceof Sink)))
+					.map(AnchorDto::new).collect(Collectors.toList()))
+			);
 		} else if (SessionType.TAG.getName().equals(queryString)) {
-			tagRepository.findAll().forEach((tag) -> {
-				devices.add(new UwbDto(tag));
-			});
 			tagSessions.add(session);
-			broadCastMessage(tagSessions, objectMapper.writeValueAsString(devices));
+			broadCastMessage(
+				tagSessions,
+				objectMapper.writeValueAsString(tagRepository.findAll().stream().map(TagDto::new).collect(Collectors.toList()))
+			);
+		} else if (SessionType.BLUETOOTH.getName().equals(queryString)) {
+			bluetoothSessions.add(session);
+			broadCastMessage(
+				bluetoothSessions,
+				objectMapper.writeValueAsString(bluetoothRepository.findAll().stream().map(BluetoothDto::new).collect(Collectors.toList()))
+			);
 		}
 	}
 
@@ -95,6 +104,8 @@ public class DeviceRegistrationWebSocket extends WebSocketCommunication {
 			anchorSessions.remove(session);
 		} else if (SessionType.TAG.getName().equals(queryString)) {
 			tagSessions.remove(session);
+		} else if (SessionType.BLUETOOTH.getName().equals(queryString)) {
+			bluetoothSessions.remove(session);
 		}
 	}
 
@@ -131,6 +142,4 @@ public class DeviceRegistrationWebSocket extends WebSocketCommunication {
 //			broadCastMessage(sessions, objectMapper.writeValueAsString(Collections.singletonList(new UwbDto(deviceEntity))));
 //		}
 	}
-
-
 }
