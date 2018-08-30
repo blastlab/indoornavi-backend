@@ -7,6 +7,8 @@ import lombok.Setter;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 
 @Entity
 @Getter
@@ -15,8 +17,14 @@ import javax.persistence.Entity;
 @NoArgsConstructor
 public class Bluetooth extends Device {
 	@Column(unique = true)
-	private Short minor;
+	@Min(Short.MAX_VALUE)
+	@Max(Integer.MAX_VALUE)
+	private Integer minor;
+
 	@Column(unique = true)
-	private Short major;
+	@Min(Short.MAX_VALUE)
+	@Max(Integer.MAX_VALUE)
+	private Integer major;
+
 	private Short power;
 }

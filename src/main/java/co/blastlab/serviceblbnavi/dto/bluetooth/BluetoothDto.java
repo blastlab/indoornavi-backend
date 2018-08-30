@@ -13,9 +13,9 @@ import lombok.*;
 public class BluetoothDto extends DeviceDto {
 
 	@ApiModelProperty(example = "14733")
-	private Short minor;
+	private Integer minor;
 	@ApiModelProperty(example = "9982")
-	private Short major;
+	private Integer major;
 	@ApiModelProperty(example = "40")
 	private Short powerTransmission;
 

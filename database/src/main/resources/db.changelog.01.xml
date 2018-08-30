@@ -616,8 +616,8 @@
 	</changeSet>
 	<changeSet author="kgebert (generated)" id="navi-364-1">
 		<createTable tableName="Bluetooth">
-			<column name="major" type="SMALLINT"/>
-			<column name="minor" type="SMALLINT"/>
+			<column name="major" type="INT"/>
+			<column name="minor" type="INT"/>
 			<column name="power" type="SMALLINT"/>
 			<column name="id" type="BIGINT">
 				<constraints nullable="false"/>
