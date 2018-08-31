@@ -8,7 +8,6 @@ import co.blastlab.serviceblbnavi.utils.Logger;
 
 import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
-import java.util.Optional;
 
 public class AnchorService {
 	@Inject
@@ -19,12 +18,8 @@ public class AnchorService {
 
 	public void setFloor(AnchorDto anchorDto, Anchor anchor) {
 		logger.debug("Trying to assign floor to device {}", anchorDto);
-		Optional<Floor> floor = floorRepository.findOptionalById(anchorDto.getFloorId());
-		if (floor.isPresent()) {
-			anchor.setFloor(floor.get());
-			logger.debug("Floor assigned");
-		} else {
-			throw new EntityNotFoundException();
-		}
+		Floor floor = floorRepository.findOptionalById(anchorDto.getFloorId()).orElseThrow(EntityNotFoundException::new);
+		anchor.setFloor(floor);
+		logger.debug("Floor assigned");
 	}
 }
