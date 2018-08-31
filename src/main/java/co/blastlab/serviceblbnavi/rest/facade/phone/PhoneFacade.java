@@ -8,14 +8,14 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 
 import javax.validation.Valid;
-import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 
 @Path("/phones")
 @Api("/phones")
 @SetOperationId
 public interface PhoneFacade {
-	@GET
+	@POST
 	@ApiOperation(value = "register or authenticate phone", response = PhoneDto.class)
 	@AuthorizedAccess
 	PhoneDto auth(@ApiParam(value = "phone", required = true) @Valid PhoneDto phone);
