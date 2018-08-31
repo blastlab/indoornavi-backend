@@ -14,9 +14,11 @@ public class PhoneBean implements PhoneFacade {
 	@Inject
 	private PhoneRepository phoneRepository;
 
+	@Inject
+	private ModelMapper modelMapper;
+
 	@Override
 	public PhoneDto auth(PhoneDto phone) {
-		ModelMapper modelMapper = new ModelMapper();
 		Phone phoneEntity = phoneRepository.findOptionalByUserData(phone.getUserData()).orElseGet(() -> {
 			Phone newPhone = new Phone();
 			newPhone.setUserData(phone.getUserData());
