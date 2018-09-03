@@ -49,4 +49,23 @@ public class PhoneFacadeIT extends BaseIT {
 			.body("userData", is("NotExisting"))
 			.body("id", is(not(nullValue())));
 	}
+
+	@Test
+	public void authWithTooLongUserDataWillThrowAnError() {
+		StringBuilder tooLong = new StringBuilder();
+		for (int i = 0; i < 300; i++) {
+			tooLong.append("t");
+		}
+		String body = new RequestBodyBuilder("Phone.json")
+			.setParameter("userData", tooLong.toString())
+			.build();
+
+		givenUser()
+			.body(body)
+			.when()
+			.post("/phones")
+			.then()
+			// assertions
+			.statusCode(HttpStatus.SC_BAD_REQUEST);
+	}
 }
