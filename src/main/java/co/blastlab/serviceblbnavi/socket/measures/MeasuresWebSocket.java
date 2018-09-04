@@ -1,12 +1,12 @@
 package co.blastlab.serviceblbnavi.socket.measures;
 
 import co.blastlab.serviceblbnavi.dao.repository.AnchorRepository;
-import co.blastlab.serviceblbnavi.dao.repository.CoordinatesRepository;
 import co.blastlab.serviceblbnavi.dao.repository.FloorRepository;
 import co.blastlab.serviceblbnavi.dao.repository.TagRepository;
-import co.blastlab.serviceblbnavi.domain.Coordinates;
+import co.blastlab.serviceblbnavi.dao.repository.UwbCoordinatesRepository;
+import co.blastlab.serviceblbnavi.domain.UwbCoordinates;
 import co.blastlab.serviceblbnavi.dto.anchor.AnchorDto;
-import co.blastlab.serviceblbnavi.dto.report.CoordinatesDto;
+import co.blastlab.serviceblbnavi.dto.report.UwbCoordinatesDto;
 import co.blastlab.serviceblbnavi.dto.tag.TagDto;
 import co.blastlab.serviceblbnavi.socket.WebSocket;
 import co.blastlab.serviceblbnavi.socket.area.AreaEvent;
@@ -53,7 +53,7 @@ public class MeasuresWebSocket extends WebSocket {
 	private Logger logger;
 
 	@Inject
-	private CoordinatesRepository coordinatesRepository;
+	private UwbCoordinatesRepository coordinatesRepository;
 
 	@Inject
 	private SinkAnchorsDistanceBridge sinkAnchorsDistanceBridge;
@@ -155,7 +155,7 @@ public class MeasuresWebSocket extends WebSocket {
 				}
 			} else {
 				logger.trace("Trying to calculate coordinates");
-				Optional<CoordinatesDto> coords = coordinatesCalculator.calculateTagPosition(distanceMessage.getDid1(), distanceMessage.getDid2(), distanceMessage.getDist());
+				Optional<UwbCoordinatesDto> coords = coordinatesCalculator.calculateTagPosition(distanceMessage.getDid1(), distanceMessage.getDid2(), distanceMessage.getDist());
 				if (coords.isPresent()) {
 					this.saveCoordinates(coords.get());
 					Set<Session> sessions = this.filterSessions(coords.get());
@@ -170,8 +170,8 @@ public class MeasuresWebSocket extends WebSocket {
 		return distanceMessage.getDid1() > Short.MAX_VALUE && distanceMessage.getDid2() > Short.MAX_VALUE;
 	}
 
-	private void saveCoordinates(CoordinatesDto coordinatesDto) {
-		Coordinates coordinates = new Coordinates();
+	private void saveCoordinates(UwbCoordinatesDto coordinatesDto) {
+		UwbCoordinates coordinates = new UwbCoordinates();
 		coordinates.setTag(tagRepository.findOptionalByShortId(coordinatesDto.getTagShortId()).orElseThrow(EntityNotFoundException::new));
 		coordinates.setX(coordinatesDto.getPoint().getX());
 		coordinates.setY(coordinatesDto.getPoint().getY());
@@ -179,7 +179,7 @@ public class MeasuresWebSocket extends WebSocket {
 		coordinatesRepository.save(coordinates);
 	}
 
-	private Set<Session> filterSessions(CoordinatesDto coordinatesDto) {
+	private Set<Session> filterSessions(UwbCoordinatesDto coordinatesDto) {
 		Set<Session> sessions = clientSessions;
 		for(Map.Entry<FilterType, Filter> filterEntry : activeFilters.entrySet()) {
 			if (FilterType.TAG.equals(filterEntry.getKey())) {
@@ -191,7 +191,7 @@ public class MeasuresWebSocket extends WebSocket {
 		return sessions;
 	}
 
-	private void sendAreaEvents(CoordinatesDto coordinatesDto) {
+	private void sendAreaEvents(UwbCoordinatesDto coordinatesDto) {
 		List<AreaEvent> events = areaEventController.checkCoordinates(coordinatesDto);
 		for (AreaEvent event : events) {
 			broadCastMessage(this.getClientSessions(), new AreaEventWrapper(event));
