@@ -2,8 +2,9 @@ package co.blastlab.serviceblbnavi.socket.info;
 
 import co.blastlab.serviceblbnavi.dao.repository.DeviceRepository;
 import co.blastlab.serviceblbnavi.domain.*;
-import co.blastlab.serviceblbnavi.dto.device.DeviceDto;
-import co.blastlab.serviceblbnavi.service.DeviceService;
+import co.blastlab.serviceblbnavi.dto.anchor.AnchorDto;
+import co.blastlab.serviceblbnavi.dto.uwb.UwbDto;
+import co.blastlab.serviceblbnavi.service.UwbService;
 import co.blastlab.serviceblbnavi.socket.WebSocket;
 import co.blastlab.serviceblbnavi.socket.info.client.UpdateRequest;
 import co.blastlab.serviceblbnavi.socket.info.controller.DeviceStatus;
@@ -95,7 +96,7 @@ public class InfoWebSocket extends WebSocket {
 	private DeviceRepository deviceRepository;
 
 	@Inject
-	private DeviceService deviceService;
+	private UwbService uwbService;
 
 	@Inject
 	private NetworkController networkController;
@@ -423,9 +424,9 @@ public class InfoWebSocket extends WebSocket {
 			deviceStatus.setRestartCount(deviceStatus.getRestartCount() + 1);
 			if (isProperFirmwareVersion(deviceConnected) && deviceStatus.getRestartCount() == 2) {
 				deviceStatus.setRestartCount(0);
-				Optional<? extends Device> optionalByShortId = deviceService.findOptionalByShortId(deviceConnected.getShortId());
+				Optional<? extends Uwb> optionalByShortId = uwbService.findOptionalByShortId(deviceConnected.getShortId());
 				if (optionalByShortId.isPresent()) {
-					optionalByShortId.get().setPartition(Device.getPartition(deviceConnected.getFirmwareMinor()));
+					optionalByShortId.get().setPartition(Uwb.getPartition(deviceConnected.getFirmwareMinor()));
 					deviceRepository.save(optionalByShortId.get());
 					deviceStatus.getUpdateFinished().complete(null);
 					logger.trace("Device {} has been updated", deviceStatus.getDevice());
@@ -473,24 +474,24 @@ public class InfoWebSocket extends WebSocket {
 	private void handleVersion(Info info) {
 		Version version = objectMapper.convertValue(info.getArgs(), Version.class);
 		logger.setId(getSessionId()).trace("Received message about device version {}", version);
-		Optional<? extends Device> optionalByShortId = deviceService.findOptionalByShortId(version.getShortId());
+		Optional<? extends Uwb> optionalByShortId = uwbService.findOptionalByShortId(version.getShortId());
 		if (optionalByShortId.isPresent()) {
-			final Device device = optionalByShortId.get();
+			final Uwb device = optionalByShortId.get();
 			String[] firmwareVersion = version.getFirmwareVersion().split("\\.");
 			device.setMajor(Integer.parseInt(firmwareVersion[0]));
 			device.setMinor(Integer.parseInt(firmwareVersion[1]));
 			device.setCommitHash(firmwareVersion[2]);
 			deviceRepository.save(device);
 			Optional<DeviceStatus> deviceStatus = networkController.getDeviceStatus(device.getShortId());
-			deviceStatus.ifPresent(ds -> ds.setDevice(new DeviceDto(device)));
+			deviceStatus.ifPresent(ds -> ds.setDevice(new AnchorDto((Anchor) device)));
 		}
 	}
 
 	private boolean isProperFirmwareVersion(DeviceConnected deviceConnected) {
-		Optional<? extends Device> deviceOptional = deviceService.findOptionalByShortId(deviceConnected.getShortId());
+		Optional<? extends Uwb> deviceOptional = uwbService.findOptionalByShortId(deviceConnected.getShortId());
 		if (deviceOptional.isPresent()) {
-			Device device = deviceOptional.get();
-			return device.getPartition() != Device.getPartition(deviceConnected.getFirmwareMinor());
+			Uwb uwb = deviceOptional.get();
+			return uwb.getPartition() != Uwb.getPartition(deviceConnected.getFirmwareMinor());
 		}
 		return false;
 	}
@@ -541,41 +542,41 @@ public class InfoWebSocket extends WebSocket {
 
 	private Optional<DeviceStatus> registerNewDevice(Session session, DeviceConnected deviceConnected) {
 		logger.setId(getSessionId());
-		Optional<? extends Device> deviceOptional = deviceService.findOptionalByShortId(deviceConnected.getShortId());
-		if (deviceOptional.isPresent()) {
-			Device device = deviceOptional.get();
+		Optional<? extends Uwb> uwbOptional = uwbService.findOptionalByShortId(deviceConnected.getShortId());
+		if (uwbOptional.isPresent()) {
+			Uwb uwb = uwbOptional.get();
 			List<Integer> route = deviceConnected.getRoute();
-			DeviceStatus deviceStatus = new DeviceStatus(new DeviceDto(device), DeviceStatus.Status.ONLINE);
-			if (device instanceof Sink) {
-				logger.trace("Registering sink {}", device);
+			DeviceStatus deviceStatus = new DeviceStatus(new UwbDto(uwb), DeviceStatus.Status.ONLINE);
+			if (uwb instanceof Sink) {
+				logger.trace("Registering sink {}", uwb);
 				networkController.registerSink(session, deviceStatus);
-			} else if (device instanceof Tag) {
+			} else if (uwb instanceof Tag) {
 				Optional<Network> networkOptional = networkController.getBySession(session);
 				if (networkOptional.isPresent()) {
-					logger.trace("Registering tag {}", device);
+					logger.trace("Registering tag {}", uwb);
 					networkOptional.get().getTags().add(deviceStatus);
 				} else {
 					deviceStatus = null;
 				}
-			} else if (device instanceof Anchor) {
+			} else if (uwb instanceof Anchor) {
 				Optional<Network> networkOptional = networkController.getBySession(session);
 				if (networkOptional.isPresent()) {
-					logger.trace("Registering anchor {}", device);
+					logger.trace("Registering anchor {}", uwb);
 					networkOptional.get().getAnchors().add(deviceStatus);
 				} else {
 					deviceStatus = null;
 				}
 			}
 			logger.trace("Setting partition and route");
-			device.setPartition(Device.getPartition(deviceConnected.getFirmwareMinor()));
+			uwb.setPartition(Uwb.getPartition(deviceConnected.getFirmwareMinor()));
 			for (int i = 0; i < route.size(); i++) {
-				Optional<? extends Device> routeDeviceOptional = deviceService.findOptionalByShortId(route.get(i));
+				Optional<? extends Uwb> routeDeviceOptional = uwbService.findOptionalByShortId(route.get(i));
 				if (routeDeviceOptional.isPresent()) {
-					Device routeDevice = routeDeviceOptional.get();
-					device.getRoute().add(new RoutePart(routeDevice.getShortId(), i, device));
+					Uwb routeDevice = routeDeviceOptional.get();
+					uwb.getRoute().add(new RoutePart(routeDevice.getShortId(), i, uwb));
 				}
 			}
-			deviceRepository.save(device);
+			deviceRepository.save(uwb);
 			return Optional.ofNullable(deviceStatus);
 		}
 		logger.trace("Device not found in database");
@@ -600,9 +601,9 @@ public class InfoWebSocket extends WebSocket {
 		info.setArgs(new AskList(""));
 
 		for (Integer shortId : updateRequest.getDevicesShortIds()) {
-			Optional<? extends Device> optionalDevice = deviceService.findOptionalByShortId(shortId);
+			Optional<? extends Uwb> optionalDevice = uwbService.findOptionalByShortId(shortId);
 			if (optionalDevice.isPresent()) {
-				Device device = optionalDevice.get();
+				Uwb device = optionalDevice.get();
 				if (device instanceof Sink) {
 					sendAskForFileList(shortId, info, notConnectedDevices);
 					updateSinkToDevicesMap(sinkToDevicesMap, shortId, shortId);
@@ -673,9 +674,9 @@ public class InfoWebSocket extends WebSocket {
 		logger.setId(session.getId()).trace("Trying to send start upgrade command");
 		Info info = new UpdateInfo();
 		Integer toUpdateId = network.getToUpdateIds().poll();
-		Optional<? extends Device> toUpdateOptional = deviceService.findOptionalByShortId(toUpdateId);
+		Optional<? extends Uwb> toUpdateOptional = uwbService.findOptionalByShortId(toUpdateId);
 		if (toUpdateOptional.isPresent()) {
-			Device toUpdate = toUpdateOptional.get();
+			Uwb toUpdate = toUpdateOptional.get();
 			List<Integer> route = toUpdate.getRoute().stream().map(RoutePart::getDeviceShortId).collect(Collectors.toList());
 			info.setArgs(new Start(toUpdate.getShortId(), route, path, toUpdate.getReversedPartition().getValue()));
 			broadCastMessage(ImmutableSet.of(session), objectMapper.writeValueAsString(Collections.singletonList(info)));
