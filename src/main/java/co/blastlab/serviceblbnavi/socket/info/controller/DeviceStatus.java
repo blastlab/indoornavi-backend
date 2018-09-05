@@ -1,6 +1,6 @@
 package co.blastlab.serviceblbnavi.socket.info.controller;
 
-import co.blastlab.serviceblbnavi.dto.device.DeviceDto;
+import co.blastlab.serviceblbnavi.dto.uwb.UwbDto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Objects;
 import lombok.Getter;
@@ -14,14 +14,14 @@ import java.util.concurrent.CompletableFuture;
 @Getter
 @NoArgsConstructor
 public class DeviceStatus {
-	private DeviceDto device;
+	private UwbDto device;
 	private Status status;
 	private Date lastTimeUpdated;
 	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	private CompletableFuture<Void> updateFinished = new CompletableFuture<>();
 	private Integer restartCount = 0;
 
-	public DeviceStatus(DeviceDto device, Status status) {
+	public DeviceStatus(UwbDto device, Status status) {
 		this.device = device;
 		this.status = status;
 		this.lastTimeUpdated = new Date();

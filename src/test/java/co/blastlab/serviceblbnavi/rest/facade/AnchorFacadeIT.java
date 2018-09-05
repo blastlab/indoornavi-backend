@@ -9,7 +9,8 @@ import org.junit.Test;
 
 import java.util.Arrays;
 
-import static co.blastlab.serviceblbnavi.rest.facade.TagFacadeIT.*;
+import static co.blastlab.serviceblbnavi.rest.facade.TagFacadeIT.CONSTRAINT_CODE_002;
+import static co.blastlab.serviceblbnavi.rest.facade.TagFacadeIT.CONSTRAINT_MESSAGE_002;
 import static co.blastlab.serviceblbnavi.rest.facade.util.violation.ViolationMatcher.validViolation;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -27,24 +28,24 @@ public class AnchorFacadeIT extends BaseIT {
 	private static final int FLOOR_EXISTING = 4;
 	private static final int ANCHOR_ID_NONEXISTING = 666;
 	private static final int ANCHOR_ID_FOR_UPDATE = 1;
-	private static final int ANCHOR_SHORT_ID_EXISTING = 111111;
-	private static final int ANCHOR_LONG_ID_EXISTING = 11111111;
+	private static final int ANCHOR_SHORT_ID_EXISTING = 32999;
+	private static final String ANCHOR_MAC_EXISTING = "00:11:d2:00:11:10";
 	private static final int ANCHOR_SHORT_ID_CREATING = 1345;
-	private static final long ANCHOR_LONG_ID_CREATING = 9753571457L;
+	private static final String ANCHOR_MAC_CREATING = "00:22:d2:00:11:11";
 
 	private static final boolean ANCHOR_NOT_VERIFIED = false;
 	private static final boolean ANCHOR_VERIFIED = true;
 
 	@Override
 	public ImmutableList<String> getAdditionalLabels() {
-		return ImmutableList.of("Anchor", "Device", "Floor", "Building");
+		return ImmutableList.of("Anchor", "Device", "Floor", "Building", "Uwb");
 	}
 
 	@Test
 	public void createNewAnchor() {
 		String body = new RequestBodyBuilder("Anchor.json")
 			.setParameter("shortId", ANCHOR_SHORT_ID_CREATING)
-			.setParameter("longId", ANCHOR_LONG_ID_CREATING)
+			.setParameter("macAddress", ANCHOR_MAC_CREATING)
 			.setParameter("name", NAME)
 			.setParameter("floorId", FLOOR_EXISTING)
 			.setParameter("x", X)
@@ -59,7 +60,7 @@ public class AnchorFacadeIT extends BaseIT {
 			.then().statusCode(HttpStatus.SC_OK)
 			.body(
 				"shortId", equalTo(ANCHOR_SHORT_ID_CREATING),
-				"longId", equalTo(ANCHOR_LONG_ID_CREATING),
+				"macAddress", equalTo(ANCHOR_MAC_CREATING),
 				"name", equalTo(NAME),
 				"floorId", equalTo(FLOOR_EXISTING),
 				"x", equalTo(X),
@@ -72,7 +73,7 @@ public class AnchorFacadeIT extends BaseIT {
 	public void shouldCreateNewAnchorWithoutNameAndFloorIdAndCoordinates() {
 		String body = new RequestBodyBuilder("Anchor.json")
 			.setParameter("shortId", ANCHOR_SHORT_ID_CREATING)
-			.setParameter("longId", ANCHOR_LONG_ID_CREATING)
+			.setParameter("macAddress", ANCHOR_MAC_CREATING)
 			.setParameter("name", "")
 			.setParameter("floorId", null)
 			.setParameter("x", null)
@@ -86,7 +87,7 @@ public class AnchorFacadeIT extends BaseIT {
 			.then().statusCode(HttpStatus.SC_OK)
 			.body(
 				"shortId", equalTo(ANCHOR_SHORT_ID_CREATING),
-				"longId", equalTo(ANCHOR_LONG_ID_CREATING),
+				"macAddress", equalTo(ANCHOR_MAC_CREATING),
 				"name", equalTo(""),
 				"floorId", equalTo(null),
 				"x", equalTo(null),
@@ -99,7 +100,7 @@ public class AnchorFacadeIT extends BaseIT {
 	public void shouldCreateNewAnchorWithoutName() {
 		String body = new RequestBodyBuilder("Anchor.json")
 			.setParameter("shortId", ANCHOR_SHORT_ID_CREATING)
-			.setParameter("longId", ANCHOR_LONG_ID_CREATING)
+			.setParameter("macAddress", ANCHOR_MAC_CREATING)
 			.setParameter("name", "")
 			.setParameter("floorId", FLOOR_EXISTING)
 			.setParameter("x", X)
@@ -113,7 +114,7 @@ public class AnchorFacadeIT extends BaseIT {
 			.then().statusCode(HttpStatus.SC_OK)
 			.body(
 				"shortId", equalTo(ANCHOR_SHORT_ID_CREATING),
-				"longId", equalTo(ANCHOR_LONG_ID_CREATING),
+				"macAddress", equalTo(ANCHOR_MAC_CREATING),
 				"name", equalTo(""),
 				"floorId", equalTo(FLOOR_EXISTING),
 				"x", equalTo(X),
@@ -127,7 +128,7 @@ public class AnchorFacadeIT extends BaseIT {
 		int nonexistingFloorId = 666;
 		String body = new RequestBodyBuilder("Anchor.json")
 			.setParameter("shortId", ANCHOR_SHORT_ID_CREATING)
-			.setParameter("longId", ANCHOR_LONG_ID_CREATING)
+			.setParameter("macAddress", ANCHOR_MAC_CREATING)
 			.setParameter("name", NAME)
 			.setParameter("floorId", nonexistingFloorId)
 			.setParameter("x", X)
@@ -142,34 +143,10 @@ public class AnchorFacadeIT extends BaseIT {
 	}
 
 	@Test
-	public void shouldNotCreateNewAnchorWithDuplicatedLongId() {
-		String body = new RequestBodyBuilder("Anchor.json")
-			.setParameter("shortId", ANCHOR_SHORT_ID_CREATING)
-			.setParameter("longId", ANCHOR_LONG_ID_EXISTING)
-			.setParameter("name", NAME)
-			.setParameter("floorId", FLOOR_EXISTING)
-			.setParameter("x", X)
-			.setParameter("y", Y)
-			.setParameter("verified", ANCHOR_NOT_VERIFIED)
-			.build();
-
-		ExtViolationResponse extViolationResponse = givenUser()
-			.body(body)
-			.when().post(ANCHOR_PATH)
-			.then().statusCode(HttpStatus.SC_BAD_REQUEST)
-			.extract()
-			.as(ExtViolationResponse.class);
-
-		assertThat(extViolationResponse.getError(), is(DB_VALIDATION_ERROR_NAME));
-		assertThat(extViolationResponse.getMessage(), is(CONSTRAINT_MESSAGE_003));
-		assertThat(extViolationResponse.getCode(), is(CONSTRAINT_CODE_003));
-	}
-
-	@Test
 	public void shouldNotCreateNewAnchorWithDuplicatedShortId() {
 		String body = new RequestBodyBuilder("Anchor.json")
 			.setParameter("shortId", ANCHOR_SHORT_ID_EXISTING)
-			.setParameter("longId", ANCHOR_LONG_ID_CREATING)
+			.setParameter("macAddress", ANCHOR_MAC_CREATING)
 			.setParameter("name", "")
 			.setParameter("floorId", FLOOR_EXISTING)
 			.setParameter("x", X)
@@ -193,7 +170,7 @@ public class AnchorFacadeIT extends BaseIT {
 	public void updateAnchor() {
 		String body = new RequestBodyBuilder("Anchor.json")
 			.setParameter("shortId", ANCHOR_SHORT_ID_EXISTING)
-			.setParameter("longId", ANCHOR_LONG_ID_EXISTING)
+			.setParameter("macAddress", ANCHOR_MAC_EXISTING)
 			.setParameter("name", NAME)
 			.setParameter("floorId", FLOOR_EXISTING)
 			.setParameter("x", X)
@@ -208,7 +185,7 @@ public class AnchorFacadeIT extends BaseIT {
 			.then().statusCode(HttpStatus.SC_OK)
 			.body(
 				"shortId", equalTo(ANCHOR_SHORT_ID_EXISTING),
-				"longId", equalTo(ANCHOR_LONG_ID_EXISTING),
+				"macAddress", equalTo(ANCHOR_MAC_EXISTING),
 				"name", equalTo(NAME),
 				"floorId", equalTo(FLOOR_EXISTING),
 				"x", equalTo(X),
@@ -221,7 +198,7 @@ public class AnchorFacadeIT extends BaseIT {
 	public void shouldNotUpdateNonexistingAnchor() {
 		String body = new RequestBodyBuilder("Anchor.json")
 			.setParameter("shortId", ANCHOR_SHORT_ID_EXISTING)
-			.setParameter("longId", ANCHOR_LONG_ID_EXISTING)
+			.setParameter("macAddress", ANCHOR_MAC_EXISTING)
 			.setParameter("name", NAME)
 			.setParameter("floorId", FLOOR_EXISTING)
 			.setParameter("x", X)
@@ -251,7 +228,7 @@ public class AnchorFacadeIT extends BaseIT {
 		Integer updatedAnchorId = 2;
 		String body = new RequestBodyBuilder("Anchor.json")
 			.setParameter("shortId", 40622)
-			.setParameter("longId", 93170459)
+			.setParameter("macAddress", 93170459)
 			.setParameter("name", NAME)
 			.setParameter("floorId", FLOOR_EXISTING)
 			.setParameter("x", X)
@@ -266,7 +243,7 @@ public class AnchorFacadeIT extends BaseIT {
 			.then().statusCode(HttpStatus.SC_OK)
 			.body(
 				"shortId", equalTo(40622),
-				"longId", equalTo(93170459),
+				"macAddress", equalTo("93170459"),
 				"name", equalTo(NAME),
 				"floorId", equalTo(FLOOR_EXISTING),
 				"x", equalTo(X),
@@ -279,7 +256,7 @@ public class AnchorFacadeIT extends BaseIT {
 	public void shouldRemoveFloorIdAndNameAndCoordinatesWhileUpdatingAnchor() {
 		String body = new RequestBodyBuilder("Anchor.json")
 			.setParameter("shortId", ANCHOR_SHORT_ID_EXISTING)
-			.setParameter("longId", ANCHOR_LONG_ID_EXISTING)
+			.setParameter("macAddress", ANCHOR_MAC_EXISTING)
 			.setParameter("name", "")
 			.setParameter("floorId", null)
 			.setParameter("x", null)
@@ -294,7 +271,7 @@ public class AnchorFacadeIT extends BaseIT {
 			.then().statusCode(HttpStatus.SC_OK)
 			.body(
 				"shortId", equalTo(ANCHOR_SHORT_ID_EXISTING),
-				"longId", equalTo(ANCHOR_LONG_ID_EXISTING),
+				"macAddress", equalTo(ANCHOR_MAC_EXISTING),
 				"name", equalTo(""),
 				"floorId", equalTo(null),
 				"x", equalTo(null),
@@ -350,10 +327,10 @@ public class AnchorFacadeIT extends BaseIT {
 			.then().statusCode(HttpStatus.SC_OK)
 			.body(
 				"id", equalTo(Arrays.asList(1, 2, 3, 8)),
-				"shortId", equalTo(Arrays.asList(ANCHOR_SHORT_ID_EXISTING, 222222, 333333, 999999)),
-				"longId", equalTo(Arrays.asList(ANCHOR_LONG_ID_EXISTING, 22222222, 33333333, 9090909090L)),
+				"shortId", equalTo(Arrays.asList(ANCHOR_SHORT_ID_EXISTING, 33000, 33001, 34999)),
+				"macAddress", equalTo(Arrays.asList(ANCHOR_MAC_EXISTING, null, null, null)),
 				"name", equalTo(Arrays.asList("LeftBottomAnchor", "TopRightAnchor", "BottomRightAnchor", "Sink")),
-				"floorId", equalTo(Arrays.asList(2, 2, 2, 2)),
+				"floorId", equalTo(Arrays.asList(1, 1, 1, 1)),
 				"x", equalTo(Arrays.asList(0, 500, 500, 0)),
 				"y", equalTo(Arrays.asList(500, 0, 500, 0)),
 				"verified", equalTo(Arrays.asList(true, true, true, true))
@@ -370,11 +347,10 @@ public class AnchorFacadeIT extends BaseIT {
 			.as(ViolationResponse.class);
 
 		assertThat(violationResponse.getError(), is(VALIDATION_ERROR_NAME));
-		assertThat(violationResponse.getViolations().size(), is(3));
+		assertThat(violationResponse.getViolations().size(), is(2));
 		assertThat(violationResponse.getViolations(),
 			containsInAnyOrder(
 				validViolation("shortId", "may not be null"),
-				validViolation("longId", "may not be null"),
 				validViolation("verified", "may not be null")
 			)
 		);
@@ -391,11 +367,10 @@ public class AnchorFacadeIT extends BaseIT {
 			.as(ViolationResponse.class);
 
 		assertThat(violationResponse.getError(), is(VALIDATION_ERROR_NAME));
-		assertThat(violationResponse.getViolations().size(), is(3));
+		assertThat(violationResponse.getViolations().size(), is(2));
 		assertThat(violationResponse.getViolations(),
 			containsInAnyOrder(
 				validViolation("shortId", "may not be null"),
-				validViolation("longId", "may not be null"),
 				validViolation("verified", "may not be null")
 			)
 		);

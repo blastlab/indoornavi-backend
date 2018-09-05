@@ -18,6 +18,8 @@
 		<delete tableName="tag"/>
 		<delete tableName="sink"/>
 		<delete tableName="anchor"/>
+		<delete tableName="uwb" />
+		<delete tableName="bluetooth" />
 		<delete tableName="device"/>
 		<delete tableName="floor"/>
 		<delete tableName="image"/>
@@ -34,6 +36,7 @@
 		<loadUpdateData tableName="permission" file="test/Permission.csv" primaryKey="id" relativeToChangelogFile="true" />
 		<loadUpdateData tableName="permission" file="test/navi-142/Permission.csv" primaryKey="id" relativeToChangelogFile="true" />
 		<loadUpdateData tableName="permission" file="test/navi-73/Permission.csv" primaryKey="id" relativeToChangelogFile="true" />
+		<loadUpdateData tableName="permission" file="test/navi-364/Permission.csv" primaryKey="id" relativeToChangelogFile="true" />
 	</changeSet>
 
 	<changeSet context="test" id="PermissionGroup" author="kgebert" runOnChange="true" labels="PermissionGroup" runAlways="true">
@@ -44,6 +47,7 @@
 		<loadData tableName="permissiongroup_permission" file="test/PermissionGroupPermission.csv" relativeToChangelogFile="true" />
 		<loadData tableName="permissiongroup_permission" file="test/navi-142/PermissionGroupPermission.csv" relativeToChangelogFile="true" />
 		<loadData tableName="permissiongroup_permission" file="test/navi-73/PermissionGroupPermission.csv" relativeToChangelogFile="true" />
+		<loadData tableName="permissiongroup_permission" file="test/navi-364/PermissionGroupPermission.csv" relativeToChangelogFile="true" />
 	</changeSet>
 
 	<changeSet context="test" id="User" author="kgebert" runOnChange="true" labels="User" runAlways="true">
@@ -76,6 +80,14 @@
 		<loadUpdateData tableName="device" file="test/Device.csv" primaryKey="id" relativeToChangelogFile="true">
 			<column name="verified" type="boolean" />
 		</loadUpdateData>
+	</changeSet>
+
+	<changeSet id="Bluetooth" author="kgebert" context="test" runOnChange="true" labels="Bluetooth" runAlways="true">
+		<loadUpdateData tableName="bluetooth" file="test/Bluetooth.csv" primaryKey="id" relativeToChangelogFile="true"/>
+	</changeSet>
+
+	<changeSet id="Uwb" author="kgebert" context="test" runOnChange="true" labels="Uwb" runAlways="true">
+		<loadUpdateData tableName="uwb" file="test/Uwb.csv" primaryKey="id" relativeToChangelogFile="true"/>
 	</changeSet>
 
 	<changeSet id="Anchor" author="pkuzmicki" context="test" runOnChange="true" labels="Anchor" runAlways="true">
