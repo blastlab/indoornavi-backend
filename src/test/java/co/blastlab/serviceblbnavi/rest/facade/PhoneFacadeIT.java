@@ -1,18 +1,18 @@
 package co.blastlab.serviceblbnavi.rest.facade;
 
-import co.blastlab.serviceblbnavi.dto.Point;
-import co.blastlab.serviceblbnavi.dto.phone.PhoneCoordinatesDto;
 import co.blastlab.serviceblbnavi.rest.facade.util.RequestBodyBuilder;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
 import liquibase.exception.LiquibaseException;
 import org.apache.http.HttpStatus;
+import org.json.simple.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.sql.SQLException;
 import java.util.Collections;
+import java.util.HashMap;
 
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
@@ -26,16 +26,27 @@ public class PhoneFacadeIT extends BaseIT {
 	}
 
 	private ObjectMapper objectMapper = new ObjectMapper();
-	private PhoneCoordinatesDto phoneCoordinatesDto_1;
-	private PhoneCoordinatesDto phoneCoordinatesDto_2;
+	private JSONObject phoneCoordinatesJSON_1;
+	private JSONObject phoneCoordinatesJSON_2;
 
 	@Before
 	public void setUp() throws LiquibaseException, SQLException, ClassNotFoundException {
 		super.setUp();
-		phoneCoordinatesDto_1 = new PhoneCoordinatesDto();
-		phoneCoordinatesDto_1.setPoint(new Point(10, 20));
-		phoneCoordinatesDto_2 = new PhoneCoordinatesDto();
-		phoneCoordinatesDto_2.setPoint(new Point(1, 2));
+		JSONObject pointJSON_1 = new JSONObject(new HashMap<String, Object>() {{
+			this.put("x", 10);
+			this.put("y", 20);
+		}});
+		phoneCoordinatesJSON_1 = new JSONObject(new HashMap<String, Object>() {{
+			this.put("point", pointJSON_1);
+		}});
+
+		JSONObject pointJSON_2 = new JSONObject(new HashMap<String, Object>() {{
+			this.put("x", 1);
+			this.put("y", 2);
+		}});
+		phoneCoordinatesJSON_2 = new JSONObject(new HashMap<String, Object>() {{
+			this.put("point", pointJSON_2);
+		}});
 	}
 
 	@Test
@@ -94,9 +105,9 @@ public class PhoneFacadeIT extends BaseIT {
 	@Test
 	public void saveCoordinatesWithJustOneOnTheList() throws JsonProcessingException {
 		// given
-		phoneCoordinatesDto_1.setFloorId(1L);
-		phoneCoordinatesDto_1.setPhoneId(1L);
-		String body = objectMapper.writeValueAsString(Collections.singletonList(phoneCoordinatesDto_1));
+		phoneCoordinatesJSON_1.put("floorId", 1L);
+		phoneCoordinatesJSON_1.put("phoneId", 1L);
+		String body = objectMapper.writeValueAsString(Collections.singletonList(phoneCoordinatesJSON_1));
 
 		// when
 		givenUser()
@@ -116,11 +127,11 @@ public class PhoneFacadeIT extends BaseIT {
 	@Test
 	public void saveCoordinatesWithMoreThanOneOnTheList() throws JsonProcessingException {
 		// given
-		phoneCoordinatesDto_1.setFloorId(1L);
-		phoneCoordinatesDto_1.setPhoneId(1L);
-		phoneCoordinatesDto_2.setFloorId(5L);
-		phoneCoordinatesDto_2.setPhoneId(2L);
-		String body = objectMapper.writeValueAsString(ImmutableList.of(phoneCoordinatesDto_1, phoneCoordinatesDto_2));
+		phoneCoordinatesJSON_1.put("floorId", 1L);
+		phoneCoordinatesJSON_1.put("phoneId", 1L);
+		phoneCoordinatesJSON_2.put("floorId", 5L);
+		phoneCoordinatesJSON_2.put("phoneId", 2L);
+		String body = objectMapper.writeValueAsString(ImmutableList.of(phoneCoordinatesJSON_1, phoneCoordinatesJSON_2));
 
 		// when
 		givenUser()
@@ -144,9 +155,9 @@ public class PhoneFacadeIT extends BaseIT {
 	@Test
 	public void saveCoordinatesToFloorThatDoesNotExist() throws JsonProcessingException {
 		// given
-		phoneCoordinatesDto_1.setFloorId(190L);
-		phoneCoordinatesDto_1.setPhoneId(1L);
-		String body = objectMapper.writeValueAsString(Collections.singletonList(phoneCoordinatesDto_1));
+		phoneCoordinatesJSON_1.put("floorId", 190L);
+		phoneCoordinatesJSON_1.put("phoneId", 1L);
+		String body = objectMapper.writeValueAsString(Collections.singletonList(phoneCoordinatesJSON_1));
 
 		// when
 		givenUser()
@@ -161,9 +172,9 @@ public class PhoneFacadeIT extends BaseIT {
 	@Test
 	public void saveCoordinatesOfPhoneThatDoesNotExist() throws JsonProcessingException {
 		// given
-		phoneCoordinatesDto_1.setFloorId(1L);
-		phoneCoordinatesDto_1.setPhoneId(100L);
-		String body = objectMapper.writeValueAsString(Collections.singletonList(phoneCoordinatesDto_1));
+		phoneCoordinatesJSON_1.put("floorId", 1L);
+		phoneCoordinatesJSON_1.put("phoneId", 100L);
+		String body = objectMapper.writeValueAsString(Collections.singletonList(phoneCoordinatesJSON_1));
 
 		// when
 		givenUser()
