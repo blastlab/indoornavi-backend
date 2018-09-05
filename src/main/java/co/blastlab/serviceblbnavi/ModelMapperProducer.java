@@ -3,9 +3,9 @@ package co.blastlab.serviceblbnavi;
 import org.modelmapper.ModelMapper;
 
 import javax.enterprise.inject.Produces;
-import javax.faces.bean.SessionScoped;
+import javax.faces.bean.ApplicationScoped;
 
-@SessionScoped
+@ApplicationScoped
 public class ModelMapperProducer {
 
 	@Produces
