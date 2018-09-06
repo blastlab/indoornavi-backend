@@ -3,7 +3,6 @@ package co.blastlab.serviceblbnavi.rest.facade.tag;
 import co.blastlab.serviceblbnavi.dao.repository.TagRepository;
 import co.blastlab.serviceblbnavi.domain.Tag;
 import co.blastlab.serviceblbnavi.dto.tag.TagDto;
-import co.blastlab.serviceblbnavi.rest.facade.device.DeviceBean;
 import co.blastlab.serviceblbnavi.utils.Logger;
 import org.apache.http.HttpStatus;
 
@@ -16,7 +15,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Stateless
-public class TagBean extends DeviceBean implements TagFacade {
+public class TagBean implements TagFacade {
 
 	@Inject
 	private Logger logger;
@@ -29,13 +28,10 @@ public class TagBean extends DeviceBean implements TagFacade {
 		logger.debug("Trying to create tag {}", tag);
 		Tag tagEntity = new Tag();
 		tagEntity.setShortId(tag.getShortId());
-		tagEntity.setLongId(tag.getLongId());
+		tagEntity.setMac(tag.getMacAddress());
 		tagEntity.setName(tag.getName());
 		tagEntity.setVerified(tag.getVerified());
 
-		if (tag.getFloorId() != null) {
-			super.setFloor(tag, tagEntity);
-		}
 		tagEntity = tagRepository.save(tagEntity);
 		logger.debug("Tag created");
 		return new TagDto(tagEntity);
@@ -48,15 +44,10 @@ public class TagBean extends DeviceBean implements TagFacade {
 		if (tagOptional.isPresent()){
 			Tag tagEntity = tagOptional.get();
 			tagEntity.setShortId(tag.getShortId());
-			tagEntity.setLongId(tag.getLongId());
+			tagEntity.setMac(tag.getMacAddress());
 			tagEntity.setName(tag.getName());
 			tagEntity.setVerified(tag.getVerified());
 
-			if (tag.getFloorId() != null) {
-				super.setFloor(tag, tagEntity);
-			} else {
-				tagEntity.setFloor(null);
-			}
 			tagRepository.save(tagEntity);
 			logger.debug("Tag updated");
 			return new TagDto(tagEntity);

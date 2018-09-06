@@ -15,7 +15,7 @@ public class PublicationFacadeIT extends BaseIT {
 
 	@Override
 	public ImmutableList<String> getAdditionalLabels() {
-		return ImmutableList.of("Floor", "Building", "Tag", "Device", "Publication", "Publication_Tag", "Publication_User", "Publication_Floor");
+		return ImmutableList.of("Floor", "Building", "Tag", "Device", "Uwb", "Publication", "Publication_Tag", "Publication_User", "Publication_Floor");
 	}
 
 	@Test
@@ -38,11 +38,12 @@ public class PublicationFacadeIT extends BaseIT {
 
 	@Test
 	public void update() {
+		TagDto tag1 = new TagDto();
+		tag1.setId(4L);
+		TagDto tag2 = new TagDto();
+		tag2.setId(5L);
 		String body = new RequestBodyBuilder("Publication.json")
-			.setParameter("tags", ImmutableList.of(
-				new TagDto(4L, null, null, null, null, null, null),
-				new TagDto(5L, null, null, null, null, null, null))
-			)
+			.setParameter("tags", ImmutableList.of(tag1, tag2))
 			.setParameter("users", ImmutableList.of())
 			.build();
 

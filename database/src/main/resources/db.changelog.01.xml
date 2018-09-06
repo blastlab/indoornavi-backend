@@ -614,4 +614,115 @@
 			<column name="hMin" type="integer"/>
 		</addColumn>
 	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-364-1">
+		<createTable tableName="Bluetooth">
+			<column name="major" type="INT"/>
+			<column name="minor" type="INT"/>
+			<column name="power" type="SMALLINT"/>
+			<column name="id" type="BIGINT">
+				<constraints nullable="false"/>
+			</column>
+		</createTable>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-364-2">
+		<createTable tableName="Uwb">
+			<column name="commitHash" type="VARCHAR(255)"/>
+			<column name="major" type="INT"/>
+			<column name="minor" type="INT"/>
+			<column name="firmwarePartition" type="INT"/>
+			<column name="shortId" type="INT"/>
+			<column name="id" type="BIGINT">
+				<constraints nullable="false"/>
+			</column>
+		</createTable>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-364-3">
+		<addColumn tableName="Anchor">
+			<column name="floor_id" type="bigint"/>
+		</addColumn>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-364-4">
+		<addColumn tableName="Device">
+			<column name="mac" type="varchar(255)"/>
+		</addColumn>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-364-5">
+		<addPrimaryKey columnNames="id" constraintName="BluetoothPK" tableName="Bluetooth"/>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-364-6">
+		<addPrimaryKey columnNames="id" constraintName="UwbPK" tableName="Uwb"/>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-364-7">
+		<addUniqueConstraint columnNames="major" constraintName="UC_BLUETOOTHMAJOR_COL" tableName="Bluetooth"/>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-364-8">
+		<addUniqueConstraint columnNames="minor" constraintName="UC_BLUETOOTHMINOR_COL" tableName="Bluetooth"/>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-364-9">
+		<addUniqueConstraint columnNames="mac" constraintName="UC_DEVICEMAC_COL" tableName="Device"/>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-364-10">
+		<addUniqueConstraint columnNames="shortId" constraintName="UC_UWBSHORTID_COL" tableName="Uwb"/>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-364-11">
+		<addForeignKeyConstraint baseColumnNames="id" baseTableName="Tag" constraintName="FK_Tag_Uwb" referencedColumnNames="id" referencedTableName="Uwb"/>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-364-12">
+		<addForeignKeyConstraint baseColumnNames="id" baseTableName="Anchor" constraintName="FK_Anchor_UWb" referencedColumnNames="id" referencedTableName="Uwb"/>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-364-13">
+		<addForeignKeyConstraint onDelete="SET NULL" baseColumnNames="floor_id" baseTableName="Anchor" constraintName="FK_Anchor_Floor" referencedColumnNames="id" referencedTableName="Floor"/>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-364-14">
+		<addForeignKeyConstraint baseColumnNames="id" baseTableName="Uwb" constraintName="FK_Uwb_Device" referencedColumnNames="id" referencedTableName="Device"/>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-364-15">
+		<addForeignKeyConstraint baseColumnNames="id" baseTableName="Bluetooth" constraintName="FK_Bluetooth_Device" referencedColumnNames="id" referencedTableName="Device"/>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-364-16">
+		<dropForeignKeyConstraint baseTableName="anchor" constraintName="Anchor_Device_Id"/>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-364-17">
+		<dropForeignKeyConstraint baseTableName="device" constraintName="Device_Floor_Id"/>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-364-18">
+		<dropForeignKeyConstraint baseTableName="tag" constraintName="Tag_Device_Id"/>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-364-19">
+		<dropUniqueConstraint constraintName="unique_longId" tableName="device"/>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-364-20">
+		<dropUniqueConstraint constraintName="unique_shortId" tableName="device"/>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-364-21">
+		<dropColumn columnName="commitHash" tableName="device"/>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-364-22">
+		<dropColumn columnName="firmwarePartition" tableName="device"/>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-364-23">
+		<dropColumn columnName="floor_id" tableName="device"/>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-364-24">
+		<dropColumn columnName="longId" tableName="device"/>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-364-25">
+		<dropColumn columnName="major" tableName="device"/>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-364-26">
+		<dropColumn columnName="minor" tableName="device"/>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-364-27">
+		<dropColumn columnName="shortId" tableName="device"/>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-374-1">
+		<createTable tableName="Phone">
+			<column autoIncrement="true" name="id" type="BIGINT">
+				<constraints primaryKey="true" primaryKeyName="PhonePK"/>
+			</column>
+			<column name="creationDate" type="datetime"/>
+			<column name="modificationDate" type="datetime"/>
+			<column name="userData" type="VARCHAR(255)"/>
+		</createTable>
+	</changeSet>
 </databaseChangeLog>

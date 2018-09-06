@@ -4,7 +4,7 @@ import co.blastlab.serviceblbnavi.dao.repository.AnchorRepository;
 import co.blastlab.serviceblbnavi.domain.Anchor;
 import co.blastlab.serviceblbnavi.domain.Sink;
 import co.blastlab.serviceblbnavi.dto.anchor.AnchorDto;
-import co.blastlab.serviceblbnavi.rest.facade.device.DeviceBean;
+import co.blastlab.serviceblbnavi.service.AnchorService;
 import co.blastlab.serviceblbnavi.utils.Logger;
 import org.apache.http.HttpStatus;
 
@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Stateless
-public class AnchorBean extends DeviceBean implements AnchorFacade {
+public class AnchorBean implements AnchorFacade {
 
 	@Inject
 	private Logger logger;
@@ -25,17 +25,20 @@ public class AnchorBean extends DeviceBean implements AnchorFacade {
 	@Inject
 	private AnchorRepository anchorRepository;
 
+	@Inject
+	private AnchorService anchorService;
+
 	public AnchorDto create(AnchorDto anchor) {
 		logger.debug("Trying to create anchor {}", anchor);
 		Anchor anchorEntity = new Anchor();
 		anchorEntity.setShortId(anchor.getShortId());
-		anchorEntity.setLongId(anchor.getLongId());
+		anchorEntity.setMac(anchor.getMacAddress());
 		anchorEntity.setName(anchor.getName());
 		anchorEntity.setX(anchor.getX());
 		anchorEntity.setY(anchor.getY());
 
 		if (anchor.getFloorId() != null) {
-			super.setFloor(anchor, anchorEntity);
+			anchorService.setFloor(anchor, anchorEntity);
 		}
 		anchorRepository.save(anchorEntity);
 		logger.debug("Anchor created");
@@ -51,11 +54,11 @@ public class AnchorBean extends DeviceBean implements AnchorFacade {
 			anchorEntity.setY(anchor.getY());
 			anchorEntity.setName(anchor.getName());
 			anchorEntity.setVerified(anchor.getVerified());
-			anchorEntity.setLongId(anchor.getLongId());
+			anchorEntity.setMac(anchor.getMacAddress());
 			anchorEntity.setShortId(anchor.getShortId());
 
 			if (anchor.getFloorId() != null) {
-				super.setFloor(anchor, anchorEntity);
+				anchorService.setFloor(anchor, anchorEntity);
 			} else {
 				anchorEntity.setFloor(null);
 			}
