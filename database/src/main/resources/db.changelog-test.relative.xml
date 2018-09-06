@@ -30,6 +30,7 @@
 		<delete tableName="user_permissiongroup"/>
 		<delete tableName="permissiongroup"/>
 		<delete tableName="user"/>
+		<delete tableName="phone"/>
 	</changeSet>
 
 	<changeSet context="test" id="Permission" author="kgebert" runOnChange="true" labels="Permission" runAlways="true">
@@ -150,5 +151,9 @@
 		<loadData tableName="coordinates" file="test/Coordinates.csv" relativeToChangelogFile="true">
 			<column name="creation_date" type="DATE" />
 		</loadData>
+	</changeSet>
+
+	<changeSet id="Phone" author="kgebert" context="test" runOnChange="true" labels="Phone" runAlways="true">
+		<loadData tableName="phone" file="test/Phone.csv" relativeToChangelogFile="true" />
 	</changeSet>
 </databaseChangeLog>
