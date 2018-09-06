@@ -18,6 +18,7 @@
 		<delete tableName="tag"/>
 		<delete tableName="sink"/>
 		<delete tableName="anchor"/>
+		<delete tableName="uwb"/>
 		<delete tableName="device"/>
 		<delete tableName="floor"/>
 		<delete tableName="image"/>
@@ -45,6 +46,14 @@
 		<loadUpdateData tableName="device" file="test/Device.csv" primaryKey="id">
 			<column name="verified" type="boolean" />
 		</loadUpdateData>
+	</changeSet>
+
+	<changeSet id="Bluetooth" author="kgebert" context="test" runOnChange="true" labels="Bluetooth" runAlways="true">
+		<loadUpdateData tableName="bluetooth" file="test/Bluetooth.csv" primaryKey="id"/>
+	</changeSet>
+
+	<changeSet id="Uwb" author="kgebert" context="test" runOnChange="true" labels="Uwb" runAlways="true">
+		<loadUpdateData tableName="uwb" file="test/Uwb.csv" primaryKey="id"/>
 	</changeSet>
 
 	<changeSet id="Anchor" author="pkuzmicki" context="test" runOnChange="true" labels="Anchor" runAlways="true">

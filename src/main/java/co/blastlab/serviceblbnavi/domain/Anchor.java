@@ -17,13 +17,16 @@ import javax.persistence.*;
 	)
 })
 @ToString(callSuper = true)
-public class Anchor extends Device {
+public class Anchor extends Uwb {
 
 	private Integer x;
 
 	private Integer y;
 
 	private Integer z;
+
+	@ManyToOne
+	private Floor floor;
 
 	@ManyToOne
 	private Sink sink;
