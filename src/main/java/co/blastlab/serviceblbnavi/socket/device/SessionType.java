@@ -5,7 +5,8 @@ import lombok.Getter;
 enum SessionType {
 	ANCHOR("anchors"),
 	TAG("tags"),
-	SINK("sinks");
+	SINK("sinks"),
+	BLUETOOTH("bluetooths");
 
 	@Getter
 	private final String name;

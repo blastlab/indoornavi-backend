@@ -17,7 +17,7 @@ import java.util.List;
 )
 @EqualsAndHashCode(callSuper = true)
 @Cacheable
-@ToString(exclude = "devices")
+@ToString(exclude = "anchors")
 public class Floor extends TrackedEntity {
 
 	private Integer level;
@@ -29,7 +29,7 @@ public class Floor extends TrackedEntity {
 
 	@OneToMany(mappedBy = "floor")
 	@OrderBy("name")
-	private List<Device> devices = new ArrayList<>();
+	private List<Anchor> anchors = new ArrayList<>();
 
 	@OneToOne
 	private Image image;

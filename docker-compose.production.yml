@@ -11,6 +11,9 @@ services:
       TZ: Europe/Warsaw
     container_name:
       db
+    volumes:
+      - dbvolume1:/var/lib/mysql
+      - dbvolume2:/var/lib/mariadb
 
 
   liquibase:
@@ -22,6 +25,7 @@ services:
       SCHEMA: navi
       USER: root
       PASSWORD: ""
+      CONTEXTS: production
     volumes:
       - ./database/src/main/resources:/liquibase/changelog
     entrypoint: ["wait-for-it", "db:3306", "-t", "0", "--", "/run.sh"]
@@ -43,9 +47,9 @@ services:
       TZ: Europe/Warsaw
       APP_ENVIRONMENT: production
       APP_DB_HOST: db
-#      APP_LOG_LEVEL: TRACE # will log all actions taken by user and hardware communication
+      APP_LOG_LEVEL: TRACE # will log all actions taken by user and hardware communication
 #      APP_LOG_LEVEL: DEBUG # will log all actions taken by user
-      APP_LOG_LEVEL: INFO # will only log most important messages
+#      APP_LOG_LEVEL: INFO # will only log most important messages
     entrypoint: ["wait-for-it", "liquibase:80", "-t", "0", "--", "/start-server.sh"]
 
 
@@ -62,3 +66,6 @@ services:
 volumes:
   # For Liquibase container.
   m2:
+  # For mariadb data
+  dbvolume1:
+  dbvolume2:
