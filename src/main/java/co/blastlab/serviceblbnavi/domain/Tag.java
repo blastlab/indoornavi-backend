@@ -12,6 +12,6 @@ import javax.persistence.Entity;
 @Setter
 @Cacheable
 @ToString
-public class Tag extends Device {
+public class Tag extends Uwb {
 
 }

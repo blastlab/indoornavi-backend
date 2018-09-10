@@ -3,7 +3,6 @@ package co.blastlab.serviceblbnavi.rest.facade.sink;
 import co.blastlab.serviceblbnavi.dao.repository.AnchorRepository;
 import co.blastlab.serviceblbnavi.dao.repository.FloorRepository;
 import co.blastlab.serviceblbnavi.dao.repository.SinkRepository;
-import co.blastlab.serviceblbnavi.domain.Anchor;
 import co.blastlab.serviceblbnavi.domain.Sink;
 import co.blastlab.serviceblbnavi.dto.sink.SinkDto;
 import co.blastlab.serviceblbnavi.utils.Logger;
@@ -13,7 +12,6 @@ import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
 import javax.ws.rs.core.Response;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -63,14 +61,13 @@ public class SinkBean implements SinkFacade {
 	private SinkDto createOrUpdate(Sink sinkEntity, SinkDto sink) {
 		sinkEntity.setName(sink.getName());
 		sinkEntity.setShortId(sink.getShortId());
-		sinkEntity.setLongId(sink.getLongId());
+		sinkEntity.setMac(sink.getMacAddress());
 		sinkEntity.setVerified(sink.getVerified());
 		sinkEntity.setFloor(sink.getFloorId() != null ? floorRepository.findOptionalById(sink.getFloorId()).orElseThrow(EntityNotFoundException::new) : null);
-		List<Anchor> anchors = new ArrayList<>();
+		sinkEntity.getAnchors().clear();
 		sink.getAnchors().forEach(anchorDto -> {
-			anchors.add(anchorRepository.findById(anchorDto.getId()).orElseThrow(EntityNotFoundException::new));
+			sinkEntity.getAnchors().add(anchorRepository.findById(anchorDto.getId()).orElseThrow(EntityNotFoundException::new));
 		});
-		sinkEntity.setAnchors(anchors);
 		sinkEntity.setConfigured(sink.getConfigured() != null ? sink.getConfigured() : false);
 		sinkRepository.save(sinkEntity);
 		logger.debug("Sink created/updated");

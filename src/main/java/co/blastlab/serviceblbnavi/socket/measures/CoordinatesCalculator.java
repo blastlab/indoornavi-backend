@@ -5,8 +5,6 @@ import co.blastlab.serviceblbnavi.domain.Anchor;
 import co.blastlab.serviceblbnavi.dto.Point;
 import co.blastlab.serviceblbnavi.dto.report.CoordinatesDto;
 import co.blastlab.serviceblbnavi.utils.Logger;
-import com.google.common.collect.HashBasedTable;
-import com.google.common.collect.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,11 +18,11 @@ import java.util.*;
 @Singleton
 public class CoordinatesCalculator {
 
-	// <tagId, anchorShortId, measure>
-	private Table<Integer, Integer, List<Measure>> measureTable = HashBasedTable.create();
+	// tag short id, anchor short id, measure list
+	private Map<Integer, Map<Integer, List<Measure>>> measureStorage = new LinkedHashMap<>();
 
-	// 30 minutes
-	private final static long OLD_DATA_IN_MILISECONDS = 1_800_000;
+	// 10 seconds
+	private final static long OLD_DATA_IN_MILISECONDS = 10_000;
 
 	private Map<Integer, PointAndTime> previousCoorinates = new HashMap<>();
 
@@ -35,6 +33,8 @@ public class CoordinatesCalculator {
 	private AnchorRepository anchorRepository;
 
 	public Optional<CoordinatesDto> calculateTagPosition(int firstDeviceId, int secondDeviceId, int distance) {
+		logger.trace("Measure storage tags: {}", measureStorage.keySet().size());
+
 		Integer tagId = getTagId(firstDeviceId, secondDeviceId);
 		Integer anchorId = getAnchorId(firstDeviceId, secondDeviceId);
 		if (tagId == null || anchorId == null) {
@@ -50,6 +50,8 @@ public class CoordinatesCalculator {
 			return Optional.empty();
 		}
 
+		logger.trace("Connected anchors: {}", connectedAnchors.size());
+
 		Set<Pair<AnchorDistance, AnchorDistance>> pairs = getAnchorDistancePairs(connectedAnchors, tagId);
 		List<Point> intersectionPoints = new ArrayList<>();
 		int validAnchorsCount = 0;
@@ -59,12 +61,15 @@ public class CoordinatesCalculator {
 			if (!left.isPresent() || !right.isPresent()) {
 				continue;
 			}
+
 			validAnchorsCount++;
 			intersectionPoints.addAll(IntersectionsCalculator.getIntersections(
 				left.get(), pair.getLeft().getDistance(),
 				right.get(), pair.getRight().getDistance()
 			));
 		}
+
+		logger.trace("Anchor pairs: {}", pairs.size());
 
 		if (validAnchorsCount < 3) {
 			logger.trace(String.format("Not enough valid anchors to calculate position. Currently valid anchors: %s", validAnchorsCount));
@@ -73,6 +78,10 @@ public class CoordinatesCalculator {
 
 		List<Double> intersectionPointsDistance = IntersectionsCalculator.calculateSumDistanceBetweenIntersectionPoints(intersectionPoints);
 		Double thres = calculateThres(intersectionPointsDistance, validAnchorsCount);
+
+		logger.trace("Thres calculated: {}", thres);
+		logger.trace("Intersection points found: {}", intersectionPoints.size());
+
 		int x = 0, y = 0, j = 0;
 		for (int ip = 0; ip < intersectionPoints.size(); ++ip) {
 			if (intersectionPointsDistance.get(ip) <= thres) {
@@ -83,6 +92,8 @@ public class CoordinatesCalculator {
 		}
 		x /= j;
 		y /= j;
+
+		logger.trace("Current position: X: {}, Y: {}", x, y);
 
 		Optional<PointAndTime> previousPoint = Optional.ofNullable(previousCoorinates.get(tagId));
 		Long floorId = null;
@@ -122,27 +133,6 @@ public class CoordinatesCalculator {
 	}
 
 	/**
-	 * Remove old data, older than OLD_DATA_IN_MILISECONDS
-	 */
-	public void cleanTables() {
-		long now = new Date().getTime();
-
-		Iterator<Table.Cell<Integer, Integer, List<Measure>>> measureIterator = measureTable.cellSet().iterator();
-
-		measureIterator.forEachRemaining(cell -> {
-			cell.getValue().removeIf(measure -> new Date((now - OLD_DATA_IN_MILISECONDS)).after(new Date(measure.getTimestamp())));
-		});
-
-		Iterator<Map.Entry<Integer, PointAndTime>> pointsIterator = previousCoorinates.entrySet().iterator();
-
-		pointsIterator.forEachRemaining(point -> {
-			if (new Date((now - OLD_DATA_IN_MILISECONDS)).after(new Date(point.getValue().getTimestamp()))) {
-				pointsIterator.remove();
-			}
-		});
-	}
-
-	/**
 	 * Choose tag id from two devices ids. Tags have id lower than 32767.
 	 *
 	 * @param firstDeviceId id of the first device
@@ -175,28 +165,51 @@ public class CoordinatesCalculator {
 	}
 
 	private void setConnection(int tagId, int anchorId, double distance) {
-		if (measureTable.contains(tagId, anchorId)) {
-			Measure measure = new Measure(distance, new Date().getTime());
-			if (measureTable.get(tagId, anchorId).size() >= 5) {
-				measureTable.get(tagId, anchorId).remove(0);
+		long now = new Date().getTime();
+		if (measureStorage.containsKey(tagId)) {
+			Map<Integer, List<Measure>> anchorsMeasures = measureStorage.get(tagId);
+			if (anchorsMeasures.containsKey(anchorId)) {
+				List<Measure> measures = anchorsMeasures.get(anchorId);
+				measures.add(new Measure(distance, now));
+			} else {
+				anchorsMeasures.put(anchorId, new LinkedList<>(Collections.singletonList(new Measure(distance, now))));
 			}
-			measureTable.get(tagId, anchorId).add(measure);
 		} else {
-			measureTable.put(tagId, anchorId, new ArrayList<>(Collections.singletonList(new Measure(distance, new Date().getTime()))));
+			Map<Integer, List<Measure>> anchorsMeasures = new LinkedHashMap<>();
+			anchorsMeasures.put(anchorId, new LinkedList<>(Collections.singletonList(new Measure(distance, now))));
+			measureStorage.put(tagId, anchorsMeasures);
 		}
 	}
 
+	private void cleanOldData() {
+		long now = new Date().getTime();
+		measureStorage.entrySet()
+			.removeIf(tagEntry -> tagEntry.getValue().entrySet()
+				.removeIf(anchorEntry -> anchorEntry.getValue()
+					.removeIf(measure -> new Date((now - OLD_DATA_IN_MILISECONDS)).after(new Date(measure.getTimestamp())))
+				)
+			);
+	}
+
 	private Set<Integer> getConnectedAnchors(Integer tagId) {
+		this.cleanOldData();
 		Set<Integer> connectedAnchors = new HashSet<>();
-		if (measureTable.containsRow(tagId)) {
-			Map<Integer, List<Measure>> row = measureTable.row(tagId);
-			connectedAnchors = row.keySet();
+		if (measureStorage.containsKey(tagId)) {
+			connectedAnchors.addAll(measureStorage.get(tagId).keySet());
 		}
 		return connectedAnchors;
 	}
 
 	private Double getDistance(Integer tagId, Integer anchorId) {
-		return measureTable.get(tagId, anchorId).stream().mapToDouble(Measure::getDistance).sum() / measureTable.get(tagId, anchorId).size();
+		Double meanDistance = 0d;
+		if (measureStorage.containsKey(tagId)) {
+			Map<Integer, List<Measure>> anchorsMeasures = measureStorage.get(tagId);
+			if (anchorsMeasures.containsKey(anchorId)) {
+				List<Measure> measures = anchorsMeasures.get(anchorId);
+				meanDistance = measures.stream().mapToDouble(Measure::getDistance).sum() / measures.size();
+			}
+		}
+		return meanDistance;
 	}
 
 	private Set<Pair<AnchorDistance, AnchorDistance>> getAnchorDistancePairs(Set<Integer> connectedAnchors, Integer tagId) {

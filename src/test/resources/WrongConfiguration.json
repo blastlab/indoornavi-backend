@@ -1,15 +1,13 @@
 {
 	"floorId": 1,
 	"data": {
-		"anchors": [
+		"sinks": [
 			{
 				"shortId": 999777
 			},
 			{
 				"shortId": 1
 			}
-		],
-		"sinks": [
 		],
 		"scale": {
 			"start": {

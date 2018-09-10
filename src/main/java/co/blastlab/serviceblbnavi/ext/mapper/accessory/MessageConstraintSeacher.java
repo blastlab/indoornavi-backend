@@ -11,7 +11,7 @@ public class MessageConstraintSeacher {
 			case "unique_level_building_id":
 				code = MessagePack.DB_001;
 				break;
-			case "unique_shortId":
+			case "UC_UWBSHORTID_COL":
 				code = MessagePack.DB_002;
 				break;
 			case "unique_longId":
