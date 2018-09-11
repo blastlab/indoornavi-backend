@@ -725,4 +725,44 @@
 			<column name="userData" type="VARCHAR(255)"/>
 		</createTable>
 	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-376-1">
+		<createTable tableName="PhoneCoordinates">
+			<column name="id" type="BIGINT">
+				<constraints nullable="false"/>
+			</column>
+			<column name="phone_id" type="BIGINT"/>
+		</createTable>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-376-2">
+		<createTable tableName="UwbCoordinates">
+			<column name="id" type="BIGINT">
+				<constraints nullable="false"/>
+			</column>
+			<column name="tag_id" type="BIGINT"/>
+		</createTable>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-376-3">
+		<addPrimaryKey columnNames="id" constraintName="PhoneCoordinatesPK" tableName="PhoneCoordinates"/>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-376-4">
+		<addPrimaryKey columnNames="id" constraintName="UwbCoordinatesPK" tableName="UwbCoordinates"/>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-376-5">
+		<addForeignKeyConstraint baseColumnNames="tag_id" baseTableName="UwbCoordinates" constraintName="FK_UwbCoordinates_Tag" referencedColumnNames="id" referencedTableName="Tag"/>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-376-6">
+		<addForeignKeyConstraint baseColumnNames="phone_id" baseTableName="PhoneCoordinates" constraintName="FK_PhoneCoordinates_Phone" referencedColumnNames="id" referencedTableName="Phone"/>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-376-7">
+		<addForeignKeyConstraint baseColumnNames="id" baseTableName="PhoneCoordinates" constraintName="FK_PhoneCoordinates_Coordinates" referencedColumnNames="id" referencedTableName="Coordinates"/>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-376-8">
+		<addForeignKeyConstraint baseColumnNames="id" baseTableName="UwbCoordinates" constraintName="FK_UwbCoordinates_Coordinates" referencedColumnNames="id" referencedTableName="Coordinates"/>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-376-9">
+		<dropForeignKeyConstraint baseTableName="coordinates" constraintName="FK_Coordiantes_Tag"/>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-376-10">
+		<dropColumn columnName="tag_id" tableName="coordinates"/>
+	</changeSet>
 </databaseChangeLog>

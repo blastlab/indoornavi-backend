@@ -1,11 +1,11 @@
 package co.blastlab.serviceblbnavi.rest.facade.report;
 
 import co.blastlab.serviceblbnavi.dao.repository.AreaRepository;
-import co.blastlab.serviceblbnavi.dao.repository.CoordinatesRepository;
+import co.blastlab.serviceblbnavi.dao.repository.UwbCoordinatesRepository;
 import co.blastlab.serviceblbnavi.domain.Area;
 import co.blastlab.serviceblbnavi.domain.AreaConfiguration;
-import co.blastlab.serviceblbnavi.dto.report.CoordinatesDto;
 import co.blastlab.serviceblbnavi.dto.report.ReportFilterDto;
+import co.blastlab.serviceblbnavi.dto.report.UwbCoordinatesDto;
 import co.blastlab.serviceblbnavi.socket.area.AreaEvent;
 import co.blastlab.serviceblbnavi.utils.Logger;
 import com.google.common.collect.Range;
@@ -26,13 +26,13 @@ public class ReportBean implements ReportFacade {
 	private Logger logger;
 
 	@Inject
-	private CoordinatesRepository coordinatesRepository;
+	private UwbCoordinatesRepository coordinatesRepository;
 
 	@Inject
 	private AreaRepository areaRepository;
 
 	@Override
-	public List<CoordinatesDto> getCoordinates(ReportFilterDto filter) {
+	public List<UwbCoordinatesDto> getCoordinates(ReportFilterDto filter) {
 		logger.debug("Trying to retrive coordinates in date range {} - {}", filter.getFrom(), filter.getTo());
 		LocalDateTime from = filter.getFrom() != null ? filter.getFrom() : LocalDateTime.ofInstant(new Date().toInstant(), ZoneId.systemDefault()).minusYears(50);
 		LocalDateTime to = filter.getTo() != null ? filter.getTo() : LocalDateTime.ofInstant(new Date().toInstant(), ZoneId.systemDefault());
@@ -41,7 +41,7 @@ public class ReportBean implements ReportFacade {
 		}
 		Range<LocalDateTime> range = Range.openClosed(from, to);
 		return coordinatesRepository.findByFloorIdAndInRange(filter.getFloorId(), range)
-			.stream().map(CoordinatesDto::new).collect(Collectors.toList());
+			.stream().map(UwbCoordinatesDto::new).collect(Collectors.toList());
 	}
 
 	@Override
@@ -49,7 +49,7 @@ public class ReportBean implements ReportFacade {
 		logger.debug("Trying to retrive area events in date range {} - {}", filter.getFrom(), filter.getTo());
 		Map<Integer, List<Area>> tagInArea = new HashMap<>();
 		List<AreaEvent> events = new ArrayList<>();
-		List<CoordinatesDto> coordinates = getCoordinates(filter);
+		List<UwbCoordinatesDto> coordinates = getCoordinates(filter);
 		coordinates.forEach(coordinatesDto -> {
 			List<Area> areas = areaRepository.findAreasThePointIsWithin(coordinatesDto.getPoint().getX(), coordinatesDto.getPoint().getY());
 			Integer tagShortId = coordinatesDto.getTagShortId();

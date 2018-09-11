@@ -1,6 +1,6 @@
 package co.blastlab.serviceblbnavi.socket.wrappers;
 
-import co.blastlab.serviceblbnavi.dto.report.CoordinatesDto;
+import co.blastlab.serviceblbnavi.dto.report.UwbCoordinatesDto;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -10,9 +10,9 @@ import lombok.ToString;
 @ToString(callSuper = true)
 public class CoordinatesWrapper extends MessageWrapper {
 
-	private CoordinatesDto coordinates;
+	private UwbCoordinatesDto coordinates;
 
-	public CoordinatesWrapper(CoordinatesDto coordinates) {
+	public CoordinatesWrapper(UwbCoordinatesDto coordinates) {
 		super(MessageType.COORDINATES);
 		this.coordinates = coordinates;
 	}
