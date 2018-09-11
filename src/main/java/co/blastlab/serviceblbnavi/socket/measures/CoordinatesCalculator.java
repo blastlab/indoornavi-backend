@@ -10,9 +10,11 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
+import org.ejml.simple.SimpleMatrix;
 
 import javax.ejb.Singleton;
 import javax.inject.Inject;
+import javax.persistence.EntityNotFoundException;
 import java.util.*;
 
 @Singleton
@@ -45,6 +47,98 @@ public class CoordinatesCalculator {
 		setConnection(tagId, anchorId, distance);
 
 		Set<Integer> connectedAnchors = getConnectedAnchors(tagId);
+
+		Optional<Point3D> calculatedPointOptional = calculate2d(connectedAnchors, tagId);
+
+		if (!calculatedPointOptional.isPresent()) {
+			return Optional.empty();
+		}
+
+		Point3D calculatedPoint = calculatedPointOptional.get();
+
+		logger.trace("Current position: X: {}, Y: {}", calculatedPoint.getX(), calculatedPoint.getY());
+
+		Optional<PointAndTime> previousPoint = Optional.ofNullable(previousCoorinates.get(tagId));
+		Long floorId = null;
+		Optional<Anchor> anchor = anchorRepository.findByShortId(anchorId);
+		if (anchor.isPresent()) {
+			floorId = anchor.get().getFloor() != null ? anchor.get().getFloor().getId() : null;
+		}
+		if (floorId == null) {
+			return Optional.empty();
+		}
+		Date currentDate = new Date();
+		if (previousPoint.isPresent()) {
+			calculatedPoint.setX((calculatedPoint.getX() + previousPoint.get().getPoint().getX()) / 2);
+			calculatedPoint.setY((calculatedPoint.getY() + previousPoint.get().getPoint().getY()) / 2);
+		}
+		previousCoorinates.put(tagId, new PointAndTime(calculatedPoint, currentDate.getTime()));
+		// TODO
+//		return Optional.of(new CoordinatesDto(tagId, anchorId, floorId, calculatedPoint, currentDate));
+		return Optional.empty();
+	}
+
+	private Optional<Point> calculate3d(Set<Integer> connectedAnchors, Integer tagId) {
+		int N = connectedAnchors.size();
+
+		if (N < 4) {
+			logger.trace(String.format("Not enough connected anchors to calculate position. Currently connected anchors: %s", connectedAnchors.size()));
+			return Optional.empty();
+		}
+
+		logger.trace("Connected anchors: {}", connectedAnchors.size());
+
+		StateMatrix stateMatrix = getStateMatrix(connectedAnchors, tagId);
+
+		SimpleMatrix A = new SimpleMatrix(N, 3);
+		SimpleMatrix b = new SimpleMatrix(N, 3);
+
+		for (int taylorIter = 0; taylorIter < 2; ++taylorIter) {
+			for (int i = 0; i < N; ++i) {
+				SimpleMatrix delta = stateMatrix.anchorPositions.rows(i, i + 1)
+					// todo
+					.minus(stateMatrix.tagPosition.rows(0, 1));
+
+				double estimatedMeasure = Math.sqrt(
+					Math.pow(delta.get(i, 0), 2) +
+					Math.pow(delta.get(i, 1), 2) +
+					Math.pow(delta.get(i, 2), 2)
+				);
+			}
+		}
+
+		return null;
+	}
+
+	private StateMatrix getStateMatrix(Set<Integer> connectedAnchors, Integer tagId) {
+		int N = connectedAnchors.size();
+		SimpleMatrix anchorPositions = new SimpleMatrix(N, 3);
+		SimpleMatrix measures = new SimpleMatrix(N, 1);
+		SimpleMatrix tagPosition = new SimpleMatrix(1, 3);
+
+		if (previousCoorinates.containsKey(tagId)) {
+			Point3D tagPreviousCoordinates = previousCoorinates.get(tagId).point;
+			tagPosition.setRow(0, 0, tagPreviousCoordinates.x, tagPreviousCoordinates.y, tagPreviousCoordinates.z);
+		} else {
+			Optional<Integer> firstAnchorOptional = connectedAnchors.stream().findFirst();
+			firstAnchorOptional.ifPresent((Integer firstAnchorShortId) -> {
+				Anchor firstAnchor = anchorRepository.findByShortId(firstAnchorShortId).orElseThrow(EntityNotFoundException::new);
+				tagPosition.setRow(0, 0, firstAnchor.getX(), firstAnchor.getY(), firstAnchor.getZ());
+			});
+		}
+
+		Integer[] anchors = connectedAnchors.toArray(new Integer[0]);
+		for (int i = 0; i < N; ++i) {
+			Integer currentAnchorShortId = anchors[i];
+			Anchor currentAnchor = anchorRepository.findByShortId(currentAnchorShortId).orElseThrow(EntityNotFoundException::new);
+			anchorPositions.setRow(i, 0, currentAnchor.getX(), currentAnchor.getY(), currentAnchor.getZ());
+			measures.setRow(i, 0, getDistance(tagId, currentAnchorShortId));
+		}
+
+		return new StateMatrix(anchorPositions, measures, tagPosition);
+	}
+
+	private Optional<Point3D> calculate2d(Set<Integer> connectedAnchors, Integer tagId) {
 		if (connectedAnchors.size() < 3) {
 			logger.trace(String.format("Not enough connected anchors to calculate position. Currently connected anchors: %s", connectedAnchors.size()));
 			return Optional.empty();
@@ -93,28 +187,7 @@ public class CoordinatesCalculator {
 		x /= j;
 		y /= j;
 
-		logger.trace("Current position: X: {}, Y: {}", x, y);
-
-		Optional<PointAndTime> previousPoint = Optional.ofNullable(previousCoorinates.get(tagId));
-		Long floorId = null;
-		Optional<Anchor> anchor = anchorRepository.findByShortId(anchorId);
-		if (anchor.isPresent()) {
-			floorId = anchor.get().getFloor() != null ? anchor.get().getFloor().getId() : null;
-		}
-		if (floorId == null) {
-			return Optional.empty();
-		}
-		Date currentDate = new Date();
-		if (previousPoint.isPresent()) {
-			x = (x + previousPoint.get().getPoint().getX()) / 2;
-			y = (y + previousPoint.get().getPoint().getY()) / 2;
-			Point newPoint = new Point(x, y);
-			previousCoorinates.put(tagId, new PointAndTime(newPoint, currentDate.getTime()));
-			return Optional.of(new CoordinatesDto(tagId, anchorId, floorId, newPoint, currentDate));
-		}
-		Point currentPoint = new Point(x, y);
-		previousCoorinates.put(tagId, new PointAndTime(currentPoint, currentDate.getTime()));
-		return Optional.of(new CoordinatesDto(tagId, anchorId, floorId, currentPoint, currentDate));
+		return Optional.of(new Point3D(x, y, 0));
 	}
 
 	private Double calculateThres(List<Double> intersectionPointsDistances, int connectedAnchorsCount) {
@@ -135,7 +208,7 @@ public class CoordinatesCalculator {
 	/**
 	 * Choose tag id from two devices ids. Tags have id lower than 32767.
 	 *
-	 * @param firstDeviceId id of the first device
+	 * @param firstDeviceId  id of the first device
 	 * @param secondDeviceId id of the second device
 	 * @return tag id if found otherwise null
 	 */
@@ -151,7 +224,7 @@ public class CoordinatesCalculator {
 	/**
 	 * Choose anchor id from two devices ids. Anchors have id higher than 32767.
 	 *
-	 * @param firstDeviceId id of the first device
+	 * @param firstDeviceId  id of the first device
 	 * @param secondDeviceId id of the second device
 	 * @return anchor id if found otherwise null
 	 */
@@ -250,7 +323,27 @@ public class CoordinatesCalculator {
 	@AllArgsConstructor
 	private class PointAndTime {
 
-		private Point point;
+		private Point3D point;
 		private long timestamp;
+	}
+
+	@Getter
+	@Setter
+	@AllArgsConstructor
+	private class StateMatrix {
+
+		private SimpleMatrix anchorPositions;
+		private SimpleMatrix measures;
+		private SimpleMatrix tagPosition;
+	}
+
+	@Getter
+	@Setter
+	@AllArgsConstructor
+	private class Point3D {
+
+		private double x;
+		private double y;
+		private double z;
 	}
 }
