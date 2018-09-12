@@ -34,7 +34,7 @@ public class CoordinatesCalculator {
 	@Inject
 	private AnchorRepository anchorRepository;
 
-	public Optional<CoordinatesDto> calculateTagPosition(int firstDeviceId, int secondDeviceId, int distance) {
+	public Optional<CoordinatesDto> calculateTagPosition(int firstDeviceId, int secondDeviceId, int distance, boolean is3D) {
 		logger.trace("Measure storage tags: {}", measureStorage.keySet().size());
 
 		Integer tagId = getTagId(firstDeviceId, secondDeviceId);
@@ -48,7 +48,7 @@ public class CoordinatesCalculator {
 
 		Set<Integer> connectedAnchors = getConnectedAnchors(tagId);
 
-		Optional<Point3D> calculatedPointOptional = calculate2d(connectedAnchors, tagId);
+		Optional<Point3D> calculatedPointOptional = is3D ? calculate3d(connectedAnchors, tagId) : calculate2d(connectedAnchors, tagId);
 
 		if (!calculatedPointOptional.isPresent()) {
 			return Optional.empty();
@@ -73,12 +73,10 @@ public class CoordinatesCalculator {
 			calculatedPoint.setY((calculatedPoint.getY() + previousPoint.get().getPoint().getY()) / 2);
 		}
 		previousCoorinates.put(tagId, new PointAndTime(calculatedPoint, currentDate.getTime()));
-		// TODO
-//		return Optional.of(new CoordinatesDto(tagId, anchorId, floorId, calculatedPoint, currentDate));
-		return Optional.empty();
+		return Optional.of(new CoordinatesDto(tagId, anchorId, floorId, calculatedPoint, currentDate));
 	}
 
-	private Optional<Point> calculate3d(Set<Integer> connectedAnchors, Integer tagId) {
+	private Optional<Point3D> calculate3d(Set<Integer> connectedAnchors, Integer tagId) {
 		int N = connectedAnchors.size();
 
 		if (N < 4) {
@@ -91,39 +89,56 @@ public class CoordinatesCalculator {
 		StateMatrix stateMatrix = getStateMatrix(connectedAnchors, tagId);
 
 		SimpleMatrix A = new SimpleMatrix(N, 3);
-		SimpleMatrix b = new SimpleMatrix(N, 3);
+		SimpleMatrix b = new SimpleMatrix(N, 1);
 
-		for (int taylorIter = 0; taylorIter < 2; ++taylorIter) {
+		for (int taylorIter = 0; taylorIter < 10; ++taylorIter) {
 			for (int i = 0; i < N; ++i) {
 				SimpleMatrix delta = stateMatrix.anchorPositions.rows(i, i + 1)
-					// todo
-					.minus(stateMatrix.tagPosition.rows(0, 1));
+					.minus(stateMatrix.tagPosition.transpose());
+				double estimatedDistance = delta.normF();
+				double distance = stateMatrix.measures.get(i);
+				SimpleMatrix divided;
+				if (estimatedDistance != 0) {
+					divided = delta.divide(-estimatedDistance);
+				} else {
+					divided = delta.divide(-distance);
+				}
+				A.setRow(i, 0, divided.get(0), divided.get(1), divided.get(2));
+				b.setRow(i, 0, distance - estimatedDistance);
+			}
 
-				double estimatedMeasure = Math.sqrt(
-					Math.pow(delta.get(i, 0), 2) +
-					Math.pow(delta.get(i, 1), 2) +
-					Math.pow(delta.get(i, 2), 2)
-				);
+			SimpleMatrix aa = A.transpose().mult(A);
+			SimpleMatrix ab = A.transpose().mult(b);
+			SimpleMatrix p = (aa).solve(ab);
+
+			stateMatrix.tagPosition = stateMatrix.tagPosition.plus(p);
+			stateMatrix.tagPosition.print();
+
+			if (p.normF() < 10) {
+				break;
 			}
 		}
 
-		return null;
+		double x = stateMatrix.tagPosition.get(0);
+		double y = stateMatrix.tagPosition.get(1);
+		double z = stateMatrix.tagPosition.get(2);
+		return Optional.of(new Point3D((int) Math.round(x), (int) Math.round(y), (int) Math.round(z)));
 	}
 
 	private StateMatrix getStateMatrix(Set<Integer> connectedAnchors, Integer tagId) {
 		int N = connectedAnchors.size();
 		SimpleMatrix anchorPositions = new SimpleMatrix(N, 3);
 		SimpleMatrix measures = new SimpleMatrix(N, 1);
-		SimpleMatrix tagPosition = new SimpleMatrix(1, 3);
+		SimpleMatrix tagPosition = new SimpleMatrix(3, 1);
 
 		if (previousCoorinates.containsKey(tagId)) {
 			Point3D tagPreviousCoordinates = previousCoorinates.get(tagId).point;
-			tagPosition.setRow(0, 0, tagPreviousCoordinates.x, tagPreviousCoordinates.y, tagPreviousCoordinates.z);
+			tagPosition.setColumn(0, 0, tagPreviousCoordinates.getX(), tagPreviousCoordinates.getY(), tagPreviousCoordinates.getZ());
 		} else {
 			Optional<Integer> firstAnchorOptional = connectedAnchors.stream().findFirst();
 			firstAnchorOptional.ifPresent((Integer firstAnchorShortId) -> {
 				Anchor firstAnchor = anchorRepository.findByShortId(firstAnchorShortId).orElseThrow(EntityNotFoundException::new);
-				tagPosition.setRow(0, 0, firstAnchor.getX(), firstAnchor.getY(), firstAnchor.getZ());
+				tagPosition.setColumn(0, 0, firstAnchor.getX(), firstAnchor.getY(), firstAnchor.getZ());
 			});
 		}
 
@@ -335,15 +350,5 @@ public class CoordinatesCalculator {
 		private SimpleMatrix anchorPositions;
 		private SimpleMatrix measures;
 		private SimpleMatrix tagPosition;
-	}
-
-	@Getter
-	@Setter
-	@AllArgsConstructor
-	private class Point3D {
-
-		private double x;
-		private double y;
-		private double z;
 	}
 }
