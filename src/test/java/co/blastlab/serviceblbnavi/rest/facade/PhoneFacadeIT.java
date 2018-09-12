@@ -35,6 +35,7 @@ public class PhoneFacadeIT extends BaseIT {
 		JSONObject pointJSON_1 = new JSONObject(new HashMap<String, Object>() {{
 			this.put("x", 10);
 			this.put("y", 20);
+			this.put("z", 0);
 		}});
 		phoneCoordinatesJSON_1 = new JSONObject(new HashMap<String, Object>() {{
 			this.put("point", pointJSON_1);
@@ -43,6 +44,7 @@ public class PhoneFacadeIT extends BaseIT {
 		JSONObject pointJSON_2 = new JSONObject(new HashMap<String, Object>() {{
 			this.put("x", 1);
 			this.put("y", 2);
+			this.put("z", 0);
 		}});
 		phoneCoordinatesJSON_2 = new JSONObject(new HashMap<String, Object>() {{
 			this.put("point", pointJSON_2);
