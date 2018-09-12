@@ -191,5 +191,6 @@
     <orderEntry type="library" name="Maven: org.ejml:ejml-zdense:0.35" level="project" />
     <orderEntry type="library" name="Maven: org.ejml:ejml-dsparse:0.35" level="project" />
     <orderEntry type="library" name="Maven: org.ejml:ejml-simple:0.35" level="project" />
+    <orderEntry type="library" name="Maven: com.googlecode.json-simple:json-simple:1.1.1" level="project" />
   </component>
 </module>
