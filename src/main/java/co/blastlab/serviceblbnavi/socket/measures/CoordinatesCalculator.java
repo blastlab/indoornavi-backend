@@ -73,7 +73,7 @@ public class CoordinatesCalculator {
 			calculatedPoint.setY((calculatedPoint.getY() + previousPoint.get().getPoint().getY()) / 2);
 		}
 		previousCoorinates.put(tagId, new PointAndTime(calculatedPoint, currentDate.getTime()));
-		return Optional.of(new CoordinatesDto(tagId, anchorId, floorId, calculatedPoint, currentDate));
+		return Optional.of(new UwbCoordinatesDto(tagId, anchorId, floorId, calculatedPoint, currentDate));
 	}
 
 	private Optional<Point3D> calculate3d(Set<Integer> connectedAnchors, Integer tagId) {

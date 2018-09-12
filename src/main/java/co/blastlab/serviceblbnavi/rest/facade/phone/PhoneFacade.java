@@ -23,7 +23,6 @@ public interface PhoneFacade {
 	@AuthorizedAccess
 	PhoneDto auth(@ApiParam(value = "phone", required = true) @Valid PhoneDto phone);
 
-	@POST
 	@Path("/coordinates")
 	@ApiOperation(value = "save coordiantes to database", response = PhoneCoordinatesDto.class, responseContainer = "List")
 	List<PhoneCoordinatesDto> saveCoordinates(@ApiParam(value = "coordinatesList", required = true) @Valid List<PhoneCoordinatesDto> coordinatesList);

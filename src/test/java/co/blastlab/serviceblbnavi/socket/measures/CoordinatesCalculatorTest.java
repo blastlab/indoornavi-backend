@@ -44,9 +44,9 @@ public class CoordinatesCalculatorTest {
 		when(anchorRepository.findByShortId(32770)).thenReturn(lastAnchor);
 
 		// WHEN
-		Optional<CoordinatesDto> firstCalculation = coordinatesCalculator.calculateTagPosition(1, 32768, 300, false);
-		Optional<CoordinatesDto> secondCalculation = coordinatesCalculator.calculateTagPosition(1, 32769, 700, false);
-		Optional<CoordinatesDto> thirdCalculation = coordinatesCalculator.calculateTagPosition(1, 32770, 1044, false);
+		Optional<UwbCoordinatesDto> firstCalculation = coordinatesCalculator.calculateTagPosition(1, 32768, 300, false);
+		Optional<UwbCoordinatesDto> secondCalculation = coordinatesCalculator.calculateTagPosition(1, 32769, 700, false);
+		Optional<UwbCoordinatesDto> thirdCalculation = coordinatesCalculator.calculateTagPosition(1, 32770, 1044, false);
 
 		// THEN
 		assertThat(firstCalculation.isPresent(), is(false));
@@ -114,7 +114,7 @@ public class CoordinatesCalculatorTest {
 		coordinatesCalculator.calculateTagPosition(1, 32770, 141, true);
 
 		// WHEN
-		Optional<CoordinatesDto> coordinatesDto = coordinatesCalculator.calculateTagPosition(1, 32771, 173, true);
+		Optional<UwbCoordinatesDto> coordinatesDto = coordinatesCalculator.calculateTagPosition(1, 32771, 173, true);
 
 		// THEN
 		assertThat(coordinatesDto.isPresent(), is(true));
