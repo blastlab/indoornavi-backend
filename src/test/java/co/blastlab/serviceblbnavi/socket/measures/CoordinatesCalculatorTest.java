@@ -3,7 +3,7 @@ package co.blastlab.serviceblbnavi.socket.measures;
 import co.blastlab.serviceblbnavi.dao.repository.AnchorRepository;
 import co.blastlab.serviceblbnavi.domain.Anchor;
 import co.blastlab.serviceblbnavi.domain.Floor;
-import co.blastlab.serviceblbnavi.dto.report.CoordinatesDto;
+import co.blastlab.serviceblbnavi.dto.report.UwbCoordinatesDto;
 import co.blastlab.serviceblbnavi.utils.Logger;
 import com.google.common.collect.Range;
 import org.junit.Test;
@@ -72,17 +72,17 @@ public class CoordinatesCalculatorTest {
 		when(anchorRepository.findByShortId(32770)).thenReturn(lastAnchor);
 
 		// WHEN
-		Optional<CoordinatesDto> firstCalculation = coordinatesCalculator.calculateTagPosition(1, 32768, 300, false);
-		Optional<CoordinatesDto> secondCalculation = coordinatesCalculator.calculateTagPosition(1, 32769, 700, false);
+		Optional<UwbCoordinatesDto> firstCalculation = coordinatesCalculator.calculateTagPosition(1, 32768, 300, false);
+		Optional<UwbCoordinatesDto> secondCalculation = coordinatesCalculator.calculateTagPosition(1, 32769, 700, false);
 
 		// NOTE: this measures should not be taken into consideration during calculations because they are not in DB
-		Optional<CoordinatesDto> thirdCalculation = coordinatesCalculator.calculateTagPosition(1, 42555, 999, false);
-		Optional<CoordinatesDto> fourthCalculation = coordinatesCalculator.calculateTagPosition(1, 42556, 999, false);
-		Optional<CoordinatesDto> fifthCalculation = coordinatesCalculator.calculateTagPosition(1, 42555, 999, false);
-		Optional<CoordinatesDto> sixthCalculation = coordinatesCalculator.calculateTagPosition(1, 42557, 999, false);
+		Optional<UwbCoordinatesDto> thirdCalculation = coordinatesCalculator.calculateTagPosition(1, 42555, 999, false);
+		Optional<UwbCoordinatesDto> fourthCalculation = coordinatesCalculator.calculateTagPosition(1, 42556, 999, false);
+		Optional<UwbCoordinatesDto> fifthCalculation = coordinatesCalculator.calculateTagPosition(1, 42555, 999, false);
+		Optional<UwbCoordinatesDto> sixthCalculation = coordinatesCalculator.calculateTagPosition(1, 42557, 999, false);
 		// end of NOTE
 
-		Optional<CoordinatesDto> seventhCalculation = coordinatesCalculator.calculateTagPosition(1, 32770, 1044, false);
+		Optional<UwbCoordinatesDto> seventhCalculation = coordinatesCalculator.calculateTagPosition(1, 32770, 1044, false);
 
 		// THEN
 		assertThat(firstCalculation.isPresent(), is(false));

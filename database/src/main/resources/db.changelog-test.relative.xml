@@ -14,6 +14,8 @@
 		<delete tableName="area_areaconfiguration" />
 		<delete tableName="area" />
 		<delete tableName="areaconfiguration" />
+		<delete tableName="uwbcoordinates" />
+		<delete tableName="phonecoordinates" />
 		<delete tableName="coordinates"/>
 		<delete tableName="tag"/>
 		<delete tableName="sink"/>
@@ -155,5 +157,9 @@
 
 	<changeSet id="Phone" author="kgebert" context="test" runOnChange="true" labels="Phone" runAlways="true">
 		<loadData tableName="phone" file="test/Phone.csv" relativeToChangelogFile="true" />
+	</changeSet>
+
+	<changeSet id="UwbCoordinates" author="kgebert" context="test" runOnChange="true" labels="UwbCoordinates" runAlways="true">
+		<loadData tableName="uwbcoordinates" file="test/UwbCoordinates.csv" relativeToChangelogFile="true" />
 	</changeSet>
 </databaseChangeLog>

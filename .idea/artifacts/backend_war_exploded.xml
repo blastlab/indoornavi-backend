@@ -103,6 +103,7 @@
           <element id="library" level="project" name="Maven: org.ejml:ejml-zdense:0.35" />
           <element id="library" level="project" name="Maven: org.ejml:ejml-dsparse:0.35" />
           <element id="library" level="project" name="Maven: org.ejml:ejml-simple:0.35" />
+          <element id="library" level="project" name="Maven: com.googlecode.json-simple:json-simple:1.1.1" />
         </element>
       </element>
       <element id="directory" name="META-INF">
