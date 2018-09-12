@@ -151,7 +151,7 @@
 					<driver>mariadb</driver>
 					<security>
 						<user-name>${app.db.user}</user-name>
-						<password>"${app.db.password}"</password>
+						<password>${app.db.password}</password>
 					</security>
 					<connection-property name="useUnicode">true</connection-property>
 					<connection-property name="characterEncoding">utf8</connection-property>
