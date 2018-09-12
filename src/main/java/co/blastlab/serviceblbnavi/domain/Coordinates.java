@@ -12,6 +12,7 @@ import javax.persistence.ManyToOne;
 public class Coordinates extends TrackedEntity {
 	private int x;
 	private int y;
+	private int z;
 	@ManyToOne
 	private Tag tag;
 	@ManyToOne
