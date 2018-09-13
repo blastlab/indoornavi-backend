@@ -8,6 +8,7 @@ import co.blastlab.serviceblbnavi.utils.Logger;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.ejml.simple.SimpleMatrix;
@@ -58,7 +59,6 @@ public class CoordinatesCalculator {
 
 		logger.trace("Current position: X: {}, Y: {}", calculatedPoint.getX(), calculatedPoint.getY());
 
-		Optional<PointAndTime> previousPoint = Optional.ofNullable(previousCoorinates.get(tagId));
 		Long floorId = null;
 		Optional<Anchor> anchor = anchorRepository.findByShortId(anchorId);
 		if (anchor.isPresent()) {
@@ -67,10 +67,13 @@ public class CoordinatesCalculator {
 		if (floorId == null) {
 			return Optional.empty();
 		}
+
+		Optional<PointAndTime> previousPoint = Optional.ofNullable(previousCoorinates.get(tagId));
 		Date currentDate = new Date();
 		if (previousPoint.isPresent()) {
 			calculatedPoint.setX((calculatedPoint.getX() + previousPoint.get().getPoint().getX()) / 2);
 			calculatedPoint.setY((calculatedPoint.getY() + previousPoint.get().getPoint().getY()) / 2);
+			calculatedPoint.setZ((calculatedPoint.getZ() + previousPoint.get().getPoint().getZ())/ 2);
 		}
 		previousCoorinates.put(tagId, new PointAndTime(calculatedPoint, currentDate.getTime()));
 		return Optional.of(new UwbCoordinatesDto(tagId, anchorId, floorId, calculatedPoint, currentDate));
@@ -87,6 +90,8 @@ public class CoordinatesCalculator {
 		logger.trace("Connected anchors: {}", connectedAnchors.size());
 
 		StateMatrix stateMatrix = getStateMatrix(connectedAnchors, tagId);
+
+		logger.trace("State matrix: %s", stateMatrix);
 
 		SimpleMatrix A = new SimpleMatrix(N, 3);
 		SimpleMatrix b = new SimpleMatrix(N, 1);
@@ -112,9 +117,10 @@ public class CoordinatesCalculator {
 			SimpleMatrix p = (aa).solve(ab);
 
 			stateMatrix.tagPosition = stateMatrix.tagPosition.plus(p);
-			stateMatrix.tagPosition.print();
+			logger.trace("Tag position calculated matrix: %s", stateMatrix.tagPosition.toString());
 
 			if (p.normF() < 10) {
+				logger.trace("Less than 10 iteration was needed: %s", taylorIter);
 				break;
 			}
 		}
@@ -345,6 +351,7 @@ public class CoordinatesCalculator {
 	@Getter
 	@Setter
 	@AllArgsConstructor
+	@ToString
 	private class StateMatrix {
 
 		private SimpleMatrix anchorPositions;
