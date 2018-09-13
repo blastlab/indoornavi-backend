@@ -26,6 +26,11 @@ read version
 git tag -a ${version} -m "Version ${version}"
 git push origin ${version}
 
+go_to_app_directory frontend
+
+git tag -a ${version} -m "Version ${version}"
+git push origin ${version}
+
 docker login indoornavi.azurecr.io -u indoornavi -p JeLv55Xn87DA8tBR=2suAs9blMgXaDDD
 
 for app in ${apps[*]}
