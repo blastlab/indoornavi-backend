@@ -59,22 +59,19 @@ public class CoordinatesCalculator {
 
 		logger.trace("Current position: X: {}, Y: {}", calculatedPoint.getX(), calculatedPoint.getY());
 
-		Long floorId = null;
-		Optional<Anchor> anchor = anchorRepository.findByShortId(anchorId);
-		if (anchor.isPresent()) {
-			floorId = anchor.get().getFloor() != null ? anchor.get().getFloor().getId() : null;
-		}
+		Long floorId = anchorRepository.findByShortId(anchorId)
+			.map(anchor -> anchor.getFloor() != null ? anchor.getFloor().getId() : null)
+			.orElse(null);
 		if (floorId == null) {
 			return Optional.empty();
 		}
 
-		Optional<PointAndTime> previousPoint = Optional.ofNullable(previousCoorinates.get(tagId));
+		Optional.ofNullable(previousCoorinates.get(tagId)).ifPresent((previousPoint) -> {
+			calculatedPoint.setX((calculatedPoint.getX() + previousPoint.getPoint().getX()) / 2);
+			calculatedPoint.setY((calculatedPoint.getY() + previousPoint.getPoint().getY()) / 2);
+			calculatedPoint.setZ((calculatedPoint.getZ() + previousPoint.getPoint().getZ())/ 2);
+		});
 		Date currentDate = new Date();
-		if (previousPoint.isPresent()) {
-			calculatedPoint.setX((calculatedPoint.getX() + previousPoint.get().getPoint().getX()) / 2);
-			calculatedPoint.setY((calculatedPoint.getY() + previousPoint.get().getPoint().getY()) / 2);
-			calculatedPoint.setZ((calculatedPoint.getZ() + previousPoint.get().getPoint().getZ())/ 2);
-		}
 		previousCoorinates.put(tagId, new PointAndTime(calculatedPoint, currentDate.getTime()));
 		return Optional.of(new UwbCoordinatesDto(tagId, anchorId, floorId, calculatedPoint, currentDate));
 	}
