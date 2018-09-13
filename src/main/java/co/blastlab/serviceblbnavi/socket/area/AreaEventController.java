@@ -6,7 +6,7 @@ import co.blastlab.serviceblbnavi.domain.Area;
 import co.blastlab.serviceblbnavi.domain.AreaConfiguration;
 import co.blastlab.serviceblbnavi.domain.Floor;
 import co.blastlab.serviceblbnavi.domain.Tag;
-import co.blastlab.serviceblbnavi.dto.report.CoordinatesDto;
+import co.blastlab.serviceblbnavi.dto.report.UwbCoordinatesDto;
 import co.blastlab.serviceblbnavi.utils.Logger;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
@@ -74,7 +74,7 @@ public class AreaEventController {
 		});
 	}
 
-	public List<AreaEvent> checkCoordinates(CoordinatesDto coordinatesData) {
+	public List<AreaEvent> checkCoordinates(UwbCoordinatesDto coordinatesData) {
 		List<AreaEvent> events = new ArrayList<>();
 		try {
 			logger.trace("Checking if coordinates {} are within any areas", coordinatesData);
@@ -113,19 +113,19 @@ public class AreaEventController {
 		return events;
 	}
 
-	private boolean shouldSendOnEnterEvent(CoordinatesDto coordinatesData, AreaConfiguration areaConfiguration) {
+	private boolean shouldSendOnEnterEvent(UwbCoordinatesDto coordinatesData, AreaConfiguration areaConfiguration) {
 		return !tagCoordinatesHistory.containsRow(coordinatesData.getTagShortId()) && areaConfiguration.getMode().equals(ON_ENTER);
 	}
 
-	private boolean shouldSendOnLeaveEvent(CoordinatesDto coordinatesData, AreaConfiguration areaConfiguration) {
+	private boolean shouldSendOnLeaveEvent(UwbCoordinatesDto coordinatesData, AreaConfiguration areaConfiguration) {
 		return tagCoordinatesHistory.containsRow(coordinatesData.getTagShortId()) && areaConfiguration.getMode().equals(ON_LEAVE);
 	}
 
-	private void updateTime(CoordinatesDto coordinatesData, Area area) {
+	private void updateTime(UwbCoordinatesDto coordinatesData, Area area) {
 		tagCoordinatesHistory.get(coordinatesData.getTagShortId(), area).setTime(new Date().getTime());
 	}
 
-	private AreaEvent createEvent(CoordinatesDto coordinatesData, Area area, AreaConfiguration areaConfiguration) {
+	private AreaEvent createEvent(UwbCoordinatesDto coordinatesData, Area area, AreaConfiguration areaConfiguration) {
 		AreaEvent event = new AreaEvent();
 		event.setAreaName(area.getName());
 		event.setMode(areaConfiguration.getMode());
@@ -134,12 +134,12 @@ public class AreaEventController {
 		return event;
 	}
 
-	private String buildPoint(CoordinatesDto coordinatesData) {
+	private String buildPoint(UwbCoordinatesDto coordinatesData) {
 		Point point = geometryFactory.createPoint(new Coordinate(coordinatesData.getPoint().getX(), coordinatesData.getPoint().getY()));
 		return wktWriter.write(point);
 	}
 
-	private Map<Area, List<AreaConfiguration>> getFilteredAreas(CoordinatesDto coordinatesData) {
+	private Map<Area, List<AreaConfiguration>> getFilteredAreas(UwbCoordinatesDto coordinatesData) {
 		Floor floor = floorRepository.findBy(coordinatesData.getFloorId());
 		List<Area> floorAreas = areaRepository.findByFloor(floor);
 		Map<Area, List<AreaConfiguration>> filteredAreas = new HashMap<>();
