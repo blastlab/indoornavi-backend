@@ -182,5 +182,6 @@
     <orderEntry type="library" name="Maven: org.ow2.asm:asm-debug-all:5.1" level="project" />
     <orderEntry type="library" name="Maven: org.jacoco:org.jacoco.report:0.7.7.201606060606" level="project" />
     <orderEntry type="library" name="Maven: org.modelmapper:modelmapper:2.1.1" level="project" />
+    <orderEntry type="library" name="Maven: com.googlecode.json-simple:json-simple:1.1.1" level="project" />
   </component>
 </module>

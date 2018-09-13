@@ -1,7 +1,7 @@
 package co.blastlab.serviceblbnavi.rest.facade.report;
 
-import co.blastlab.serviceblbnavi.dto.report.CoordinatesDto;
 import co.blastlab.serviceblbnavi.dto.report.ReportFilterDto;
+import co.blastlab.serviceblbnavi.dto.report.UwbCoordinatesDto;
 import co.blastlab.serviceblbnavi.ext.filter.AuthorizedAccess;
 import co.blastlab.serviceblbnavi.ext.filter.SetOperationId;
 import co.blastlab.serviceblbnavi.socket.area.AreaEvent;
@@ -20,9 +20,9 @@ import java.util.List;
 public interface ReportFacade {
 	@POST
 	@Path("/coordinates")
-	@ApiOperation(value = "get coordinates", response = CoordinatesDto.class, responseContainer = "List")
+	@ApiOperation(value = "get coordinates", response = UwbCoordinatesDto.class, responseContainer = "List")
 	@AuthorizedAccess
-	List<CoordinatesDto> getCoordinates(@ApiParam(value = "filter", required = true) @Valid ReportFilterDto filter);
+	List<UwbCoordinatesDto> getCoordinates(@ApiParam(value = "filter", required = true) @Valid ReportFilterDto filter);
 
 	@POST
 	@Path("/events")

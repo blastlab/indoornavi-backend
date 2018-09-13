@@ -3,7 +3,7 @@ package co.blastlab.serviceblbnavi.socket.measures;
 import co.blastlab.serviceblbnavi.dao.repository.AnchorRepository;
 import co.blastlab.serviceblbnavi.domain.Anchor;
 import co.blastlab.serviceblbnavi.dto.Point;
-import co.blastlab.serviceblbnavi.dto.report.CoordinatesDto;
+import co.blastlab.serviceblbnavi.dto.report.UwbCoordinatesDto;
 import co.blastlab.serviceblbnavi.utils.Logger;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -32,7 +32,7 @@ public class CoordinatesCalculator {
 	@Inject
 	private AnchorRepository anchorRepository;
 
-	public Optional<CoordinatesDto> calculateTagPosition(int firstDeviceId, int secondDeviceId, int distance) {
+	public Optional<UwbCoordinatesDto> calculateTagPosition(int firstDeviceId, int secondDeviceId, int distance) {
 		logger.trace("Measure storage tags: {}", measureStorage.keySet().size());
 
 		Integer tagId = getTagId(firstDeviceId, secondDeviceId);
@@ -110,11 +110,11 @@ public class CoordinatesCalculator {
 			y = (y + previousPoint.get().getPoint().getY()) / 2;
 			Point newPoint = new Point(x, y);
 			previousCoorinates.put(tagId, new PointAndTime(newPoint, currentDate.getTime()));
-			return Optional.of(new CoordinatesDto(tagId, anchorId, floorId, newPoint, currentDate));
+			return Optional.of(new UwbCoordinatesDto(tagId, anchorId, floorId, newPoint, currentDate));
 		}
 		Point currentPoint = new Point(x, y);
 		previousCoorinates.put(tagId, new PointAndTime(currentPoint, currentDate.getTime()));
-		return Optional.of(new CoordinatesDto(tagId, anchorId, floorId, currentPoint, currentDate));
+		return Optional.of(new UwbCoordinatesDto(tagId, anchorId, floorId, currentPoint, currentDate));
 	}
 
 	private Double calculateThres(List<Double> intersectionPointsDistances, int connectedAnchorsCount) {
