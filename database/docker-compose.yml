@@ -6,7 +6,7 @@ services:
       - '3306:3306'
     environment:
       MYSQL_DATABASE: navi
-      MYSQL_ALLOW_EMPTY_PASSWORD: "true"
+      MYSQL_ROOT_PASSWORD: password
       TZ: Europe/Warsaw
 
 
