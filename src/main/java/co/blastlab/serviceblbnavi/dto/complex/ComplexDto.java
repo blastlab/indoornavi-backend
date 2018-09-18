@@ -1,13 +1,12 @@
 package co.blastlab.serviceblbnavi.dto.complex;
 
+import co.blastlab.serviceblbnavi.domain.Building;
 import co.blastlab.serviceblbnavi.domain.Complex;
 import co.blastlab.serviceblbnavi.dto.building.BuildingDto;
-import co.blastlab.serviceblbnavi.dto.floor.FloorDto;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 import org.hibernate.validator.constraints.NotEmpty;
-
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +40,11 @@ public class ComplexDto {
 
 		public WithBuildings(Complex complex) {
 			super(complex);
-			complex.getBuildings().forEach(building -> this.getBuildings().add(new BuildingDto(building)));
+			complex.getBuildings().forEach(building -> this.getBuildings().add(createBuilding(building)));
+		}
+
+		protected BuildingDto createBuilding(Building building) {
+			return new BuildingDto(building);
 		}
 
 		@Getter
@@ -49,14 +52,13 @@ public class ComplexDto {
 		@NoArgsConstructor
 		public static class WithFloors extends WithBuildings {
 
-			private List<FloorDto> floors = new ArrayList<>();
-
 			public WithFloors(Complex complex) {
 				super(complex);
-				complex.getBuildings().forEach(building -> building.getFloors().forEach(floor -> {
-						this.getFloors().add(new FloorDto(floor));
-					})
-				);
+			}
+
+			@Override
+			protected BuildingDto createBuilding(Building building) {
+				return new BuildingDto.WithFloors(building);
 			}
 		}
 	}
