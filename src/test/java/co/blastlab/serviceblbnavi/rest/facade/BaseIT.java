@@ -25,6 +25,8 @@ public abstract class BaseIT extends RestAssuredIT {
 
 	private static final String JDBC_DRIVER_CLASS = "org.mariadb.jdbc.Driver";
 	private static final String DATABASE_URL = "jdbc:mysql://db:3306/Navi";
+	private static final String DATABASE_USER = "root";
+	private static final String DATABASE_PASSWORD = "password";
 	private static final String CHANGELOG_FILE = "database/src/main/resources/db.changelog-test.relative.xml";
 	private final ImmutableList<String> BASIC_LABELS = ImmutableList.of(
 		"Clear",
@@ -43,7 +45,7 @@ public abstract class BaseIT extends RestAssuredIT {
 
 	@Before
 	public void setUp() throws LiquibaseException, SQLException, ClassNotFoundException {
-		try (Connection connection = DriverManager.getConnection(DATABASE_URL, "root", "")) {
+		try (Connection connection = DriverManager.getConnection(DATABASE_URL, DATABASE_USER, DATABASE_PASSWORD)) {
 			System.out.println(getAdditionalLabels());
 			Class.forName(JDBC_DRIVER_CLASS);
 			Database database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(new JdbcConnection(connection));
