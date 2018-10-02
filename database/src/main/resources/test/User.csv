@@ -1,0 +1,3 @@
+id,username,password,salt,token,superuser
+1,admin,68117e5b7426525fa4d8d92be9bab5178a0dccc18e05e2444c2ed508588fb94d,PxVZS5b6JWKgwnWi8SP0/w==,TestToken,true
+2,user,aac2d1daf65b8d3bfa9c76c4d17ef59363db00c56790b4faf372cab18709fc17,Y2xFz6KC9mfBjEnSnmsBRw==,UserToken,false

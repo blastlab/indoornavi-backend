@@ -1,0 +1,57 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+	<changeSet id="navi-77-11" author="kgebert">
+		<loadUpdateData tableName="permissiongroup" file="test/PermissionGroup.csv" primaryKey="id"/>
+	</changeSet>
+
+	<changeSet id="navi-77-12" author="kgebert">
+		<loadUpdateData tableName="permission" file="test/Permission.csv" primaryKey="id"/>
+	</changeSet>
+
+	<changeSet id="navi-77-13" author="kgebert">
+		<loadData tableName="permissiongroup_permission" file="test/PermissionGroupPermission.csv"/>
+	</changeSet>
+
+	<changeSet id="navi-77-14" author="kgebert">
+		<loadUpdateData tableName="user" file="test/User.csv" primaryKey="id">
+			<column name="superuser" type="boolean" />
+		</loadUpdateData>
+	</changeSet>
+
+	<changeSet id="navi-77-15" author="kgebert">
+		<loadData tableName="user_permissiongroup" file="test/UserPermissionGroup.csv"/>
+	</changeSet>
+
+	<changeSet id="navi-135-1" author="kgebert">
+		<loadUpdateData tableName="permission" file="test/navi-135/Permission.csv" primaryKey="id"/>
+	</changeSet>
+
+	<changeSet id="navi-135-2" author="kgebert">
+		<loadData tableName="permissiongroup_permission" file="test/navi-135/PermissionGroupPermission.csv" />
+	</changeSet>
+
+	<changeSet id="navi-142-1" author="kgebert">
+		<loadUpdateData tableName="permission" file="test/navi-142/Permission.csv" primaryKey="id"/>
+	</changeSet>
+
+	<changeSet id="navi-142-2" author="kgebert">
+		<loadData tableName="permissiongroup_permission" file="test/navi-142/PermissionGroupPermission.csv" />
+	</changeSet>
+
+	<changeSet id="navi-73-1" author="kgebert">
+		<loadUpdateData tableName="permission" file="test/navi-73/Permission.csv" primaryKey="id"/>
+	</changeSet>
+
+	<changeSet id="navi-73-2" author="kgebert">
+		<loadData tableName="permissiongroup_permission" file="test/navi-73/PermissionGroupPermission.csv" />
+	</changeSet>
+
+	<changeSet id="navi-364-1" author="kgebert">
+		<loadUpdateData tableName="permission" file="test/navi-364/Permission.csv" primaryKey="id"/>
+	</changeSet>
+
+	<changeSet id="navi-364-2" author="kgebert">
+		<loadData tableName="permissiongroup_permission" file="test/navi-364/PermissionGroupPermission.csv" />
+	</changeSet>
+</databaseChangeLog>

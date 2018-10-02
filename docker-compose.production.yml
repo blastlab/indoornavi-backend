@@ -1,0 +1,71 @@
+version: '2'
+services:
+
+  db:
+    image: indoornavi.azurecr.io/db
+    ports:
+      - '3306:3306'
+    environment:
+      MYSQL_DATABASE: navi
+      MYSQL_ALLOW_EMPTY_PASSWORD: "true"
+      TZ: Europe/Warsaw
+    container_name:
+      db
+    volumes:
+      - dbvolume1:/var/lib/mysql
+      - dbvolume2:/var/lib/mariadb
+
+
+  liquibase:
+    image: indoornavi.azurecr.io/liquibase
+    ports:
+      - '2306:80'
+    environment:
+      HOST: db
+      SCHEMA: navi
+      USER: root
+      PASSWORD: ""
+      CONTEXTS: production
+    volumes:
+      - ./database/src/main/resources:/liquibase/changelog
+    entrypoint: ["wait-for-it", "db:3306", "-t", "0", "--", "/run.sh"]
+
+
+  core:
+    image: indoornavi.azurecr.io/backend
+    container_name:
+      core
+    ports:
+      - '90:8080'
+      - '8787:8787'
+      - '9990:9990'
+    volumes:
+      - ./deployments:/opt/jboss/wildfly/standalone/deployments
+    depends_on:
+      - db
+    environment:
+      TZ: Europe/Warsaw
+      APP_ENVIRONMENT: production
+      APP_DB_HOST: db
+      APP_LOG_LEVEL: TRACE # will log all actions taken by user and hardware communication
+#      APP_LOG_LEVEL: DEBUG # will log all actions taken by user
+#      APP_LOG_LEVEL: INFO # will only log most important messages
+    entrypoint: ["wait-for-it", "liquibase:80", "-t", "0", "--", "/start-server.sh"]
+
+
+  frontend:
+    image: indoornavi.azurecr.io/frontend
+    volumes:
+      - ./:/app
+    ports:
+      - '4200:4200'
+    container_name:
+      frontend
+    working_dir: /app
+
+volumes:
+  # For Liquibase container.
+  m2:
+  # For mariadb data
+  dbvolume1:
+  dbvolume2:

@@ -2,75 +2,45 @@
 
 # IndoorNavi JEE app
 
-## Wildfly configuration
+## Installation for Windows 10
 
-Application requires Wildfly 9.0
+1. Get Docker for Windows: https://download.docker.com/win/stable/InstallDocker.msi
+2. Install it and run
+3. Clone repository: git@gitlab.blastlab.local:ble/serviceblbnavi.git
+4. Run console in folder where you cloned project
+5. Type: docker-compose up
 
-### Download
+## Important notes
 
-After you download wildfly and unzip it in a place you want.
+1. We are using Wildfly 10.0.0 because we faced unexpected problems with integration tests (RestAssured) on 10.1.0
 
-If you want to use wildfly admin console, first you have to do is create a managment user.
-Go to $WILDFLY_HOME/bin/ and run add-user.sh(.bat)
+## DoD
 
-In first question type 'a' for managment user.
+Definition of Done for issues is as follows:
 
-After your create a user, in the same folder run standalone.sh(.bat) to start server.
+- Created unit tests where suitable - for code with logic. Unit tests are not required for plain methods without business logic,
+for example endpoints only executing DAO methods and returning the result.
+- Created integration tests. For backend these are REST API tests.
+- Documented REST API. This documentation is generated automatically using Swagger.
+All endpoints, parameters, DTOs and possible HTTP status codes should be described.
+- Code passed code review, was integrated with other services (like fronted),
+functionality was accepted by Product Owner (if suitable) and branch was merged to `development`.
 
-If you want to manage your server via admin console, go to http://localhost:9990 and log in with credentials you've created in previous step.
+Only issue for which code fulfills above rules can be found as done.
 
-To connect to CLI in the same directory run jboss-cli.sh(.bat) --connect
+## Obsługa
+##### Odpalenie aplikacji
 
-### Resources
+``` docker-compose up ```
 
-#### MySQL Connector class
+##### Odpalenie testów jednostkowych
 
-In $WILDFLY_HOME/modules/system/layers/base/com create /mysql/main (mkdir -p mysql/main), inside put your mysql-connector-java-[version]-bin.jar
-and create module.xml with following content(remember to change [version] to your connector version) :
+``` mvn test ```
 
-<?xml version="1.0" encoding="UTF-8"?>
-        <module xmlns="urn:jboss:module:1.1" name="com.mysql">
-            <resources>
-                <resource-root path="mysql-connector-java-[version]-bin.jar"/>
-            </resources>
-            <dependencies>
-                <module name="javax.api"/>
-                <module name="javax.transaction.api"/>
-            </dependencies>
-        </module>
-```bash
-<?xml version="1.0" encoding="UTF-8"?><module xmlns="urn:jboss:module:1.1" name="com.mysql"><resources><resource-root path="mysql-connector-java-[version]-bin.jar"/></resources><dependencies><module name="javax.api"/><module name="javax.transaction.api"/></dependencies></module>
-```
-In CLI run following command:
+##### Odpalenie testów integracyjnych
 
-```bash
-/subsystem=datasources/jdbc-driver=mysql:add(driver-name=mysql,driver-module-name=com.mysql,driver-class-name=com.mysql.jdbc.Driver)
-```
+``` mvn verify ```
 
-to reference the module as a driver. Command returns {"outcome" => "success"} in case of success.
+##### Deployment aplikacji
 
-#### DataSource
-
-/subsystem=datasources/data-source=Navi:add(driver-name=mysql,user-name=navi,password=navi,connection-url=jdbc:mysql://localhost:3306/indoornavi,min-pool-size=5,max-pool-size=15,jndi-name=java:/jdbc/Navi,enabled=true,validate-on-match=true,valid-connection-checker-class-name=org.jboss.jca.adapters.jdbc.extensions.mysql.MySQLValidConnectionChecker,exception-sorter-class-name=org.jboss.jca.adapters.jdbc.extensions.mysql.MySQLExceptionSorter)
-/subsystem=datasources/data-source=Navi/connection-properties=characterEncoding:add(value=utf-8)
-/subsystem=datasources/data-source=Navi/connection-properties=connectionCollation:add(value=utf8_unicode_ci)
-/subsystem=datasources/data-source=Navi/connection-properties=noAccessToProcedureBodies:add(value=true)
-/subsystem=datasources/data-source=Navi/connection-properties=useUnicode:add(value=true)
-
-#### Api User
-
-Like in the begining, run run add-user.sh(.bat) from $WILDFLY_HOME/bin, but this time, type 'b' for Application User, add your credentials(user name and password) and in'groups' question type 'Manager' as a group.
-This user will be able to acces indoornavi rest api.
-
-#### Big files sending
-
-To let users send and receive bigger map files, in /etc/mysql/conf.d/mariadb.cnf or /etc/mysql/my.cnf change/add max_allowed_packet value to 512M and add innodb_log_file_size with the same 512M value.
-
-## Deploy
-
-```bash
-$WILDFLY_HOME/bin/jboss-cli.sh --connect --command="deploy --force [PATH_TO_EAR]"
-```
-After deploy the following paths will be available:
-- `/rest/v1` with REST API,
-- `/api` with interactive API documentation (with the HTTP authorization with defined user and password).
+``` mvn package ```

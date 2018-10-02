@@ -1,0 +1,3 @@
+id,data,version,floor_id,publishedDate,saveDraftDate
+1,'{"sinks":[],"scale":{"start":{"x":0,"y":0},"stop":{"x":50,"y":50},"realDistance":15,"measure":"CENTIMETERS"}}',0,1,2011-01-01 00:00:00,2011-01-01 00:00:00
+2,'{"sinks":[],"scale":{"start":{"x":0,"y":0},"stop":{"x":50,"y":50},"realDistance":150,"measure":"CENTIMETERS"}}',1,1,null,null
