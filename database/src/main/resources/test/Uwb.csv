@@ -1,0 +1,9 @@
+id,commitHash,major,minor,firmwarePartition,shortId
+1,null,null,null,0,32999
+2,null,null,null,0,33000
+3,null,null,null,1,33001
+4,null,null,null,1,11999
+5,null,null,null,0,12000
+6,null,null,null,1,12001
+7,null,null,null,0,12002
+8,null,null,null,1,34999

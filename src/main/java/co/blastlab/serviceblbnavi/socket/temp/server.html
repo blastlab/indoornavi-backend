@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Title</title>
+</head>
+<body>
+</body>
+<script
+	src="https://code.jquery.com/jquery-3.1.1.min.js"
+	integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+	crossorigin="anonymous"></script>
+<script>
+	$(document).ready(function () {
+		var isConnectionOpen = false;
+		var socket = new WebSocket("ws://localhost:90/measures?server");
+		var coordsSin = sin(200, 900);
+		var coordsLine = lineUp({x: 5, y: 5}, {x: 300, y: 300}, 5, 5);
+		var coordsCircle = circle(100, 0.1, {x: 300, y: 0});
+		var coordsLine2 = lineDown({x: 200, y: 500}, {x: 5, y: 25}, 5, 5);
+		var sinInterval = null;
+		var lineInterval = null;
+		var circleInterval = null;
+		var line2Interval = null;
+		var counter = 0;
+		var anchors = [];
+		var info = [{code: 2, args: "{\"did\": 999999, \"eui\": 9090909090}"}];
+
+		socket.onopen = function () {
+			console.log('connection opened');
+			isConnectionOpen = true;
+//			sendPath(sinInterval, coordsSin, 10999);
+//			sendPath(lineInterval, coordsLine, 11999);
+//			sendPath(circleInterval, coordsCircle, 12999);
+//			sendPath(line2Interval, coordsLine2, 13999);
+		};
+
+		socket.onclose = function () {
+			isConnectionOpen = false;
+		};
+
+		socket.onmessage = function (msg) {
+			console.log(msg);
+			var message = JSON.parse(msg.data);
+			if (message.type === 'ANCHORS') {
+				anchors = message['anchors'];
+			}
+		};
+
+		function sendPath(interval, coordinates, tagId) {
+			interval = setInterval(function () {
+				if (anchors.length === 0) {
+					return;
+				}
+				if (counter >= coordinates.length) {
+					clearInterval(interval);
+					return;
+				}
+				var data = JSON.stringify({
+					measures: getDistances({
+						shortId: tagId,
+						x: coordinates[counter].x,
+						y: coordinates[counter].y
+					}), info: info
+				});
+				console.log("sending: ");
+				console.log(data);
+				socket.send(data);
+				counter++;
+			}, 1000);
+		}
+
+		function sin(start, stop) {
+			var coordinates = [];
+			var increase = 90 / 180 * Math.PI / 9;
+			var y, counter = 0;
+
+			for (var x = start; x <= stop; x += 10) {
+				y = 180 - Math.sin(counter) * 120;
+				coordinates.push({x: x, y: y});
+				counter += increase;
+			}
+			return coordinates;
+		}
+
+		function lineUp(from, to, xOffset, yOffset) {
+			var coordinates = [];
+			var i = from.x;
+			var j = from.y;
+			while (i < to.x || j < to.y) {
+				coordinates.push({
+					x: i,
+					y: j
+				});
+				i += xOffset;
+				j += yOffset;
+			}
+			return coordinates;
+		}
+
+		function lineDown(from, to, xOffset, yOffset) {
+			var coordinates = [];
+			var i = from.x;
+			var j = from.y;
+			while (i > to.x && j > to.y) {
+				coordinates.push({
+					x: i,
+					y: j
+				});
+				i -= xOffset;
+				j -= yOffset;
+			}
+			return coordinates;
+		}
+
+		function circle(r, radians, center) {
+			var coordinates = [];
+			var startingRadians = 0;
+			while (startingRadians <= 2 * Math.PI) {
+				var x = r * Math.cos(startingRadians) + center.x;
+				var y = r * Math.sin(startingRadians) + center.y;
+				coordinates.push({x: x, y: y});
+				startingRadians += radians;
+			}
+			return coordinates;
+		}
+
+		function getDistances(tag) {
+			return [
+				{
+					did1: tag['shortId'],
+					did2: anchors[0]['shortId'],
+					dist: calcDistance(tag, anchors[0])
+				},
+				{
+					did1: tag['shortId'],
+					did2: anchors[1]['shortId'],
+					dist: calcDistance(tag, anchors[1])
+				},
+				{
+					did1: tag['shortId'],
+					did2: anchors[2]['shortId'],
+					dist: calcDistance(tag, anchors[2])
+				}
+			]
+		}
+
+		function calcDistance(tag, anchor) {
+			return Math.sqrt(Math.pow(Math.abs(tag.x - anchor.x), 2) + Math.pow(Math.abs(tag.y - anchor.y), 2))
+		}
+
+		// data for wizard
+		setInterval(function () {
+			var distances = [
+				{"did1": 999999, "did2": 111111, "dist": Math.floor(100)},
+				{"did1": 999999, "did2": 222222, "dist": Math.floor(70)},
+				{"did1": 111111, "did2": 222222, "dist": Math.floor(60)}
+			];
+			console.log("sending x, y ", JSON.stringify(distances));
+			socket.send(JSON.stringify(distances));
+		}, 3000);
+	});
+</script>
+</html>

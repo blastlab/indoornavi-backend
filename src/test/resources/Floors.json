@@ -1,0 +1,16 @@
+[
+	{
+		"id": 0,
+		"level": 0,
+		"name": "",
+		"building": { "id": 1 },
+		"imageId": null
+	},
+	{
+		"id": 0,
+		"level": 0,
+		"name": "",
+		"building": { "id": 1 },
+		"imageId": null
+	}
+]

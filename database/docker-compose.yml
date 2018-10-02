@@ -1,0 +1,15 @@
+version: '2'
+services:
+  db:
+    build: mariadb
+    ports:
+      - '3306:3306'
+    environment:
+      MYSQL_DATABASE: navi
+      MYSQL_ROOT_PASSWORD: password
+      TZ: Europe/Warsaw
+
+
+volumes:
+  # To prevent fetching all the Maven packages at every run store local repository in persistent named volume.
+  maven_liquibase: {}

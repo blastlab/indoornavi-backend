@@ -1,0 +1,61 @@
+version: '2'
+services:
+
+  db:
+    extends:
+      file: database/docker-compose.yml
+      service: db
+    container_name:
+      db
+
+
+  liquibase:
+    build: database
+    ports:
+      - '2306:80'
+    environment:
+      HOST: db
+      SCHEMA: navi
+      USER: root
+      PASSWORD: password
+    volumes:
+      - ./database/src/main/resources:/liquibase/changelog
+    entrypoint: ["wait-for-it", "db:3306", "-t", "0", "--", "/run.sh"]
+
+
+  core:
+    build: .
+    container_name:
+      core
+    ports:
+      - '90:8080'
+      - '8787:8787'
+      - '9990:9990'
+    volumes:
+      - ./deployments:/opt/jboss/wildfly/standalone/deployments
+    depends_on:
+      - db
+    environment:
+      TZ: Europe/Warsaw
+      APP_ENVIRONMENT: development
+      APP_DB_HOST: db
+      APP_DB_USER: root
+      APP_DB_PASSWORD: password
+#      APP_LOG_LEVEL: TRACE # will log all actions taken by user and hardware communication
+      APP_LOG_LEVEL: DEBUG # will log all actions taken by user
+#      APP_LOG_LEVEL: INFO # will only log most important messages
+    entrypoint: ["wait-for-it", "liquibase:80", "-t", "0", "--", "/start-server.sh"]
+
+
+  core_compiler:
+    build: compiler
+    volumes:
+      - ./:/app
+      - m2:/root/.m2
+    container_name:
+      core_compiler
+
+
+volumes:
+  # For Liquibase container.
+  m2:
