@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Title</title>
+</head>
+<style>
+	#container {
+		width: 1500px;
+		height: 1500px;
+		background: grey;
+		position: relative;
+	}
+
+	.square {
+		width: 5px;
+		height: 5px;
+		background: white;
+		position: absolute;
+	}
+
+	.red {
+		background-color: red;
+	}
+</style>
+<body>
+<div id="container">
+	<form>
+		<div id="checkboxes"></div>
+	</form>
+</div>
+</body>
+<script
+	src="https://code.jquery.com/jquery-3.1.1.min.js"
+	integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+	crossorigin="anonymous"></script>
+<script>
+	$(document).ready(function () {
+		var $container = $('#container');
+		var isConnectionOpen = false;
+		var socket = new WebSocket("ws://localhost:90/measures?client");
+		var message = {
+			color: ''
+		};
+		var tags = [];
+
+		$.getJSON('http://localhost:90/rest/v1/areas', function(areas) {
+			$.each(areas, function() {
+				$.each(this['points'], function() {
+					var $el = $('<div class="square"></div>');
+					$el.css({
+						'left': 250 + this['x'],
+						'top': 400 + this['y'],
+						'background-color': '#aaffaa'
+					});
+					$container.append($el);
+				});
+
+				$.each(this['buffer'], function() {
+					var $el = $('<div class="square"></div>');
+					$el.css({
+						'left': 250 + this['x'],
+						'top': 400 + this['y'],
+						'background-color': '#11ffaa'
+					});
+					$container.append($el);
+				});
+			});
+		});
+
+		socket.onopen = function () {
+			console.log('connection opened');
+			isConnectionOpen = true;
+		};
+
+		socket.onclose = function () {
+			console.log('connection closed');
+			isConnectionOpen = false;
+		};
+
+		socket.onmessage = function (msg) {
+			var message = JSON.parse(msg.data);
+
+			if (message.type === 'TAGS') {
+				var checkboxes = $('#checkboxes');
+				for (var i = 0; i < message.tags.length; i++) {
+					if (tags.indexOf(message.tags[i]['shortId']) >= 0) continue;
+
+					var checkbox = $('<input name="tag" checked type="checkbox" value="' + message.tags[i]['shortId'] + '">');
+					var wrapper = $('<span>' + message.tags[i]['shortId'] + '</span>');
+					checkbox.change(function() {
+						socket.send(JSON.stringify({
+							filterType: 'TAG_ACTIVE',
+							args: $(this).val()
+						}));
+					});
+					wrapper.css({
+						'color': getColor(message.tags[i]['shortId'])
+					});
+					wrapper.append(checkbox);
+					checkboxes.append(wrapper);
+					tags.push(message.tags[i]['shortId']);
+				}
+			} else if (message.type === 'COORDINATES') {
+				var $el = $('<div class="square"></div>');
+				$el.css({
+					'left': 250 + message['coordinatesDto']['point'].x,
+					'top': 400 + message['coordinatesDto']['point'].y,
+					'background-color': getColor(message['coordinatesDto']['deviceId'])
+				});
+				$container.append($el);
+			} else if (message.type === 'EVENT') {
+				console.log(message.event)
+				var alertMessage = '';
+				var event = message['event'];
+				if (event['mode'] === 'ON_LEAVE') {
+					alertMessage += event['tagId'] + ' left area ' + event['areaName'];
+				} else if (event['mode'] === 'ON_ENTER') {
+					alertMessage += event['tagId'] + ' entered area ' + event['areaName'];
+				}
+				console.log(alertMessage);
+			}
+		};
+
+		function getColor(deviceId) {
+			return {
+				10151: 'blue',
+				10404: 'purple',
+				10210: 'green',
+				10310: 'pink'
+			}[deviceId];
+		}
+
+		var anchors = [
+			{
+				x: 0,
+				y: 0
+			},
+			{
+				x: 785,
+				y: 0
+			},
+			{
+				x: 485,
+				y: 397
+			}
+		];
+		for (var j = 0; j < anchors.length; j++) {
+			var $el = $('<div class="square red"></div>');
+			$el.css({
+				'left': 250 + anchors[j].x,
+				'top': 400 + anchors[j].y
+			});
+			$container.append($el);
+		}
+	});
+</script>
+</html>

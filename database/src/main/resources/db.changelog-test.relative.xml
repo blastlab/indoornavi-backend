@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.3.xsd">
+
+	<!-- This file is used in test enviroment -->
+	<changeSet id="Clear" author="kgebert" context="test" runOnChange="true" labels="Clear" runAlways="true">
+		<delete tableName="configuration" />
+		<delete tableName="publication_tag" />
+		<delete tableName="publication_floor" />
+		<delete tableName="publication_user" />
+		<delete tableName="publication" />
+		<delete tableName="areaconfiguration_tag" />
+		<delete tableName="area_areaconfiguration" />
+		<delete tableName="area" />
+		<delete tableName="areaconfiguration" />
+		<delete tableName="uwbcoordinates" />
+		<delete tableName="phonecoordinates" />
+		<delete tableName="coordinates"/>
+		<delete tableName="tag"/>
+		<delete tableName="sink"/>
+		<delete tableName="anchor"/>
+		<delete tableName="uwb" />
+		<delete tableName="bluetooth" />
+		<delete tableName="device"/>
+		<delete tableName="floor"/>
+		<delete tableName="image"/>
+		<delete tableName="building"/>
+		<delete tableName="complex"/>
+		<delete tableName="permissiongroup_permission"/>
+		<delete tableName="permission"/>
+		<delete tableName="user_permissiongroup"/>
+		<delete tableName="permissiongroup"/>
+		<delete tableName="user"/>
+		<delete tableName="phone"/>
+	</changeSet>
+
+	<changeSet context="test" id="Permission" author="kgebert" runOnChange="true" labels="Permission" runAlways="true">
+		<loadUpdateData tableName="permission" file="test/Permission.csv" primaryKey="id" relativeToChangelogFile="true" />
+		<loadUpdateData tableName="permission" file="test/navi-142/Permission.csv" primaryKey="id" relativeToChangelogFile="true" />
+		<loadUpdateData tableName="permission" file="test/navi-73/Permission.csv" primaryKey="id" relativeToChangelogFile="true" />
+		<loadUpdateData tableName="permission" file="test/navi-364/Permission.csv" primaryKey="id" relativeToChangelogFile="true" />
+	</changeSet>
+
+	<changeSet context="test" id="PermissionGroup" author="kgebert" runOnChange="true" labels="PermissionGroup" runAlways="true">
+		<loadUpdateData tableName="permissiongroup" file="test/PermissionGroup.csv" primaryKey="id" relativeToChangelogFile="true" />
+	</changeSet>
+
+	<changeSet context="test" id="PermissionGroup_Permission" author="kgebert" runOnChange="true" labels="PermissionGroup_Permission" runAlways="true">
+		<loadData tableName="permissiongroup_permission" file="test/PermissionGroupPermission.csv" relativeToChangelogFile="true" />
+		<loadData tableName="permissiongroup_permission" file="test/navi-142/PermissionGroupPermission.csv" relativeToChangelogFile="true" />
+		<loadData tableName="permissiongroup_permission" file="test/navi-73/PermissionGroupPermission.csv" relativeToChangelogFile="true" />
+		<loadData tableName="permissiongroup_permission" file="test/navi-364/PermissionGroupPermission.csv" relativeToChangelogFile="true" />
+	</changeSet>
+
+	<changeSet context="test" id="User" author="kgebert" runOnChange="true" labels="User" runAlways="true">
+		<loadUpdateData tableName="user" file="test/User.csv" primaryKey="id" relativeToChangelogFile="true">
+			<column name="superuser" type="boolean" />
+		</loadUpdateData>
+	</changeSet>
+
+	<changeSet context="test" id="User_PermissionGroup" author="kgebert" runOnChange="true" labels="User_PermissionGroup" runAlways="true">
+		<loadData tableName="user_permissiongroup" file="test/UserPermissionGroup.csv" relativeToChangelogFile="true" />
+	</changeSet>
+
+	<changeSet id="Complex" author="mcichosz" context="test" runOnChange="true" labels="Complex" runAlways="true">
+		<loadUpdateData tableName="complex" file="test/Complex.csv" primaryKey="id" relativeToChangelogFile="true"/>
+	</changeSet>
+
+	<changeSet id="Building" author="mcichosz" context="test" runOnChange="true" labels="Building" runAlways="true">
+		<loadUpdateData tableName="building" file="test/Building.csv" primaryKey="id" relativeToChangelogFile="true"/>
+	</changeSet>
+
+	<changeSet id="Image" author="jsmol" context="test" runOnChange="true" labels="Image" runAlways="true">
+		<loadUpdateData tableName="image" file="test/Image.csv" primaryKey="id" relativeToChangelogFile="true"/>
+	</changeSet>
+
+	<changeSet id="Floor" author="mcichosz" context="test" runOnChange="true" labels="Floor" runAlways="true">
+		<loadUpdateData tableName="floor" file="test/Floor.csv" primaryKey="id" relativeToChangelogFile="true"/>
+	</changeSet>
+
+	<changeSet id="Device" author="jsmol" context="test" runOnChange="true" labels="Device" runAlways="true">
+		<loadUpdateData tableName="device" file="test/Device.csv" primaryKey="id" relativeToChangelogFile="true">
+			<column name="verified" type="boolean" />
+		</loadUpdateData>
+	</changeSet>
+
+	<changeSet id="Bluetooth" author="kgebert" context="test" runOnChange="true" labels="Bluetooth" runAlways="true">
+		<loadUpdateData tableName="bluetooth" file="test/Bluetooth.csv" primaryKey="id" relativeToChangelogFile="true"/>
+	</changeSet>
+
+	<changeSet id="Uwb" author="kgebert" context="test" runOnChange="true" labels="Uwb" runAlways="true">
+		<loadUpdateData tableName="uwb" file="test/Uwb.csv" primaryKey="id" relativeToChangelogFile="true"/>
+	</changeSet>
+
+	<changeSet id="Anchor" author="pkuzmicki" context="test" runOnChange="true" labels="Anchor" runAlways="true">
+		<loadUpdateData tableName="anchor" file="test/Anchor.csv" primaryKey="id" relativeToChangelogFile="true"/>
+	</changeSet>
+
+	<changeSet id="Tag" author="jsmol" context="test" runOnChange="true" labels="Tag" runAlways="true">
+		<loadUpdateData tableName="tag" file="test/Tag.csv" primaryKey="id" relativeToChangelogFile="true"/>
+	</changeSet>
+
+	<changeSet id="Sink" author="kgebert" context="test" runOnChange="true" labels="Sink" runAlways="true">
+		<loadUpdateData tableName="sink" file="test/Sink.csv" primaryKey="id" relativeToChangelogFile="true">
+			<column name="configured" type="boolean" />
+		</loadUpdateData>
+	</changeSet>
+
+	<changeSet id="Area" author="kgebert" context="test" runOnChange="true" labels="Area" runAlways="true">
+		<sql>
+			insert into area (id, polygon, name, floor_id) VALUES (1, GeomFromText('POLYGON(( 190 750, 580 750, 580 980, 190 980, 190 750 ))'), 'test', 2);
+			insert into area (id, polygon, name, floor_id) VALUES (2, GeomFromText('POLYGON(( 15 50, 25 50, 25 90, 15 90, 15 50 ))'), 'test2', 2);
+		</sql>
+	</changeSet>
+
+	<changeSet id="AreaConfiguration" author="kgebert" context="test" runOnChange="true" labels="AreaConfiguration" runAlways="true">
+		<loadUpdateData tableName="areaconfiguration" file="test/AreaConfiguration.csv" primaryKey="id" relativeToChangelogFile="true" />
+	</changeSet>
+
+	<changeSet id="Area_AreaConfiguration" author="kgebert" context="test" runOnChange="true" labels="Area_AreaConfiguration" runAlways="true">
+		<loadData tableName="area_areaconfiguration" file="test/AreaAreaConfiguration.csv" relativeToChangelogFile="true" />
+	</changeSet>
+
+	<changeSet id="AreaConfiguration_Tag" author="kgebert" context="test" runOnChange="true" labels="AreaConfiguration_Tag" runAlways="true">
+		<loadData tableName="areaconfiguration_tag" file="test/AreaConfigurationTag.csv" relativeToChangelogFile="true" />
+	</changeSet>
+
+	<changeSet id="Configuration" author="kgebert" context="test" runOnChange="true" labels="Configuration" runAlways="true">
+		<loadUpdateData quotchar="'" tableName="configuration" file="test/Configuration.csv" primaryKey="id" relativeToChangelogFile="true">
+			<column name="publishedDate" type="DATE" />
+			<column name="saveDraftDate" type="DATE" />
+		</loadUpdateData>
+	</changeSet>
+
+	<changeSet id="Publication" author="kgebert" context="test" runOnChange="true" labels="Publication" runAlways="true">
+		<loadUpdateData tableName="publication" file="test/Publication.csv" primaryKey="id" relativeToChangelogFile="true" />
+	</changeSet>
+
+	<changeSet id="Publication_Tag" author="kgebert" context="test" runOnChange="true" labels="Publication_Tag" runAlways="true">
+		<loadData tableName="publication_tag" file="test/PublicationTag.csv" relativeToChangelogFile="true" />
+	</changeSet>
+
+	<changeSet id="Publication_User" author="kgebert" context="test" runOnChange="true" labels="Publication_User" runAlways="true">
+		<loadData tableName="publication_user" file="test/PublicationUser.csv" relativeToChangelogFile="true" />
+	</changeSet>
+
+	<changeSet id="Publication_Floor" author="kgebert" context="test" runOnChange="true" labels="Publication_Floor" runAlways="true">
+		<loadData tableName="publication_floor" file="test/PublicationFloor.csv" relativeToChangelogFile="true" />
+	</changeSet>
+	
+	<changeSet id="Coordinates" author="kgebert" context="test" runOnChange="true" labels="Coordinates" runAlways="true">
+		<loadData tableName="coordinates" file="test/Coordinates.csv" relativeToChangelogFile="true">
+			<column name="creation_date" type="DATE" />
+		</loadData>
+	</changeSet>
+
+	<changeSet id="Phone" author="kgebert" context="test" runOnChange="true" labels="Phone" runAlways="true">
+		<loadData tableName="phone" file="test/Phone.csv" relativeToChangelogFile="true" />
+	</changeSet>
+
+	<changeSet id="UwbCoordinates" author="kgebert" context="test" runOnChange="true" labels="UwbCoordinates" runAlways="true">
+		<loadData tableName="uwbcoordinates" file="test/UwbCoordinates.csv" relativeToChangelogFile="true" />
+	</changeSet>
+</databaseChangeLog>
