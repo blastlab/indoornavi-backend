@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.3.xsd">
+	<!-- This file is used in development enviroment -->
+	<changeSet id="Clear" author="kgebert" context="test" runOnChange="true" labels="Clear" runAlways="true">
+		<delete tableName="apikey" />
+		<delete tableName="configuration" />
+		<delete tableName="publication_tag" />
+		<delete tableName="publication_user" />
+		<delete tableName="publication_floor" />
+		<delete tableName="publication" />
+		<delete tableName="areaconfiguration_tag" />
+		<delete tableName="area_areaconfiguration" />
+		<delete tableName="area" />
+		<delete tableName="areaconfiguration" />
+		<delete tableName="coordinates"/>
+		<delete tableName="tag"/>
+		<delete tableName="sink"/>
+		<delete tableName="anchor"/>
+		<delete tableName="uwb"/>
+		<delete tableName="device"/>
+		<delete tableName="floor"/>
+		<delete tableName="image"/>
+		<delete tableName="building"/>
+		<delete tableName="complex"/>
+	</changeSet>
+
+	<changeSet id="Complex" author="mcichosz" context="test" runOnChange="true" labels="Complex" runAlways="true">
+		<loadUpdateData tableName="complex" file="test/demo/Complex.csv" primaryKey="id"/>
+	</changeSet>
+
+	<changeSet id="Building" author="mcichosz" context="test" runOnChange="true" labels="Building" runAlways="true">
+		<loadUpdateData tableName="building" quotchar="'" file="test/demo/Building.csv" primaryKey="id"/>
+	</changeSet>
+
+	<changeSet id="Image" author="jsmol" context="test" runOnChange="true" labels="Image" runAlways="true">
+		<loadUpdateData tableName="image" file="test/Image.csv" primaryKey="id"/>
+	</changeSet>
+
+	<changeSet id="Floor" author="mcichosz" context="test" runOnChange="true" labels="Floor" runAlways="true">
+		<loadUpdateData tableName="floor" quotchar="'" file="test/demo/Floor.csv" primaryKey="id"/>
+	</changeSet>
+
+	<changeSet id="Device" author="jsmol" context="test" runOnChange="true" labels="Device" runAlways="true">
+		<loadUpdateData tableName="device" file="test/Device.csv" primaryKey="id">
+			<column name="verified" type="boolean" />
+		</loadUpdateData>
+	</changeSet>
+
+	<changeSet id="Bluetooth" author="kgebert" context="test" runOnChange="true" labels="Bluetooth" runAlways="true">
+		<loadUpdateData tableName="bluetooth" file="test/Bluetooth.csv" primaryKey="id"/>
+	</changeSet>
+
+	<changeSet id="Uwb" author="kgebert" context="test" runOnChange="true" labels="Uwb" runAlways="true">
+		<loadUpdateData tableName="uwb" file="test/Uwb.csv" primaryKey="id"/>
+	</changeSet>
+
+	<changeSet id="Anchor" author="pkuzmicki" context="test" runOnChange="true" labels="Anchor" runAlways="true">
+		<loadUpdateData tableName="anchor" file="test/Anchor.csv" primaryKey="id"/>
+	</changeSet>
+
+	<changeSet id="Tag" author="jsmol" context="test" runOnChange="true" labels="Tag" runAlways="true">
+		<loadUpdateData tableName="tag" file="test/Tag.csv" primaryKey="id"/>
+	</changeSet>
+
+	<changeSet id="Sink" author="kgebert" context="test" runOnChange="true" labels="Sink" runAlways="true">
+		<loadUpdateData tableName="sink" file="test/Sink.csv" primaryKey="id">
+			<column name="configured" type="boolean" />
+		</loadUpdateData>
+	</changeSet>
+
+	<changeSet id="Area" author="kgebert" context="test" runOnChange="true" labels="Area" runAlways="true">
+		<sql>
+			insert into area (id, polygon, name, floor_id) VALUES (1, GeomFromText('POLYGON(( 190 750, 580 750, 580 980, 190 980, 190 750 ))'), 'test', 2);
+		</sql>
+	</changeSet>
+
+	<changeSet id="AreaConfiguration" author="kgebert" context="test" runOnChange="true" labels="AreaConfiguration" runAlways="true">
+		<loadUpdateData tableName="areaconfiguration" file="test/AreaConfiguration.csv" primaryKey="id" />
+	</changeSet>
+
+	<changeSet id="Area_AreaConfiguration" author="kgebert" context="test" runOnChange="true" labels="Area_AreaConfiguration" runAlways="true">
+		<loadData tableName="area_areaconfiguration" file="test/AreaAreaConfiguration.csv" />
+	</changeSet>
+
+	<changeSet id="AreaConfiguration_Tag" author="kgebert" context="test" runOnChange="true" labels="AreaConfiguration_Tag" runAlways="true">
+		<loadData tableName="areaconfiguration_tag" file="test/AreaConfigurationTag.csv" />
+	</changeSet>
+
+	<changeSet id="Publication" author="kgebert" context="test" runOnChange="true" labels="Publication" runAlways="true">
+		<loadUpdateData tableName="publication" file="test/Publication.csv" primaryKey="id" />
+	</changeSet>
+
+	<changeSet id="Publication_Tag" author="kgebert" context="test" runOnChange="true" labels="Publication_Tag" runAlways="true">
+		<loadData tableName="publication_tag" file="test/PublicationTag.csv" />
+	</changeSet>
+
+	<changeSet id="Publication_User" author="kgebert" context="test" runOnChange="true" labels="Publication_User" runAlways="true">
+		<loadData tableName="publication_user" file="test/PublicationUser.csv" />
+	</changeSet>
+
+	<changeSet id="Publication_Floor" author="kgebert" context="test" runOnChange="true" labels="Publication_Floor" runAlways="true">
+		<loadData tableName="publication_floor" file="test/PublicationFloor.csv" />
+	</changeSet>
+
+	<changeSet id="ApiKey" author="kgebert" context="test" runOnChange="true" labels="ApiKey" runAlways="true">
+		<loadUpdateData tableName="apikey" file="test/ApiKey.csv" primaryKey="id" />
+	</changeSet>
+</databaseChangeLog>
