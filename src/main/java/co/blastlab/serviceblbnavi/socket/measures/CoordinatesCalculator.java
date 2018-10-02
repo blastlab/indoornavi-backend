@@ -125,6 +125,12 @@ public class CoordinatesCalculator {
 		double x = stateMatrix.tagPosition.get(0);
 		double y = stateMatrix.tagPosition.get(1);
 		double z = stateMatrix.tagPosition.get(2);
+
+		if (!isTagPositionGood(stateMatrix)) {
+			logger.trace("Tag position calculated far too far: x = %s, y = %s, z = %s", x, y, z);
+			return Optional.empty();
+		}
+
 		return Optional.of(new Point3D((int) Math.round(x), (int) Math.round(y), (int) Math.round(z)));
 	}
 
@@ -155,6 +161,18 @@ public class CoordinatesCalculator {
 
 		return new StateMatrix(anchorPositions, measures, tagPosition);
 	}
+
+	private boolean isTagPositionGood(StateMatrix stateMatrix) {
+		double maxDistance = stateMatrix.measures.elementMaxAbs();
+		double maxPosition = stateMatrix.tagPosition.elementMaxAbs();
+		boolean tooFar, badValue;
+		tooFar = Math.abs(stateMatrix.tagPosition.get(0)) > stateMatrix.anchorPositions.cols(0, 1).elementMaxAbs() + maxDistance;
+		tooFar |= Math.abs(stateMatrix.tagPosition.get(1)) > stateMatrix.anchorPositions.cols(1, 2).elementMaxAbs() + maxDistance;
+		tooFar |= Math.abs(stateMatrix.tagPosition.get(2)) > stateMatrix.anchorPositions.cols(2, 3).elementMaxAbs() + maxDistance;
+		badValue = Double.isInfinite(maxPosition) || Double.isNaN(maxPosition);
+		return !(tooFar || badValue);
+	}
+
 
 	private Optional<Point3D> calculate2d(Set<Integer> connectedAnchors, Integer tagId) {
 		if (connectedAnchors.size() < 3) {
