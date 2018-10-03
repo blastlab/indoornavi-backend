@@ -24905,7 +24905,7 @@
 				 * `defer`, `delay`, `difference`, `drop`, `dropRight`, `dropRightWhile`,
 				 * `dropWhile`, `fill`, `filter`, `flatten`, `flattenDeep`, `flow`, `flowRight`,
 				 * `forEach`, `forEachRight`, `forIn`, `forInRight`, `forOwn`, `forOwnRight`,
-				 * `functions`, `groupBy`, `indexBy`, `initial`, `intersection`, `invert`,
+				 * `functions`, `groupBy`, `indexBy`, `initial`, `findIntersection`, `invert`,
 				 * `invoke`, `keys`, `keysIn`, `map`, `mapKeys`, `mapValues`, `matches`,
 				 * `matchesProperty`, `memoize`, `merge`, `method`, `methodOf`, `mixin`,
 				 * `modArgs`, `negate`, `omit`, `once`, `pairs`, `partial`, `partialRight`,
