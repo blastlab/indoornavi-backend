@@ -21,6 +21,15 @@ public abstract class WebSocket extends WebSocketCommunication {
 		return session.getRequestParameterMap().containsKey(SERVER);
 	}
 
+	protected void open(Session session) {
+		logger.setId(getSessionId()).trace("Session opened {}, query params = {}", session.getId(), session.getRequestParameterMap());
+		if (session.getRequestParameterMap().containsKey(CLIENT)) {
+			getClientSessions().add(session);
+		} else if (session.getRequestParameterMap().containsKey(SERVER)) {
+			getServerSessions().add(session);
+		}
+	}
+
 	protected void open(Session session, Runnable doForClients, Runnable doForServers) {
 		logger.setId(getSessionId()).trace("Session opened {}, query params = {}", session.getId(), session.getRequestParameterMap());
 		if (session.getRequestParameterMap().containsKey(CLIENT)) {

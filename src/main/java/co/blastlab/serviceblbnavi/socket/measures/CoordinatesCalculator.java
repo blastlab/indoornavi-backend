@@ -1,9 +1,14 @@
 package co.blastlab.serviceblbnavi.socket.measures;
 
 import co.blastlab.serviceblbnavi.dao.repository.AnchorRepository;
+import co.blastlab.serviceblbnavi.dao.repository.TagRepository;
 import co.blastlab.serviceblbnavi.domain.Anchor;
+import co.blastlab.serviceblbnavi.domain.Floor;
 import co.blastlab.serviceblbnavi.dto.Point;
+import co.blastlab.serviceblbnavi.dto.floor.FloorDto;
 import co.blastlab.serviceblbnavi.dto.report.UwbCoordinatesDto;
+import co.blastlab.serviceblbnavi.dto.tag.TagDto;
+import co.blastlab.serviceblbnavi.socket.tagTracer.TagTraceDto;
 import co.blastlab.serviceblbnavi.utils.Logger;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,6 +17,7 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
 import javax.ejb.Singleton;
+import javax.enterprise.event.Event;
 import javax.inject.Inject;
 import java.util.*;
 
@@ -31,6 +37,22 @@ public class CoordinatesCalculator {
 
 	@Inject
 	private AnchorRepository anchorRepository;
+
+	@Inject
+	private TagRepository tagRepository;
+
+	private boolean traceTags;
+
+	@Inject
+	private Event<TagTraceDto> tagTraceEvent;
+
+	public void startTracingTags() {
+		this.traceTags = true;
+	}
+
+	public void stopTracingTags() {
+		this.traceTags = false;
+	}
 
 	public Optional<UwbCoordinatesDto> calculateTagPosition(int firstDeviceId, int secondDeviceId, int distance) {
 		logger.trace("Measure storage tags: {}", measureStorage.keySet().size());
@@ -96,25 +118,37 @@ public class CoordinatesCalculator {
 		logger.trace("Current position: X: {}, Y: {}", x, y);
 
 		Optional<PointAndTime> previousPoint = Optional.ofNullable(previousCoorinates.get(tagId));
-		Long floorId = null;
+		Floor floor = null;
 		Optional<Anchor> anchor = anchorRepository.findByShortId(anchorId);
 		if (anchor.isPresent()) {
-			floorId = anchor.get().getFloor() != null ? anchor.get().getFloor().getId() : null;
+			floor = anchor.get().getFloor();
 		}
-		if (floorId == null) {
+		if (floor == null) {
 			return Optional.empty();
 		}
 		Date currentDate = new Date();
+		if (traceTags) {
+			this.sendEventToTagTracer(tagId, floor);
+		}
 		if (previousPoint.isPresent()) {
 			x = (x + previousPoint.get().getPoint().getX()) / 2;
 			y = (y + previousPoint.get().getPoint().getY()) / 2;
 			Point newPoint = new Point(x, y);
 			previousCoorinates.put(tagId, new PointAndTime(newPoint, currentDate.getTime()));
-			return Optional.of(new UwbCoordinatesDto(tagId, anchorId, floorId, newPoint, currentDate));
+			return Optional.of(new UwbCoordinatesDto(tagId, anchorId, floor.getId(), newPoint, currentDate));
 		}
 		Point currentPoint = new Point(x, y);
 		previousCoorinates.put(tagId, new PointAndTime(currentPoint, currentDate.getTime()));
-		return Optional.of(new UwbCoordinatesDto(tagId, anchorId, floorId, currentPoint, currentDate));
+		return Optional.of(new UwbCoordinatesDto(tagId, anchorId, floor.getId(), currentPoint, currentDate));
+	}
+
+	private void sendEventToTagTracer(Integer tagId, final Floor floor) {
+		tagRepository.findOptionalByShortId(tagId).ifPresent((tag -> {
+			tagTraceEvent.fire(new TagTraceDto(
+				new TagDto(tag),
+				new FloorDto(floor)
+			));
+		}));
 	}
 
 	private Double calculateThres(List<Double> intersectionPointsDistances, int connectedAnchorsCount) {
