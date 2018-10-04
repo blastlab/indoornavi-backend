@@ -81,11 +81,15 @@ public class CoordinatesCalculator {
 
 		logger.trace("Current position: X: {}, Y: {}", calculatedPoint.getX(), calculatedPoint.getY());
 
-		Long floorId = anchorRepository.findByShortId(anchorId)
-			.map(anchor -> anchor.getFloor() != null ? anchor.getFloor().getId() : null)
+		Floor floor = anchorRepository.findByShortId(anchorId)
+			.map(Anchor::getFloor)
 			.orElse(null);
-		if (floorId == null) {
+		if (floor == null) {
 			return Optional.empty();
+		}
+
+		if (traceTags) {
+			this.sendEventToTagTracer(tagId, floor);
 		}
 
 		Optional.ofNullable(previousCoorinates.get(tagId)).ifPresent((previousPoint) -> {
@@ -95,7 +99,7 @@ public class CoordinatesCalculator {
 		});
 		Date currentDate = new Date();
 		previousCoorinates.put(tagId, new PointAndTime(calculatedPoint, currentDate.getTime()));
-		return Optional.of(new UwbCoordinatesDto(tagId, anchorId, floorId, calculatedPoint, currentDate));
+		return Optional.of(new UwbCoordinatesDto(tagId, anchorId, floor.getId(), calculatedPoint, currentDate));
 	}
 
 	private Optional<Point3D> calculate3d(Set<Integer> connectedAnchors, Integer tagId) {
@@ -245,31 +249,7 @@ public class CoordinatesCalculator {
 		x /= j;
 		y /= j;
 
-		logger.trace("Current position: X: {}, Y: {}", x, y);
-
-		Optional<PointAndTime> previousPoint = Optional.ofNullable(previousCoorinates.get(tagId));
-		Floor floor = null;
-		Optional<Anchor> anchor = anchorRepository.findByShortId(anchorId);
-		if (anchor.isPresent()) {
-			floor = anchor.get().getFloor();
-		}
-		if (floor == null) {
-			return Optional.empty();
-		}
-		Date currentDate = new Date();
-		if (traceTags) {
-			this.sendEventToTagTracer(tagId, floor);
-		}
-		if (previousPoint.isPresent()) {
-			x = (x + previousPoint.get().getPoint().getX()) / 2;
-			y = (y + previousPoint.get().getPoint().getY()) / 2;
-			Point newPoint = new Point(x, y);
-			previousCoorinates.put(tagId, new PointAndTime(newPoint, currentDate.getTime()));
-			return Optional.of(new UwbCoordinatesDto(tagId, anchorId, floor.getId(), newPoint, currentDate));
-		}
-		Point currentPoint = new Point(x, y);
-		previousCoorinates.put(tagId, new PointAndTime(currentPoint, currentDate.getTime()));
-		return Optional.of(new UwbCoordinatesDto(tagId, anchorId, floor.getId(), currentPoint, currentDate));
+		return Optional.of(new Point3D(x, y, 0));
 	}
 
 	private void sendEventToTagTracer(Integer tagId, final Floor floor) {
