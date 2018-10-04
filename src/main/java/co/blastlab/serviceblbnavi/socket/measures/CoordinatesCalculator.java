@@ -13,12 +13,15 @@ import co.blastlab.serviceblbnavi.utils.Logger;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
+import org.ejml.simple.SimpleMatrix;
 
 import javax.ejb.Singleton;
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
+import javax.persistence.EntityNotFoundException;
 import java.util.*;
 
 @Singleton
@@ -54,7 +57,7 @@ public class CoordinatesCalculator {
 		this.traceTags = false;
 	}
 
-	public Optional<UwbCoordinatesDto> calculateTagPosition(int firstDeviceId, int secondDeviceId, int distance) {
+	public Optional<UwbCoordinatesDto> calculateTagPosition(int firstDeviceId, int secondDeviceId, int distance, boolean is3D) {
 		logger.trace("Measure storage tags: {}", measureStorage.keySet().size());
 
 		Integer tagId = getTagId(firstDeviceId, secondDeviceId);
@@ -67,6 +70,137 @@ public class CoordinatesCalculator {
 		setConnection(tagId, anchorId, distance);
 
 		Set<Integer> connectedAnchors = getConnectedAnchors(tagId);
+
+		Optional<Point3D> calculatedPointOptional = is3D ? calculate3d(connectedAnchors, tagId) : calculate2d(connectedAnchors, tagId);
+
+		if (!calculatedPointOptional.isPresent()) {
+			return Optional.empty();
+		}
+
+		Point3D calculatedPoint = calculatedPointOptional.get();
+
+		logger.trace("Current position: X: {}, Y: {}", calculatedPoint.getX(), calculatedPoint.getY());
+
+		Floor floor = anchorRepository.findByShortId(anchorId)
+			.map(Anchor::getFloor)
+			.orElse(null);
+		if (floor == null) {
+			return Optional.empty();
+		}
+
+		if (traceTags) {
+			this.sendEventToTagTracer(tagId, floor);
+		}
+
+		Optional.ofNullable(previousCoorinates.get(tagId)).ifPresent((previousPoint) -> {
+			calculatedPoint.setX((calculatedPoint.getX() + previousPoint.getPoint().getX()) / 2);
+			calculatedPoint.setY((calculatedPoint.getY() + previousPoint.getPoint().getY()) / 2);
+			calculatedPoint.setZ((calculatedPoint.getZ() + previousPoint.getPoint().getZ())/ 2);
+		});
+		Date currentDate = new Date();
+		previousCoorinates.put(tagId, new PointAndTime(calculatedPoint, currentDate.getTime()));
+		return Optional.of(new UwbCoordinatesDto(tagId, anchorId, floor.getId(), calculatedPoint, currentDate));
+	}
+
+	private Optional<Point3D> calculate3d(Set<Integer> connectedAnchors, Integer tagId) {
+		int N = connectedAnchors.size();
+
+		if (N < 4) {
+			logger.trace(String.format("Not enough connected anchors to calculate position. Currently connected anchors: %s", connectedAnchors.size()));
+			return Optional.empty();
+		}
+
+		logger.trace("Connected anchors: {}", connectedAnchors.size());
+
+		StateMatrix stateMatrix = getStateMatrix(connectedAnchors, tagId);
+
+		logger.trace("State matrix: %s", stateMatrix);
+
+		SimpleMatrix A = new SimpleMatrix(N, 3);
+		SimpleMatrix b = new SimpleMatrix(N, 1);
+
+		for (int taylorIter = 0; taylorIter < 10; ++taylorIter) {
+			for (int i = 0; i < N; ++i) {
+				SimpleMatrix delta = stateMatrix.anchorPositions.rows(i, i + 1)
+					.minus(stateMatrix.tagPosition.transpose());
+				double estimatedDistance = delta.normF();
+				double distance = stateMatrix.measures.get(i);
+				SimpleMatrix divided;
+				if (estimatedDistance != 0) {
+					divided = delta.divide(-estimatedDistance);
+				} else {
+					divided = delta.divide(-distance);
+				}
+				A.setRow(i, 0, divided.get(0), divided.get(1), divided.get(2));
+				b.setRow(i, 0, distance - estimatedDistance);
+			}
+
+			SimpleMatrix aa = A.transpose().mult(A);
+			SimpleMatrix ab = A.transpose().mult(b);
+			SimpleMatrix p = (aa).solve(ab);
+
+			stateMatrix.tagPosition = stateMatrix.tagPosition.plus(p);
+			logger.trace("Tag position calculated matrix: %s", stateMatrix.tagPosition.toString());
+
+			if (p.normF() < 10) {
+				logger.trace("Less than 10 iteration was needed: %s", taylorIter);
+				break;
+			}
+		}
+
+		double x = stateMatrix.tagPosition.get(0);
+		double y = stateMatrix.tagPosition.get(1);
+		double z = stateMatrix.tagPosition.get(2);
+
+		if (!isTagPositionGood(stateMatrix)) {
+			logger.trace("Tag position calculated far too far: x = %s, y = %s, z = %s", x, y, z);
+			return Optional.empty();
+		}
+
+		return Optional.of(new Point3D((int) Math.round(x), (int) Math.round(y), (int) Math.round(z)));
+	}
+
+	private StateMatrix getStateMatrix(Set<Integer> connectedAnchors, Integer tagId) {
+		int N = connectedAnchors.size();
+		SimpleMatrix anchorPositions = new SimpleMatrix(N, 3);
+		SimpleMatrix measures = new SimpleMatrix(N, 1);
+		SimpleMatrix tagPosition = new SimpleMatrix(3, 1);
+
+		if (previousCoorinates.containsKey(tagId)) {
+			Point3D tagPreviousCoordinates = previousCoorinates.get(tagId).point;
+			tagPosition.setColumn(0, 0, tagPreviousCoordinates.getX(), tagPreviousCoordinates.getY(), tagPreviousCoordinates.getZ());
+		} else {
+			Optional<Integer> firstAnchorOptional = connectedAnchors.stream().findFirst();
+			firstAnchorOptional.ifPresent((Integer firstAnchorShortId) -> {
+				Anchor firstAnchor = anchorRepository.findByShortId(firstAnchorShortId).orElseThrow(EntityNotFoundException::new);
+				tagPosition.setColumn(0, 0, firstAnchor.getX(), firstAnchor.getY(), firstAnchor.getZ());
+			});
+		}
+
+		Integer[] anchors = connectedAnchors.toArray(new Integer[0]);
+		for (int i = 0; i < N; ++i) {
+			Integer currentAnchorShortId = anchors[i];
+			Anchor currentAnchor = anchorRepository.findByShortId(currentAnchorShortId).orElseThrow(EntityNotFoundException::new);
+			anchorPositions.setRow(i, 0, currentAnchor.getX(), currentAnchor.getY(), currentAnchor.getZ());
+			measures.setRow(i, 0, getDistance(tagId, currentAnchorShortId));
+		}
+
+		return new StateMatrix(anchorPositions, measures, tagPosition);
+	}
+
+	private boolean isTagPositionGood(StateMatrix stateMatrix) {
+		double maxDistance = stateMatrix.measures.elementMaxAbs();
+		double maxPosition = stateMatrix.tagPosition.elementMaxAbs();
+		boolean tooFar, badValue;
+		tooFar = Math.abs(stateMatrix.tagPosition.get(0)) > stateMatrix.anchorPositions.cols(0, 1).elementMaxAbs() + maxDistance;
+		tooFar |= Math.abs(stateMatrix.tagPosition.get(1)) > stateMatrix.anchorPositions.cols(1, 2).elementMaxAbs() + maxDistance;
+		tooFar |= Math.abs(stateMatrix.tagPosition.get(2)) > stateMatrix.anchorPositions.cols(2, 3).elementMaxAbs() + maxDistance;
+		badValue = Double.isInfinite(maxPosition) || Double.isNaN(maxPosition);
+		return !(tooFar || badValue);
+	}
+
+
+	private Optional<Point3D> calculate2d(Set<Integer> connectedAnchors, Integer tagId) {
 		if (connectedAnchors.size() < 3) {
 			logger.trace(String.format("Not enough connected anchors to calculate position. Currently connected anchors: %s", connectedAnchors.size()));
 			return Optional.empty();
@@ -115,31 +249,7 @@ public class CoordinatesCalculator {
 		x /= j;
 		y /= j;
 
-		logger.trace("Current position: X: {}, Y: {}", x, y);
-
-		Optional<PointAndTime> previousPoint = Optional.ofNullable(previousCoorinates.get(tagId));
-		Floor floor = null;
-		Optional<Anchor> anchor = anchorRepository.findByShortId(anchorId);
-		if (anchor.isPresent()) {
-			floor = anchor.get().getFloor();
-		}
-		if (floor == null) {
-			return Optional.empty();
-		}
-		Date currentDate = new Date();
-		if (traceTags) {
-			this.sendEventToTagTracer(tagId, floor);
-		}
-		if (previousPoint.isPresent()) {
-			x = (x + previousPoint.get().getPoint().getX()) / 2;
-			y = (y + previousPoint.get().getPoint().getY()) / 2;
-			Point newPoint = new Point(x, y);
-			previousCoorinates.put(tagId, new PointAndTime(newPoint, currentDate.getTime()));
-			return Optional.of(new UwbCoordinatesDto(tagId, anchorId, floor.getId(), newPoint, currentDate));
-		}
-		Point currentPoint = new Point(x, y);
-		previousCoorinates.put(tagId, new PointAndTime(currentPoint, currentDate.getTime()));
-		return Optional.of(new UwbCoordinatesDto(tagId, anchorId, floor.getId(), currentPoint, currentDate));
+		return Optional.of(new Point3D(x, y, 0));
 	}
 
 	private void sendEventToTagTracer(Integer tagId, final Floor floor) {
@@ -169,7 +279,7 @@ public class CoordinatesCalculator {
 	/**
 	 * Choose tag id from two devices ids. Tags have id lower than 32767.
 	 *
-	 * @param firstDeviceId id of the first device
+	 * @param firstDeviceId  id of the first device
 	 * @param secondDeviceId id of the second device
 	 * @return tag id if found otherwise null
 	 */
@@ -185,7 +295,7 @@ public class CoordinatesCalculator {
 	/**
 	 * Choose anchor id from two devices ids. Anchors have id higher than 32767.
 	 *
-	 * @param firstDeviceId id of the first device
+	 * @param firstDeviceId  id of the first device
 	 * @param secondDeviceId id of the second device
 	 * @return anchor id if found otherwise null
 	 */
@@ -284,7 +394,18 @@ public class CoordinatesCalculator {
 	@AllArgsConstructor
 	private class PointAndTime {
 
-		private Point point;
+		private Point3D point;
 		private long timestamp;
+	}
+
+	@Getter
+	@Setter
+	@AllArgsConstructor
+	@ToString
+	private class StateMatrix {
+
+		private SimpleMatrix anchorPositions;
+		private SimpleMatrix measures;
+		private SimpleMatrix tagPosition;
 	}
 }
