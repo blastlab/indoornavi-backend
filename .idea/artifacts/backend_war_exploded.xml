@@ -94,6 +94,15 @@
           <element id="library" level="project" name="Maven: org.ow2.asm:asm-debug-all:5.1" />
           <element id="library" level="project" name="Maven: org.jacoco:org.jacoco.report:0.7.7.201606060606" />
           <element id="library" level="project" name="Maven: org.modelmapper:modelmapper:2.1.1" />
+          <element id="library" level="project" name="Maven: org.ejml:ejml-all:0.35" />
+          <element id="library" level="project" name="Maven: com.google.code.findbugs:jsr305:3.0.2" />
+          <element id="library" level="project" name="Maven: org.ejml:ejml-core:0.35" />
+          <element id="library" level="project" name="Maven: org.ejml:ejml-fdense:0.35" />
+          <element id="library" level="project" name="Maven: org.ejml:ejml-ddense:0.35" />
+          <element id="library" level="project" name="Maven: org.ejml:ejml-cdense:0.35" />
+          <element id="library" level="project" name="Maven: org.ejml:ejml-zdense:0.35" />
+          <element id="library" level="project" name="Maven: org.ejml:ejml-dsparse:0.35" />
+          <element id="library" level="project" name="Maven: org.ejml:ejml-simple:0.35" />
           <element id="library" level="project" name="Maven: com.googlecode.json-simple:json-simple:1.1.1" />
         </element>
       </element>

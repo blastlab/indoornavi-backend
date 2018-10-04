@@ -765,4 +765,11 @@
 	<changeSet author="kgebert (generated)" id="navi-376-10">
 		<dropColumn columnName="tag_id" tableName="coordinates"/>
 	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-378-1">
+		<addColumn tableName="Coordinates">
+			<column name="z" type="integer">
+				<constraints nullable="false"/>
+			</column>
+		</addColumn>
+	</changeSet>
 </databaseChangeLog>
