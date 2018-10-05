@@ -14,7 +14,7 @@ public class MessageConstraintSeacher {
 			case "UC_UWBSHORTID_COL":
 				code = MessagePack.DB_002;
 				break;
-			case "unique_longId":
+			case "UC_DEVICEMAC_COL":
 				code = MessagePack.DB_003;
 				break;
 			case "unique_username":

@@ -17,13 +17,13 @@ import javax.validation.constraints.Min;
 @NoArgsConstructor
 public class Bluetooth extends Device {
 	@Column(unique = true)
-	@Min(Short.MAX_VALUE)
-	@Max(Integer.MAX_VALUE)
+	@Min(0)
+	@Max(65536)
 	private Integer minor;
 
 	@Column(unique = true)
-	@Min(Short.MAX_VALUE)
-	@Max(Integer.MAX_VALUE)
+	@Min(0)
+	@Max(65536)
 	private Integer major;
 
 	private Short power;
