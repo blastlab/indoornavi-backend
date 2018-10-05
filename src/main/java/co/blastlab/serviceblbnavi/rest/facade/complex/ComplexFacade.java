@@ -47,7 +47,7 @@ public interface ComplexFacade {
 	@GET
 	@ApiOperation(value = "find all complexes", response = ComplexDto.class, responseContainer = "List")
 	@AuthorizedAccess("COMPLEX_READ")
-	List<ComplexDto> findAll();
+	List<ComplexDto.WithBuildings.WithFloors> findAll();
 
 	@GET
 	@Path("/{id: \\d+}/buildings")

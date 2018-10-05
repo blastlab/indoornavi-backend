@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -53,7 +55,7 @@ public class MeasuresWebSocketTest {
 
 		measuresWebSocket.handleMessage("[{\"did1\": 1, \"did2\": 100501, \"dist\": 100}]", session);
 
-		verify(coordinatesCalculator).calculateTagPosition(1, 100501, 100);
+		verify(coordinatesCalculator).calculateTagPosition(eq(1), eq(100501), eq(100), isA(Boolean.class));
 	}
 
 	@Test

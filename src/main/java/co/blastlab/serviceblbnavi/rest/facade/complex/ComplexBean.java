@@ -74,10 +74,10 @@ public class ComplexBean implements ComplexFacade {
 
 
 	@Override
-	public List<ComplexDto> findAll() {
-		List<ComplexDto> complexes = new ArrayList<>();
+	public List<ComplexDto.WithBuildings.WithFloors> findAll() {
+		List<ComplexDto.WithBuildings.WithFloors> complexes = new ArrayList<>();
 		complexRepository.findAll()
-			.forEach(complexEntity -> complexes.add(new ComplexDto(complexEntity)));
+			.forEach(complexEntity -> complexes.add(new ComplexDto.WithBuildings.WithFloors(complexEntity)));
 		return complexes;
 	}
 
