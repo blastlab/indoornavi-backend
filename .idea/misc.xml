@@ -5,13 +5,6 @@
     <file type="javaeeApplication" url="file://$PROJECT_DIR$/serviceblbnavi-ear" />
     <file type="web" url="file://$PROJECT_DIR$" />
   </component>
-  <component name="MavenProjectsManager">
-    <option name="originalFiles">
-      <list>
-        <option value="$PROJECT_DIR$/pom.xml" />
-      </list>
-    </option>
-  </component>
   <component name="NullableNotNullManager">
     <option name="myDefaultNullable" value="org.jetbrains.annotations.Nullable" />
     <option name="myDefaultNotNull" value="javax.validation.constraints.NotNull" />

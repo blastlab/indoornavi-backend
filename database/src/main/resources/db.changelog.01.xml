@@ -771,4 +771,11 @@
 	<changeSet author="kgebert (generated)" id="navi-409-2">
 		<dropUniqueConstraint constraintName="UC_BLUETOOTHMINOR_COL" tableName="Bluetooth"/>
 	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-378-1">
+		<addColumn tableName="Coordinates">
+			<column name="z" type="integer">
+				<constraints nullable="false"/>
+			</column>
+		</addColumn>
+	</changeSet>
 </databaseChangeLog>
