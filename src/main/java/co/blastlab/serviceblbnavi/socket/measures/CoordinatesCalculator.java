@@ -33,6 +33,8 @@ public class CoordinatesCalculator {
 	// 10 seconds
 	private final static long OLD_DATA_IN_MILISECONDS = 10_000;
 
+	private final static int TAG_Z = 100;
+
 	private Map<Integer, PointAndTime> previousCoorinates = new HashMap<>();
 
 	@Inject
@@ -220,8 +222,8 @@ public class CoordinatesCalculator {
 
 			validAnchorsCount++;
 			intersectionPoints.addAll(IntersectionsCalculator.getIntersections(
-				left.get(), pair.getLeft().getDistance(),
-				right.get(), pair.getRight().getDistance()
+				left.get(), calculatePitagoras(left.get(), pair.getLeft().getDistance()),
+				right.get(), calculatePitagoras(right.get(), pair.getRight().getDistance())
 			));
 		}
 
@@ -250,6 +252,15 @@ public class CoordinatesCalculator {
 		y /= j;
 
 		return Optional.of(new Point3D(x, y, 0));
+	}
+
+	private double calculatePitagoras(Anchor anchor, double distance) {
+		int z = anchor.getZ();
+		if (z > distance + 100) {
+			logger.trace("Warning! Anchor shortId = {} height is higher than distance +/- 100 cm", anchor.getShortId());
+		}
+		double result = Math.pow(distance, 2) - Math.pow(z - TAG_Z, 2);
+		return result < 0 ? 0 : Math.sqrt(result);
 	}
 
 	private void sendEventToTagTracer(Integer tagId, final Floor floor) {
@@ -344,8 +355,8 @@ public class CoordinatesCalculator {
 		return connectedAnchors;
 	}
 
-	private Double getDistance(Integer tagId, Integer anchorId) {
-		Double meanDistance = 0d;
+	private double getDistance(Integer tagId, Integer anchorId) {
+		double meanDistance = 0d;
 		if (measureStorage.containsKey(tagId)) {
 			Map<Integer, List<Measure>> anchorsMeasures = measureStorage.get(tagId);
 			if (anchorsMeasures.containsKey(anchorId)) {
