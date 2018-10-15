@@ -6,6 +6,8 @@ import co.blastlab.serviceblbnavi.dto.anchor.AnchorDto;
 import co.blastlab.serviceblbnavi.dto.uwb.UwbDto;
 import co.blastlab.serviceblbnavi.service.UwbService;
 import co.blastlab.serviceblbnavi.socket.WebSocket;
+import co.blastlab.serviceblbnavi.socket.command.CommandWebSocket;
+import co.blastlab.serviceblbnavi.socket.command.InternetAddress;
 import co.blastlab.serviceblbnavi.socket.info.client.UpdateRequest;
 import co.blastlab.serviceblbnavi.socket.info.controller.DeviceStatus;
 import co.blastlab.serviceblbnavi.socket.info.controller.Network;
@@ -25,6 +27,7 @@ import co.blastlab.serviceblbnavi.socket.info.server.file.in.FileListSummary;
 import co.blastlab.serviceblbnavi.socket.info.server.file.out.AskList;
 import co.blastlab.serviceblbnavi.socket.info.server.file.out.Delete;
 import co.blastlab.serviceblbnavi.socket.info.server.file.out.Upload;
+import co.blastlab.serviceblbnavi.socket.info.server.sinkConnected.SinkConnected;
 import co.blastlab.serviceblbnavi.socket.info.server.update.UpdateInfo;
 import co.blastlab.serviceblbnavi.socket.info.server.update.UpdateInfo.UpdateInfoType;
 import co.blastlab.serviceblbnavi.socket.info.server.update.UpdateInfoCode;
@@ -96,6 +99,9 @@ public class InfoWebSocket extends WebSocket {
 	private DeviceRepository deviceRepository;
 
 	@Inject
+	private CommandWebSocket commandWebSocket;
+
+	@Inject
 	private UwbService uwbService;
 
 	@Inject
@@ -152,6 +158,7 @@ public class InfoWebSocket extends WebSocket {
 				InfoType infoType = InfoType.from(info.getCode());
 				switch (infoType) {
 					case STATION_WAKE_UP:
+						handleSinkRegistrationForCommands(session, info);
 						break;
 					case STATION_SLEEP:
 						break;
@@ -378,6 +385,11 @@ public class InfoWebSocket extends WebSocket {
 				sendErrorCode("IWS_004");
 			}
 		});
+	}
+
+	private void handleSinkRegistrationForCommands(Session session, Info info) {
+		SinkConnected sinkConnected = objectMapper.convertValue(info.getArgs(), SinkConnected.class);
+		commandWebSocket.addSink(sinkConnected.getName(), new InternetAddress(session.getRequestURI().getHost(), sinkConnected.getPort()));
 	}
 
 	/**
