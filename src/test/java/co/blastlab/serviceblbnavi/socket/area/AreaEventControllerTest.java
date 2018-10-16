@@ -76,12 +76,16 @@ public class AreaEventControllerTest {
 		area_2.setPolygon(polygon);
 		area_2.setHMin(100);
 		area_2.setHMax(300);
-		AreaConfiguration areaConfiguration = new AreaConfiguration();
-		areaConfiguration.setTags(ImmutableList.of(tag));
-		areaConfiguration.setOffset(0);
-		areaConfiguration.setMode(AreaConfiguration.Mode.ON_ENTER);
-		area_1.setConfigurations(ImmutableList.of(areaConfiguration));
-		area_2.setConfigurations(ImmutableList.of(areaConfiguration));
+		AreaConfiguration onEnter = new AreaConfiguration();
+		onEnter.setTags(ImmutableList.of(tag));
+		onEnter.setOffset(0);
+		onEnter.setMode(AreaConfiguration.Mode.ON_ENTER);
+		AreaConfiguration onLeave = new AreaConfiguration();
+		onLeave.setTags(ImmutableList.of(tag));
+		onLeave.setOffset(0);
+		onLeave.setMode(AreaConfiguration.Mode.ON_LEAVE);
+		area_1.setConfigurations(ImmutableList.of(onEnter, onLeave));
+		area_2.setConfigurations(ImmutableList.of(onEnter));
 
 		// prepare floor
 		Floor floor = new Floor();
@@ -100,8 +104,10 @@ public class AreaEventControllerTest {
 		assertEquals(1, eventsInside.size());
 		assertEquals(1L, eventsInside.get(0).getAreaId().longValue());
 		assertEquals(AreaConfiguration.Mode.ON_ENTER, eventsInside.get(0).getMode());
-		assertEquals(1, eventsInsideButHigher.size());
-		assertEquals(2L, eventsInsideButHigher.get(0).getAreaId().longValue());
-		assertEquals(AreaConfiguration.Mode.ON_ENTER, eventsInsideButHigher.get(0).getMode());
+		assertEquals(2, eventsInsideButHigher.size());
+		assertEquals(1L, eventsInsideButHigher.get(0).getAreaId().longValue());
+		assertEquals(AreaConfiguration.Mode.ON_LEAVE, eventsInsideButHigher.get(0).getMode());
+		assertEquals(2L, eventsInsideButHigher.get(1).getAreaId().longValue());
+		assertEquals(AreaConfiguration.Mode.ON_ENTER, eventsInsideButHigher.get(1).getMode());
 	}
 }
