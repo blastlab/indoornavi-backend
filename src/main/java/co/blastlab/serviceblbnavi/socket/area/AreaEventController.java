@@ -7,6 +7,7 @@ import co.blastlab.serviceblbnavi.domain.AreaConfiguration;
 import co.blastlab.serviceblbnavi.domain.Floor;
 import co.blastlab.serviceblbnavi.domain.Tag;
 import co.blastlab.serviceblbnavi.dto.report.UwbCoordinatesDto;
+import co.blastlab.serviceblbnavi.socket.measures.Point3D;
 import co.blastlab.serviceblbnavi.utils.Logger;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
@@ -17,6 +18,7 @@ import com.vividsolutions.jts.io.ParseException;
 import com.vividsolutions.jts.io.WKTReader;
 import com.vividsolutions.jts.io.WKTWriter;
 import org.apache.commons.lang.time.DateUtils;
+import org.apache.commons.lang3.Range;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
@@ -85,15 +87,17 @@ public class AreaEventController {
 
 				for (Map.Entry<Area, List<AreaConfiguration>> areaEntry : areas.entrySet()) {
 					for (AreaConfiguration areaConfiguration : areaEntry.getValue()) {
-						if (point.isWithinDistance(areaEntry.getKey().getPolygon(), areaConfiguration.getOffset())) {
-							logger.trace("The point is within area {}", areaEntry.getKey().getName());
+						if (isWithin(areaEntry.getKey(), point, areaConfiguration.getOffset(), coordinatesData.getPoint())) {
+							logger.trace("The point {} is within area {}", coordinatesData.getPoint(), areaEntry.getKey().getName());
 							if (shouldSendOnEnterEvent(coordinatesData, areaConfiguration)) {
 								logger.trace("Sending event area {}", areaConfiguration.getMode());
-								events.add(createEvent(coordinatesData, areaEntry.getKey(), areaConfiguration));
-								tagCoordinatesHistory.put(coordinatesData.getTagShortId(), areaEntry.getKey(), new Date());
-							} else if (tagCoordinatesHistory.containsRow(coordinatesData.getTagShortId())) {
+								addNew(coordinatesData, areaEntry.getKey(), areaConfiguration, events);
+							} else if (tagCoordinatesHistory.contains(coordinatesData.getTagShortId(), areaEntry.getKey())) {
 								logger.trace("Updating coordinates history");
 								updateTime(coordinatesData, areaEntry.getKey());
+							} else if (tagCoordinatesHistory.containsRow(coordinatesData.getTagShortId())) {
+								logger.trace("The point {} is within area {} but different than previous");
+								addNew(coordinatesData, areaEntry.getKey(), areaConfiguration, events);
 							}
 						} else {
 							if (shouldSendOnLeaveEvent(coordinatesData, areaConfiguration)) {
@@ -111,6 +115,15 @@ public class AreaEventController {
 		}
 
 		return events;
+	}
+
+	private void addNew(UwbCoordinatesDto coordinatesData, Area area, AreaConfiguration areaConfiguration, List<AreaEvent> events) {
+		events.add(createEvent(coordinatesData, area, areaConfiguration));
+		tagCoordinatesHistory.put(coordinatesData.getTagShortId(), area, new Date());
+	}
+
+	private boolean isWithin(Area area, Point point, Integer offset, Point3D tagCoordinates) {
+		return point.isWithinDistance(area.getPolygon(), offset) && Range.between(area.getHMin(), area.getHMax()).contains(tagCoordinates.getZ());
 	}
 
 	private boolean shouldSendOnEnterEvent(UwbCoordinatesDto coordinatesData, AreaConfiguration areaConfiguration) {
