@@ -35,6 +35,8 @@ public class CoordinatesCalculator {
 
 	private final static int TAG_Z = 100;
 
+	private final static int MAX_DIFFERENCE_BETWEEN_DISTANCE_AND_ANCHOR_HEIGHT = 100;
+
 	private Map<Integer, PointAndTime> previousCoorinates = new HashMap<>();
 
 	@Inject
@@ -256,11 +258,15 @@ public class CoordinatesCalculator {
 
 	private double calculatePitagoras(Anchor anchor, double distance) {
 		int z = anchor.getZ();
-		if (z > distance + 100) {
-			logger.trace("Warning! Anchor shortId = {} height is higher than distance +/- 100 cm", anchor.getShortId());
-		}
+		checkAnchorIsInProperHeight(anchor, z, distance);
 		double result = Math.pow(distance, 2) - Math.pow(z - TAG_Z, 2);
 		return result < 0 ? 0 : Math.sqrt(result);
+	}
+
+	private void checkAnchorIsInProperHeight(Anchor anchor, int z, double distance) {
+		if (z > distance + MAX_DIFFERENCE_BETWEEN_DISTANCE_AND_ANCHOR_HEIGHT) {
+			logger.trace("Warning! Anchor shortId = {} height is higher than distance +100cm", anchor.getShortId());
+		}
 	}
 
 	private void sendEventToTagTracer(Integer tagId, final Floor floor) {
