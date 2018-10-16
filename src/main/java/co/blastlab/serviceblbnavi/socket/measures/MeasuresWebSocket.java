@@ -155,7 +155,7 @@ public class MeasuresWebSocket extends WebSocket {
 				}
 			} else {
 				logger.trace("Trying to calculate coordinates");
-				Optional<UwbCoordinatesDto> coords = coordinatesCalculator.calculateTagPosition(distanceMessage.getDid1(), distanceMessage.getDid2(), distanceMessage.getDist(), true);
+				Optional<UwbCoordinatesDto> coords = coordinatesCalculator.calculateTagPosition(distanceMessage.getDid1(), distanceMessage.getDid2(), distanceMessage.getDist(), false);
 				if (coords.isPresent()) {
 					this.saveCoordinates(coords.get());
 					Set<Session> sessions = this.filterSessions(coords.get());
