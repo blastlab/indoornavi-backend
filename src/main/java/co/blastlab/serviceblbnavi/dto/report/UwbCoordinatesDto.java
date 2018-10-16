@@ -2,7 +2,7 @@ package co.blastlab.serviceblbnavi.dto.report;
 
 import co.blastlab.serviceblbnavi.domain.UwbCoordinates;
 import co.blastlab.serviceblbnavi.dto.CoordinatesDto;
-import co.blastlab.serviceblbnavi.dto.Point;
+import co.blastlab.serviceblbnavi.socket.measures.Point3D;
 import lombok.*;
 
 import java.util.Date;
@@ -21,7 +21,7 @@ public class UwbCoordinatesDto extends CoordinatesDto {
 		this.tagShortId = uwbCoordinates.getTag() != null ? uwbCoordinates.getTag().getShortId() : null;
 	}
 
-	public UwbCoordinatesDto(Integer tagId, Integer anchorId, Long floorId, Point newPoint, Date currentDate) {
+	public UwbCoordinatesDto(Integer tagId, Integer anchorId, Long floorId, Point3D newPoint, Date currentDate) {
 		this.tagShortId = tagId;
 		this.anchorShortId = anchorId;
 		this.setFloorId(floorId);
