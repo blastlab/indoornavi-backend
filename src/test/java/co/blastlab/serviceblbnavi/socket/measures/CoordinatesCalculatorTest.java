@@ -36,10 +36,10 @@ public class CoordinatesCalculatorTest {
 		// GIVEN
 		Floor floor = new Floor();
 		floor.setId(1L);
-		Optional<Anchor> lastAnchor = Optional.of(new Anchor(0, 100, floor));
+		Optional<Anchor> lastAnchor = Optional.of(new Anchor(0, 100, 0, floor));
 
-		when(anchorRepository.findOptionalByShortIdAndPositionNotNull(32768)).thenReturn(Optional.of(new Anchor(0, 0, floor)));
-		when(anchorRepository.findOptionalByShortIdAndPositionNotNull(32769)).thenReturn(Optional.of(new Anchor(100, 0, floor)));
+		when(anchorRepository.findOptionalByShortIdAndPositionNotNull(32768)).thenReturn(Optional.of(new Anchor(0, 0, 0, floor)));
+		when(anchorRepository.findOptionalByShortIdAndPositionNotNull(32769)).thenReturn(Optional.of(new Anchor(100, 0, 0, floor)));
 		when(anchorRepository.findOptionalByShortIdAndPositionNotNull(32770)).thenReturn(lastAnchor);
 		when(anchorRepository.findByShortId(32770)).thenReturn(lastAnchor);
 
@@ -53,7 +53,7 @@ public class CoordinatesCalculatorTest {
 		assertThat(secondCalculation.isPresent(), is(false));
 		assertThat(thirdCalculation.isPresent(), is(true));
 		assertTrue("The x coordinates should be around 67 - 77 (+/-5)", Range.open(67, 77).contains(thirdCalculation.get().getPoint().getX()));
-		assertTrue("The y coordinates should be around -401 - -391 (+/-5)", Range.open(-401, -391).contains(thirdCalculation.get().getPoint().getY()));
+		assertTrue("The y coordinates should be around -401 - -391 (+/-5)", Range.open(-400, -390).contains(thirdCalculation.get().getPoint().getY()));
 	}
 
 	@Test
@@ -61,10 +61,10 @@ public class CoordinatesCalculatorTest {
 		// GIVEN
 		Floor floor = new Floor();
 		floor.setId(1L);
-		Optional<Anchor> lastAnchor = Optional.of(new Anchor(0, 100, floor));
+		Optional<Anchor> lastAnchor = Optional.of(new Anchor(0, 100, 0, floor));
 
-		when(anchorRepository.findOptionalByShortIdAndPositionNotNull(32768)).thenReturn(Optional.of(new Anchor(0, 0, floor)));
-		when(anchorRepository.findOptionalByShortIdAndPositionNotNull(32769)).thenReturn(Optional.of(new Anchor(100, 0, floor)));
+		when(anchorRepository.findOptionalByShortIdAndPositionNotNull(32768)).thenReturn(Optional.of(new Anchor(0, 0, 0, floor)));
+		when(anchorRepository.findOptionalByShortIdAndPositionNotNull(32769)).thenReturn(Optional.of(new Anchor(100, 0, 0, floor)));
 		when(anchorRepository.findOptionalByShortIdAndPositionNotNull(42555)).thenReturn(Optional.empty());
 		when(anchorRepository.findOptionalByShortIdAndPositionNotNull(42556)).thenReturn(Optional.empty());
 		when(anchorRepository.findOptionalByShortIdAndPositionNotNull(42557)).thenReturn(Optional.empty());
@@ -93,7 +93,7 @@ public class CoordinatesCalculatorTest {
 		assertThat(sixthCalculation.isPresent(), is(false));
 		assertThat(seventhCalculation.isPresent(), is(true));
 		assertTrue("The x coordinates should be around 67 - 77 (+/-5)", Range.open(67, 77).contains(seventhCalculation.get().getPoint().getX()));
-		assertTrue("The y coordinates should be around -401 - -391 (+/-5)", Range.open(-401, -391).contains(seventhCalculation.get().getPoint().getY()));
+		assertTrue("The y coordinates should be around -401 - -391 (+/-5)", Range.open(-400, -390).contains(seventhCalculation.get().getPoint().getY()));
 	}
 
 	@Test
@@ -121,5 +121,29 @@ public class CoordinatesCalculatorTest {
 		assertTrue("The x coordinates should be around 110 - 90 (+/-10)", Range.open(90 ,110).contains(coordinatesDto.get().getPoint().getX()));
 		assertTrue("The y coordinates should be around 110 - 90 (+/-10)", Range.open(90, 110).contains(coordinatesDto.get().getPoint().getY()));
 		assertTrue("The z coordinates should be around 110 - 90 (+/-10)", Range.open(90, 110).contains(coordinatesDto.get().getPoint().getZ()));
+	}
+
+	@Test
+	public void shouldCalculateInRangeEvenWhenAnchorsArePositionedHigh() {
+		// given
+		Floor floor = new Floor();
+		floor.setId(1L);
+		Anchor anchor_1 = new Anchor(0, 0, 800, floor);
+		Anchor anchor_2 = new Anchor(0, 100, 800, floor);
+		Anchor anchor_3 = new Anchor(100, 100, 900, floor);
+		when(anchorRepository.findOptionalByShortIdAndPositionNotNull(32769)).thenReturn(Optional.of(anchor_1));
+		when(anchorRepository.findOptionalByShortIdAndPositionNotNull(32770)).thenReturn(Optional.of(anchor_2));
+		when(anchorRepository.findOptionalByShortIdAndPositionNotNull(32771)).thenReturn(Optional.of(anchor_3));
+		when(anchorRepository.findByShortId(32771)).thenReturn(Optional.of(anchor_3));
+
+		// when
+		coordinatesCalculator.calculateTagPosition(1, 32769, 695, true);
+		coordinatesCalculator.calculateTagPosition(1, 32770, 700, true);
+		Optional<UwbCoordinatesDto> coordinatesDto = coordinatesCalculator.calculateTagPosition(1, 32771, 795, false);
+
+		// then
+		assertThat(coordinatesDto.isPresent(), is(true));
+		assertTrue(Range.open(30, 40).contains(coordinatesDto.get().getPoint().getX()));
+		assertTrue(Range.open(60, 70).contains(coordinatesDto.get().getPoint().getY()));
 	}
 }

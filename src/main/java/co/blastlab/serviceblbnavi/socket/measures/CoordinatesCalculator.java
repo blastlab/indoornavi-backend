@@ -33,6 +33,10 @@ public class CoordinatesCalculator {
 	// 10 seconds
 	private final static long OLD_DATA_IN_MILISECONDS = 10_000;
 
+	private final static int TAG_Z = 100;
+
+	private final static int MAX_DIFFERENCE_BETWEEN_DISTANCE_AND_ANCHOR_HEIGHT = 100;
+
 	private Map<Integer, PointAndTime> previousCoorinates = new HashMap<>();
 
 	@Inject
@@ -220,8 +224,8 @@ public class CoordinatesCalculator {
 
 			validAnchorsCount++;
 			intersectionPoints.addAll(IntersectionsCalculator.getIntersections(
-				left.get(), pair.getLeft().getDistance(),
-				right.get(), pair.getRight().getDistance()
+				left.get(), calculatePitagoras(left.get(), pair.getLeft().getDistance()),
+				right.get(), calculatePitagoras(right.get(), pair.getRight().getDistance())
 			));
 		}
 
@@ -250,6 +254,19 @@ public class CoordinatesCalculator {
 		y /= j;
 
 		return Optional.of(new Point3D(x, y, 0));
+	}
+
+	private double calculatePitagoras(Anchor anchor, double distance) {
+		int z = anchor.getZ();
+		checkAnchorIsInProperHeight(anchor, z, distance);
+		double result = Math.pow(distance, 2) - Math.pow(z - TAG_Z, 2);
+		return result < 0 ? 0 : Math.sqrt(result);
+	}
+
+	private void checkAnchorIsInProperHeight(Anchor anchor, int z, double distance) {
+		if (z > distance + MAX_DIFFERENCE_BETWEEN_DISTANCE_AND_ANCHOR_HEIGHT) {
+			logger.trace("Warning! Anchor shortId = {} height is higher than distance +100cm", anchor.getShortId());
+		}
 	}
 
 	private void sendEventToTagTracer(Integer tagId, final Floor floor) {
@@ -344,8 +361,8 @@ public class CoordinatesCalculator {
 		return connectedAnchors;
 	}
 
-	private Double getDistance(Integer tagId, Integer anchorId) {
-		Double meanDistance = 0d;
+	private double getDistance(Integer tagId, Integer anchorId) {
+		double meanDistance = 0d;
 		if (measureStorage.containsKey(tagId)) {
 			Map<Integer, List<Measure>> anchorsMeasures = measureStorage.get(tagId);
 			if (anchorsMeasures.containsKey(anchorId)) {
