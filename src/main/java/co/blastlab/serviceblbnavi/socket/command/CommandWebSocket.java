@@ -17,8 +17,6 @@ import javax.inject.Inject;
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -110,21 +108,22 @@ public class CommandWebSocket extends WebSocket {
 	public void addSink(String name, InternetAddress ipAndPort) {
 		Session session;
 		WebSocketContainer webSocketContainer = ContainerProvider.getWebSocketContainer();
-		try {
-			if (this.sinkNameToSession.containsKey(name)) {
-				session = this.sinkNameToSession.get(name);
-				if (!session.isOpen()) {
-					session = webSocketContainer.connectToServer(clientWebSocket, new URI(ipAndPort.getIp()));
-				}
-			} else {
-				session = webSocketContainer.connectToServer(clientWebSocket, new URI(ipAndPort.getIp()));
-			}
-			this.sinkNameToSession.put(name, session);
-			this.sinkNameToInetAddress.put(name, ipAndPort);
-
-			broadCastMessage(clientSessions, new CommandSinkWrapper(name, ipAndPort));
-		} catch (IOException | URISyntaxException | DeploymentException e) {
-			// TODO send info about error
-		}
+//		try {
+//			if (this.sinkNameToSession.containsKey(name)) {
+//				session = this.sinkNameToSession.get(name);
+//				if (!session.isOpen()) {
+//					session = webSocketContainer.connectToServer(clientWebSocket, new URI(String.format("%s:%s", ipAndPort.getIp(), ipAndPort.getPort())));
+//				}
+//			} else {
+//				session = webSocketContainer.connectToServer(clientWebSocket, new URI(String.format("%s:%s", ipAndPort.getIp(), ipAndPort.getPort())));
+//			}
+//			this.sinkNameToSession.put(name, session);
+//			this.sinkNameToInetAddress.put(name, ipAndPort);
+//
+//			broadCastMessage(clientSessions, new CommandSinkWrapper(name, ipAndPort));
+//		} catch (IOException | URISyntaxException | DeploymentException e) {
+//			// TODO send info about error
+//			e.printStackTrace();
+//		}
 	}
 }

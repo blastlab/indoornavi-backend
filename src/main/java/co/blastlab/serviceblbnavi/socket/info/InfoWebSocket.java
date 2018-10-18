@@ -67,10 +67,12 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
-@ServerEndpoint("/info")
+@ServerEndpoint(InfoWebSocket.SERVER_ENDPOINT)
 @Singleton
 @Startup
 public class InfoWebSocket extends WebSocket {
+
+	public static final String SERVER_ENDPOINT = "/info";
 
 	@Inject
 	private Logger logger;
@@ -389,7 +391,7 @@ public class InfoWebSocket extends WebSocket {
 
 	private void handleSinkRegistrationForCommands(Session session, Info info) {
 		SinkConnected sinkConnected = objectMapper.convertValue(info.getArgs(), SinkConnected.class);
-		commandWebSocket.addSink(sinkConnected.getName(), new InternetAddress(session.getRequestURI().getHost(), sinkConnected.getPort()));
+		commandWebSocket.addSink(sinkConnected.getName(), new InternetAddress("172.16.170.40", sinkConnected.getPort()));
 	}
 
 	/**
