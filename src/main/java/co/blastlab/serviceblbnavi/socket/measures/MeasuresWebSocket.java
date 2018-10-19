@@ -175,6 +175,7 @@ public class MeasuresWebSocket extends WebSocket {
 		coordinates.setTag(tagRepository.findOptionalByShortId(coordinatesDto.getTagShortId()).orElseThrow(EntityNotFoundException::new));
 		coordinates.setX(coordinatesDto.getPoint().getX());
 		coordinates.setY(coordinatesDto.getPoint().getY());
+		coordinates.setZ(coordinatesDto.getPoint().getZ());
 		coordinates.setFloor(floorRepository.findOptionalById(coordinatesDto.getFloorId()).orElseThrow(EntityNotFoundException::new));
 		coordinatesRepository.save(coordinates);
 	}

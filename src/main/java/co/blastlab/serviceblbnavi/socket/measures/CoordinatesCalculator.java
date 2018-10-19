@@ -66,7 +66,7 @@ public class CoordinatesCalculator {
 		Integer tagId = getTagId(firstDeviceId, secondDeviceId);
 		Integer anchorId = getAnchorId(firstDeviceId, secondDeviceId);
 		if (tagId == null || anchorId == null) {
-			logger.trace(String.format("One of the devices' ids is out of range. Ids are: %s, %s and range is (1, %s)", firstDeviceId, secondDeviceId, Short.MAX_VALUE));
+			logger.trace("One of the devices' ids is out of range. Ids are: {}, {} and range is (1, {})", firstDeviceId, secondDeviceId, Short.MAX_VALUE);
 			return Optional.empty();
 		}
 
@@ -109,7 +109,7 @@ public class CoordinatesCalculator {
 		int N = connectedAnchors.size();
 
 		if (N < 4) {
-			logger.trace(String.format("Not enough connected anchors to calculate position. Currently connected anchors: %s", connectedAnchors.size()));
+			logger.trace("Not enough connected anchors to calculate position. Currently connected anchors: {}", connectedAnchors.size());
 			return Optional.empty();
 		}
 
@@ -122,13 +122,13 @@ public class CoordinatesCalculator {
 		}
 
 		if (anchors.size() < 4) {
-			logger.trace(String.format("Not enough connected and in database anchors to calculate position. Currently connected anchors: %s", connectedAnchors.size()));
+			logger.trace("Not enough connected and in database anchors to calculate position. Currently connected anchors: {}", connectedAnchors.size());
 			return Optional.empty();
 		}
 
 		StateMatrix stateMatrix = getStateMatrix(anchors, tagId);
 
-		logger.trace("State matrix: %s", stateMatrix);
+		logger.trace("State matrix: {}", stateMatrix);
 
 		SimpleMatrix A = new SimpleMatrix(N, 3);
 		SimpleMatrix b = new SimpleMatrix(N, 1);
@@ -154,10 +154,10 @@ public class CoordinatesCalculator {
 			SimpleMatrix p = (aa).solve(ab);
 
 			stateMatrix.tagPosition = stateMatrix.tagPosition.plus(p);
-			logger.trace("Tag position calculated matrix: %s", stateMatrix.tagPosition.toString());
+			logger.trace("Tag position calculated matrix: {}", stateMatrix.tagPosition.toString());
 
 			if (p.normF() < 10) {
-				logger.trace("Less than 10 iteration was needed: %s", taylorIter);
+				logger.trace("Less than 10 iteration was needed: {}", taylorIter);
 				break;
 			}
 		}
@@ -167,7 +167,7 @@ public class CoordinatesCalculator {
 		double z = stateMatrix.tagPosition.get(2);
 
 		if (!isTagPositionGood(stateMatrix)) {
-			logger.trace("Tag position calculated far too far: x = %s, y = %s, z = %s", x, y, z);
+			logger.trace("Tag position calculated far too far: x = {}, y = {}, z = {}", x, y, z);
 			return Optional.empty();
 		}
 
@@ -213,7 +213,7 @@ public class CoordinatesCalculator {
 
 	private Optional<Point3D> calculate2d(Set<Integer> connectedAnchors, Integer tagId) {
 		if (connectedAnchors.size() < 3) {
-			logger.trace(String.format("Not enough connected anchors to calculate position. Currently connected anchors: %s", connectedAnchors.size()));
+			logger.trace("Not enough connected anchors to calculate position. Currently connected anchors: {}", connectedAnchors.size());
 			return Optional.empty();
 		}
 
@@ -239,7 +239,7 @@ public class CoordinatesCalculator {
 		logger.trace("Anchor pairs: {}", pairs.size());
 
 		if (validAnchorsCount < 3) {
-			logger.trace(String.format("Not enough valid anchors to calculate position. Currently valid anchors: %s", validAnchorsCount));
+			logger.trace("Not enough valid anchors to calculate position. Currently valid anchors: {}", validAnchorsCount);
 			return Optional.empty();
 		}
 
