@@ -21,7 +21,6 @@ import org.ejml.simple.SimpleMatrix;
 import javax.ejb.Singleton;
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
-import javax.persistence.EntityNotFoundException;
 import java.util.*;
 
 @Singleton
@@ -116,7 +115,18 @@ public class CoordinatesCalculator {
 
 		logger.trace("Connected anchors: {}", connectedAnchors.size());
 
-		StateMatrix stateMatrix = getStateMatrix(connectedAnchors, tagId);
+		List<Anchor> anchors = new ArrayList<>();
+		for (Integer connectedAnchorShortId : connectedAnchors) {
+			Optional<Anchor> anchorOptional = anchorRepository.findByShortId(connectedAnchorShortId);
+			anchorOptional.ifPresent(anchors::add);
+		}
+
+		if (anchors.size() < 4) {
+			logger.trace(String.format("Not enough connected and in database anchors to calculate position. Currently connected anchors: %s", connectedAnchors.size()));
+			return Optional.empty();
+		}
+
+		StateMatrix stateMatrix = getStateMatrix(anchors, tagId);
 
 		logger.trace("State matrix: %s", stateMatrix);
 
@@ -164,7 +174,7 @@ public class CoordinatesCalculator {
 		return Optional.of(new Point3D((int) Math.round(x), (int) Math.round(y), (int) Math.round(z)));
 	}
 
-	private StateMatrix getStateMatrix(Set<Integer> connectedAnchors, Integer tagId) {
+	private StateMatrix getStateMatrix(List<Anchor> connectedAnchors, Integer tagId) {
 		int N = connectedAnchors.size();
 		SimpleMatrix anchorPositions = new SimpleMatrix(N, 3);
 		SimpleMatrix measures = new SimpleMatrix(N, 1);
@@ -174,19 +184,16 @@ public class CoordinatesCalculator {
 			Point3D tagPreviousCoordinates = previousCoorinates.get(tagId).point;
 			tagPosition.setColumn(0, 0, tagPreviousCoordinates.getX(), tagPreviousCoordinates.getY(), tagPreviousCoordinates.getZ());
 		} else {
-			Optional<Integer> firstAnchorOptional = connectedAnchors.stream().findFirst();
-			firstAnchorOptional.ifPresent((Integer firstAnchorShortId) -> {
-				Anchor firstAnchor = anchorRepository.findByShortId(firstAnchorShortId).orElseThrow(EntityNotFoundException::new);
+			connectedAnchors.stream().findFirst().ifPresent((Anchor firstAnchor) -> {
 				tagPosition.setColumn(0, 0, firstAnchor.getX(), firstAnchor.getY(), firstAnchor.getZ());
 			});
 		}
 
-		Integer[] anchors = connectedAnchors.toArray(new Integer[0]);
+		Anchor[] anchors = connectedAnchors.toArray(new Anchor[0]);
 		for (int i = 0; i < N; ++i) {
-			Integer currentAnchorShortId = anchors[i];
-			Anchor currentAnchor = anchorRepository.findByShortId(currentAnchorShortId).orElseThrow(EntityNotFoundException::new);
+			Anchor currentAnchor = anchors[i];
 			anchorPositions.setRow(i, 0, currentAnchor.getX(), currentAnchor.getY(), currentAnchor.getZ());
-			measures.setRow(i, 0, getDistance(tagId, currentAnchorShortId));
+			measures.setRow(i, 0, getDistance(tagId, currentAnchor.getShortId()));
 		}
 
 		return new StateMatrix(anchorPositions, measures, tagPosition);
