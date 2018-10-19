@@ -1,6 +1,6 @@
 package co.blastlab.serviceblbnavi.socket.wrappers;
 
-import co.blastlab.serviceblbnavi.socket.command.InternetAddress;
+import co.blastlab.serviceblbnavi.socket.info.command.InternetAddress;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
