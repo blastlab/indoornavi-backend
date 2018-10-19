@@ -1,4 +1,4 @@
-package co.blastlab.serviceblbnavi.socket.command.request;
+package co.blastlab.serviceblbnavi.socket.info.command.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

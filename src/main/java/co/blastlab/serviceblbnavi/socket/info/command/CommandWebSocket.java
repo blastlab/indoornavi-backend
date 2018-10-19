@@ -1,9 +1,9 @@
-package co.blastlab.serviceblbnavi.socket.command;
+package co.blastlab.serviceblbnavi.socket.info.command;
 
 import co.blastlab.serviceblbnavi.socket.WebSocket;
-import co.blastlab.serviceblbnavi.socket.command.request.CheckBatteryLevel;
-import co.blastlab.serviceblbnavi.socket.command.request.CommandRequestBase;
-import co.blastlab.serviceblbnavi.socket.command.response.BatteryLevel;
+import co.blastlab.serviceblbnavi.socket.info.command.request.CheckBatteryLevel;
+import co.blastlab.serviceblbnavi.socket.info.command.request.CommandRequestBase;
+import co.blastlab.serviceblbnavi.socket.info.command.response.BatteryLevel;
 import co.blastlab.serviceblbnavi.socket.wrappers.CommandSinkWrapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
