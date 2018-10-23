@@ -7,8 +7,11 @@ import co.blastlab.serviceblbnavi.dto.uwb.UwbDto;
 import co.blastlab.serviceblbnavi.service.UwbService;
 import co.blastlab.serviceblbnavi.socket.WebSocket;
 import co.blastlab.serviceblbnavi.socket.info.client.UpdateRequest;
-import co.blastlab.serviceblbnavi.socket.info.command.CommandWebSocket;
-import co.blastlab.serviceblbnavi.socket.info.command.InternetAddress;
+import co.blastlab.serviceblbnavi.socket.info.command.BatteryLevelController;
+import co.blastlab.serviceblbnavi.socket.info.command.CommandController;
+import co.blastlab.serviceblbnavi.socket.info.command.request.CheckBatteryLevel;
+import co.blastlab.serviceblbnavi.socket.info.command.request.CommandRequestBase;
+import co.blastlab.serviceblbnavi.socket.info.command.response.BatteryLevel;
 import co.blastlab.serviceblbnavi.socket.info.controller.DeviceStatus;
 import co.blastlab.serviceblbnavi.socket.info.controller.Network;
 import co.blastlab.serviceblbnavi.socket.info.controller.NetworkController;
@@ -27,7 +30,6 @@ import co.blastlab.serviceblbnavi.socket.info.server.file.in.FileListSummary;
 import co.blastlab.serviceblbnavi.socket.info.server.file.out.AskList;
 import co.blastlab.serviceblbnavi.socket.info.server.file.out.Delete;
 import co.blastlab.serviceblbnavi.socket.info.server.file.out.Upload;
-import co.blastlab.serviceblbnavi.socket.info.server.sinkConnected.SinkConnected;
 import co.blastlab.serviceblbnavi.socket.info.server.update.UpdateInfo;
 import co.blastlab.serviceblbnavi.socket.info.server.update.UpdateInfo.UpdateInfoType;
 import co.blastlab.serviceblbnavi.socket.info.server.update.UpdateInfoCode;
@@ -35,8 +37,10 @@ import co.blastlab.serviceblbnavi.socket.info.server.update.UpdateInfoCode.Updat
 import co.blastlab.serviceblbnavi.socket.info.server.update.in.UpdateAcknowledge;
 import co.blastlab.serviceblbnavi.socket.info.server.update.out.Start;
 import co.blastlab.serviceblbnavi.socket.info.server.version.Version;
+import co.blastlab.serviceblbnavi.socket.wrappers.BatteryLevelsWrapper;
 import co.blastlab.serviceblbnavi.socket.wrappers.InfoErrorWrapper;
 import co.blastlab.serviceblbnavi.socket.wrappers.InfoWrapper;
+import co.blastlab.serviceblbnavi.socket.wrappers.SerialWrapper;
 import co.blastlab.serviceblbnavi.utils.Logger;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -67,12 +71,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
-@ServerEndpoint(InfoWebSocket.SERVER_ENDPOINT)
+@ServerEndpoint("/info")
 @Singleton
 @Startup
 public class InfoWebSocket extends WebSocket {
-
-	public static final String SERVER_ENDPOINT = "/info";
 
 	@Inject
 	private Logger logger;
@@ -101,13 +103,16 @@ public class InfoWebSocket extends WebSocket {
 	private DeviceRepository deviceRepository;
 
 	@Inject
-	private CommandWebSocket commandWebSocket;
-
-	@Inject
 	private UwbService uwbService;
 
 	@Inject
 	private NetworkController networkController;
+
+	@Inject
+	private CommandController commandController;
+
+	@Inject
+	private BatteryLevelController batteryLevelController;
 
 	@Resource
 	private ManagedExecutorService managedExecutorService;
@@ -115,9 +120,16 @@ public class InfoWebSocket extends WebSocket {
 	// key: thread id, value: session id
 	private Map<Long, String> threadIdToSessionId = Collections.synchronizedMap(new HashMap<>());
 	private static Set<Session> clientSessions = Collections.synchronizedSet(new HashSet<>());
-	private static Set<Session> serverSessions = Collections.synchronizedSet(new HashSet<>());
+
+	// key: device serial, value: session
+	private static Map<String, Session> serverSessions = Collections.synchronizedMap(new HashMap<>());
 
 	private ObjectMapper objectMapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+	public void setServerSerial(Session session, String serial) {
+		serverSessions.put(serial, session);
+		broadCastMessage(clientSessions, new SerialWrapper(serial));
+	}
 
 	@Override
 	protected Set<Session> getClientSessions() {
@@ -126,7 +138,7 @@ public class InfoWebSocket extends WebSocket {
 
 	@Override
 	protected Set<Session> getServerSessions() {
-		return serverSessions;
+		return new HashSet<>(serverSessions.values());
 	}
 
 	@Override
@@ -138,7 +150,9 @@ public class InfoWebSocket extends WebSocket {
 	public void open(Session session) {
 		super.open(session, () -> {
 			sendInfoAboutConnectedDevices(session);
-		}, () -> {});
+		}, () -> {
+			commandController.sendHandShake(session);
+		});
 	}
 
 	@OnClose
@@ -160,7 +174,6 @@ public class InfoWebSocket extends WebSocket {
 				InfoType infoType = InfoType.from(info.getCode());
 				switch (infoType) {
 					case STATION_WAKE_UP:
-						handleSinkRegistrationForCommands(session, info);
 						break;
 					case STATION_SLEEP:
 						break;
@@ -178,11 +191,28 @@ public class InfoWebSocket extends WebSocket {
 					case FILE:
 						handleFileMessage(session, info);
 						break;
+					case COMMAND:
+						commandController.handleCommand(session, info);
+						break;
 				}
 			}
 		} else if (isClientSession(session)) {
 			logger.trace("[{}] Received message from client {}", getSessionId(), message);
-			prepareUpload(message);
+			CommandRequestBase commandRequest = objectMapper.readValue(message, CommandRequestBase.class);
+			switch (commandRequest.getType()) {
+				case CHECK_BATTERY_LEVEL:
+					List<CheckBatteryLevel> checkBatteryLevel = objectMapper.convertValue(commandRequest.getArgs(), new TypeReference<List<CheckBatteryLevel>>() {});
+					try {
+						List<BatteryLevel> batteryLevels = batteryLevelController.check(checkBatteryLevel).get();
+						broadCastMessage(Collections.singleton(session), new BatteryLevelsWrapper(batteryLevels));
+					} catch (InterruptedException | ExecutionException e) {
+						e.printStackTrace();
+					}
+					break;
+				case UPDATE_FIRMWARE:
+					prepareUpload(message);
+					break;
+			}
 		}
 	}
 
@@ -387,11 +417,6 @@ public class InfoWebSocket extends WebSocket {
 				sendErrorCode("IWS_004");
 			}
 		});
-	}
-
-	private void handleSinkRegistrationForCommands(Session session, Info info) {
-		SinkConnected sinkConnected = objectMapper.convertValue(info.getArgs(), SinkConnected.class);
-		commandWebSocket.addSink(sinkConnected.getName(), new InternetAddress("172.16.170.40", sinkConnected.getPort()));
 	}
 
 	/**
