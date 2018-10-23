@@ -778,4 +778,16 @@
 			</column>
 		</addColumn>
 	</changeSet>
+	<changeSet id="navi-443-1" author="kgebert">
+		<dropForeignKeyConstraint baseTableName="PhoneCoordinates" constraintName="FK_PhoneCoordinates_Coordinates" />
+	</changeSet>
+	<changeSet id="navi-443-2" author="kgebert">
+		<dropForeignKeyConstraint baseTableName="UwbCoordinates" constraintName="FK_UwbCoordinates_Coordinates" />
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-443-3">
+		<addForeignKeyConstraint onDelete="CASCADE" baseColumnNames="id" baseTableName="PhoneCoordinates" constraintName="FK_PhoneCoordinates_Coordinates" referencedColumnNames="id" referencedTableName="Coordinates"/>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-443-4">
+		<addForeignKeyConstraint onDelete="CASCADE" baseColumnNames="id" baseTableName="UwbCoordinates" constraintName="FK_UwbCoordinates_Coordinates" referencedColumnNames="id" referencedTableName="Coordinates"/>
+	</changeSet>
 </databaseChangeLog>
