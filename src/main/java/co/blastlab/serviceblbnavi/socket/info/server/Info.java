@@ -29,6 +29,7 @@ public class Info extends InfoCode {
 		STATUS(3),
 		STATION_WAKE_UP(4),
 		STATION_SLEEP(5),
+		COMMAND(7),
 		FIRMWARE_UPDATE(20),
 		FILE(21);
 

@@ -8,11 +8,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CheckBatteryLevel extends CommandRequestBase implements CommandRequest {
-	private String sinkName;
-	private Integer sinkShortId;
+	private String serial;
+	private Integer shortId;
 
 	@Override
-	public String toString() {
-		return String.format("stat did:%s", Integer.toHexString(this.getSinkShortId()));
+	public String toStringCommand() {
+		return String.format("stat did:%s", Integer.toHexString(this.getShortId()));
 	}
 }
