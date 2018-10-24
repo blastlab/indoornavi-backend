@@ -105,6 +105,7 @@ public class ConfigurationExtractor {
 
 	public void resetAreas(Floor floor) {
 		List<Area> areasOnTheFloor = areaRepository.findByFloor(floor);
+		floor.getAreas().clear();
 		areasOnTheFloor.forEach((area -> areaRepository.remove(area)));
 	}
 }
