@@ -23,6 +23,8 @@ public class AreaDto {
 	private String name;
 	private Long floorId;
 	private List<Point> points = new ArrayList<>();
+	// this field is used in configuration
+	private List<Point> pointsInPixels = new ArrayList<>();
 	private List<AreaConfigurationDto> configurations = new ArrayList<>();
 	private List<Point> buffer = new ArrayList<>();
 	private Integer heightMax;
