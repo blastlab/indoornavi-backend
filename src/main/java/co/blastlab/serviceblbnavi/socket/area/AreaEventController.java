@@ -10,6 +10,7 @@ import co.blastlab.serviceblbnavi.dto.report.UwbCoordinatesDto;
 import co.blastlab.serviceblbnavi.socket.measures.Point3D;
 import co.blastlab.serviceblbnavi.utils.Logger;
 import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Range;
 import com.google.common.collect.Table;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -18,7 +19,6 @@ import com.vividsolutions.jts.io.ParseException;
 import com.vividsolutions.jts.io.WKTReader;
 import com.vividsolutions.jts.io.WKTWriter;
 import org.apache.commons.lang.time.DateUtils;
-import org.apache.commons.lang3.Range;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
@@ -123,7 +123,15 @@ public class AreaEventController {
 	}
 
 	private boolean isWithin(Area area, Point point, Integer offset, Point3D tagCoordinates) {
-		return point.isWithinDistance(area.getPolygon(), offset) && Range.between(area.getHMin(), area.getHMax()).contains(tagCoordinates.getZ());
+		Range<Integer> range = Range.closed(area.getHMin(), area.getHMax());
+		if (area.getHMin() == null && area.getHMax() == null) {
+			range = Range.all();
+		} else if (area.getHMin() == null) {
+			range = Range.lessThan(area.getHMax());
+		} else if (area.getHMax() == null) {
+			range = Range.greaterThan(area.getHMin());
+		}
+		return point.isWithinDistance(area.getPolygon(), offset) && range.contains(tagCoordinates.getZ());
 	}
 
 	private boolean shouldSendOnEnterEvent(UwbCoordinatesDto coordinatesData, AreaConfiguration areaConfiguration) {
@@ -148,7 +156,7 @@ public class AreaEventController {
 	}
 
 	private String buildPoint(UwbCoordinatesDto coordinatesData) {
-		Point point = geometryFactory.createPoint(new Coordinate(coordinatesData.getPoint().getX(), coordinatesData.getPoint().getY()));
+		Point point = geometryFactory.createPoint(new Coordinate(coordinatesData.getPoint().getX(), coordinatesData.getPoint().getY(), coordinatesData.getPoint().getZ()));
 		return wktWriter.write(point);
 	}
 
