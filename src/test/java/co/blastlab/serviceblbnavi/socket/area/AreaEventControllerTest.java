@@ -85,7 +85,7 @@ public class AreaEventControllerTest {
 		onLeave.setOffset(0);
 		onLeave.setMode(AreaConfiguration.Mode.ON_LEAVE);
 		area_1.setConfigurations(ImmutableList.of(onEnter, onLeave));
-		area_2.setConfigurations(ImmutableList.of(onEnter));
+		area_2.setConfigurations(ImmutableList.of(onEnter, onLeave));
 
 		// prepare floor
 		Floor floor = new Floor();
@@ -98,6 +98,8 @@ public class AreaEventControllerTest {
 		List<AreaEvent> eventsOutside = areaEventController.checkCoordinates(outside);
 		List<AreaEvent> eventsInside = areaEventController.checkCoordinates(inside);
 		List<AreaEvent> eventsInsideButHigher = areaEventController.checkCoordinates(insideButHigher);
+		List<AreaEvent> eventsInsideButHigherAgain = areaEventController.checkCoordinates(insideButHigher);
+		List<AreaEvent> eventsInsideButLowerAgain = areaEventController.checkCoordinates(inside);
 
 		// THEN
 		assertEquals(0, eventsOutside.size());
@@ -105,9 +107,15 @@ public class AreaEventControllerTest {
 		assertEquals(1L, eventsInside.get(0).getAreaId().longValue());
 		assertEquals(AreaConfiguration.Mode.ON_ENTER, eventsInside.get(0).getMode());
 		assertEquals(2, eventsInsideButHigher.size());
-		assertEquals(1L, eventsInsideButHigher.get(0).getAreaId().longValue());
-		assertEquals(AreaConfiguration.Mode.ON_LEAVE, eventsInsideButHigher.get(0).getMode());
-		assertEquals(2L, eventsInsideButHigher.get(1).getAreaId().longValue());
-		assertEquals(AreaConfiguration.Mode.ON_ENTER, eventsInsideButHigher.get(1).getMode());
+		assertEquals(2L, eventsInsideButHigher.get(0).getAreaId().longValue());
+		assertEquals(AreaConfiguration.Mode.ON_ENTER, eventsInsideButHigher.get(0).getMode());
+		assertEquals(1L, eventsInsideButHigher.get(1).getAreaId().longValue());
+		assertEquals(AreaConfiguration.Mode.ON_LEAVE, eventsInsideButHigher.get(1).getMode());
+		assertEquals(0, eventsInsideButHigherAgain.size());
+		assertEquals(2, eventsInsideButLowerAgain.size());
+		assertEquals(AreaConfiguration.Mode.ON_LEAVE, eventsInsideButLowerAgain.get(0).getMode());
+		assertEquals(2L, eventsInsideButLowerAgain.get(0).getAreaId().longValue());
+		assertEquals(AreaConfiguration.Mode.ON_ENTER, eventsInsideButLowerAgain.get(1).getMode());
+		assertEquals(1L, eventsInsideButLowerAgain.get(1).getAreaId().longValue());
 	}
 }

@@ -26,6 +26,8 @@ import javax.ejb.Startup;
 import javax.enterprise.concurrent.ManagedScheduledExecutorService;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -89,7 +91,7 @@ public class AreaEventController {
 					for (AreaConfiguration areaConfiguration : areaEntry.getValue()) {
 						if (isWithin(areaEntry.getKey(), point, areaConfiguration.getOffset(), coordinatesData.getPoint())) {
 							logger.trace("The point {} is within area {}", coordinatesData.getPoint(), areaEntry.getKey().getName());
-							if (shouldSendOnEnterEvent(coordinatesData, areaConfiguration)) {
+							if (shouldSendOnEnterEvent(coordinatesData, areaEntry.getKey(), areaConfiguration)) {
 								logger.trace("Sending event area {}", areaConfiguration.getMode());
 								addNew(coordinatesData, areaEntry.getKey(), areaConfiguration, events);
 							} else if (tagCoordinatesHistory.contains(coordinatesData.getTagShortId(), areaEntry.getKey())) {
@@ -100,7 +102,7 @@ public class AreaEventController {
 								addNew(coordinatesData, areaEntry.getKey(), areaConfiguration, events);
 							}
 						} else {
-							if (shouldSendOnLeaveEvent(coordinatesData, areaConfiguration)) {
+							if (shouldSendOnLeaveEvent(coordinatesData, areaEntry.getKey(), areaConfiguration)) {
 								logger.trace("Tag has left area {}", areaEntry.getKey().getName());
 								events.add(createEvent(coordinatesData, areaEntry.getKey(), areaConfiguration));
 								tagCoordinatesHistory.remove(coordinatesData.getTagShortId(), areaEntry.getKey());
@@ -123,23 +125,23 @@ public class AreaEventController {
 	}
 
 	private boolean isWithin(Area area, Point point, Integer offset, Point3D tagCoordinates) {
-		Range<Integer> range = Range.closed(area.getHMin(), area.getHMax());
-		if (area.getHMin() == null && area.getHMax() == null) {
-			range = Range.all();
-		} else if (area.getHMin() == null) {
+		Range<Integer> range = Range.all();
+		if (area.getHMin() != null && area.getHMax() != null) {
+			range = Range.closed(area.getHMin(), area.getHMax());
+		} else if (area.getHMin() == null && area.getHMax() != null) {
 			range = Range.lessThan(area.getHMax());
-		} else if (area.getHMax() == null) {
+		} else if (area.getHMax() == null && area.getHMin() != null) {
 			range = Range.greaterThan(area.getHMin());
 		}
 		return point.isWithinDistance(area.getPolygon(), offset) && range.contains(tagCoordinates.getZ());
 	}
 
-	private boolean shouldSendOnEnterEvent(UwbCoordinatesDto coordinatesData, AreaConfiguration areaConfiguration) {
+	private boolean shouldSendOnEnterEvent(UwbCoordinatesDto coordinatesData, Area area, AreaConfiguration areaConfiguration) {
 		return !tagCoordinatesHistory.containsRow(coordinatesData.getTagShortId()) && areaConfiguration.getMode().equals(ON_ENTER);
 	}
 
-	private boolean shouldSendOnLeaveEvent(UwbCoordinatesDto coordinatesData, AreaConfiguration areaConfiguration) {
-		return tagCoordinatesHistory.containsRow(coordinatesData.getTagShortId()) && areaConfiguration.getMode().equals(ON_LEAVE);
+	private boolean shouldSendOnLeaveEvent(UwbCoordinatesDto coordinatesData, Area area, AreaConfiguration areaConfiguration) {
+		return tagCoordinatesHistory.contains(coordinatesData.getTagShortId(), area) && areaConfiguration.getMode().equals(ON_LEAVE);
 	}
 
 	private void updateTime(UwbCoordinatesDto coordinatesData, Area area) {
@@ -152,6 +154,7 @@ public class AreaEventController {
 		event.setMode(areaConfiguration.getMode());
 		event.setTagId(coordinatesData.getTagShortId());
 		event.setAreaId(area.getId());
+		event.setDate(LocalDateTime.ofInstant(coordinatesData.getDate().toInstant(), ZoneId.systemDefault()));
 		return event;
 	}
 
