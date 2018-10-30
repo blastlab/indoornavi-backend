@@ -790,4 +790,9 @@
 	<changeSet author="kgebert (generated)" id="navi-443-4">
 		<addForeignKeyConstraint onDelete="CASCADE" baseColumnNames="id" baseTableName="UwbCoordinates" constraintName="FK_UwbCoordinates_Coordinates" referencedColumnNames="id" referencedTableName="Coordinates"/>
 	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-457-1">
+		<addColumn tableName="Area">
+			<column name="polygonInPixels" type="POLYGON"/>
+		</addColumn>
+	</changeSet>
 </databaseChangeLog>

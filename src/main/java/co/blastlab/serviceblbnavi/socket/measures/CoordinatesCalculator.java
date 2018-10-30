@@ -82,7 +82,7 @@ public class CoordinatesCalculator {
 
 		Point3D calculatedPoint = calculatedPointOptional.get();
 
-		logger.trace("Current position: X: {}, Y: {}", calculatedPoint.getX(), calculatedPoint.getY());
+		logger.trace("Current position: X: {}, Y: {}, Z: {}", calculatedPoint.getX(), calculatedPoint.getY(), calculatedPoint.getZ());
 
 		Floor floor = anchorRepository.findByShortId(anchorId)
 			.map(Anchor::getFloor)
@@ -128,7 +128,7 @@ public class CoordinatesCalculator {
 
 		StateMatrix stateMatrix = getStateMatrix(anchors, tagId);
 
-		logger.trace("State matrix: {}", stateMatrix);
+//		logger.trace("State matrix: {}", stateMatrix);
 
 		SimpleMatrix A = new SimpleMatrix(N, 3);
 		SimpleMatrix b = new SimpleMatrix(N, 1);
@@ -154,7 +154,7 @@ public class CoordinatesCalculator {
 			SimpleMatrix p = (aa).solve(ab);
 
 			stateMatrix.tagPosition = stateMatrix.tagPosition.plus(p);
-			logger.trace("Tag position calculated matrix: {}", stateMatrix.tagPosition.toString());
+//			logger.trace("Tag position calculated matrix: {}", stateMatrix.tagPosition.toString());
 
 			if (p.normF() < 10) {
 				logger.trace("Less than 10 iteration was needed: {}", taylorIter);
@@ -164,7 +164,18 @@ public class CoordinatesCalculator {
 
 		double x = stateMatrix.tagPosition.get(0);
 		double y = stateMatrix.tagPosition.get(1);
-		double z = stateMatrix.tagPosition.get(2);
+		double z = stateMatrix.tagPosition.get(2) < 0 ? 0 : stateMatrix.tagPosition.get(2);
+
+		double res = 0;
+		for (int i = 0; i < anchors.size(); i++) {
+			Anchor anchor = anchors.get(i);
+			double _x = Math.pow(anchor.getX() - x, 2);
+			double _y = Math.pow(anchor.getY() - y, 2);
+			double _z = Math.pow(anchor.getZ() - z, 2);
+			res += Math.abs(Math.sqrt(_x + _y + _z) - stateMatrix.measures.get(i));
+		}
+
+		logger.trace("Tag position calculated: x = {}, y = {}, z = {}, res = {}", x, y, z, res);
 
 		if (!isTagPositionGood(stateMatrix)) {
 			logger.trace("Tag position calculated far too far: x = {}, y = {}, z = {}", x, y, z);
