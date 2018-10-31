@@ -167,20 +167,28 @@ public class CoordinatesCalculator {
 		double z = stateMatrix.tagPosition.get(2) < 0 ? 0 : stateMatrix.tagPosition.get(2);
 
 		double res = 0;
+		double max = 0;
+		Anchor maxA = null;
 		for (int i = 0; i < anchors.size(); i++) {
 			Anchor anchor = anchors.get(i);
 			double _x = Math.pow(anchor.getX() - x, 2);
 			double _y = Math.pow(anchor.getY() - y, 2);
 			double _z = Math.pow(anchor.getZ() - z, 2);
-			res += Math.abs(Math.sqrt(_x + _y + _z) - stateMatrix.measures.get(i));
+			double curr = Math.abs(Math.sqrt(_x + _y + _z) - stateMatrix.measures.get(i));
+			if (curr > max) {
+				max = curr;
+				maxA = anchor;
+			}
+			res += curr;
 		}
-
-		logger.trace("Tag position calculated: x = {}, y = {}, z = {}, res = {}", x, y, z, res);
 
 		if (!isTagPositionGood(stateMatrix)) {
 			logger.trace("Tag position calculated far too far: x = {}, y = {}, z = {}", x, y, z);
 			return Optional.empty();
 		}
+
+		logger.trace("Tag position calculated: x = {}, y = {}, z = {}, res = {}, max = {} from = {}"
+			, (int) Math.round(x), (int) Math.round(y), (int) Math.round(z), res, max, maxA.getShortId());
 
 		return Optional.of(new Point3D((int) Math.round(x), (int) Math.round(y), (int) Math.round(z)));
 	}
