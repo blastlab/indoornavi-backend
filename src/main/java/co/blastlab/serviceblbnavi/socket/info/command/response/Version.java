@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 public class Version implements CommandResponse {
 
 	private String serial;
+	private Integer shortId;
 
 	@Override
 	public void fromString(String descriptor) {
@@ -17,6 +18,9 @@ public class Version implements CommandResponse {
 		getParameters(descriptor).forEach((key, value) -> {
 			if (key.toLowerCase().equals("serial")) {
 				this.serial = value;
+			}
+			if (key.toLowerCase().equals("did")) {
+				this.shortId = Integer.valueOf(value);
 			}
 		});
 	}

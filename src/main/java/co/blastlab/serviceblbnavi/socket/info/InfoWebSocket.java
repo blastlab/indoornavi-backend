@@ -121,18 +121,22 @@ public class InfoWebSocket extends WebSocket {
 	private Map<Long, String> threadIdToSessionId = Collections.synchronizedMap(new HashMap<>());
 	private static Set<Session> clientSessions = Collections.synchronizedSet(new HashSet<>());
 
-	// key: device serial, value: session
-	private static Map<String, Session> serverSessions = Collections.synchronizedMap(new HashMap<>());
+	// key: sink shortId, value: session
+	private static Map<Integer, Session> serverSessions = Collections.synchronizedMap(new HashMap<>());
 
 	private ObjectMapper objectMapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
-	public void setServerSerial(Session session, String serial) {
-		serverSessions.put(serial, session);
+	public void assignSinkMetadataToSession(Session session, Integer shortId, String serial) {
+		serverSessions.put(shortId, session);
 		broadCastMessage(clientSessions, new SerialWrapper(serial));
 	}
 
+	public Session getSinkSession(Integer sinkShortId) {
+		return serverSessions.get(sinkShortId);
+	}
+
 	@Override
-	protected Set<Session> getClientSessions() {
+	public Set<Session> getClientSessions() {
 		return clientSessions;
 	}
 
@@ -202,12 +206,8 @@ public class InfoWebSocket extends WebSocket {
 			switch (commandRequest.getType()) {
 				case CHECK_BATTERY_LEVEL:
 					List<CheckBatteryLevel> checkBatteryLevel = objectMapper.convertValue(commandRequest.getArgs(), new TypeReference<List<CheckBatteryLevel>>() {});
-					try {
-						List<BatteryLevel> batteryLevels = batteryLevelController.check(checkBatteryLevel).get();
-						broadCastMessage(Collections.singleton(session), new BatteryLevelsWrapper(batteryLevels));
-					} catch (InterruptedException | ExecutionException e) {
-						e.printStackTrace();
-					}
+					List<BatteryLevel> batteryLevels = batteryLevelController.check(checkBatteryLevel);
+					broadCastMessage(Collections.singleton(session), new BatteryLevelsWrapper(batteryLevels));
 					break;
 				case UPDATE_FIRMWARE:
 					prepareUpload(message);

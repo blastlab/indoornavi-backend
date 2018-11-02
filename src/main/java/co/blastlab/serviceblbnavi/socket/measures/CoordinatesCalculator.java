@@ -4,6 +4,7 @@ import co.blastlab.serviceblbnavi.dao.repository.AnchorRepository;
 import co.blastlab.serviceblbnavi.dao.repository.TagRepository;
 import co.blastlab.serviceblbnavi.domain.Anchor;
 import co.blastlab.serviceblbnavi.domain.Floor;
+import co.blastlab.serviceblbnavi.domain.Sink;
 import co.blastlab.serviceblbnavi.dto.Point;
 import co.blastlab.serviceblbnavi.dto.floor.FloorDto;
 import co.blastlab.serviceblbnavi.dto.report.UwbCoordinatesDto;
@@ -44,6 +45,8 @@ public class CoordinatesCalculator {
 	@Inject
 	private TagRepository tagRepository;
 
+	private Map<Integer, Integer> tagToSinkMapping = new HashMap<>();
+
 	private boolean traceTags;
 
 	@Inject
@@ -57,6 +60,10 @@ public class CoordinatesCalculator {
 		this.traceTags = false;
 	}
 
+	public Optional<Integer> findSinkForTag(Integer tagShortId) {
+		return tagToSinkMapping.containsKey(tagShortId) ? Optional.of(tagToSinkMapping.get(tagShortId)) : Optional.empty();
+	}
+
 	public Optional<UwbCoordinatesDto> calculateTagPosition(int firstDeviceId, int secondDeviceId, int distance, boolean is3D) {
 		logger.trace("Measure storage tags: {}", measureStorage.keySet().size());
 
@@ -65,6 +72,10 @@ public class CoordinatesCalculator {
 		if (tagId == null || anchorId == null) {
 			logger.trace(String.format("One of the devices' ids is out of range. Ids are: %s, %s and range is (1, %s)", firstDeviceId, secondDeviceId, Short.MAX_VALUE));
 			return Optional.empty();
+		}
+
+		if (isSink(anchorId)) {
+			tagToSinkMapping.put(tagId, anchorId);
 		}
 
 		setConnection(tagId, anchorId, distance);
@@ -100,6 +111,11 @@ public class CoordinatesCalculator {
 		Date currentDate = new Date();
 		previousCoorinates.put(tagId, new PointAndTime(calculatedPoint, currentDate.getTime()));
 		return Optional.of(new UwbCoordinatesDto(tagId, anchorId, floor.getId(), calculatedPoint, currentDate));
+	}
+
+	private boolean isSink(Integer anchorId) {
+		Optional<Anchor> anchorOptional = anchorRepository.findByShortId(anchorId);
+		return anchorOptional.filter(anchor -> anchor instanceof Sink).isPresent();
 	}
 
 	private Optional<Point3D> calculate3d(Set<Integer> connectedAnchors, Integer tagId) {
