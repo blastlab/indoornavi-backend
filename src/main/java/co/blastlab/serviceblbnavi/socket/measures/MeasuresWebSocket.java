@@ -23,7 +23,6 @@ import co.blastlab.serviceblbnavi.utils.Logger;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import javax.annotation.PostConstruct;
 import javax.ejb.Singleton;
 import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
@@ -42,12 +41,8 @@ public class MeasuresWebSocket extends WebSocket {
 	// key: thread id, value: session id
 	private Map<Long, String> threadIdToSessionId = Collections.synchronizedMap(new HashMap<>());
 
+	@Inject
 	private ObjectMapper objectMapper;
-
-	@PostConstruct
-	public void init() {
-		objectMapper = new ObjectMapper();
-	}
 
 	@Inject
 	private Logger logger;

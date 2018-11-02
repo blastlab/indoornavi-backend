@@ -44,38 +44,8 @@ public class CommandController extends WebSocketCommunication {
 			case "I1112":
 				Version version = new Version();
 				version.fromString(descriptor.toString());
-				infoWebSocket.setServerSerial(serverSession, version.getSerial());
+				infoWebSocket.assignSinkMetadataToSession(serverSession, version.getShortId(), version.getSerial());
 		}
 	}
-
-//		if (isClientSession(session)) {
-//			CommandRequestBase command = objectMapper.readValue(message, CommandRequestBase.class);
-//			switch (command.getType()) {
-//				case CHECK_BATTERY_LEVEL:
-//					CheckBatteryLevel checkBatteryLevel = objectMapper.convertValue(command, CheckBatteryLevel.class);
-//					String name = checkBatteryLevel.getSerial();
-//					if (this.sinkNameToSession.containsKey(name)) {
-//						Session sinkSession = this.sinkNameToSession.get(name);
-//						if (sinkSession.isOpen()) {
-//							broadCastMessage(
-//								Sets.newHashSet(this.sinkNameToSession.get(name)),
-//								checkBatteryLevel.toString()
-//							);
-//						}
-//					}
-//					break;
-//			}
-//		}
-
-//		String[] parts = clientWebsocketMessage.getMessage().split(" ");
-//		String code = parts[0];
-//		List<String> descriptor = Arrays.stream(parts).filter(value -> value.contains(":")).collect(Collectors.toList());
-//		switch (code) {
-//			case "I1111":
-//				BatteryLevel batteryLevel = new BatteryLevel();
-//				batteryLevel.fromString(descriptor.toString());
-//				broadCastMessage(getClientSessions(), objectMapper.writeValueAsString(batteryLevel));
-//				break;
-//		}
 
 }
