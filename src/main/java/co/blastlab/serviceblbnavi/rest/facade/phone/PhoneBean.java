@@ -56,7 +56,7 @@ public class PhoneBean implements PhoneFacade {
 		coordinatesList.forEach((coordinatesDto -> {
 			Phone phone = phoneRepository.findOptionalById(coordinatesDto.getPhoneId()).orElseThrow(EntityNotFoundException::new);
 			Floor floor = floorRepository.findOptionalById(coordinatesDto.getFloorId()).orElseThrow(EntityNotFoundException::new);
-			Coordinates coordinates = new Coordinates(coordinatesDto.getPoint().getX(), coordinatesDto.getPoint().getY(), 0, floor);
+			Coordinates coordinates = new Coordinates(coordinatesDto.getPoint().getX(), coordinatesDto.getPoint().getY(), 0, floor, coordinatesDto.getTimestamp());
 			PhoneCoordinates phoneCoordinates = new PhoneCoordinates(coordinates, phone);
 			phoneCoordinates.setPhone(phone);
 			phoneCoordinatesRepository.save(phoneCoordinates);
