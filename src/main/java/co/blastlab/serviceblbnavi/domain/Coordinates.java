@@ -9,6 +9,7 @@ import javax.persistence.Entity;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.ManyToOne;
+import java.sql.Timestamp;
 
 @Getter
 @Setter
@@ -22,4 +23,5 @@ public class Coordinates extends TrackedEntity {
 	private int z;
 	@ManyToOne
 	private Floor floor;
+	private Timestamp timestamp;
 }

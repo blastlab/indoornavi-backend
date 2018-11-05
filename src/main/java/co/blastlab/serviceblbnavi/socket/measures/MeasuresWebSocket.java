@@ -30,6 +30,7 @@ import javax.persistence.EntityNotFoundException;
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -157,7 +158,7 @@ public class MeasuresWebSocket extends WebSocket {
 				logger.trace("Trying to calculate coordinates");
 				Optional<UwbCoordinatesDto> coords = coordinatesCalculator.calculateTagPosition(distanceMessage.getDid1(), distanceMessage.getDid2(), distanceMessage.getDist(), false);
 				if (coords.isPresent()) {
-					this.saveCoordinates(coords.get());
+					this.saveCoordinates(coords.get(), distanceMessage.getTime());
 					Set<Session> sessions = this.filterSessions(coords.get());
 					broadCastMessage(sessions, new CoordinatesWrapper(coords.get()));
 					this.sendAreaEvents(coords.get());
@@ -170,12 +171,13 @@ public class MeasuresWebSocket extends WebSocket {
 		return distanceMessage.getDid1() > Short.MAX_VALUE && distanceMessage.getDid2() > Short.MAX_VALUE;
 	}
 
-	private void saveCoordinates(UwbCoordinatesDto coordinatesDto) {
+	private void saveCoordinates(UwbCoordinatesDto coordinatesDto, Timestamp timestamp) {
 		UwbCoordinates coordinates = new UwbCoordinates();
 		coordinates.setTag(tagRepository.findOptionalByShortId(coordinatesDto.getTagShortId()).orElseThrow(EntityNotFoundException::new));
 		coordinates.setX(coordinatesDto.getPoint().getX());
 		coordinates.setY(coordinatesDto.getPoint().getY());
 		coordinates.setFloor(floorRepository.findOptionalById(coordinatesDto.getFloorId()).orElseThrow(EntityNotFoundException::new));
+		coordinates.setTimestamp(timestamp);
 		coordinatesRepository.save(coordinates);
 	}
 
