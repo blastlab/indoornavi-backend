@@ -9,7 +9,7 @@ import javax.persistence.Entity;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.ManyToOne;
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -23,5 +23,5 @@ public class Coordinates extends TrackedEntity {
 	private int z;
 	@ManyToOne
 	private Floor floor;
-	private ZonedDateTime measurementTime;
+	private LocalDateTime measurementTime;
 }

@@ -32,8 +32,8 @@ import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -181,7 +181,7 @@ public class MeasuresWebSocket extends WebSocket {
 		coordinates.setY(coordinatesDto.getPoint().getY());
 		coordinates.setFloor(floorRepository.findOptionalById(coordinatesDto.getFloorId()).orElseThrow(EntityNotFoundException::new));
 		Instant instant = Instant.ofEpochMilli(timestamp.getTime());
-		coordinates.setMeasurementTime(ZonedDateTime.ofInstant(instant, ZoneId.of("CET")));
+		coordinates.setMeasurementTime(LocalDateTime.ofInstant(instant, ZoneId.systemDefault()));
 		coordinatesRepository.save(coordinates);
 	}
 
