@@ -792,7 +792,7 @@
 	</changeSet>
 	<changeSet author="kgebert (generated)" id="navi-441-1">
 		<addColumn tableName="Coordinates">
-			<column name="timestamp" type="datetime"/>
+			<column name="measurementTime" type="datetime"/>
 		</addColumn>
 	</changeSet>
 </databaseChangeLog>
