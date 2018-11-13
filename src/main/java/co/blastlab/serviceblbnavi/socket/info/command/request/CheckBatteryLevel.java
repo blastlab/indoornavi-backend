@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CheckBatteryLevel extends CommandRequestBase implements CommandRequest {
+public class CheckBatteryLevel implements CommandRequest {
 	private String serial;
 	private Integer shortId;
 
