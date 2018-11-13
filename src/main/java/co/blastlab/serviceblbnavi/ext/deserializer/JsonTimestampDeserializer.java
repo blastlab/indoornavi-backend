@@ -16,6 +16,6 @@ public class JsonTimestampDeserializer extends JsonDeserializer<Timestamp> {
 		ObjectCodec oc = jp.getCodec();
 		DoubleNode node = oc.readTree(jp);
 		double seconds = node.doubleValue();
-		return new Timestamp((long)(seconds * 1000)); // C# uses seconds so we need to convert it to miliseconds
+		return new Timestamp((long)seconds * 1000); // C# uses seconds so we need to convert it to miliseconds
 	}
 }
