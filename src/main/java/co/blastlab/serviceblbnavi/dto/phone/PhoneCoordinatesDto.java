@@ -4,7 +4,7 @@ import co.blastlab.serviceblbnavi.domain.PhoneCoordinates;
 import co.blastlab.serviceblbnavi.dto.CoordinatesDto;
 import lombok.*;
 
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -13,7 +13,7 @@ import java.time.ZonedDateTime;
 @ToString(callSuper = true)
 public class PhoneCoordinatesDto extends CoordinatesDto {
 	private Long phoneId;
-	private ZonedDateTime measurementTime;
+	private LocalDateTime measurementTime;
 
 	public PhoneCoordinatesDto(PhoneCoordinates phoneCoordinates) {
 		super(phoneCoordinates);
