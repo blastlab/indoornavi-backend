@@ -1,10 +1,12 @@
-package co.blastlab.serviceblbnavi.socket.info.command.response;
+package co.blastlab.serviceblbnavi.socket.info.server.command;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.lang3.Range;
+
+import java.util.List;
 
 @Getter
 @Setter
@@ -22,14 +24,14 @@ public class BatteryLevel implements CommandResponse {
 	private static int MIN_MV_WITH_BATTERY = 3100;
 
 	@Override
-	public void fromString(String descriptor) {
+	public void fromDescriptor(List<String> descriptor) {
 		// stat did:%x mV:%d Rx:%d Tx:%d Er:%d To:%d Uptime:%dd.%dh.%dm.%ds
 		getParameters(descriptor).forEach((key, value) -> {
 			if (key.toLowerCase().equals("did")) {
-				setDeviceShortId(Integer.valueOf(value));
+				setDeviceShortId(Integer.valueOf(value, 16));
 			}
 			if (key.toLowerCase().equals("uptime")) {
-				String[] uptime = value.split("\\.");
+				String[] uptime = value.replaceAll("[^\\d.]", "").split("\\.");
 				short days = Short.valueOf(uptime[0]);
 				short hours = Short.valueOf(uptime[1]);
 				short minutes = Short.valueOf(uptime[2]);
@@ -39,9 +41,9 @@ public class BatteryLevel implements CommandResponse {
 			if (key.toLowerCase().equals("mv")) {
 				Integer mV = Integer.valueOf(value);
 				if (isWithBattery(mV)) {
-					percentage = (double) (((MAX_MV_WITH_BATTERY - MIN_MV_WITH_BATTERY) / 100) * mV);
+					percentage = (double) ((mV - MIN_MV_WITH_BATTERY) * 100) / (MAX_MV_WITH_BATTERY - MIN_MV_WITH_BATTERY);
 				} else {
-					percentage = (double) (((MAX_MV_WITHOUT_BATTERY - MIN_MV_WITHOUT_BATTERY) / 100) * mV);
+					percentage = (double) ((mV - MIN_MV_WITHOUT_BATTERY) * 100) / (MAX_MV_WITHOUT_BATTERY - MIN_MV_WITHOUT_BATTERY);
 				}
 			}
 		});

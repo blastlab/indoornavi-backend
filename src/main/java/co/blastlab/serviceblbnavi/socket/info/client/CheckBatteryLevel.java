@@ -1,4 +1,4 @@
-package co.blastlab.serviceblbnavi.socket.info.command.request;
+package co.blastlab.serviceblbnavi.socket.info.client;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CheckBatteryLevel implements CommandRequest {
-	private String serial;
 	private Integer shortId;
 
 	@Override
