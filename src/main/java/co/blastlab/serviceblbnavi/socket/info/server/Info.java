@@ -1,9 +1,6 @@
 package co.blastlab.serviceblbnavi.socket.info.server;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -12,6 +9,7 @@ import java.util.Map;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 @ToString(callSuper = true)
 public class Info extends InfoCode {
 	private long time;

@@ -1,6 +1,6 @@
 package co.blastlab.serviceblbnavi.socket.wrappers;
 
-import co.blastlab.serviceblbnavi.socket.info.command.response.BatteryLevel;
+import co.blastlab.serviceblbnavi.socket.info.server.command.BatteryLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;

@@ -6,21 +6,17 @@ import co.blastlab.serviceblbnavi.dto.anchor.AnchorDto;
 import co.blastlab.serviceblbnavi.dto.uwb.UwbDto;
 import co.blastlab.serviceblbnavi.service.UwbService;
 import co.blastlab.serviceblbnavi.socket.WebSocket;
+import co.blastlab.serviceblbnavi.socket.info.client.CheckBatteryLevel;
+import co.blastlab.serviceblbnavi.socket.info.client.ClientRequest;
 import co.blastlab.serviceblbnavi.socket.info.client.UpdateRequest;
-import co.blastlab.serviceblbnavi.socket.info.command.BatteryLevelController;
-import co.blastlab.serviceblbnavi.socket.info.command.CommandController;
-import co.blastlab.serviceblbnavi.socket.info.command.request.CheckBatteryLevel;
-import co.blastlab.serviceblbnavi.socket.info.command.request.CommandRequestBase;
-import co.blastlab.serviceblbnavi.socket.info.command.response.BatteryLevel;
-import co.blastlab.serviceblbnavi.socket.info.controller.DeviceStatus;
-import co.blastlab.serviceblbnavi.socket.info.controller.Network;
-import co.blastlab.serviceblbnavi.socket.info.controller.NetworkController;
+import co.blastlab.serviceblbnavi.socket.info.controller.*;
 import co.blastlab.serviceblbnavi.socket.info.helper.Crc16;
 import co.blastlab.serviceblbnavi.socket.info.helper.JsonHelper;
 import co.blastlab.serviceblbnavi.socket.info.server.Info;
 import co.blastlab.serviceblbnavi.socket.info.server.Info.InfoType;
 import co.blastlab.serviceblbnavi.socket.info.server.InfoCode;
 import co.blastlab.serviceblbnavi.socket.info.server.broadcast.DeviceConnected;
+import co.blastlab.serviceblbnavi.socket.info.server.command.BatteryLevel;
 import co.blastlab.serviceblbnavi.socket.info.server.file.FileInfo;
 import co.blastlab.serviceblbnavi.socket.info.server.file.FileInfo.FileInfoType;
 import co.blastlab.serviceblbnavi.socket.info.server.file.in.Deleted;
@@ -40,7 +36,6 @@ import co.blastlab.serviceblbnavi.socket.info.server.version.Version;
 import co.blastlab.serviceblbnavi.socket.wrappers.BatteryLevelsWrapper;
 import co.blastlab.serviceblbnavi.socket.wrappers.InfoErrorWrapper;
 import co.blastlab.serviceblbnavi.socket.wrappers.InfoWrapper;
-import co.blastlab.serviceblbnavi.socket.wrappers.SerialWrapper;
 import co.blastlab.serviceblbnavi.utils.Logger;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -126,9 +121,8 @@ public class InfoWebSocket extends WebSocket {
 
 	private ObjectMapper objectMapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
-	public void assignSinkMetadataToSession(Session session, Integer shortId, String serial) {
+	public void assignSinkShortIdToSession(Session session, Integer shortId) {
 		serverSessions.put(shortId, session);
-		broadCastMessage(clientSessions, new SerialWrapper(serial));
 	}
 
 	public Session getSinkSession(Integer sinkShortId) {
@@ -203,12 +197,14 @@ public class InfoWebSocket extends WebSocket {
 			}
 		} else if (isClientSession(session)) {
 			logger.trace("[{}] Received message from client {}", getSessionId(), message);
-			CommandRequestBase commandRequest = objectMapper.readValue(message, CommandRequestBase.class);
-			switch (commandRequest.getType()) {
+			ClientRequest clientRequest = objectMapper.readValue(message, ClientRequest.class);
+			switch (clientRequest.getType()) {
 				case CHECK_BATTERY_LEVEL:
-					List<CheckBatteryLevel> checkBatteryLevel = objectMapper.convertValue(commandRequest.getArgs(), new TypeReference<List<CheckBatteryLevel>>() {});
+					List<CheckBatteryLevel> checkBatteryLevel = objectMapper.convertValue(clientRequest.getArgs(), new TypeReference<List<CheckBatteryLevel>>() {});
 					List<BatteryLevel> batteryLevels = batteryLevelController.check(checkBatteryLevel);
-					broadCastMessage(Collections.singleton(session), new BatteryLevelsWrapper(batteryLevels));
+					if (batteryLevels.size() > 0) {
+						broadCastMessage(Collections.singleton(session), new BatteryLevelsWrapper(batteryLevels));
+					}
 					break;
 				case UPDATE_FIRMWARE:
 					prepareUpload(message);

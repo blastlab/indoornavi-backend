@@ -1,11 +1,14 @@
-package co.blastlab.serviceblbnavi.socket.info.command;
+package co.blastlab.serviceblbnavi.socket.info.controller;
 
 import co.blastlab.serviceblbnavi.socket.WebSocketCommunication;
 import co.blastlab.serviceblbnavi.socket.info.InfoWebSocket;
-import co.blastlab.serviceblbnavi.socket.info.command.response.BatteryLevel;
-import co.blastlab.serviceblbnavi.socket.info.command.response.CommandResponseBase;
-import co.blastlab.serviceblbnavi.socket.info.command.response.Version;
 import co.blastlab.serviceblbnavi.socket.info.server.Info;
+import co.blastlab.serviceblbnavi.socket.info.server.command.BatteryLevel;
+import co.blastlab.serviceblbnavi.socket.info.server.command.CommandResponseBase;
+import co.blastlab.serviceblbnavi.socket.info.server.command.Version;
+import co.blastlab.serviceblbnavi.socket.info.server.handshake.Handshake;
+import co.blastlab.serviceblbnavi.socket.wrappers.InfoErrorWrapper;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.inject.Inject;
@@ -29,7 +32,12 @@ public class CommandController extends WebSocketCommunication {
 	private InfoWebSocket infoWebSocket;
 
 	public void sendHandShake(Session serverSession) {
-		broadCastMessage(Collections.singleton(serverSession), "version");
+		try {
+			broadCastMessage(Collections.singleton(serverSession), objectMapper.writeValueAsString(Collections.singleton(new Handshake())));
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+			broadCastMessage(infoWebSocket.getClientSessions(), new InfoErrorWrapper("CC_001"));
+		}
 	}
 
 	public void handleCommand(Session serverSession, Info info) {
@@ -39,12 +47,12 @@ public class CommandController extends WebSocketCommunication {
 		switch (code) {
 			case "I1111":
 				BatteryLevel batteryLevel = new BatteryLevel();
-				batteryLevel.fromString(descriptor.toString());
-				batteryLevelController.updateBatteryLevel(batteryLevel.getDeviceShortId(), batteryLevel.getPercentage());
+				batteryLevel.fromDescriptor(descriptor);
+				batteryLevelController.updateBatteryLevel(batteryLevel);
 			case "I1112":
 				Version version = new Version();
-				version.fromString(descriptor.toString());
-				infoWebSocket.assignSinkMetadataToSession(serverSession, version.getShortId(), version.getSerial());
+				version.fromDescriptor(descriptor);
+				infoWebSocket.assignSinkShortIdToSession(serverSession, version.getShortId());
 		}
 	}
 

@@ -1,4 +1,4 @@
-package co.blastlab.serviceblbnavi.socket.info.command.request;
+package co.blastlab.serviceblbnavi.socket.info.client;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class CommandRequestBase {
+public class ClientRequest {
 	private CommandType type;
 	private Object args;
 }
