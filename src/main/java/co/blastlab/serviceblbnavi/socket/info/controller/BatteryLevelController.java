@@ -97,9 +97,13 @@ public class BatteryLevelController extends WebSocketCommunication {
 				}
 				if (sinkShortIdOptional.isPresent()) {
 					Session sinkSession = infoWebSocket.getSinkSession(sinkShortIdOptional.get());
-					Info info = new Info(Info.InfoType.COMMAND.getValue());
-					info.setArgs(statusRequest);
-					broadCastMessage(Collections.singleton(sinkSession), objectMapper.writeValueAsString(Collections.singleton(info)));
+					if (sinkSession != null) {
+						Info info = new Info(Info.InfoType.COMMAND.getValue());
+						info.setArgs(statusRequest);
+						broadCastMessage(Collections.singleton(sinkSession), objectMapper.writeValueAsString(Collections.singleton(info)));
+					} else {
+						broadCastMessage(infoWebSocket.getClientSessions(), new InfoErrorWrapper("BLC_002"));
+					}
 				}
 				Thread.sleep(50);
 			} catch (InterruptedException | JsonProcessingException e) {
