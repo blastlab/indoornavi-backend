@@ -7,7 +7,7 @@ import co.blastlab.serviceblbnavi.socket.info.server.command.BatteryLevel;
 import co.blastlab.serviceblbnavi.socket.info.server.command.CommandResponseBase;
 import co.blastlab.serviceblbnavi.socket.info.server.command.Version;
 import co.blastlab.serviceblbnavi.socket.info.server.handshake.Handshake;
-import co.blastlab.serviceblbnavi.socket.wrappers.InfoErrorWrapper;
+import co.blastlab.serviceblbnavi.socket.wrappers.CommandErrorWrapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -36,7 +36,7 @@ public class CommandController extends WebSocketCommunication {
 			broadCastMessage(Collections.singleton(serverSession), objectMapper.writeValueAsString(Collections.singleton(new Handshake())));
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();
-			broadCastMessage(infoWebSocket.getClientSessions(), new InfoErrorWrapper("CC_001"));
+			broadCastMessage(infoWebSocket.getClientSessions(), new CommandErrorWrapper("CC_001"));
 		}
 	}
 
