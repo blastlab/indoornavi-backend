@@ -10,7 +10,7 @@ import co.blastlab.serviceblbnavi.socket.info.server.Info;
 import co.blastlab.serviceblbnavi.socket.info.server.command.BatteryLevel;
 import co.blastlab.serviceblbnavi.socket.measures.CoordinatesCalculator;
 import co.blastlab.serviceblbnavi.socket.wrappers.BatteryLevelsWrapper;
-import co.blastlab.serviceblbnavi.socket.wrappers.InfoErrorWrapper;
+import co.blastlab.serviceblbnavi.socket.wrappers.CommandErrorWrapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
@@ -102,13 +102,13 @@ public class BatteryLevelController extends WebSocketCommunication {
 						info.setArgs(statusRequest);
 						broadCastMessage(Collections.singleton(sinkSession), objectMapper.writeValueAsString(Collections.singleton(info)));
 					} else {
-						broadCastMessage(infoWebSocket.getClientSessions(), new InfoErrorWrapper("BLC_002"));
+						broadCastMessage(infoWebSocket.getClientSessions(), new CommandErrorWrapper("BLC_002"));
 					}
 				}
 				Thread.sleep(50);
 			} catch (InterruptedException | JsonProcessingException e) {
 				e.printStackTrace();
-				broadCastMessage(infoWebSocket.getClientSessions(), new InfoErrorWrapper("BLC_001"));
+				broadCastMessage(infoWebSocket.getClientSessions(), new CommandErrorWrapper("BLC_001"));
 			}
 		});
 	}
