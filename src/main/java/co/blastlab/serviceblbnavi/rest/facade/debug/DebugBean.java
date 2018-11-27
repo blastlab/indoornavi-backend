@@ -1,6 +1,7 @@
 package co.blastlab.serviceblbnavi.rest.facade.debug;
 
 import co.blastlab.serviceblbnavi.dao.repository.DebugReportRepository;
+import co.blastlab.serviceblbnavi.dao.repository.SinkRepository;
 import co.blastlab.serviceblbnavi.domain.DebugReport;
 import co.blastlab.serviceblbnavi.dto.report.UwbCoordinatesDto;
 import co.blastlab.serviceblbnavi.socket.measures.DistanceMessage;
@@ -12,10 +13,15 @@ import org.apache.http.HttpStatus;
 import javax.ejb.Stateless;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
+import javax.persistence.EntityNotFoundException;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.StreamingOutput;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 @Stateless
@@ -29,6 +35,9 @@ public class DebugBean implements DebugFacade {
 
 	@Inject
 	private ObjectMapper objectMapper;
+
+	@Inject
+	private SinkRepository sinkRepository;
 
 	private Stream.Builder<String> coordinatesStreamBuilder;
 	private Stream.Builder<String> rawMeasuresStreamBuilder;
@@ -60,11 +69,31 @@ public class DebugBean implements DebugFacade {
 	}
 
 	@Override
-	public Response start() throws IOException {
+	public Response download(Long id) {
+//		logger.debug("Trying to download image id {}", id);
+		Optional<DebugReport> debugReportOptional = debugReportRepository.findOptionalById(id);
+		if (debugReportOptional.isPresent()) {
+			DebugReport debugReport = debugReportOptional.get();
+
+			StreamingOutput stream = outputStream -> {
+				try {
+					outputStream.write(debugReport.getData());
+				} catch (Exception e) {
+					throw new WebApplicationException(e);
+				}
+			};
+
+			return Response.ok(stream, MediaType.APPLICATION_OCTET_STREAM).header("Content-Disposition", "attachment;filename=classes.jar").build();
+		}
+		throw new EntityNotFoundException();
+	}
+
+	@Override
+	public Response start(Long sinkId) throws IOException {
 		measuresWebSocket.setDebugMode(true);
 
 		startCoordinatesFile();
-		startRawMeasuresFile();
+		startRawMeasuresFile(sinkId);
 
 		return Response.ok().build();
 	}
@@ -90,15 +119,38 @@ public class DebugBean implements DebugFacade {
 		coordinatesStreamBuilder.add("Time; DID; X; Y; Z;\n");
 	}
 
-	private void startRawMeasuresFile() {
+	private void startRawMeasuresFile(Long sinkId) {
 		rawMeasuresStreamBuilder = Stream.builder();
-//		rawMeasuresStreamBuilder.add()
+		sinkRepository.findOptionalById(sinkId).ifPresent(sink -> {
+			rawMeasuresStreamBuilder.add(
+				String.format("%s sink %s %s",
+					new Date().getTime() / 1000,
+					Integer.toHexString(sink.getShortId()),
+					sink.getMac() == null ? 0 : sink.getMac()
+				)
+			);
+			sink.getAnchors().forEach((anchor -> {
+				rawMeasuresStreamBuilder.add(
+					String.format("%s anchor %s %s %s %s",
+						new Date().getTime() / 1000,
+						Integer.toHexString(anchor.getShortId()),
+						anchor.getX(),
+						anchor.getY(),
+						anchor.getZ()
+					)
+				);
+			}));
+		});
 	}
 
 	private void saveFile(Stream.Builder<String> streamBuilder, DebugReport.ReportType type) {
 		Stream<String> stream = streamBuilder.build();
-		byte[] bytes = stream.toString().getBytes();
+		Byte[] bytes = stream.toArray(Byte[]::new);
 		stream.close();
-		debugReportRepository.save(new DebugReport(bytes, type));
+		byte[] data = new byte[bytes.length];
+		for (int i = 0; i < bytes.length; i++) {
+			data[i] = bytes[i];
+		}
+		debugReportRepository.save(new DebugReport(data, type));
 	}
 }

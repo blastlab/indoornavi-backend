@@ -10,9 +10,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
 import javax.enterprise.event.Observes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
+import javax.validation.constraints.NotNull;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.util.List;
@@ -26,13 +25,19 @@ public interface DebugFacade {
 	@AuthorizedAccess("DEBUG")
 	List<DebugReport> list() throws IOException;
 
-	@Path("/start")
+	@Path("/{id: \\d+}")
+	@GET
+	@Produces({"image/png", "image/jpeg"})
+	@ApiOperation(value = "download the file", response = Response.class)
+	@AuthorizedAccess("DEBUG")
+	Response download(@PathParam("id") Long id);
+
+	@Path("/{id: \\d+}")
 	@ApiOperation(value = "start debug", response = Response.class)
 	@POST
 	@AuthorizedAccess("DEBUG")
-	Response start() throws IOException;
+	Response start(@PathParam("id") @NotNull Long sinkId) throws IOException;
 
-	@Path("/stop")
 	@ApiOperation(value = "stop debug", response = Response.class)
 	@POST
 	@AuthorizedAccess("DEBUG")
