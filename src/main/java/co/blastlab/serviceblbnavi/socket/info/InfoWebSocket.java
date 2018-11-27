@@ -149,27 +149,28 @@ public class InfoWebSocket extends WebSocket {
 			logger.trace("Received message from server {}", message);
 			List<Info> infos = objectMapper.readValue(message, new TypeReference<List<Info>>() {});
 			for (Info info : infos) {
-				InfoType infoType = InfoType.from(info.getCode());
-				switch (infoType) {
-					case STATION_WAKE_UP:
-						break;
-					case STATION_SLEEP:
-						break;
-					case VERSION:
-						handleVersion(info);
-						break;
-					case BROADCAST:
-						handleBroadcast(session, info);
-						break;
-					case STATUS:
-						break;
-					case FIRMWARE_UPDATE:
-						handleFirmwareUpdate(session, info);
-						break;
-					case FILE:
-						handleFileMessage(session, info);
-						break;
-				}
+				Optional.ofNullable(InfoType.from(info.getCode())).ifPresent(infoType -> {
+					switch (infoType) {
+						case STATION_WAKE_UP:
+							break;
+						case STATION_SLEEP:
+							break;
+						case VERSION:
+							handleVersion(info);
+							break;
+						case BROADCAST:
+							handleBroadcast(session, info);
+							break;
+						case STATUS:
+							break;
+						case FIRMWARE_UPDATE:
+							handleFirmwareUpdate(session, info);
+							break;
+						case FILE:
+							handleFileMessage(session, info);
+							break;
+					}
+				});
 			}
 		} else if (isClientSession(session)) {
 			logger.trace("[{}] Received message from client {}", getSessionId(), message);
