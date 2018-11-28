@@ -8,6 +8,7 @@ import co.blastlab.serviceblbnavi.service.UwbService;
 import co.blastlab.serviceblbnavi.socket.WebSocket;
 import co.blastlab.serviceblbnavi.socket.info.client.CheckBatteryLevel;
 import co.blastlab.serviceblbnavi.socket.info.client.ClientRequest;
+import co.blastlab.serviceblbnavi.socket.info.client.RawCommand;
 import co.blastlab.serviceblbnavi.socket.info.client.UpdateRequest;
 import co.blastlab.serviceblbnavi.socket.info.controller.*;
 import co.blastlab.serviceblbnavi.socket.info.helper.Crc16;
@@ -129,6 +130,14 @@ public class InfoWebSocket extends WebSocket {
 		return serverSessions.get(sinkShortId);
 	}
 
+	public Optional<Integer> getSinkShortIdBySession(Session session) {
+		Integer[] keys = serverSessions.entrySet()
+			.stream()
+			.filter(entry -> Objects.equals(entry.getValue(), session))
+			.map(Map.Entry::getKey).distinct().toArray(Integer[]::new);
+		return Optional.ofNullable(keys.length > 0 ? keys[0] : null);
+	}
+
 	@Override
 	public Set<Session> getClientSessions() {
 		return clientSessions;
@@ -190,7 +199,7 @@ public class InfoWebSocket extends WebSocket {
 							handleFileMessage(session, info);
 							break;
 						case COMMAND:
-							commandController.handleCommand(session, info);
+							commandController.handleServerCommand(session, info);
 							break;
 					}
 				});
@@ -205,6 +214,10 @@ public class InfoWebSocket extends WebSocket {
 					if (batteryLevels.size() > 0) {
 						broadCastMessage(Collections.singleton(session), new BatteryLevelsWrapper(batteryLevels));
 					}
+					break;
+				case RAW_COMMAND:
+					RawCommand rawCommand = objectMapper.convertValue(clientRequest.getArgs(), RawCommand.class);
+					commandController.handleRawCommand(rawCommand, session);
 					break;
 				case UPDATE_FIRMWARE:
 					prepareUpload(message);
