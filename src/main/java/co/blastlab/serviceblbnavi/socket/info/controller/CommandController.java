@@ -2,12 +2,16 @@ package co.blastlab.serviceblbnavi.socket.info.controller;
 
 import co.blastlab.serviceblbnavi.socket.WebSocketCommunication;
 import co.blastlab.serviceblbnavi.socket.info.InfoWebSocket;
+import co.blastlab.serviceblbnavi.socket.info.client.RawCommand;
 import co.blastlab.serviceblbnavi.socket.info.server.Info;
 import co.blastlab.serviceblbnavi.socket.info.server.command.BatteryLevel;
 import co.blastlab.serviceblbnavi.socket.info.server.command.CommandResponseBase;
 import co.blastlab.serviceblbnavi.socket.info.server.command.Version;
 import co.blastlab.serviceblbnavi.socket.info.server.handshake.Handshake;
 import co.blastlab.serviceblbnavi.socket.wrappers.CommandErrorWrapper;
+import co.blastlab.serviceblbnavi.socket.wrappers.InfoErrorWrapper;
+import co.blastlab.serviceblbnavi.socket.wrappers.ServerCommandWrapper;
+import co.blastlab.serviceblbnavi.utils.Logger;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -31,8 +35,12 @@ public class CommandController extends WebSocketCommunication {
 	@Inject
 	private InfoWebSocket infoWebSocket;
 
+	@Inject
+	private Logger logger;
+
 	public void sendHandShake(Session serverSession) {
 		try {
+			logger.trace("Sending handshake to {}", serverSession.getId());
 			broadCastMessage(Collections.singleton(serverSession), objectMapper.writeValueAsString(Collections.singleton(new Handshake())));
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();
@@ -40,8 +48,10 @@ public class CommandController extends WebSocketCommunication {
 		}
 	}
 
-	public void handleCommand(Session serverSession, Info info) {
-		String[] parts = objectMapper.convertValue(info.getArgs(), CommandResponseBase.class).getMsg().split(" ");
+	public void handleServerCommand(Session serverSession, Info info) {
+		logger.trace("Received command from server {}", info.getArgs());
+		String message = objectMapper.convertValue(info.getArgs(), CommandResponseBase.class).getMsg();
+		String[] parts = message.split(" ");
 		String code = parts[0];
 		List<String> descriptor = Arrays.stream(parts).filter(value -> value.contains(":")).collect(Collectors.toList());
 		switch (code) {
@@ -49,10 +59,30 @@ public class CommandController extends WebSocketCommunication {
 				BatteryLevel batteryLevel = new BatteryLevel();
 				batteryLevel.fromDescriptor(descriptor);
 				batteryLevelController.updateBatteryLevel(batteryLevel);
+				break;
 			case "I1112":
 				Version version = new Version();
 				version.fromDescriptor(descriptor);
 				infoWebSocket.assignSinkShortIdToSession(serverSession, version.getShortId());
+				break;
+			default:
+				infoWebSocket.getSinkShortIdBySession(serverSession).ifPresent(sinkShortId -> {
+					broadCastMessage(infoWebSocket.getClientSessions(), new ServerCommandWrapper(message, sinkShortId));
+				});
+				break;
+		}
+	}
+
+	public void handleRawCommand(RawCommand command, Session clientSession) {
+		logger.trace("Raw command received {}, sending it to sink {}", command.getValue(), command.getSinkShortId());
+		Session sinkSession = infoWebSocket.getSinkSession(command.getSinkShortId());
+		Info info = new Info(Info.InfoType.COMMAND.getValue());
+		info.setArgs(command.getValue());
+		try {
+			broadCastMessage(Collections.singleton(sinkSession), objectMapper.writeValueAsString(Collections.singleton(info)));
+		} catch (JsonProcessingException e) {
+			broadCastMessage(Collections.singleton(clientSession), new InfoErrorWrapper("CC_002"));
+			e.printStackTrace();
 		}
 	}
 

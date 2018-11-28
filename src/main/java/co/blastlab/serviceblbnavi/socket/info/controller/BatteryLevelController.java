@@ -31,13 +31,13 @@ public class BatteryLevelController extends WebSocketCommunication {
 	private Map<Integer, LevelAndTime> batteryLevelMapping = Collections.synchronizedMap(new HashMap<>());
 
 	@Inject
-	private CoordinatesCalculator coordinatesCalculator;
-
-	@Inject
 	private InfoWebSocket infoWebSocket;
 
 	@Inject
 	private ObjectMapper objectMapper;
+
+	@Inject
+	private CoordinatesCalculator coordinatesCalculator;
 
 	@Inject
 	private AnchorRepository anchorRepository;
