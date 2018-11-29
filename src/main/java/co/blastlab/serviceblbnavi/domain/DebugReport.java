@@ -19,6 +19,8 @@ public class DebugReport extends TrackedEntity {
 	@Basic(fetch = FetchType.LAZY)
 	private byte[] data;
 
+	private String name;
+
 	@Enumerated(EnumType.STRING)
 	private ReportType reportType;
 
