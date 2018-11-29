@@ -1,6 +1,7 @@
 package co.blastlab.serviceblbnavi.rest.facade.debug;
 
 import co.blastlab.serviceblbnavi.domain.DebugReport;
+import co.blastlab.serviceblbnavi.dto.debug.DebugFileName;
 import co.blastlab.serviceblbnavi.dto.report.UwbCoordinatesDto;
 import co.blastlab.serviceblbnavi.ext.filter.AuthorizedAccess;
 import co.blastlab.serviceblbnavi.ext.filter.SetOperationId;
@@ -8,8 +9,10 @@ import co.blastlab.serviceblbnavi.socket.measures.DistanceMessage;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 
 import javax.enterprise.event.Observes;
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
@@ -41,7 +44,12 @@ public interface DebugFacade {
 	@ApiOperation(value = "stop debug", response = Response.class)
 	@POST
 	@AuthorizedAccess("DEBUG")
-	Response stop() throws IOException;
+	Response stop(@ApiParam(value = "debugFileName", required = true) @Valid DebugFileName debugFileName) throws IOException;
+
+	@Path("/{id: \\d+}")
+	@DELETE
+	@AuthorizedAccess("DEBUG")
+	Response delete(@PathParam("id") Long id);
 
 	void rawMeasureEndpoint(@Observes DistanceMessage distanceMessage) throws JsonProcessingException;
 
