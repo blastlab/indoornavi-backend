@@ -30,7 +30,7 @@ public interface DebugFacade {
 
 	@Path("/{id: \\d+}")
 	@GET
-	@Produces({"image/png", "image/jpeg"})
+	@Produces({"text/plain"})
 	@ApiOperation(value = "download the file", response = Response.class)
 	@AuthorizedAccess("DEBUG")
 	Response download(@PathParam("id") Long id);
