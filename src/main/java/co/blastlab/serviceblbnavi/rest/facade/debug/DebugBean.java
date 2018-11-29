@@ -3,6 +3,7 @@ package co.blastlab.serviceblbnavi.rest.facade.debug;
 import co.blastlab.serviceblbnavi.dao.repository.DebugReportRepository;
 import co.blastlab.serviceblbnavi.dao.repository.SinkRepository;
 import co.blastlab.serviceblbnavi.domain.DebugReport;
+import co.blastlab.serviceblbnavi.dto.debug.DebugFileName;
 import co.blastlab.serviceblbnavi.dto.report.UwbCoordinatesDto;
 import co.blastlab.serviceblbnavi.socket.measures.DistanceMessage;
 import co.blastlab.serviceblbnavi.socket.measures.MeasuresWebSocket;
@@ -80,7 +81,7 @@ public class DebugBean implements DebugFacade {
 
 	@Override
 	public Response download(Long id) {
-		logger.trace("Trying to download debug report file: {}", id);
+		logger.debug("Trying to download debug report file: {}", id);
 		Optional<DebugReport> debugReportOptional = debugReportRepository.findOptionalById(id);
 		if (debugReportOptional.isPresent()) {
 			DebugReport debugReport = debugReportOptional.get();
@@ -93,7 +94,7 @@ public class DebugBean implements DebugFacade {
 				}
 			};
 
-			logger.trace("Streaming debug report file: {}", debugReport.getName());
+			logger.debug("Streaming debug report file: {}", debugReport.getName());
 			return Response.ok(stream, MediaType.APPLICATION_OCTET_STREAM)
 				.header("Content-Disposition", String.format("attachment;filename=%s", debugReport.getName())).build();
 		}
@@ -102,7 +103,7 @@ public class DebugBean implements DebugFacade {
 
 	@Override
 	public Response start(Long sinkId) throws IOException {
-		logger.trace("Starting to collect debug files for sink {}", sinkId);
+		logger.debug("Starting to collect debug files for sink {}", sinkId);
 		measuresWebSocket.setDebugMode(true);
 
 		startCoordinatesFile();
@@ -112,22 +113,31 @@ public class DebugBean implements DebugFacade {
 	}
 
 	@Override
-	public Response stop() throws IOException {
+	public Response stop(DebugFileName debugFileName) throws IOException {
 		if (coordinatesStreamBuilder == null || rawMeasuresStreamBuilder == null) {
-			logger.trace("You have to run start endpoint first.");
+			logger.debug("You have to run start endpoint first.");
 			return Response.status(HttpStatus.SC_BAD_REQUEST).build();
 		}
 		measuresWebSocket.setDebugMode(false);
 
-		logger.trace("Save debug report files");
+		logger.debug("Save debug report files");
 
-		saveFile(coordinatesStreamBuilder, DebugReport.ReportType.COORDINATES);
-		saveFile(rawMeasuresStreamBuilder, DebugReport.ReportType.RAW);
+		saveFile(coordinatesStreamBuilder, DebugReport.ReportType.COORDINATES, debugFileName);
+		saveFile(rawMeasuresStreamBuilder, DebugReport.ReportType.RAW, debugFileName);
 
 		coordinatesStreamBuilder = null;
 		rawMeasuresStreamBuilder = null;
 
 		return Response.ok().build();
+	}
+
+	@Override
+	public Response delete(Long id) {
+		logger.debug("Trying to remove debug report {}", id);
+		DebugReport debugReport = debugReportRepository.findOptionalById(id).orElseThrow(EntityNotFoundException::new);
+		debugReportRepository.remove(debugReport);
+		logger.debug("Debug report {} removed", id);
+		return Response.status(HttpStatus.SC_NO_CONTENT).build();
 	}
 
 	private void startCoordinatesFile() {
@@ -159,18 +169,31 @@ public class DebugBean implements DebugFacade {
 		});
 	}
 
-	private void saveFile(Stream.Builder<String> streamBuilder, DebugReport.ReportType type) {
+	private void saveFile(Stream.Builder<String> streamBuilder, DebugReport.ReportType type, DebugFileName debugFile) {
 		Stream<String> stream = streamBuilder.build();
 		String stringData = stream.collect(Collectors.joining());
 		stream.close();
-		DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd-HH:mm:ss");
+
 		debugReportRepository.save(
 			new DebugReport(
 				stringData.getBytes(),
-				String.format("%s-%s.txt", type.toString(), formatter.format(new Date())),
+				getFileName(debugFile, type),
 				type
 			)
 		);
+	}
+
+	private String getDefaultFileName(DebugReport.ReportType type) {
+		DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd-HH:mm:ss");
+		return String.format("%s-%s.txt", type.toString(), formatter.format(new Date()));
+	}
+
+	private String getFileName(DebugFileName debugFileName, DebugReport.ReportType type) {
+		if (DebugReport.ReportType.COORDINATES.equals(type)) {
+			return debugFileName.getCoordinates() == null ? getDefaultFileName(type) : debugFileName.getCoordinates();
+		} else {
+			return debugFileName.getRawMeasures() == null ? getDefaultFileName(type) : debugFileName.getRawMeasures();
+		}
 	}
 
 	private String convertToSeconds(long milis) {
