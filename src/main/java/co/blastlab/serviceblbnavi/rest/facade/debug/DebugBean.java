@@ -114,7 +114,7 @@ public class DebugBean implements DebugFacade {
 		startCoordinatesFile();
 		startRawMeasuresFile(sinkId);
 
-		return Response.ok().build();
+		return Response.accepted().build();
 	}
 
 	@Override
@@ -133,7 +133,7 @@ public class DebugBean implements DebugFacade {
 		coordinatesStreamBuilder = null;
 		rawMeasuresStreamBuilder = null;
 
-		return Response.ok().build();
+		return Response.accepted().build();
 	}
 
 	@Override
