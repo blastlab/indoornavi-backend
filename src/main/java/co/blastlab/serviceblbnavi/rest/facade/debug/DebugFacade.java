@@ -28,6 +28,12 @@ public interface DebugFacade {
 	@AuthorizedAccess("DEBUG")
 	List<DebugReport> list() throws IOException;
 
+	@ApiOperation(value = "check if debug has been started", response = DebugReport.class, responseContainer = "list")
+	@Path("/isStarted")
+	@GET
+	@AuthorizedAccess("DEBUG")
+	Boolean isStarted();
+
 	@Path("/{id: \\d+}")
 	@GET
 	@Produces({"text/plain"})
