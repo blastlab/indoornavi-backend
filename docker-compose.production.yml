@@ -32,7 +32,7 @@ services:
 
 
   core:
-    image: indoornavi.azurecr.io/backend
+    image: indoornavi.azurecr.io/indoornavi
     container_name:
       core
     ports:
@@ -51,17 +51,6 @@ services:
 #      APP_LOG_LEVEL: DEBUG # will log all actions taken by user
 #      APP_LOG_LEVEL: INFO # will only log most important messages
     entrypoint: ["wait-for-it", "liquibase:80", "-t", "0", "--", "/start-server.sh"]
-
-
-  frontend:
-    image: indoornavi.azurecr.io/frontend
-    volumes:
-      - ./:/app
-    ports:
-      - '4200:4200'
-    container_name:
-      frontend
-    working_dir: /app
 
 volumes:
   # For Liquibase container.
