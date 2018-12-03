@@ -22,6 +22,7 @@ import co.blastlab.serviceblbnavi.socket.wrappers.TagsWrapper;
 import co.blastlab.serviceblbnavi.utils.Logger;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.Getter;
 import lombok.Setter;
 
 import javax.annotation.PostConstruct;
@@ -47,6 +48,7 @@ public class MeasuresWebSocket extends WebSocket {
 	private ObjectMapper objectMapper;
 
 	@Setter
+	@Getter
 	private boolean isDebugMode;
 
 	@Inject

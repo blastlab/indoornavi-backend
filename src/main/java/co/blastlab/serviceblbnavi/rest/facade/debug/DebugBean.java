@@ -80,6 +80,11 @@ public class DebugBean implements DebugFacade {
 	}
 
 	@Override
+	public Boolean isStarted() {
+		return measuresWebSocket.isDebugMode();
+	}
+
+	@Override
 	public Response download(Long id) {
 		logger.debug("Trying to download debug report file: {}", id);
 		Optional<DebugReport> debugReportOptional = debugReportRepository.findOptionalById(id);
