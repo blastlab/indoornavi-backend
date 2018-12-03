@@ -6,6 +6,10 @@
 
 	<display-name>IndoorNavi</display-name>
 
+	<error-page>
+		<location>/index.html</location>
+	</error-page>
+
 	<security-constraint>
 		<web-resource-collection>
 			<web-resource-name>rest-api</web-resource-name>
