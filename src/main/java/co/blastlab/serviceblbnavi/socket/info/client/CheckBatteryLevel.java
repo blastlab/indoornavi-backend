@@ -1,12 +1,14 @@
 package co.blastlab.serviceblbnavi.socket.info.client;
 
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(of = "shortId")
 public class CheckBatteryLevel implements CommandRequest {
 	private Integer shortId;
 

@@ -210,7 +210,7 @@ public class InfoWebSocket extends WebSocket {
 			switch (clientRequest.getType()) {
 				case CHECK_BATTERY_LEVEL:
 					List<CheckBatteryLevel> checkBatteryLevel = objectMapper.convertValue(clientRequest.getArgs(), new TypeReference<List<CheckBatteryLevel>>() {});
-					List<BatteryLevel> batteryLevels = batteryLevelController.check(checkBatteryLevel);
+					List<BatteryLevel> batteryLevels = batteryLevelController.checkBatteryLevels(checkBatteryLevel);
 					if (batteryLevels.size() > 0) {
 						broadCastMessage(Collections.singleton(session), new BatteryLevelsWrapper(batteryLevels));
 					}
@@ -475,7 +475,7 @@ public class InfoWebSocket extends WebSocket {
 				deviceStatus.setRestartCount(0);
 				Optional<? extends Uwb> optionalByShortId = uwbService.findOptionalByShortId(deviceConnected.getShortId());
 				if (optionalByShortId.isPresent()) {
-					optionalByShortId.get().setPartition(Uwb.getPartition(deviceConnected.getFirmwareMinor()));
+//					optionalByShortId.get().setPartition(Uwb.getPartition(deviceConnected.getFirmwareMinor()));
 					deviceRepository.save(optionalByShortId.get());
 					deviceStatus.getUpdateFinished().complete(null);
 					logger.trace("Device {} has been updated", deviceStatus.getDevice());
@@ -540,7 +540,7 @@ public class InfoWebSocket extends WebSocket {
 		Optional<? extends Uwb> deviceOptional = uwbService.findOptionalByShortId(deviceConnected.getShortId());
 		if (deviceOptional.isPresent()) {
 			Uwb uwb = deviceOptional.get();
-			return uwb.getPartition() != Uwb.getPartition(deviceConnected.getFirmwareMinor());
+//			return uwb.getPartition() != Uwb.getPartition(deviceConnected.getFirmwareMinor());
 		}
 		return false;
 	}
@@ -617,7 +617,7 @@ public class InfoWebSocket extends WebSocket {
 				}
 			}
 			logger.trace("Setting partition and route");
-			uwb.setPartition(Uwb.getPartition(deviceConnected.getFirmwareMinor()));
+//			uwb.setPartition(Uwb.getPartition(deviceConnected.getFirmwareMinor()));
 			for (int i = 0; i < route.size(); i++) {
 				Optional<? extends Uwb> routeDeviceOptional = uwbService.findOptionalByShortId(route.get(i));
 				if (routeDeviceOptional.isPresent()) {

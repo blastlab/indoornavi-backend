@@ -11,6 +11,7 @@ import co.blastlab.serviceblbnavi.socket.info.server.command.BatteryLevel;
 import co.blastlab.serviceblbnavi.socket.measures.CoordinatesCalculator;
 import co.blastlab.serviceblbnavi.socket.wrappers.BatteryLevelsWrapper;
 import co.blastlab.serviceblbnavi.socket.wrappers.CommandErrorWrapper;
+import co.blastlab.serviceblbnavi.utils.Logger;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
@@ -19,16 +20,19 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.lang3.time.DateUtils;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
+import javax.ejb.*;
 import javax.inject.Inject;
-import javax.inject.Singleton;
 import javax.websocket.Session;
 import java.util.*;
 
 @Singleton
+@Startup
 public class BatteryLevelController extends WebSocketCommunication {
 	private static short EXPIRATION_MINUTES = 3;
 
-	private Map<Integer, LevelAndTime> batteryLevelMapping = Collections.synchronizedMap(new HashMap<>());
+	private Map<Integer, LevelAndTime> batteryLevelMapping = new HashMap<>();
 
 	@Inject
 	private InfoWebSocket infoWebSocket;
@@ -42,20 +46,33 @@ public class BatteryLevelController extends WebSocketCommunication {
 	@Inject
 	private AnchorRepository anchorRepository;
 
-	void updateBatteryLevel(BatteryLevel batteryLevel) {
-		LevelAndTime levelAndTime;
-		if (batteryLevelMapping.containsKey(batteryLevel.getDeviceShortId())) {
-			levelAndTime = batteryLevelMapping.get(batteryLevel.getDeviceShortId());
-			levelAndTime.getBatteryLevel().setPercentage(batteryLevel.getPercentage());
-			levelAndTime.setModifiedDate(new Date());
-		} else {
-			levelAndTime = new LevelAndTime(batteryLevel, new Date());
-			batteryLevelMapping.put(batteryLevel.getDeviceShortId(), levelAndTime);
-		}
+	private Set<CheckBatteryLevel> batteryLevelsToCheck = new HashSet<>();
+
+	@Inject
+	private Logger logger;
+
+	@Resource
+	private TimerService timerService;
+
+	@PostConstruct
+	private void init() {
+		logger.trace("Creating timer for battery level controller");
+		timerService.createIntervalTimer(0, 100, new TimerConfig());
+	}
+
+	public void updateBatteryLevel(BatteryLevel batteryLevel) {
+		LevelAndTime levelAndTime = new LevelAndTime(batteryLevel, new Date());
+		batteryLevelMapping.put(batteryLevel.getDeviceShortId(), levelAndTime);
 		broadCastMessage(infoWebSocket.getClientSessions(), new BatteryLevelsWrapper(Collections.singletonList(levelAndTime.getBatteryLevel())));
 	}
 
-	public List<BatteryLevel> check(List<CheckBatteryLevel> checkBatteryLevelList) {
+	/**
+	 * Takes a list of devices' ids and check if information about battery is in memory and is not expired, otherwise it asks server about
+	 * battery status
+	 * @param checkBatteryLevelList list of devices' ids to be checked
+	 * @return battery levels which are not expired
+	 */
+	public List<BatteryLevel> checkBatteryLevels(List<CheckBatteryLevel> checkBatteryLevelList) {
 		List<BatteryLevel> batteryLevels = new ArrayList<>();
 		ListIterator<CheckBatteryLevel> checkBatteryLevelIterator = checkBatteryLevelList.listIterator();
 		while (checkBatteryLevelIterator.hasNext()) {
@@ -71,14 +88,18 @@ public class BatteryLevelController extends WebSocketCommunication {
 		}
 
 		if (checkBatteryLevelList.size() > 0) {
-			askServerAboutBatteryLevel(checkBatteryLevelList);
+			batteryLevelsToCheck.addAll(checkBatteryLevelList);
 		}
 
 		return batteryLevels;
 	}
 
-	private void askServerAboutBatteryLevel(List<CheckBatteryLevel> checkBatteryLevel) {
-		checkBatteryLevel.forEach(toCheck -> {
+	@Timeout
+	public void askServerAboutBatteryLevel() {
+		Iterator<CheckBatteryLevel> iterator = batteryLevelsToCheck.iterator();
+		if (iterator.hasNext()) {
+			CheckBatteryLevel toCheck = iterator.next();
+			logger.trace("Timer executes in battery level controller to check battery level for {}", toCheck.getShortId());
 			String statusRequest = toCheck.toStringCommand();
 			Optional<Integer> sinkShortIdOptional = Optional.empty();
 			try {
@@ -97,15 +118,16 @@ public class BatteryLevelController extends WebSocketCommunication {
 						broadCastMessage(infoWebSocket.getClientSessions(), new CommandErrorWrapper("BLC_002", sinkShortIdOptional.get()));
 					}
 				}
-				Thread.sleep(50);
-			} catch (InterruptedException | JsonProcessingException e) {
+			} catch (JsonProcessingException e) {
 				e.printStackTrace();
 				CommandErrorWrapper commandError = sinkShortIdOptional
 					.map(shortId -> new CommandErrorWrapper("BLC_001", shortId))
 					.orElseGet(() -> new CommandErrorWrapper("BLC_001"));
 				broadCastMessage(infoWebSocket.getClientSessions(), commandError);
+			} finally {
+				iterator.remove();
 			}
-		});
+		}
 	}
 
 	private Optional<Integer> getSinkShortIdForTag(Integer tagShortId) {
