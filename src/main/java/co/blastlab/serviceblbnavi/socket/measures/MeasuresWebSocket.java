@@ -25,7 +25,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.annotation.PostConstruct;
 import javax.ejb.Singleton;
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
@@ -45,6 +44,7 @@ public class MeasuresWebSocket extends WebSocket {
 	// key: thread id, value: session id
 	private Map<Long, String> threadIdToSessionId = Collections.synchronizedMap(new HashMap<>());
 
+	@Inject
 	private ObjectMapper objectMapper;
 
 	@Setter
@@ -56,11 +56,6 @@ public class MeasuresWebSocket extends WebSocket {
 
 	@Inject
 	private Event<UwbCoordinatesDto> coordinatesDtoEvent;
-
-	@PostConstruct
-	public void init() {
-		objectMapper = new ObjectMapper();
-	}
 
 	@Inject
 	private Logger logger;

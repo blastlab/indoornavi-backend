@@ -6,16 +6,18 @@ import co.blastlab.serviceblbnavi.dto.anchor.AnchorDto;
 import co.blastlab.serviceblbnavi.dto.uwb.UwbDto;
 import co.blastlab.serviceblbnavi.service.UwbService;
 import co.blastlab.serviceblbnavi.socket.WebSocket;
+import co.blastlab.serviceblbnavi.socket.info.client.CheckBatteryLevel;
+import co.blastlab.serviceblbnavi.socket.info.client.ClientRequest;
+import co.blastlab.serviceblbnavi.socket.info.client.RawCommand;
 import co.blastlab.serviceblbnavi.socket.info.client.UpdateRequest;
-import co.blastlab.serviceblbnavi.socket.info.controller.DeviceStatus;
-import co.blastlab.serviceblbnavi.socket.info.controller.Network;
-import co.blastlab.serviceblbnavi.socket.info.controller.NetworkController;
+import co.blastlab.serviceblbnavi.socket.info.controller.*;
 import co.blastlab.serviceblbnavi.socket.info.helper.Crc16;
 import co.blastlab.serviceblbnavi.socket.info.helper.JsonHelper;
 import co.blastlab.serviceblbnavi.socket.info.server.Info;
 import co.blastlab.serviceblbnavi.socket.info.server.Info.InfoType;
 import co.blastlab.serviceblbnavi.socket.info.server.InfoCode;
 import co.blastlab.serviceblbnavi.socket.info.server.broadcast.DeviceConnected;
+import co.blastlab.serviceblbnavi.socket.info.server.command.BatteryLevel;
 import co.blastlab.serviceblbnavi.socket.info.server.file.FileInfo;
 import co.blastlab.serviceblbnavi.socket.info.server.file.FileInfo.FileInfoType;
 import co.blastlab.serviceblbnavi.socket.info.server.file.in.Deleted;
@@ -32,6 +34,7 @@ import co.blastlab.serviceblbnavi.socket.info.server.update.UpdateInfoCode.Updat
 import co.blastlab.serviceblbnavi.socket.info.server.update.in.UpdateAcknowledge;
 import co.blastlab.serviceblbnavi.socket.info.server.update.out.Start;
 import co.blastlab.serviceblbnavi.socket.info.server.version.Version;
+import co.blastlab.serviceblbnavi.socket.wrappers.BatteryLevelsWrapper;
 import co.blastlab.serviceblbnavi.socket.wrappers.InfoErrorWrapper;
 import co.blastlab.serviceblbnavi.socket.wrappers.InfoWrapper;
 import co.blastlab.serviceblbnavi.utils.Logger;
@@ -101,24 +104,48 @@ public class InfoWebSocket extends WebSocket {
 	@Inject
 	private NetworkController networkController;
 
+	@Inject
+	private CommandController commandController;
+
+	@Inject
+	private BatteryLevelController batteryLevelController;
+
 	@Resource
 	private ManagedExecutorService managedExecutorService;
 
 	// key: thread id, value: session id
 	private Map<Long, String> threadIdToSessionId = Collections.synchronizedMap(new HashMap<>());
 	private static Set<Session> clientSessions = Collections.synchronizedSet(new HashSet<>());
-	private static Set<Session> serverSessions = Collections.synchronizedSet(new HashSet<>());
+
+	// key: sink shortId, value: session
+	private static Map<Integer, Session> serverSessions = Collections.synchronizedMap(new HashMap<>());
 
 	private ObjectMapper objectMapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
+	public void assignSinkShortIdToSession(Session session, Integer shortId) {
+		serverSessions.put(shortId, session);
+	}
+
+	public Session getSinkSession(Integer sinkShortId) {
+		return serverSessions.get(sinkShortId);
+	}
+
+	public Optional<Integer> getSinkShortIdBySession(Session session) {
+		Integer[] keys = serverSessions.entrySet()
+			.stream()
+			.filter(entry -> Objects.equals(entry.getValue(), session))
+			.map(Map.Entry::getKey).distinct().toArray(Integer[]::new);
+		return Optional.ofNullable(keys.length > 0 ? keys[0] : null);
+	}
+
 	@Override
-	protected Set<Session> getClientSessions() {
+	public Set<Session> getClientSessions() {
 		return clientSessions;
 	}
 
 	@Override
 	protected Set<Session> getServerSessions() {
-		return serverSessions;
+		return new HashSet<>(serverSessions.values());
 	}
 
 	@Override
@@ -130,7 +157,9 @@ public class InfoWebSocket extends WebSocket {
 	public void open(Session session) {
 		super.open(session, () -> {
 			sendInfoAboutConnectedDevices(session);
-		}, () -> {});
+		}, () -> {
+			commandController.sendHandShake(session);
+		});
 	}
 
 	@OnClose
@@ -169,12 +198,31 @@ public class InfoWebSocket extends WebSocket {
 						case FILE:
 							handleFileMessage(session, info);
 							break;
+						case COMMAND:
+							commandController.handleServerCommand(session, info);
+							break;
 					}
 				});
 			}
 		} else if (isClientSession(session)) {
 			logger.trace("[{}] Received message from client {}", getSessionId(), message);
-			prepareUpload(message);
+			ClientRequest clientRequest = objectMapper.readValue(message, ClientRequest.class);
+			switch (clientRequest.getType()) {
+				case CHECK_BATTERY_LEVEL:
+					List<CheckBatteryLevel> checkBatteryLevel = objectMapper.convertValue(clientRequest.getArgs(), new TypeReference<List<CheckBatteryLevel>>() {});
+					List<BatteryLevel> batteryLevels = batteryLevelController.checkBatteryLevels(checkBatteryLevel);
+					if (batteryLevels.size() > 0) {
+						broadCastMessage(Collections.singleton(session), new BatteryLevelsWrapper(batteryLevels));
+					}
+					break;
+				case RAW_COMMAND:
+					RawCommand rawCommand = objectMapper.convertValue(clientRequest.getArgs(), RawCommand.class);
+					commandController.handleRawCommand(rawCommand, session);
+					break;
+				case UPDATE_FIRMWARE:
+					prepareUpload(message);
+					break;
+			}
 		}
 	}
 
@@ -427,7 +475,7 @@ public class InfoWebSocket extends WebSocket {
 				deviceStatus.setRestartCount(0);
 				Optional<? extends Uwb> optionalByShortId = uwbService.findOptionalByShortId(deviceConnected.getShortId());
 				if (optionalByShortId.isPresent()) {
-					optionalByShortId.get().setPartition(Uwb.getPartition(deviceConnected.getFirmwareMinor()));
+//					optionalByShortId.get().setPartition(Uwb.getPartition(deviceConnected.getFirmwareMinor()));
 					deviceRepository.save(optionalByShortId.get());
 					deviceStatus.getUpdateFinished().complete(null);
 					logger.trace("Device {} has been updated", deviceStatus.getDevice());
@@ -492,7 +540,7 @@ public class InfoWebSocket extends WebSocket {
 		Optional<? extends Uwb> deviceOptional = uwbService.findOptionalByShortId(deviceConnected.getShortId());
 		if (deviceOptional.isPresent()) {
 			Uwb uwb = deviceOptional.get();
-			return uwb.getPartition() != Uwb.getPartition(deviceConnected.getFirmwareMinor());
+//			return uwb.getPartition() != Uwb.getPartition(deviceConnected.getFirmwareMinor());
 		}
 		return false;
 	}
@@ -569,7 +617,7 @@ public class InfoWebSocket extends WebSocket {
 				}
 			}
 			logger.trace("Setting partition and route");
-			uwb.setPartition(Uwb.getPartition(deviceConnected.getFirmwareMinor()));
+//			uwb.setPartition(Uwb.getPartition(deviceConnected.getFirmwareMinor()));
 			for (int i = 0; i < route.size(); i++) {
 				Optional<? extends Uwb> routeDeviceOptional = uwbService.findOptionalByShortId(route.get(i));
 				if (routeDeviceOptional.isPresent()) {
