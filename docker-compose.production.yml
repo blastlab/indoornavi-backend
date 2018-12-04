@@ -7,14 +7,12 @@ services:
       - '3306:3306'
     environment:
       MYSQL_DATABASE: navi
-      MYSQL_ALLOW_EMPTY_PASSWORD: "true"
+      MYSQL_ROOT_PASSWORD: password
       TZ: Europe/Warsaw
     container_name:
       db
     volumes:
-      - dbvolume1:/var/lib/mysql
-      - dbvolume2:/var/lib/mariadb
-
+      - dbvolume:/var/lib/mysql
 
   liquibase:
     image: indoornavi.azurecr.io/liquibase
@@ -24,7 +22,7 @@ services:
       HOST: db
       SCHEMA: navi
       USER: root
-      PASSWORD: ""
+      PASSWORD: password
       CONTEXTS: production
     volumes:
       - ./database/src/main/resources:/liquibase/changelog
@@ -34,19 +32,19 @@ services:
   core:
     image: indoornavi.azurecr.io/indoornavi
     container_name:
-      core
+      indoornavi
     ports:
       - '90:8080'
       - '8787:8787'
       - '9990:9990'
-    volumes:
-      - ./deployments:/opt/jboss/wildfly/standalone/deployments
     depends_on:
       - db
     environment:
       TZ: Europe/Warsaw
       APP_ENVIRONMENT: production
       APP_DB_HOST: db
+      APP_DB_USER: root
+      APP_DB_PASSWORD: password
       APP_LOG_LEVEL: TRACE # will log all actions taken by user and hardware communication
 #      APP_LOG_LEVEL: DEBUG # will log all actions taken by user
 #      APP_LOG_LEVEL: INFO # will only log most important messages
@@ -56,5 +54,4 @@ volumes:
   # For Liquibase container.
   m2:
   # For mariadb data
-  dbvolume1:
-  dbvolume2:
+  dbvolume:
