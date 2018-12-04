@@ -22,9 +22,12 @@ import co.blastlab.serviceblbnavi.socket.wrappers.TagsWrapper;
 import co.blastlab.serviceblbnavi.utils.Logger;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.Singleton;
+import javax.enterprise.event.Event;
 import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
 import javax.websocket.*;
@@ -43,6 +46,16 @@ public class MeasuresWebSocket extends WebSocket {
 	private Map<Long, String> threadIdToSessionId = Collections.synchronizedMap(new HashMap<>());
 
 	private ObjectMapper objectMapper;
+
+	@Setter
+	@Getter
+	private boolean isDebugMode;
+
+	@Inject
+	private Event<DistanceMessage> distanceMessageEvent;
+
+	@Inject
+	private Event<UwbCoordinatesDto> coordinatesDtoEvent;
 
 	@PostConstruct
 	public void init() {
@@ -144,6 +157,9 @@ public class MeasuresWebSocket extends WebSocket {
 	private void handleMeasures(List<DistanceMessage> measures) {
 		logger.setId(getSessionId());
 		measures.forEach(distanceMessage -> {
+			if (isDebugMode) {
+				distanceMessageEvent.fire(distanceMessage);
+			}
 			logger.trace("Will analyze distance message: {}", distanceMessage);
 			if (bothDevicesAreAnchors(distanceMessage)) {
 				try {
@@ -156,12 +172,15 @@ public class MeasuresWebSocket extends WebSocket {
 			} else {
 				logger.trace("Trying to calculate coordinates");
 				Optional<UwbCoordinatesDto> coords = coordinatesCalculator.calculateTagPosition(distanceMessage.getDid1(), distanceMessage.getDid2(), distanceMessage.getDist(), false);
-				if (coords.isPresent()) {
-					this.saveCoordinates(coords.get());
-					Set<Session> sessions = this.filterSessions(coords.get());
-					broadCastMessage(sessions, new CoordinatesWrapper(coords.get()));
-					this.sendAreaEvents(coords.get());
-				}
+				coords.ifPresent(coordinatesDto -> {
+					if (isDebugMode) {
+						coordinatesDtoEvent.fire(coordinatesDto);
+					}
+					this.saveCoordinates(coordinatesDto);
+					Set<Session> sessions = this.filterSessions(coordinatesDto);
+					broadCastMessage(sessions, new CoordinatesWrapper(coordinatesDto));
+					this.sendAreaEvents(coordinatesDto);
+				});
 			}
 		});
 	}
