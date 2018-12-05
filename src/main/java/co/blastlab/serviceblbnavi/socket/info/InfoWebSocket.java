@@ -18,6 +18,7 @@ import co.blastlab.serviceblbnavi.socket.info.server.Info.InfoType;
 import co.blastlab.serviceblbnavi.socket.info.server.InfoCode;
 import co.blastlab.serviceblbnavi.socket.info.server.broadcast.DeviceConnected;
 import co.blastlab.serviceblbnavi.socket.info.server.command.BatteryLevel;
+import co.blastlab.serviceblbnavi.socket.info.server.command.DeviceTurnOn;
 import co.blastlab.serviceblbnavi.socket.info.server.file.FileInfo;
 import co.blastlab.serviceblbnavi.socket.info.server.file.FileInfo.FileInfoType;
 import co.blastlab.serviceblbnavi.socket.info.server.file.in.Deleted;
@@ -238,6 +239,30 @@ public class InfoWebSocket extends WebSocket {
 			}
 		});
 		getClientSessions().forEach(this::sendInfoAboutConnectedDevices);
+	}
+
+	public void onDeviceTurnOn(DeviceTurnOn deviceTurnOn) {
+		Optional<DeviceStatus> deviceStatusOptional = networkController.getDeviceStatus(deviceTurnOn.getDeviceShortId());
+		if (deviceStatusOptional.isPresent() && deviceStatusOptional.get().getStatus() == DeviceStatus.Status.RESTARTING) {
+			DeviceStatus deviceStatus = deviceStatusOptional.get();
+			logger.trace("Device is restarting after update ({})", deviceStatus.getRestartCount());
+			deviceStatus.setRestartCount(deviceStatus.getRestartCount() + 1);
+			if (isProperFirmwareVersion(deviceTurnOn) && deviceStatus.getRestartCount() == 2) {
+				deviceStatus.setRestartCount(0);
+				Optional<? extends Uwb> optionalByShortId = uwbService.findOptionalByShortId(deviceTurnOn.getDeviceShortId());
+				if (optionalByShortId.isPresent()) {
+					optionalByShortId.get().setPartition(Uwb.getPartition(deviceTurnOn.getFirmwareMinor()));
+					deviceRepository.save(optionalByShortId.get());
+					deviceStatus.getUpdateFinished().complete(null);
+					logger.trace("Device {} has been updated", deviceStatus.getDevice());
+				}
+			} else if (deviceStatus.getRestartCount() == 2) {
+				logger.trace("Device restarted 2 times but has wrong firmware");
+				deviceStatus.setStatus(DeviceStatus.Status.ONLINE);
+				deviceStatus.setRestartCount(0);
+				sendErrorCode("IWS_011");
+			}
+		}
 	}
 
 	private void checkOutdatedDeviceStatus(DeviceStatus deviceStatus) {
@@ -466,33 +491,10 @@ public class InfoWebSocket extends WebSocket {
 	private void handleBroadcast(Session session, Info info) {
 		DeviceConnected deviceConnected = objectMapper.convertValue(info.getArgs(), DeviceConnected.class);
 		logger.setId(getSessionId()).trace("Device connected {}", deviceConnected);
-		Optional<DeviceStatus> deviceStatusOptional = networkController.getDeviceStatus(deviceConnected.getShortId());
-		if (deviceStatusOptional.isPresent() && deviceStatusOptional.get().getStatus() == DeviceStatus.Status.RESTARTING) {
-			DeviceStatus deviceStatus = deviceStatusOptional.get();
-			logger.trace("Device is restarting after update ({})", deviceStatus.getRestartCount());
-			deviceStatus.setRestartCount(deviceStatus.getRestartCount() + 1);
-			if (isProperFirmwareVersion(deviceConnected) && deviceStatus.getRestartCount() == 2) {
-				deviceStatus.setRestartCount(0);
-				Optional<? extends Uwb> optionalByShortId = uwbService.findOptionalByShortId(deviceConnected.getShortId());
-				if (optionalByShortId.isPresent()) {
-//					optionalByShortId.get().setPartition(Uwb.getPartition(deviceConnected.getFirmwareMinor()));
-					deviceRepository.save(optionalByShortId.get());
-					deviceStatus.getUpdateFinished().complete(null);
-					logger.trace("Device {} has been updated", deviceStatus.getDevice());
-				}
-			} else if (deviceStatus.getRestartCount() == 2) {
-				logger.trace("Device restarted 2 times but has wrong firmware");
-				deviceStatus.setStatus(DeviceStatus.Status.ONLINE);
-				deviceStatus.setRestartCount(0);
-				sendErrorCode("IWS_011");
-			}
-		} else {
-			logger.trace("Trying to register new device");
-			final Optional<DeviceStatus> newDeviceOptional = registerNewDevice(session, deviceConnected);
-			newDeviceOptional.ifPresent(deviceStatus -> broadCastMessage(getClientSessions(), new InfoWrapper(Collections.singleton(deviceStatus)), () -> {
-				sendErrorCode("IWS_010");
-			}));
-		}
+		final Optional<DeviceStatus> newDeviceOptional = registerNewDevice(session, deviceConnected);
+		newDeviceOptional.ifPresent(deviceStatus -> broadCastMessage(getClientSessions(), new InfoWrapper(Collections.singleton(deviceStatus)), () -> {
+			sendErrorCode("IWS_010");
+		}));
 	}
 
 	private void handleFirmwareUpdate(Session session, Info info) {
@@ -536,11 +538,11 @@ public class InfoWebSocket extends WebSocket {
 		}
 	}
 
-	private boolean isProperFirmwareVersion(DeviceConnected deviceConnected) {
-		Optional<? extends Uwb> deviceOptional = uwbService.findOptionalByShortId(deviceConnected.getShortId());
+	private boolean isProperFirmwareVersion(DeviceTurnOn deviceTurnOn) {
+		Optional<? extends Uwb> deviceOptional = uwbService.findOptionalByShortId(deviceTurnOn.getDeviceShortId());
 		if (deviceOptional.isPresent()) {
 			Uwb uwb = deviceOptional.get();
-//			return uwb.getPartition() != Uwb.getPartition(deviceConnected.getFirmwareMinor());
+			return uwb.getPartition() != Uwb.getPartition(deviceTurnOn.getFirmwareMinor());
 		}
 		return false;
 	}
@@ -616,8 +618,7 @@ public class InfoWebSocket extends WebSocket {
 					deviceStatus = null;
 				}
 			}
-			logger.trace("Setting partition and route");
-//			uwb.setPartition(Uwb.getPartition(deviceConnected.getFirmwareMinor()));
+			logger.trace("Setting route");
 			for (int i = 0; i < route.size(); i++) {
 				Optional<? extends Uwb> routeDeviceOptional = uwbService.findOptionalByShortId(route.get(i));
 				if (routeDeviceOptional.isPresent()) {
