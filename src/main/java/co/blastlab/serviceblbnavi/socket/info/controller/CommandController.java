@@ -6,6 +6,7 @@ import co.blastlab.serviceblbnavi.socket.info.client.RawCommand;
 import co.blastlab.serviceblbnavi.socket.info.server.Info;
 import co.blastlab.serviceblbnavi.socket.info.server.command.BatteryLevel;
 import co.blastlab.serviceblbnavi.socket.info.server.command.CommandResponseBase;
+import co.blastlab.serviceblbnavi.socket.info.server.command.DeviceTurnOn;
 import co.blastlab.serviceblbnavi.socket.info.server.command.Version;
 import co.blastlab.serviceblbnavi.socket.info.server.handshake.Handshake;
 import co.blastlab.serviceblbnavi.socket.wrappers.CommandErrorWrapper;
@@ -55,6 +56,11 @@ public class CommandController extends WebSocketCommunication {
 		String code = parts[0];
 		List<String> descriptor = Arrays.stream(parts).filter(value -> value.contains(":")).collect(Collectors.toList());
 		switch (code) {
+			case "I1101":
+				DeviceTurnOn deviceTurnOn = new DeviceTurnOn();
+				deviceTurnOn.fromDescriptor(descriptor);
+				infoWebSocket.onDeviceTurnOn(deviceTurnOn);
+				break;
 			case "I1111":
 				BatteryLevel batteryLevel = new BatteryLevel();
 				batteryLevel.fromDescriptor(descriptor);
