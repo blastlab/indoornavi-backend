@@ -10,4 +10,9 @@ public class Handshake extends Info {
 		super(InfoType.COMMAND.getValue());
 		setArgs("version");
 	}
+
+	public Handshake(Integer shortId) {
+		super(InfoType.COMMAND.getValue());
+		setArgs(String.format("version did:%s", Integer.toHexString(shortId)));
+	}
 }

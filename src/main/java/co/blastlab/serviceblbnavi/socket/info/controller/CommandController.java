@@ -40,9 +40,16 @@ public class CommandController extends WebSocketCommunication {
 	private Logger logger;
 
 	public void sendHandShake(Session serverSession) {
+		sendHandShake(serverSession, null);
+	}
+
+	public void sendHandShake(Session serverSession, Integer shortId) {
 		try {
 			logger.trace("Sending handshake to {}", serverSession.getId());
-			broadCastMessage(Collections.singleton(serverSession), objectMapper.writeValueAsString(Collections.singleton(new Handshake())));
+			broadCastMessage(
+				Collections.singleton(serverSession),
+				objectMapper.writeValueAsString(Collections.singleton(shortId == null ? new Handshake() : new Handshake(shortId)))
+			);
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();
 			broadCastMessage(infoWebSocket.getClientSessions(), new CommandErrorWrapper("CC_001"));
@@ -50,7 +57,6 @@ public class CommandController extends WebSocketCommunication {
 	}
 
 	public void handleServerCommand(Session serverSession, Info info) {
-		logger.trace("Received command from server {}", info.getArgs());
 		String message = objectMapper.convertValue(info.getArgs(), CommandResponseBase.class).getMsg();
 		String[] parts = message.split(" ");
 		String code = parts[0];
@@ -59,7 +65,7 @@ public class CommandController extends WebSocketCommunication {
 			case "I1101":
 				DeviceTurnOn deviceTurnOn = new DeviceTurnOn();
 				deviceTurnOn.fromDescriptor(descriptor);
-				infoWebSocket.onDeviceTurnOn(deviceTurnOn);
+				infoWebSocket.onDeviceTurnOn(serverSession, deviceTurnOn);
 				break;
 			case "I1111":
 				BatteryLevel batteryLevel = new BatteryLevel();
@@ -80,7 +86,6 @@ public class CommandController extends WebSocketCommunication {
 	}
 
 	public void handleRawCommand(RawCommand command, Session clientSession) {
-		logger.trace("Raw command received {}, sending it to sink {}", command.getValue(), command.getSinkShortId());
 		Session sinkSession = infoWebSocket.getSinkSession(command.getSinkShortId());
 		Info info = new Info(Info.InfoType.COMMAND.getValue());
 		info.setArgs(command.getValue());
