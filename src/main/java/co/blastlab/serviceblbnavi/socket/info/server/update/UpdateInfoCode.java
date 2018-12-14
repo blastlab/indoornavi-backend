@@ -14,9 +14,10 @@ public class UpdateInfoCode {
 	private Integer shortId;
 
 	public enum UpdateInfoCodeType {
-		SUCCESS(18),
-		ABORTED(19),
-		RETRANSMISSION(20);
+		BAD_FIRMWARE_VERSION(11),
+		SUCCESS(22),
+		ABORTED(23),
+		RETRANSMISSION(24);
 
 		private final int value;
 		UpdateInfoCodeType(final int newValue) {

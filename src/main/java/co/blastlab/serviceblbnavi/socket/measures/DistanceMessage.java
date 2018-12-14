@@ -14,4 +14,6 @@ public class DistanceMessage {
 	private Integer did2;
 	private Integer dist;
 	private Double signal;
+	private Double fpp;
+	private Double time;
 }
