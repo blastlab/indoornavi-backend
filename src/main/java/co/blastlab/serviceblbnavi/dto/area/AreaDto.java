@@ -12,6 +12,7 @@ import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Getter
@@ -23,8 +24,9 @@ public class AreaDto {
 	private String name;
 	private Long floorId;
 	private List<Point> points = new ArrayList<>();
+	// this field is used in configuration
+	private List<Point> pointsInPixels = new ArrayList<>();
 	private List<AreaConfigurationDto> configurations = new ArrayList<>();
-	private List<Point> buffer = new ArrayList<>();
 	private Integer heightMax;
 	private Integer heightMin;
 
@@ -32,16 +34,20 @@ public class AreaDto {
 		this.setId(area.getId());
 		this.setName(area.getName());
 		this.setFloorId(area.getFloor() != null ? area.getFloor().getId() : null);
-		this.setPoints(this.toPoints(area.getPolygon()));
-		this.setBuffer(this.toPoints(((Polygon) area.getPolygon().buffer(50))));
+		Optional.ofNullable(area.getPolygon()).ifPresent(polygon -> {
+			this.setPoints(this.toPoints(polygon));
+		});
+		Optional.ofNullable(area.getPolygonInPixels()).ifPresent((polygon -> {
+			this.setPointsInPixels(this.toPoints(polygon));
+		}));
 		this.setConfigurations(area.getConfigurations().stream().map(AreaConfigurationDto::new).collect(Collectors.toList()));
 		this.setHeightMax(area.getHMax());
 		this.setHeightMin(area.getHMin());
 	}
 
-	public Polygon toPolygon() {
+	public Polygon toPolygon(boolean isInPixels) {
 		GeometryFactory geometryFactory = new GeometryFactory();
-		List<Coordinate> coordinates = points.stream().map(point -> new Coordinate(point.getX(), point.getY())).collect(Collectors.toList());
+		List<Coordinate> coordinates = (isInPixels ? pointsInPixels : points).stream().map(point -> new Coordinate(point.getX(), point.getY())).collect(Collectors.toList());
 		coordinates.add(coordinates.get(0));
 		return geometryFactory.createPolygon(
 			coordinates.toArray(new Coordinate[coordinates.size()])

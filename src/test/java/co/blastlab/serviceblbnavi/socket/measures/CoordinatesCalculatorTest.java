@@ -36,10 +36,10 @@ public class CoordinatesCalculatorTest {
 		// GIVEN
 		Floor floor = new Floor();
 		floor.setId(1L);
-		Optional<Anchor> lastAnchor = Optional.of(new Anchor(0, 100, 0, floor));
+		Optional<Anchor> lastAnchor = Optional.of(new Anchor(0, 100, 0, floor, 32770));
 
-		when(anchorRepository.findOptionalByShortIdAndPositionNotNull(32768)).thenReturn(Optional.of(new Anchor(0, 0, 0, floor)));
-		when(anchorRepository.findOptionalByShortIdAndPositionNotNull(32769)).thenReturn(Optional.of(new Anchor(100, 0, 0, floor)));
+		when(anchorRepository.findOptionalByShortIdAndPositionNotNull(32768)).thenReturn(Optional.of(new Anchor(0, 0, 0, floor, 32768)));
+		when(anchorRepository.findOptionalByShortIdAndPositionNotNull(32769)).thenReturn(Optional.of(new Anchor(100, 0, 0, floor, 32769)));
 		when(anchorRepository.findOptionalByShortIdAndPositionNotNull(32770)).thenReturn(lastAnchor);
 		when(anchorRepository.findByShortId(32770)).thenReturn(lastAnchor);
 
@@ -61,10 +61,10 @@ public class CoordinatesCalculatorTest {
 		// GIVEN
 		Floor floor = new Floor();
 		floor.setId(1L);
-		Optional<Anchor> lastAnchor = Optional.of(new Anchor(0, 100, 0, floor));
+		Optional<Anchor> lastAnchor = Optional.of(new Anchor(0, 100, 0, floor, 32770));
 
-		when(anchorRepository.findOptionalByShortIdAndPositionNotNull(32768)).thenReturn(Optional.of(new Anchor(0, 0, 0, floor)));
-		when(anchorRepository.findOptionalByShortIdAndPositionNotNull(32769)).thenReturn(Optional.of(new Anchor(100, 0, 0, floor)));
+		when(anchorRepository.findOptionalByShortIdAndPositionNotNull(32768)).thenReturn(Optional.of(new Anchor(0, 0, 0, floor, 32768)));
+		when(anchorRepository.findOptionalByShortIdAndPositionNotNull(32769)).thenReturn(Optional.of(new Anchor(100, 0, 0, floor, 32769)));
 		when(anchorRepository.findOptionalByShortIdAndPositionNotNull(42555)).thenReturn(Optional.empty());
 		when(anchorRepository.findOptionalByShortIdAndPositionNotNull(42556)).thenReturn(Optional.empty());
 		when(anchorRepository.findOptionalByShortIdAndPositionNotNull(42557)).thenReturn(Optional.empty());
@@ -101,11 +101,11 @@ public class CoordinatesCalculatorTest {
 		// GIVEN
 		Floor floor = new Floor();
 		floor.setId(1L);
-		Optional<Anchor> lastAnchor = Optional.of(new Anchor(0, 0, 0, floor));
-		Optional<Anchor> firstAnchor = Optional.of(new Anchor(0, 0, 100, floor));
+		Optional<Anchor> lastAnchor = Optional.of(new Anchor(0, 0, 0, floor, 32771));
+		Optional<Anchor> firstAnchor = Optional.of(new Anchor(0, 0, 100, floor, 32768));
 
-		when(anchorRepository.findByShortId(32769)).thenReturn(Optional.of(new Anchor(100, 0, 0, floor)));
-		when(anchorRepository.findByShortId(32770)).thenReturn(Optional.of(new Anchor(0, 100, 0, floor)));
+		when(anchorRepository.findByShortId(32769)).thenReturn(Optional.of(new Anchor(100, 0, 0, floor, 32769)));
+		when(anchorRepository.findByShortId(32770)).thenReturn(Optional.of(new Anchor(0, 100, 0, floor, 32770)));
 		when(anchorRepository.findByShortId(32771)).thenReturn(lastAnchor);
 		when(anchorRepository.findByShortId(32768)).thenReturn(firstAnchor);
 
@@ -128,9 +128,9 @@ public class CoordinatesCalculatorTest {
 		// given
 		Floor floor = new Floor();
 		floor.setId(1L);
-		Anchor anchor_1 = new Anchor(0, 0, 800, floor);
-		Anchor anchor_2 = new Anchor(0, 100, 800, floor);
-		Anchor anchor_3 = new Anchor(100, 100, 900, floor);
+		Anchor anchor_1 = new Anchor(0, 0, 800, floor, 32769);
+		Anchor anchor_2 = new Anchor(0, 100, 800, floor, 32770);
+		Anchor anchor_3 = new Anchor(100, 100, 900, floor, 32771);
 		when(anchorRepository.findOptionalByShortIdAndPositionNotNull(32769)).thenReturn(Optional.of(anchor_1));
 		when(anchorRepository.findOptionalByShortIdAndPositionNotNull(32770)).thenReturn(Optional.of(anchor_2));
 		when(anchorRepository.findOptionalByShortIdAndPositionNotNull(32771)).thenReturn(Optional.of(anchor_3));

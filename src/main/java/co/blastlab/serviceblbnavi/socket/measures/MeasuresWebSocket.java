@@ -170,7 +170,7 @@ public class MeasuresWebSocket extends WebSocket {
 				}
 			} else {
 				logger.trace("Trying to calculate coordinates");
-				Optional<UwbCoordinatesDto> coords = coordinatesCalculator.calculateTagPosition(distanceMessage.getDid1(), distanceMessage.getDid2(), distanceMessage.getDist(), false);
+				Optional<UwbCoordinatesDto> coords = coordinatesCalculator.calculateTagPosition(distanceMessage.getDid1(), distanceMessage.getDid2(), distanceMessage.getDist(), true);
 				coords.ifPresent(coordinatesDto -> {
 					if (isDebugMode) {
 						coordinatesDtoEvent.fire(coordinatesDto);
@@ -193,6 +193,7 @@ public class MeasuresWebSocket extends WebSocket {
 		coordinates.setTag(tagRepository.findOptionalByShortId(coordinatesDto.getTagShortId()).orElseThrow(EntityNotFoundException::new));
 		coordinates.setX(coordinatesDto.getPoint().getX());
 		coordinates.setY(coordinatesDto.getPoint().getY());
+		coordinates.setZ(coordinatesDto.getPoint().getZ());
 		coordinates.setFloor(floorRepository.findOptionalById(coordinatesDto.getFloorId()).orElseThrow(EntityNotFoundException::new));
 		Instant instant = Instant.ofEpochMilli(timestamp.getTime());
 		coordinates.setMeasurementTime(LocalDateTime.ofInstant(instant, ZoneId.systemDefault()));
