@@ -32,6 +32,10 @@ import javax.persistence.EntityNotFoundException;
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
+import java.sql.Timestamp;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -171,7 +175,7 @@ public class MeasuresWebSocket extends WebSocket {
 					if (isDebugMode) {
 						coordinatesDtoEvent.fire(coordinatesDto);
 					}
-					this.saveCoordinates(coordinatesDto);
+					this.saveCoordinates(coordinatesDto, distanceMessage.getTime());
 					Set<Session> sessions = this.filterSessions(coordinatesDto);
 					broadCastMessage(sessions, new CoordinatesWrapper(coordinatesDto));
 					this.sendAreaEvents(coordinatesDto);
@@ -184,12 +188,14 @@ public class MeasuresWebSocket extends WebSocket {
 		return distanceMessage.getDid1() > Short.MAX_VALUE && distanceMessage.getDid2() > Short.MAX_VALUE;
 	}
 
-	private void saveCoordinates(UwbCoordinatesDto coordinatesDto) {
+	private void saveCoordinates(UwbCoordinatesDto coordinatesDto, Timestamp timestamp) {
 		UwbCoordinates coordinates = new UwbCoordinates();
 		coordinates.setTag(tagRepository.findOptionalByShortId(coordinatesDto.getTagShortId()).orElseThrow(EntityNotFoundException::new));
 		coordinates.setX(coordinatesDto.getPoint().getX());
 		coordinates.setY(coordinatesDto.getPoint().getY());
 		coordinates.setFloor(floorRepository.findOptionalById(coordinatesDto.getFloorId()).orElseThrow(EntityNotFoundException::new));
+		Instant instant = Instant.ofEpochMilli(timestamp.getTime());
+		coordinates.setMeasurementTime(LocalDateTime.ofInstant(instant, ZoneId.systemDefault()));
 		coordinatesRepository.save(coordinates);
 	}
 

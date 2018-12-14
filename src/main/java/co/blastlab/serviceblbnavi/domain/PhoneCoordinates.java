@@ -16,7 +16,7 @@ public class PhoneCoordinates extends Coordinates {
 	private Phone phone;
 
 	public PhoneCoordinates(Coordinates coordinates, Phone phone) {
-		super(coordinates.getX(), coordinates.getY(), 0, coordinates.getFloor());
+		super(coordinates.getX(), coordinates.getY(), 0, coordinates.getFloor(), coordinates.getMeasurementTime());
 		setPhone(phone);
 	}
 }
