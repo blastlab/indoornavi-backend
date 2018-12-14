@@ -807,4 +807,9 @@
 			<column name="reportType" type="VARCHAR(255)"/>
 		</createTable>
 	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-457-1">
+		<addColumn tableName="Area">
+			<column name="polygonInPixels" type="POLYGON"/>
+		</addColumn>
+	</changeSet>
 </databaseChangeLog>
