@@ -3,6 +3,7 @@
 # Set default values
 : ${PORT:=3306}
 : ${COMMAND:="update"}
+: ${TEAMCITY:=false}
 
 JDBC_URL="jdbc:mysql://$HOST:$PORT/$SCHEMA?createDatabaseIfNotExist=true&useUnicode=true&characterEncoding=utf-8&connectionCollation=utf8_unicode_ci&serverTimezone=UTC"
 
@@ -17,6 +18,10 @@ function liq {
 }
 
 liq ${COMMAND}
+
+if [ "$TEAMCITY" = true ]; then
+	exit 0
+fi 
 
 # Serve website with doc, only after regular update action (on others, like rollback, finish and close container)
 if [ "$COMMAND" == "update" ]; then
