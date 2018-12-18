@@ -44,6 +44,6 @@ public class AreaDtoTest {
 		points.add(new Point(10, 10));
 		areaDto.setPoints(points);
 
-		assertThat(areaDto.toPolygon().toText(), is("POLYGON ((0 0, 0 10, 10 10, 0 0))"));
+		assertThat(areaDto.toPolygon(false).toText(), is("POLYGON ((0 0, 0 10, 10 10, 0 0))"));
 	}
 }

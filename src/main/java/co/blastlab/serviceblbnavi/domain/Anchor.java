@@ -37,11 +37,12 @@ public class Anchor extends Uwb {
 		this.setFloor(floor);
 	}
 
-	public Anchor(Integer x, Integer y, Integer z, Floor floor) {
+	public Anchor(Integer x, Integer y, Integer z, Floor floor, Integer shortId) {
 		this.x = x;
 		this.y = y;
 		this.z = z;
 		this.setFloor(floor);
+		this.setShortId(shortId);
 	}
 
 	public static final String BY_SHORT_ID_AND_POSITION_NOT_NULL = "byShortIdAndPositionIsNotNull";

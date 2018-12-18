@@ -22,7 +22,7 @@ public class NetworkController {
 	}
 
 	public void unregister(Session session) {
-		this.networks.removeIf(futureWrapper -> futureWrapper.getSession().getId().equals(session.getId()));
+		this.networks.removeIf(network -> network.getSession().getId().equals(session.getId()));
 	}
 
 	public Optional<Network> getBySinkShortId(Integer sinkShortId) {

@@ -43,7 +43,8 @@ public class AreaService {
 			areaConfigurations.add(areaConfiguration);
 		});
 		areaEntity.setConfigurations(areaConfigurations);
-		areaEntity.setPolygon(area.toPolygon());
+		areaEntity.setPolygon(area.toPolygon(false));
+		areaEntity.setPolygonInPixels(area.toPolygon(true));
 		areaEntity.setFloor(floor);
 		areaEntity.setHMax(area.getHeightMax());
 		areaEntity.setHMin(area.getHeightMin());

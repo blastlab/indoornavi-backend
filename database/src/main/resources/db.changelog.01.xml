@@ -790,4 +790,26 @@
 	<changeSet author="kgebert (generated)" id="navi-443-4">
 		<addForeignKeyConstraint onDelete="CASCADE" baseColumnNames="id" baseTableName="UwbCoordinates" constraintName="FK_UwbCoordinates_Coordinates" referencedColumnNames="id" referencedTableName="Coordinates"/>
 	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-441-1">
+		<addColumn tableName="Coordinates">
+			<column name="measurementTime" type="datetime"/>
+		</addColumn>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-512-1">
+		<createTable tableName="DebugReport">
+			<column autoIncrement="true" name="id" type="BIGINT">
+				<constraints primaryKey="true" primaryKeyName="DebugReportPK"/>
+			</column>
+			<column name="creationDate" type="datetime"/>
+			<column name="modificationDate" type="datetime"/>
+			<column name="data" type="MEDIUMBLOB"/>
+			<column name="name" type="VARCHAR(255)"/>
+			<column name="reportType" type="VARCHAR(255)"/>
+		</createTable>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-457-1">
+		<addColumn tableName="Area">
+			<column name="polygonInPixels" type="POLYGON"/>
+		</addColumn>
+	</changeSet>
 </databaseChangeLog>
