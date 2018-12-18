@@ -1,6 +1,7 @@
 package co.blastlab.serviceblbnavi.domain;
 
 import com.vividsolutions.jts.geom.Polygon;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Cascade;
@@ -13,11 +14,14 @@ import java.util.List;
 @Getter
 @Setter
 @Cacheable
+@EqualsAndHashCode(callSuper = true)
 public class Area extends TrackedEntity {
 
 	private String name;
 
 	private Polygon polygon;
+
+	private Polygon polygonInPixels;
 
 	@ManyToOne
 	private Floor floor;
