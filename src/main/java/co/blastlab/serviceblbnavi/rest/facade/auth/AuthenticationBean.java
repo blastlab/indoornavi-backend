@@ -60,7 +60,7 @@ public class AuthenticationBean implements AuthenticationFacade {
 		user.setToken(null);
 		user.setTokenExpires(null);
 		userRepository.save(user);
-		return Response.ok().build();
+		return Response.noContent().build();
 	}
 
 	private User authenticateUser(CredentialsDto credentialsDto) throws AuthUtils.AuthenticationException, AuthUtils.InvalidPasswordException {
