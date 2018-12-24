@@ -6,7 +6,6 @@ import co.blastlab.serviceblbnavi.dto.report.UwbCoordinatesDto;
 import co.blastlab.serviceblbnavi.socket.area.AreaEvent;
 import co.blastlab.serviceblbnavi.socket.area.AreaEventController;
 import co.blastlab.serviceblbnavi.utils.Logger;
-import com.google.common.collect.Range;
 import org.apache.http.HttpStatus;
 
 import javax.ejb.Stateless;
@@ -39,8 +38,10 @@ public class ReportBean implements ReportFacade {
 		if (from.isAfter(to)) {
 			throw new WebApplicationException("Invalid date range: `from` can not be after `to`", HttpStatus.SC_UNPROCESSABLE_ENTITY);
 		}
-		Range<LocalDateTime> range = Range.openClosed(from, to);
-		return coordinatesRepository.findByFloorIdAndInDateRange(filter.getFloorId(), from, to)
+		return filter.getFloorId() == null ?
+			coordinatesRepository.findByDateRange(from, to)
+				.stream().map(UwbCoordinatesDto::new).collect(Collectors.toList()) :
+			coordinatesRepository.findByFloorIdAndInDateRange(filter.getFloorId(), from, to)
 			.stream().map(UwbCoordinatesDto::new).collect(Collectors.toList());
 	}
 

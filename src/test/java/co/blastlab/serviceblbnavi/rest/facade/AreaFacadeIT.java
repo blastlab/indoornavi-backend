@@ -110,10 +110,8 @@ public class AreaFacadeIT extends BaseIT {
 			// assertions
 			.body("size()", is(2))
 			.body("get(0).points", is(notNullValue()))
-			.body("get(0).buffer", is(notNullValue()))
 			.body("get(0).name", is("test"))
 			.body("get(1).points", is(notNullValue()))
-			.body("get(1).buffer", is(notNullValue()))
 			.body("get(1).name", is("test2"));
 	}
 }
