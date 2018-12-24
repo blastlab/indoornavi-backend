@@ -10,14 +10,28 @@ import java.util.List;
 
 @Repository
 public interface UwbCoordinatesRepository extends EntityRepository<UwbCoordinates, Long> {
+
+	String REQUIRED_FIELDS = "c.id, c.creationDate, c.modificationDate, round(avg(c.x)) as x, round(avg(c.y)) as y, c.floor_id, c.measurementTime, round(avg(c.z)) as z, uc.tag_id";
+
 	@Query(
 		value =
-			"select c.id, c.creationDate, c.modificationDate, round(avg(c.x)) as x, round(avg(c.y)) as y, c.floor_id, round(avg(c.z)) as z, uc.tag_id " +
-			"from coordinates c inner join uwbcoordinates uc on c.id = uc.id " +
-			"where c.floor_id = ?1 and c.creationDate >= ?2 and creationDate <= ?3 " +
-			"group by c.creationDate " +
-			"order by c.creationDate",
+			"select " + REQUIRED_FIELDS + " " +
+				"from coordinates c inner join uwbcoordinates uc on c.id = uc.id " +
+				"where c.floor_id = ?1 and c.creationDate >= ?2 and creationDate <= ?3 " +
+				"group by c.creationDate " +
+				"order by c.creationDate",
 		isNative = true
 	)
 	List<UwbCoordinates> findByFloorIdAndInDateRange(Long floorId, LocalDateTime dateFrom, LocalDateTime dateTo);
+
+	@Query(
+		value =
+			"select " + REQUIRED_FIELDS + " " +
+				"from coordinates c inner join uwbcoordinates uc on c.id = uc.id " +
+				"where c.creationDate >= ?1 and creationDate <= ?2 " +
+				"group by c.creationDate " +
+				"order by c.creationDate",
+		isNative = true
+	)
+	List<UwbCoordinates> findByDateRange(LocalDateTime dateFrom, LocalDateTime dateTo);
 }

@@ -129,116 +129,7 @@ public class ReportFacadeIT extends BaseIT {
 	}
 
 	@Test
-	public void getAllAreaEvents() {
-		// given
-		String body = new RequestBodyBuilder("Report.json")
-			.build();
-
-		// when
-		givenUser()
-			.body(body)
-			.when()
-			.post("/reports/events")
-			.then()
-			// then
-			.statusCode(HttpStatus.SC_OK)
-			.body(
-				"size()", equalTo(6),
-				"get(0).mode", equalTo("ON_ENTER"),
-				"get(1).mode", equalTo("ON_LEAVE"),
-				"get(2).mode", equalTo("ON_ENTER"),
-				"get(3).mode", equalTo("ON_LEAVE"),
-				"get(4).mode", equalTo("ON_ENTER"),
-				"get(5).mode", equalTo("ON_LEAVE")
-			);
-	}
-
-	@Test
-	public void getAllAreaEventsForSpecificFloor() {
-		// given
-		Integer floorId = 2;
-		String body = new RequestBodyBuilder("Report.json")
-			.setParameter("floorId", floorId)
-			.build();
-
-		// when
-		givenUser()
-			.body(body)
-			.when()
-			.post("/reports/events")
-			.then()
-			// then
-			.statusCode(HttpStatus.SC_OK)
-			.body(
-				"size()", equalTo(4),
-				"get(0).mode", equalTo("ON_ENTER"),
-				"get(0).tagId", equalTo(11999),
-				"get(1).mode", equalTo("ON_LEAVE"),
-				"get(1).tagId", equalTo(11999),
-				"get(2).mode", equalTo("ON_ENTER"),
-				"get(2).tagId", equalTo(12000),
-				"get(3).mode", equalTo("ON_LEAVE"),
-				"get(3).tagId", equalTo(12000)
-			);
-	}
-
-	@Test
-	public void getAllAreaEventsForStartDate() {
-		// given
-		String body = new RequestBodyBuilder("Report.json")
-			.setParameter("from", "2011-03-01T23:59:59")
-			.build();
-
-		// when
-		givenUser()
-			.body(body)
-			.when()
-			.post("/reports/events")
-			.then()
-			// then
-			.statusCode(HttpStatus.SC_OK)
-			.body(
-				"size()", equalTo(4),
-				"get(0).mode", equalTo("ON_ENTER"),
-				"get(0).areaName", equalTo("test"),
-				"get(0).tagId", equalTo(12000),
-				"get(1).mode", equalTo("ON_LEAVE"),
-				"get(1).areaName", equalTo("test"),
-				"get(1).tagId", equalTo(12000),
-				"get(2).mode", equalTo("ON_ENTER"),
-				"get(2).areaName", equalTo("test"),
-				"get(2).tagId", equalTo(12001),
-				"get(3).mode", equalTo("ON_LEAVE"),
-				"get(3).areaName", equalTo("test"),
-				"get(3).tagId", equalTo(12001)
-			);
-	}
-
-	@Test
-	public void getAllAreaEventsForEndDate() {
-		// given
-		String body = new RequestBodyBuilder("Report.json")
-			.setParameter("to", "2011-03-01T23:59:59")
-			.build();
-
-		// when
-		givenUser()
-			.body(body)
-			.when()
-			.post("/reports/events")
-			.then()
-			// then
-			.statusCode(HttpStatus.SC_OK)
-			.body(
-				"size()", equalTo(1),
-				"get(0).mode", equalTo("ON_ENTER"),
-				"get(0).areaName", equalTo("test"),
-				"get(0).tagId", equalTo(11999)
-			);
-	}
-
-	@Test
-	public void getAllAreaEventsForStartAndEndDate() {
+	public void getAreaEventsForTag_1() {
 		// given
 		String body = new RequestBodyBuilder("Report.json")
 			.setParameter("from", "2011-01-01T00:00:00")
@@ -261,6 +152,54 @@ public class ReportFacadeIT extends BaseIT {
 				"get(1).mode", equalTo("ON_LEAVE"),
 				"get(1).areaName", equalTo("test"),
 				"get(1).tagId", equalTo(11999)
+			);
+	}
+
+	@Test
+	public void getAreaEventsForTag_2() {
+		// given
+		String body = new RequestBodyBuilder("Report.json")
+			.setParameter("from", "2011-05-01T00:00:00")
+			.setParameter("to", "2011-05-01T23:59:59")
+			.build();
+
+		// when
+		givenUser()
+			.body(body)
+			.when()
+			.post("/reports/events")
+			.then()
+			// then
+			.statusCode(HttpStatus.SC_OK)
+			.body(
+				"size()", equalTo(2),
+				"get(0).mode", equalTo("ON_ENTER"),
+				"get(0).areaName", equalTo("test"),
+				"get(0).tagId", equalTo(12000),
+				"get(1).mode", equalTo("ON_LEAVE"),
+				"get(1).areaName", equalTo("test"),
+				"get(1).tagId", equalTo(12000)
+			);
+	}
+
+	@Test
+	public void getAreaEventsForTag_3() {
+		// given
+		String body = new RequestBodyBuilder("Report.json")
+			.setParameter("from", "2011-06-01T00:00:00")
+			.setParameter("to", "2011-07-01T23:59:59")
+			.build();
+
+		// when
+		givenUser()
+			.body(body)
+			.when()
+			.post("/reports/events")
+			.then()
+			// then - this tag is walking on a floor where no areas can be found
+			.statusCode(HttpStatus.SC_OK)
+			.body(
+				"size()", equalTo(0)
 			);
 	}
 }
