@@ -18,8 +18,6 @@ public class BatteryLevel implements CommandResponse {
 	private Uptime uptime;
 	private Double percentage;
 
-	private static int MAX_MV_WITHOUT_BATTERY = 5200;
-	private static int MIN_MV_WITHOUT_BATTERY = 4500;
 	private static int MAX_MV_WITH_BATTERY = 4300;
 	private static int MIN_MV_WITH_BATTERY = 3100;
 
@@ -43,7 +41,7 @@ public class BatteryLevel implements CommandResponse {
 				if (isWithBattery(mV)) {
 					percentage = (double) ((mV - MIN_MV_WITH_BATTERY) * 100) / (MAX_MV_WITH_BATTERY - MIN_MV_WITH_BATTERY);
 				} else {
-					percentage = (double) ((mV - MIN_MV_WITHOUT_BATTERY) * 100) / (MAX_MV_WITHOUT_BATTERY - MIN_MV_WITHOUT_BATTERY);
+					percentage = (double) (mV > MAX_MV_WITH_BATTERY ? 100 : 0);
 				}
 			}
 		});
