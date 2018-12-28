@@ -25,36 +25,36 @@ import java.util.List;
 public interface DebugFacade {
 	@ApiOperation(value = "list of files", response = DebugReport.class, responseContainer = "list")
 	@GET
-	@AuthorizedAccess("DEBUG")
+	@AuthorizedAccess("DEBUG_READ")
 	List<DebugReport> list() throws IOException;
 
 	@ApiOperation(value = "check if debug has been started", response = DebugReport.class, responseContainer = "list")
 	@Path("/isStarted")
 	@GET
-	@AuthorizedAccess("DEBUG")
+	@AuthorizedAccess("DEBUG_READ")
 	Boolean isStarted();
 
 	@Path("/{id: \\d+}")
 	@GET
 	@Produces({"text/plain"})
 	@ApiOperation(value = "download the file", response = Response.class)
-	@AuthorizedAccess("DEBUG")
+	@AuthorizedAccess("DEBUG_READ")
 	Response download(@PathParam("id") Long id);
 
 	@Path("/{id: \\d+}")
 	@ApiOperation(value = "start debug", response = Response.class)
 	@POST
-	@AuthorizedAccess("DEBUG")
+	@AuthorizedAccess("DEBUG_READ")
 	Response start(@PathParam("id") @NotNull Long sinkId) throws IOException;
 
 	@ApiOperation(value = "stop debug", response = Response.class)
 	@POST
-	@AuthorizedAccess("DEBUG")
+	@AuthorizedAccess("DEBUG_READ")
 	Response stop(@ApiParam(value = "debugFileName", required = true) @Valid DebugFileName debugFileName) throws IOException;
 
 	@Path("/{id: \\d+}")
 	@DELETE
-	@AuthorizedAccess("DEBUG")
+	@AuthorizedAccess("DEBUG_READ")
 	Response delete(@PathParam("id") Long id);
 
 	void rawMeasureEndpoint(@Observes DistanceMessage distanceMessage) throws JsonProcessingException;
