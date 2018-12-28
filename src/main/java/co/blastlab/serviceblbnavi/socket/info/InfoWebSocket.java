@@ -644,8 +644,9 @@ public class InfoWebSocket extends WebSocket {
 				commandController.sendHandShake(session, deviceTurnOn.getDeviceShortId());
 			}
 
-
-			uwb.setPartition(Uwb.getPartition(deviceTurnOn.getFirmwareMinor()));
+			if (uwb.getPartition() == null) {
+				uwb.setPartition(Uwb.getPartition(deviceTurnOn.getFirmwareMinor()));
+			}
 
 			return Optional.ofNullable(deviceStatus);
 		}

@@ -97,6 +97,8 @@ public class BatteryLevelController extends WebSocketCommunication {
 	@Timeout
 	public void askServerAboutBatteryLevel() {
 		Iterator<CheckBatteryLevel> iterator = batteryLevelsToCheck.iterator();
+		// we need an instance of logger created here, otherwise it throws an exception about being out of context
+		Logger logger = new Logger();
 		if (iterator.hasNext()) {
 			CheckBatteryLevel toCheck = iterator.next();
 			logger.trace("Timer executes in battery level controller to check battery level for {}", toCheck.getShortId());
