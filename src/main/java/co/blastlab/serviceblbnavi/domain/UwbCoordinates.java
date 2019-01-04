@@ -10,6 +10,7 @@ import javax.persistence.ManyToOne;
 @Getter
 @Setter
 public class UwbCoordinates extends Coordinates {
+
 	@ManyToOne
 	private Tag tag;
 }
