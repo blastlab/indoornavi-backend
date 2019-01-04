@@ -63,6 +63,7 @@ public class TagTracerWebSocket extends WebSocket {
 	}
 
 	public void tagTraceAdded(@Observes TagTraceDto tagTrace) throws JsonProcessingException {
+		logger.setId(getSessionId()).trace("Tag trace added {}", tagTrace);
 		broadCastMessage(getClientSessions(), objectMapper.writeValueAsString(tagTrace));
 	}
 }

@@ -3,11 +3,13 @@ package co.blastlab.serviceblbnavi.socket.measures;
 import co.blastlab.serviceblbnavi.socket.bridge.AnchorPositionBridge;
 import co.blastlab.serviceblbnavi.socket.bridge.SinkAnchorsDistanceBridge;
 import co.blastlab.serviceblbnavi.utils.Logger;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import javax.websocket.Session;
@@ -41,10 +43,12 @@ public class MeasuresWebSocketTest {
 	@Mock
 	private Logger logger;
 
+	@Spy
+	private ObjectMapper objectMapper;
+
 	@Before
 	public void setUp() {
 		when(session.getId()).thenReturn("sessionId");
-		measuresWebSocket.init();
 	}
 
 	@Test

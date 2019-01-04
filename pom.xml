@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>co.blastlab.serviceblbnavi</groupId>
 	<artifactId>serviceblbnavi</artifactId>
-	<version>0.8.3</version>
+	<version>0.9.0</version>
 	<packaging>war</packaging>
 
 	<name>serviceblbnavi</name>
@@ -242,7 +242,7 @@
 					<changeLogFile>database/src/main/resources/db.changelog.xml</changeLogFile>
 					<driver>org.mariadb.jdbc.Driver</driver>
 					<username>root</username>
-					<password></password>
+					<password>password</password>
 					<url>jdbc:mysql://localhost:3306/Navi</url>
 					<diffChangeLogFile>database/src/main/resources/db.changelog.NEW.xml</diffChangeLogFile>
 					<referenceUrl>hibernate:ejb3:NaviPU?dialect=org.hibernate.dialect.MySQL5Dialect</referenceUrl>
