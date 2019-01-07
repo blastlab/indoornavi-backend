@@ -1,8 +1,0 @@
-<component name="ArtifactManager">
-  <artifact type="war" name="serviceblbnavi:war">
-    <output-path>$PROJECT_DIR$/target</output-path>
-    <root id="archive" name="serviceblbnavi-1.0.war">
-      <element id="artifact" artifact-name="serviceblbnavi:war exploded" />
-    </root>
-  </artifact>
-</component>
