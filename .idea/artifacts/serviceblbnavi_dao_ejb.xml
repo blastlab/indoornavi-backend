@@ -1,8 +1,0 @@
-<component name="ArtifactManager">
-  <artifact type="ejb-jar" name="serviceblbnavi-dao:ejb">
-    <output-path>$PROJECT_DIR$/serviceblbnavi-dao/target</output-path>
-    <root id="archive" name="serviceblbnavi-dao-1.0.jar">
-      <element id="artifact" artifact-name="serviceblbnavi-dao:ejb exploded" />
-    </root>
-  </artifact>
-</component>

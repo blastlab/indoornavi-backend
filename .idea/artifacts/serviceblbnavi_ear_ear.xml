@@ -1,8 +1,0 @@
-<component name="ArtifactManager">
-  <artifact type="ear" name="serviceblbnavi-ear:ear">
-    <output-path>$PROJECT_DIR$/serviceblbnavi-ear/deployments</output-path>
-    <root id="archive" name="serviceblbnavi-ear-1.0.ear">
-      <element id="artifact" artifact-name="serviceblbnavi-ear:ear exploded" />
-    </root>
-  </artifact>
-</component>
