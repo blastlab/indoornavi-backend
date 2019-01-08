@@ -16,4 +16,4 @@
 # May be removed if using Maven or Gradle
 !.idea/modules.xml
 !.idea/misc.xml
-!.idea/*.iml
+!*.iml
