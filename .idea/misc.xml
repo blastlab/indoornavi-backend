@@ -5,6 +5,9 @@
     <file type="javaeeApplication" url="file://$PROJECT_DIR$/serviceblbnavi-ear" />
     <file type="web" url="file://$PROJECT_DIR$" />
   </component>
+  <component name="JavaScriptSettings">
+    <option name="languageLevel" value="ES6" />
+  </component>
   <component name="MavenProjectsManager">
     <option name="originalFiles">
       <list>
