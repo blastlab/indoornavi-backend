@@ -25,7 +25,6 @@ public class AnchorFacadeIT extends BaseIT {
 	private static final Integer X = 3;
 	private static final Integer Y = 2;
 	private static final String NAME = "Anker  $ \\\" \\\\ ążśźęćółń ĄŻŚŹĘĆŃÓŁ `~!@#%^&*()-_=+{}[]:;'|><,.?";
-	private static final int FLOOR_EXISTING = 4;
 	private static final int ANCHOR_ID_NONEXISTING = 666;
 	private static final int ANCHOR_ID_FOR_UPDATE = 1;
 	private static final int ANCHOR_SHORT_ID_EXISTING = 32999;
@@ -47,10 +46,8 @@ public class AnchorFacadeIT extends BaseIT {
 			.setParameter("shortId", ANCHOR_SHORT_ID_CREATING)
 			.setParameter("macAddress", ANCHOR_MAC_CREATING)
 			.setParameter("name", NAME)
-			.setParameter("floorId", FLOOR_EXISTING)
 			.setParameter("x", X)
 			.setParameter("y", Y)
-			.setParameter("floorId", FLOOR_EXISTING)
 			.setParameter("verified", ANCHOR_NOT_VERIFIED)
 			.build();
 
@@ -62,7 +59,6 @@ public class AnchorFacadeIT extends BaseIT {
 				"shortId", equalTo(ANCHOR_SHORT_ID_CREATING),
 				"macAddress", equalTo(ANCHOR_MAC_CREATING),
 				"name", equalTo(NAME),
-				"floorId", equalTo(FLOOR_EXISTING),
 				"x", equalTo(X),
 				"y", equalTo(Y),
 				"verified", equalTo(ANCHOR_NOT_VERIFIED)
@@ -70,12 +66,11 @@ public class AnchorFacadeIT extends BaseIT {
 	}
 
 	@Test
-	public void shouldCreateNewAnchorWithoutNameAndFloorIdAndCoordinates() {
+	public void shouldCreateNewAnchorWithoutNameAndCoordinates() {
 		String body = new RequestBodyBuilder("Anchor.json")
 			.setParameter("shortId", ANCHOR_SHORT_ID_CREATING)
 			.setParameter("macAddress", ANCHOR_MAC_CREATING)
 			.setParameter("name", "")
-			.setParameter("floorId", null)
 			.setParameter("x", null)
 			.setParameter("y", null)
 			.setParameter("verified", ANCHOR_NOT_VERIFIED)
@@ -89,7 +84,6 @@ public class AnchorFacadeIT extends BaseIT {
 				"shortId", equalTo(ANCHOR_SHORT_ID_CREATING),
 				"macAddress", equalTo(ANCHOR_MAC_CREATING),
 				"name", equalTo(""),
-				"floorId", equalTo(null),
 				"x", equalTo(null),
 				"y", equalTo(null),
 				"verified", equalTo(ANCHOR_NOT_VERIFIED)
@@ -102,7 +96,6 @@ public class AnchorFacadeIT extends BaseIT {
 			.setParameter("shortId", ANCHOR_SHORT_ID_CREATING)
 			.setParameter("macAddress", ANCHOR_MAC_CREATING)
 			.setParameter("name", "")
-			.setParameter("floorId", FLOOR_EXISTING)
 			.setParameter("x", X)
 			.setParameter("y", Y)
 			.setParameter("verified", ANCHOR_NOT_VERIFIED)
@@ -116,30 +109,10 @@ public class AnchorFacadeIT extends BaseIT {
 				"shortId", equalTo(ANCHOR_SHORT_ID_CREATING),
 				"macAddress", equalTo(ANCHOR_MAC_CREATING),
 				"name", equalTo(""),
-				"floorId", equalTo(FLOOR_EXISTING),
 				"x", equalTo(X),
 				"y", equalTo(Y),
 				"verified", equalTo(ANCHOR_NOT_VERIFIED)
 			);
-	}
-
-	@Test
-	public void shouldNotCreateAnchorWithNonexistingFloor() {
-		int nonexistingFloorId = 666;
-		String body = new RequestBodyBuilder("Anchor.json")
-			.setParameter("shortId", ANCHOR_SHORT_ID_CREATING)
-			.setParameter("macAddress", ANCHOR_MAC_CREATING)
-			.setParameter("name", NAME)
-			.setParameter("floorId", nonexistingFloorId)
-			.setParameter("x", X)
-			.setParameter("y", Y)
-			.setParameter("verified", ANCHOR_NOT_VERIFIED)
-			.build();
-
-		givenUser()
-			.body(body)
-			.when().post(ANCHOR_PATH)
-			.then().statusCode(HttpStatus.SC_NOT_FOUND);
 	}
 
 	@Test
@@ -148,7 +121,6 @@ public class AnchorFacadeIT extends BaseIT {
 			.setParameter("shortId", ANCHOR_SHORT_ID_EXISTING)
 			.setParameter("macAddress", ANCHOR_MAC_CREATING)
 			.setParameter("name", "")
-			.setParameter("floorId", FLOOR_EXISTING)
 			.setParameter("x", X)
 			.setParameter("y", Y)
 			.setParameter("verified", ANCHOR_NOT_VERIFIED)
@@ -172,7 +144,6 @@ public class AnchorFacadeIT extends BaseIT {
 			.setParameter("shortId", ANCHOR_SHORT_ID_EXISTING)
 			.setParameter("macAddress", ANCHOR_MAC_EXISTING)
 			.setParameter("name", NAME)
-			.setParameter("floorId", FLOOR_EXISTING)
 			.setParameter("x", X)
 			.setParameter("y", Y)
 			.setParameter("verified", ANCHOR_VERIFIED)
@@ -187,7 +158,6 @@ public class AnchorFacadeIT extends BaseIT {
 				"shortId", equalTo(ANCHOR_SHORT_ID_EXISTING),
 				"macAddress", equalTo(ANCHOR_MAC_EXISTING),
 				"name", equalTo(NAME),
-				"floorId", equalTo(FLOOR_EXISTING),
 				"x", equalTo(X),
 				"y", equalTo(Y),
 				"verified", equalTo(ANCHOR_VERIFIED)
@@ -200,7 +170,6 @@ public class AnchorFacadeIT extends BaseIT {
 			.setParameter("shortId", ANCHOR_SHORT_ID_EXISTING)
 			.setParameter("macAddress", ANCHOR_MAC_EXISTING)
 			.setParameter("name", NAME)
-			.setParameter("floorId", FLOOR_EXISTING)
 			.setParameter("x", X)
 			.setParameter("y", Y)
 			.setParameter("verified", ANCHOR_NOT_VERIFIED)
@@ -224,13 +193,11 @@ public class AnchorFacadeIT extends BaseIT {
 	}
 
 	@Test
-	public void shouldAddFloorIdAndNameAndCoordinatesWhileUpdatingAnchor() {
-		Integer updatedAnchorId = 2;
+	public void shouldAddNameAndCoordinatesWhileUpdatingAnchor() {
 		String body = new RequestBodyBuilder("Anchor.json")
 			.setParameter("shortId", 40622)
 			.setParameter("macAddress", 93170459)
 			.setParameter("name", NAME)
-			.setParameter("floorId", FLOOR_EXISTING)
 			.setParameter("x", X)
 			.setParameter("y", Y)
 			.setParameter("verified", ANCHOR_NOT_VERIFIED)
@@ -245,7 +212,6 @@ public class AnchorFacadeIT extends BaseIT {
 				"shortId", equalTo(40622),
 				"macAddress", equalTo("93170459"),
 				"name", equalTo(NAME),
-				"floorId", equalTo(FLOOR_EXISTING),
 				"x", equalTo(X),
 				"y", equalTo(Y),
 				"verified", equalTo(ANCHOR_NOT_VERIFIED)
@@ -253,12 +219,11 @@ public class AnchorFacadeIT extends BaseIT {
 	}
 
 	@Test
-	public void shouldRemoveFloorIdAndNameAndCoordinatesWhileUpdatingAnchor() {
+	public void shouldRemoveNameAndCoordinatesWhileUpdatingAnchor() {
 		String body = new RequestBodyBuilder("Anchor.json")
 			.setParameter("shortId", ANCHOR_SHORT_ID_EXISTING)
 			.setParameter("macAddress", ANCHOR_MAC_EXISTING)
 			.setParameter("name", "")
-			.setParameter("floorId", null)
 			.setParameter("x", null)
 			.setParameter("y", null)
 			.setParameter("verified", ANCHOR_NOT_VERIFIED)
@@ -273,26 +238,10 @@ public class AnchorFacadeIT extends BaseIT {
 				"shortId", equalTo(ANCHOR_SHORT_ID_EXISTING),
 				"macAddress", equalTo(ANCHOR_MAC_EXISTING),
 				"name", equalTo(""),
-				"floorId", equalTo(null),
 				"x", equalTo(null),
 				"y", equalTo(null),
 				"verified", equalTo(ANCHOR_NOT_VERIFIED)
 			);
-	}
-
-	@Test
-	public void shouldNotAddNonexistingFloorIdWhileUpdatingAnchor() {
-		Integer nonexistingFloorId = 9999;
-		String body = new RequestBodyBuilder("Anchor.json")
-			.setParameter("floorId", nonexistingFloorId)
-			.build();
-
-		givenUser()
-			.pathParam("id", ANCHOR_ID_FOR_UPDATE)
-			.body(body)
-			.when().put(ANCHOR_PATH_WITH_ID)
-			.then().statusCode(HttpStatus.SC_NOT_FOUND);
-
 	}
 
 	@Test
@@ -330,7 +279,6 @@ public class AnchorFacadeIT extends BaseIT {
 				"shortId", equalTo(Arrays.asList(ANCHOR_SHORT_ID_EXISTING, 33000, 33001, 34999)),
 				"macAddress", equalTo(Arrays.asList(ANCHOR_MAC_EXISTING, null, null, null)),
 				"name", equalTo(Arrays.asList("LeftBottomAnchor", "TopRightAnchor", "BottomRightAnchor", "Sink")),
-				"floorId", equalTo(Arrays.asList(1, 1, 1, 1)),
 				"x", equalTo(Arrays.asList(0, 500, 500, 0)),
 				"y", equalTo(Arrays.asList(500, 0, 500, 0)),
 				"verified", equalTo(Arrays.asList(true, true, true, true))
