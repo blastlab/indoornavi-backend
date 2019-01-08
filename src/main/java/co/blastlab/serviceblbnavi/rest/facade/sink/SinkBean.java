@@ -63,7 +63,7 @@ public class SinkBean implements SinkFacade {
 		sinkEntity.setShortId(sink.getShortId());
 		sinkEntity.setMac(sink.getMacAddress());
 		sinkEntity.setVerified(sink.getVerified());
-		sinkEntity.setFloor(sink.getFloorId() != null ? floorRepository.findOptionalById(sink.getFloorId()).orElseThrow(EntityNotFoundException::new) : null);
+		sinkEntity.setFloor(sink.getFloor() != null ? floorRepository.findOptionalById(sink.getFloor().getId()).orElseThrow(EntityNotFoundException::new) : null);
 		sinkEntity.getAnchors().clear();
 		sink.getAnchors().forEach(anchorDto -> {
 			sinkEntity.getAnchors().add(anchorRepository.findById(anchorDto.getId()).orElseThrow(EntityNotFoundException::new));
