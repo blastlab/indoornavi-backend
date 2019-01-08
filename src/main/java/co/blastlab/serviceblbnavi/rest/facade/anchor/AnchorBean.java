@@ -37,7 +37,7 @@ public class AnchorBean implements AnchorFacade {
 		anchorEntity.setX(anchor.getX());
 		anchorEntity.setY(anchor.getY());
 
-		if (anchor.getFloorId() != null) {
+		if (anchor.getFloor() != null) {
 			anchorService.setFloor(anchor, anchorEntity);
 		}
 		anchorRepository.save(anchorEntity);
@@ -57,7 +57,7 @@ public class AnchorBean implements AnchorFacade {
 			anchorEntity.setMac(anchor.getMacAddress());
 			anchorEntity.setShortId(anchor.getShortId());
 
-			if (anchor.getFloorId() != null) {
+			if (anchor.getFloor() != null) {
 				anchorService.setFloor(anchor, anchorEntity);
 			} else {
 				anchorEntity.setFloor(null);
