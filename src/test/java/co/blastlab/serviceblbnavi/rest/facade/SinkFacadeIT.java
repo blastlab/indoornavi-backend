@@ -27,7 +27,7 @@ public class SinkFacadeIT extends BaseIT {
 			.body("size()", is(1))
 			.root("get(0)")
 			.body("name", is("Sink"))
-			.body("floorId", is(1))
+			.body("floor", is(notNullValue()))
 			.body("configured", is(false))
 			.body("anchors.size()", is(0));
 	}

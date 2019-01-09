@@ -18,7 +18,7 @@ public class AnchorService {
 
 	public void setFloor(AnchorDto anchorDto, Anchor anchor) {
 		logger.debug("Trying to assign floor to device {}", anchorDto);
-		Floor floor = floorRepository.findOptionalById(anchorDto.getFloorId()).orElseThrow(EntityNotFoundException::new);
+		Floor floor = floorRepository.findOptionalById(anchorDto.getFloor().getId()).orElseThrow(EntityNotFoundException::new);
 		anchor.setFloor(floor);
 		logger.debug("Floor assigned");
 	}
