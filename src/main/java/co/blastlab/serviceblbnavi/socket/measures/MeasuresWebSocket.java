@@ -150,6 +150,7 @@ public class MeasuresWebSocket extends WebSocket {
 		} else if (isServerSession(session)) {
 			List<DistanceMessage> measures = objectMapper.readValue(message, new TypeReference<List<DistanceMessage>>(){});
 			handleMeasures(measures);
+			broadCastMessage(getClientSessions(), message);
 		}
 	}
 
