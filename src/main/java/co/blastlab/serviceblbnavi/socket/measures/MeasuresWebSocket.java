@@ -25,6 +25,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.ejb.AccessTimeout;
 import javax.ejb.Singleton;
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
@@ -37,10 +38,12 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @ServerEndpoint("/measures")
 @Singleton
+@AccessTimeout(unit = TimeUnit.SECONDS, value = 15)
 public class MeasuresWebSocket extends WebSocket {
 
 	private static Set<Session> clientSessions = Collections.synchronizedSet(new HashSet<>());
