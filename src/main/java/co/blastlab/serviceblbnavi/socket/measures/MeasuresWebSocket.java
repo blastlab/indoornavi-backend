@@ -158,6 +158,8 @@ public class MeasuresWebSocket extends WebSocket {
 
 	private void handleMeasures(List<DistanceMessage> measures) {
 		logger.setId(getSessionId());
+		long sumStartTime = System.nanoTime();
+		long sumStartTime2 = System.nanoTime();
 		measures.forEach(distanceMessage -> {
 			if (isDebugMode) {
 				distanceMessageEvent.fire(distanceMessage);
@@ -195,6 +197,12 @@ public class MeasuresWebSocket extends WebSocket {
 				});
 			}
 		});
+
+		long sumEndTime = System.nanoTime();
+		long sumEndTime2 = System.nanoTime();
+		logger.trace("___________________________________________________________________________________________________");
+		logger.trace("sum time calculating {} ms and sum time saving {} ms", (sumEndTime - sumStartTime) / 1000000, (sumEndTime2 - sumStartTime2) / 1000000);
+		logger.trace("___________________________________________________________________________________________________");
 	}
 
 	private boolean bothDevicesAreAnchors(DistanceMessage distanceMessage) {
