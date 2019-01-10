@@ -173,8 +173,14 @@ public class MeasuresWebSocket extends WebSocket {
 				}
 			} else {
 				logger.trace("Trying to calculate coordinates");
+				long startTime = System.nanoTime();
 				Optional<UwbCoordinatesDto> coords = coordinatesCalculator.calculateTagPosition(distanceMessage.getDid1(), distanceMessage.getDid2(), distanceMessage.getDist(), false);
+				long endTime = System.nanoTime();
+				logger.trace("___________________________________________________________________________________________________");
+				logger.trace("calcualting tag position took {} ms", (endTime - startTime) / 1000000);
+				logger.trace("___________________________________________________________________________________________________");
 				coords.ifPresent(coordinatesDto -> {
+					long startTime2 = System.nanoTime();
 					if (isDebugMode) {
 						coordinatesDtoEvent.fire(coordinatesDto);
 					}
@@ -182,6 +188,10 @@ public class MeasuresWebSocket extends WebSocket {
 					Set<Session> sessions = this.filterSessions(coordinatesDto);
 					broadCastMessage(sessions, new CoordinatesWrapper(coordinatesDto));
 					this.sendAreaEvents(coordinatesDto);
+					long endTime2 = System.nanoTime();
+					logger.trace("___________________________________________________________________________________________________");
+					logger.trace("saving tag position took {} ms", (endTime2 - startTime2) / 1000000);
+					logger.trace("___________________________________________________________________________________________________");
 				});
 			}
 		});
