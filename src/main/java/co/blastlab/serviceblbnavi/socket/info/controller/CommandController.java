@@ -77,12 +77,11 @@ public class CommandController extends WebSocketCommunication {
 				version.fromDescriptor(descriptor);
 				infoWebSocket.assignSinkShortIdToSession(serverSession, version.getShortId());
 				break;
-			default:
-				infoWebSocket.getSinkShortIdBySession(serverSession).ifPresent(sinkShortId -> {
-					broadCastMessage(infoWebSocket.getClientSessions(), new ServerCommandWrapper(message, sinkShortId));
-				});
-				break;
 		}
+
+		infoWebSocket.getSinkShortIdBySession(serverSession).ifPresent(sinkShortId -> {
+			broadCastMessage(infoWebSocket.getClientSessions(), new ServerCommandWrapper(message, sinkShortId));
+		});
 	}
 
 	public void handleRawCommand(RawCommand command, Session clientSession) {
