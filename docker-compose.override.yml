@@ -54,6 +54,10 @@ services:
       - m2:/root/.m2
     container_name:
       core_compiler
+  solver:
+    build: solver_python
+    ports:
+      - "8080:8080"
 
 
 volumes:
