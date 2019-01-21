@@ -180,4 +180,7 @@
     <orderEntry type="library" name="Maven: org.ejml:ejml-simple:0.35" level="project" />
     <orderEntry type="library" name="Maven: com.googlecode.json-simple:json-simple:1.1.1" level="project" />
   </component>
+  <component name="TemplatesService">
+    <option name="TEMPLATE_CONFIGURATION" value="Jinja2" />
+  </component>
 </module>

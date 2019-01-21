@@ -80,7 +80,7 @@ class HeatMapSolver:
         if arr[2] > 0:
             if arr[2] < self._divider:
                 arr[2] = 1
-            elif arr[2] > self._heat_median * 4:
+            elif arr[2] > self._heat_median * self._max_allowed - self._heat_median:
                 arr[2] = self._max_allowed
             else:
                 arr[2] = ceil(arr[2] / self._divider) / 2
