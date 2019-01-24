@@ -2,6 +2,7 @@ package co.blastlab.serviceblbnavi.rest.facade;
 
 import co.blastlab.serviceblbnavi.rest.facade.util.RequestBodyBuilder;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import org.apache.http.HttpStatus;
 import org.junit.Test;
 
@@ -15,6 +16,28 @@ public class ReportFacadeIT extends BaseIT {
 			"Building", "Floor", "Device", "Tag", "Uwb", "Coordinates", "UwbCoordinates",
 			"Area", "AreaConfiguration", "Area_AreaConfiguration", "AreaConfiguration_Tag"
 		);
+	}
+
+	@Test
+	public void getCoordinatesForSpecificTag() {
+		// given
+		String body = new RequestBodyBuilder("Report.json")
+			.setParameter("tagsIds", Lists.newArrayList(4))
+			.build();
+
+		// when
+		givenUser()
+			.body(body)
+			.when()
+			.post("/reports/coordinates")
+			.then()
+			// then
+			.statusCode(HttpStatus.SC_OK)
+			.body(
+				"size()", equalTo(4),
+				"get(0).point.x", equalTo(180),
+				"get(0).point.y", equalTo(740)
+			);
 	}
 
 	@Test
