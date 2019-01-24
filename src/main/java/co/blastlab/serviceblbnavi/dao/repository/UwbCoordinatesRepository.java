@@ -17,7 +17,18 @@ public interface UwbCoordinatesRepository extends EntityRepository<UwbCoordinate
 		value =
 			"select " + REQUIRED_FIELDS + " " +
 				"from coordinates c inner join uwbcoordinates uc on c.id = uc.id " +
-				"where c.floor_id = ?1 and c.creationDate >= ?2 and creationDate <= ?3 " +
+				"where c.floor_id = ?1 and c.creationDate >= ?2 and c.creationDate <= ?3 and uc.tag_id in (?4)" +
+				"group by c.creationDate " +
+				"order by c.creationDate",
+		isNative = true
+	)
+	List<UwbCoordinates> findByFloorAndTagsAndInDateRange(Long floorId, LocalDateTime dateFrom, LocalDateTime dateTo, String commaSeparatedIds);
+
+	@Query(
+		value =
+			"select " + REQUIRED_FIELDS + " " +
+				"from coordinates c inner join uwbcoordinates uc on c.id = uc.id " +
+				"where c.floor_id = ?1 and c.creationDate >= ?2 and c.creationDate <= ?3 " +
 				"group by c.creationDate " +
 				"order by c.creationDate",
 		isNative = true
@@ -28,10 +39,21 @@ public interface UwbCoordinatesRepository extends EntityRepository<UwbCoordinate
 		value =
 			"select " + REQUIRED_FIELDS + " " +
 				"from coordinates c inner join uwbcoordinates uc on c.id = uc.id " +
-				"where c.creationDate >= ?1 and creationDate <= ?2 " +
+				"where c.creationDate >= ?1 and c.creationDate <= ?2 " +
 				"group by c.creationDate " +
 				"order by c.creationDate",
 		isNative = true
 	)
 	List<UwbCoordinates> findByDateRange(LocalDateTime dateFrom, LocalDateTime dateTo);
+
+	@Query(
+		value =
+			"select " + REQUIRED_FIELDS + " " +
+				"from coordinates c inner join uwbcoordinates uc on c.id = uc.id " +
+				"where c.creationDate >= ?1 and c.creationDate <= ?2 and uc.tag_id in (?3)" +
+				"group by c.creationDate " +
+				"order by c.creationDate",
+		isNative = true
+	)
+	List<UwbCoordinates> findByTagsAndInDateRange(LocalDateTime from, LocalDateTime to, String commaSeparatedIds);
 }
