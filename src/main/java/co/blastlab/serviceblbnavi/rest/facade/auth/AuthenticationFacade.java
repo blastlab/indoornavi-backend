@@ -6,6 +6,7 @@ import co.blastlab.serviceblbnavi.ext.filter.SetOperationId;
 import io.swagger.annotations.*;
 
 import javax.validation.Valid;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
@@ -30,4 +31,9 @@ public interface AuthenticationFacade {
 	@Path("/logout")
 	@AuthorizedAccess
 	Response logout();
+
+	@GET
+	@Path("/watchdog")
+	@AuthorizedAccess
+	Response watchdog();
 }

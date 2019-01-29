@@ -63,6 +63,11 @@ public class AuthenticationBean implements AuthenticationFacade {
 		return Response.noContent().build();
 	}
 
+	@Override
+	public Response watchdog() {
+		return Response.noContent().build();
+	}
+
 	private User authenticateUser(CredentialsDto credentialsDto) throws AuthUtils.AuthenticationException, AuthUtils.InvalidPasswordException {
 		User user = userRepository.findOptionalByUsername(credentialsDto.getUsername()).orElseThrow(AuthUtils.AuthenticationException::new);
 
