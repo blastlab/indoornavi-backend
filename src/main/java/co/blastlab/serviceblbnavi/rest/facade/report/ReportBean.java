@@ -1,6 +1,7 @@
 package co.blastlab.serviceblbnavi.rest.facade.report;
 
 import co.blastlab.serviceblbnavi.dao.repository.UwbCoordinatesRepository;
+import co.blastlab.serviceblbnavi.domain.UwbCoordinates;
 import co.blastlab.serviceblbnavi.dto.report.ReportFilterDto;
 import co.blastlab.serviceblbnavi.dto.report.UwbCoordinatesDto;
 import co.blastlab.serviceblbnavi.socket.area.AreaEvent;
@@ -38,11 +39,26 @@ public class ReportBean implements ReportFacade {
 		if (from.isAfter(to)) {
 			throw new WebApplicationException("Invalid date range: `from` can not be after `to`", HttpStatus.SC_UNPROCESSABLE_ENTITY);
 		}
-		return filter.getFloorId() == null ?
-			coordinatesRepository.findByDateRange(from, to)
-				.stream().map(UwbCoordinatesDto::new).collect(Collectors.toList()) :
-			coordinatesRepository.findByFloorIdAndInDateRange(filter.getFloorId(), from, to)
-			.stream().map(UwbCoordinatesDto::new).collect(Collectors.toList());
+		List<UwbCoordinates> filteredCoordinates;
+		if (filter.getFloorId() != null && filter.getTagsIds().size() > 0) {
+			filteredCoordinates = coordinatesRepository.findByFloorAndTagsAndInDateRange(
+				filter.getFloorId(),
+				from,
+				to,
+				filter.getTagsIds().stream().map(String::valueOf).collect(Collectors.joining(", "))
+			);
+		} else if (filter.getFloorId() != null) {
+			filteredCoordinates = coordinatesRepository.findByFloorIdAndInDateRange(filter.getFloorId(), from, to);
+		} else if (filter.getTagsIds().size() > 0) {
+			filteredCoordinates = coordinatesRepository.findByTagsAndInDateRange(
+				from,
+				to,
+				filter.getTagsIds().stream().map(String::valueOf).collect(Collectors.joining(", "))
+			);
+		} else {
+			filteredCoordinates = coordinatesRepository.findByDateRange(from, to);
+		}
+		return filteredCoordinates.stream().map(UwbCoordinatesDto::new).collect(Collectors.toList());
 	}
 
 	@Override
@@ -56,5 +72,4 @@ public class ReportBean implements ReportFacade {
 
 		return events;
 	}
-
 }

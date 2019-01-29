@@ -1,5 +1,6 @@
 {
 	"floorId": null,
 	"from": null,
-	"to": null
+	"to": null,
+	"tagsIds": []
 }
