@@ -54,7 +54,7 @@ public class DebugBean implements DebugFacade {
 	public void rawMeasureEndpoint(@Observes DistanceMessage distanceMessage) throws JsonProcessingException {
 		logger.trace("Adding raw measure to file: {}", distanceMessage.toString());
 		rawMeasuresStreamBuilder.add(
-			String.format("%s %s\n",
+			String.format("%s %s\n\r",
 				getCurrentTimeInSeconds(),
 				objectMapper.writeValueAsString(distanceMessage)
 			)
@@ -64,7 +64,7 @@ public class DebugBean implements DebugFacade {
 	public void calculatedCoordinatesEndpoint(@Observes UwbCoordinatesDto coordinatesDto) {
 		logger.trace("Adding coordinates to file: {}", coordinatesDto.toString());
 		coordinatesStreamBuilder.add(
-			String.format("%s; %s; %s; %s; %s\n",
+			String.format("%s; %s; %s; %s; %s\n\r",
 				convertToSeconds(coordinatesDto.getDate().getTime()),
 				Integer.toHexString(coordinatesDto.getTagShortId()),
 				coordinatesDto.getPoint().getX(),
@@ -147,22 +147,24 @@ public class DebugBean implements DebugFacade {
 
 	private void startCoordinatesFile() {
 		coordinatesStreamBuilder = Stream.builder();
-		coordinatesStreamBuilder.add("Time; DID; X; Y; Z;\n");
+		coordinatesStreamBuilder.add("Time; DID; X; Y; Z;\n\r");
 	}
 
 	private void startRawMeasuresFile(Long sinkId) {
 		rawMeasuresStreamBuilder = Stream.builder();
 		sinkRepository.findOptionalById(sinkId).ifPresent(sink -> {
 			rawMeasuresStreamBuilder.add(
-				String.format("%s sink %s %s\n",
+				String.format("%s sink %s %s %s %s\n\r",
 					getCurrentTimeInSeconds(),
 					Integer.toHexString(sink.getShortId()),
-					sink.getMac() == null ? 0 : sink.getMac()
+					sink.getX(),
+					sink.getY(),
+					sink.getZ()
 				)
 			);
 			sink.getAnchors().forEach((anchor -> {
 				rawMeasuresStreamBuilder.add(
-					String.format("%s anchor %s %s %s %s\n",
+					String.format("%s anchor %s %s %s %s\n\r",
 						getCurrentTimeInSeconds(),
 						Integer.toHexString(anchor.getShortId()),
 						anchor.getX(),
