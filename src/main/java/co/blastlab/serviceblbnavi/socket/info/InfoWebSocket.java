@@ -140,7 +140,7 @@ public class InfoWebSocket extends WebSocket {
 	public Optional<Integer> getSinkShortIdBySession(Session session) {
 		Integer[] keys = serverSessions.entrySet()
 			.stream()
-			.filter(entry -> Objects.equals(entry.getValue(), session))
+			.filter(entry -> Objects.equals(entry.getValue().getId(), session.getId()))
 			.map(Map.Entry::getKey).distinct().toArray(Integer[]::new);
 		return Optional.ofNullable(keys.length > 0 ? keys[0] : null);
 	}
