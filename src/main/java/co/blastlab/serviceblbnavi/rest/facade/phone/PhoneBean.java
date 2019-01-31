@@ -9,6 +9,7 @@ import co.blastlab.serviceblbnavi.domain.Phone;
 import co.blastlab.serviceblbnavi.domain.PhoneCoordinates;
 import co.blastlab.serviceblbnavi.dto.phone.PhoneCoordinatesDto;
 import co.blastlab.serviceblbnavi.dto.phone.PhoneDto;
+import co.blastlab.serviceblbnavi.utils.DateConverter;
 import co.blastlab.serviceblbnavi.utils.Logger;
 import org.modelmapper.ModelMapper;
 
@@ -56,7 +57,13 @@ public class PhoneBean implements PhoneFacade {
 		coordinatesList.forEach((coordinatesDto -> {
 			Phone phone = phoneRepository.findOptionalById(coordinatesDto.getPhoneId()).orElseThrow(EntityNotFoundException::new);
 			Floor floor = floorRepository.findOptionalById(coordinatesDto.getFloorId()).orElseThrow(EntityNotFoundException::new);
-			Coordinates coordinates = new Coordinates(coordinatesDto.getPoint().getX(), coordinatesDto.getPoint().getY(), 0, floor, coordinatesDto.getMeasurementTime());
+			Coordinates coordinates = new Coordinates(
+				coordinatesDto.getPoint().getX(),
+				coordinatesDto.getPoint().getY(),
+				0,
+				floor,
+				DateConverter.convertToLocalDateTimeViaSqlTimestamp(coordinatesDto.getDate())
+			);
 			PhoneCoordinates phoneCoordinates = new PhoneCoordinates(coordinates, phone);
 			phoneCoordinates.setPhone(phone);
 			phoneCoordinatesRepository.save(phoneCoordinates);
