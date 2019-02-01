@@ -1,0 +1,5 @@
+package co.blastlab.indoornavi.socket.wrappers;
+
+public enum MessageType {
+	TAGS, COORDINATES, ANCHORS, EVENT, INFO_ERROR, INFO, COMMAND_SINK_CONNECTED, BATTERIES_LEVELS, SERIAL, COMMAND_ERROR, SERVER_COMMAND
+}
