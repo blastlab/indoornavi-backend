@@ -52,5 +52,5 @@ scp docker-compose.production.yml ${USER}@${HOST}:${DESTINATION}/docker-compose.
 scp -r database/src/main/resources/ ${USER}@${HOST}:${DESTINATION}/database/src/main/
 
 # copy war
-scp deployments/serviceblbnavi-1.0.war ${USER}@${HOST}:${DESTINATION}/deployments
+scp deployments/indoornavi_backend-1.0.war ${USER}@${HOST}:${DESTINATION}/deployments
 
