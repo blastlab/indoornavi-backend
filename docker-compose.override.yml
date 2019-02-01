@@ -54,11 +54,14 @@ services:
       - m2:/root/.m2
     container_name:
       core_compiler
-  solver:
-    build: solver_python
-    ports:
-      - "8080:8080"
-
+  api_server:
+      build: ./rest_solver
+      environment:
+        - ROCKET_ENV=production
+      ports:
+        - "8000:8000"
+      volumes:
+        - ./rest_solver:/build/
 
 volumes:
   # For Liquibase container.
