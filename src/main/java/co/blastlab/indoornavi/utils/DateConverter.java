@@ -1,4 +1,4 @@
-package co.blastlab.serviceblbnavi.utils;
+package co.blastlab.indoornavi.utils;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;

@@ -9,7 +9,7 @@ import co.blastlab.indoornavi.domain.Phone;
 import co.blastlab.indoornavi.domain.PhoneCoordinates;
 import co.blastlab.indoornavi.dto.phone.PhoneCoordinatesDto;
 import co.blastlab.indoornavi.dto.phone.PhoneDto;
-import co.blastlab.serviceblbnavi.utils.DateConverter;
+import co.blastlab.indoornavi.utils.DateConverter;
 import co.blastlab.indoornavi.utils.Logger;
 import org.modelmapper.ModelMapper;
 
@@ -62,7 +62,7 @@ public class PhoneBean implements PhoneFacade {
 				coordinatesDto.getPoint().getY(),
 				0,
 				floor,
-				DateConverter.convertToLocalDateTimeViaSqlTimestamp(coordinatesDto.getDate())
+				coordinatesDto.getDate() != null ? DateConverter.convertToLocalDateTimeViaSqlTimestamp(coordinatesDto.getDate()) : null
 			);
 			PhoneCoordinates phoneCoordinates = new PhoneCoordinates(coordinates, phone);
 			phoneCoordinates.setPhone(phone);

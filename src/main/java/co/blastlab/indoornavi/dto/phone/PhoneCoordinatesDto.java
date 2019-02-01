@@ -2,11 +2,7 @@ package co.blastlab.indoornavi.dto.phone;
 
 import co.blastlab.indoornavi.domain.PhoneCoordinates;
 import co.blastlab.indoornavi.dto.CoordinatesDto;
-import co.blastlab.serviceblbnavi.utils.DateConverter;
 import lombok.*;
-
-import java.time.LocalDateTime;
-import java.util.Date;
 
 @Getter
 @Setter
