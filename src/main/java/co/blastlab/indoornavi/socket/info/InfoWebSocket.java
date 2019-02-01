@@ -47,8 +47,8 @@ import org.apache.commons.codec.binary.Hex;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
-import javax.ejb.*;
 import javax.ejb.Timer;
+import javax.ejb.*;
 import javax.enterprise.concurrent.ManagedExecutorService;
 import javax.inject.Inject;
 import javax.websocket.OnClose;
