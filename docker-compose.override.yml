@@ -55,13 +55,13 @@ services:
     container_name:
       core_compiler
   api_server:
-      build: ./rest_report_solver
+      build: solver
       environment:
         - ROCKET_ENV=production
       ports:
         - "8000:8000"
       volumes:
-        - ./rest_report_solver:/build/
+        - ./solver:/build/
 
 volumes:
   # For Liquibase container.
