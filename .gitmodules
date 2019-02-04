@@ -1,3 +1,3 @@
-[submodule "rest_report_solver"]
-	path = rest_report_solver
-	url = git@gitlab.blastlab.local:indoornavi/rest_report_solver.git
+[submodule "solver"]
+	path = solver
+	url = git@gitlab.blastlab.local:indoornavi/solver.git
