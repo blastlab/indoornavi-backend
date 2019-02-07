@@ -54,7 +54,7 @@ services:
       - m2:/root/.m2
     container_name:
       core_compiler
-  api_server:
+  solver:
       build: solver
       environment:
         - ROCKET_ENV=production
