@@ -54,11 +54,15 @@ services:
       - m2:/root/.m2
     container_name:
       core_compiler
+
   solver:
     build: solver_python
     ports:
       - "8080:8080"
 
+  emulator:
+    build: emulator
+    entrypoint: ["wait-for-it", "core:8080", "-t", "0", "--", "python3 start.py path paths/11999.json paths/12000.json"]
 
 volumes:
   # For Liquibase container.
