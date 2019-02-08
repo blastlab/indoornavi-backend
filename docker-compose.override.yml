@@ -62,7 +62,7 @@ services:
 
   emulator:
     build: emulator
-    entrypoint: ["wait-for-it", "core:8080", "-t", "0", "--", "python3 start.py path paths/11999.json paths/12000.json"]
+    entrypoint: ["wait-for-it", "core:8080", "-t", "0", "--", "python", "start.py", "path", "paths/11999.json", "paths/12000.json"]
 
 volumes:
   # For Liquibase container.
