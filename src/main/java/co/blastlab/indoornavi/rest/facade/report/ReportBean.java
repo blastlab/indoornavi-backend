@@ -45,7 +45,7 @@ public class ReportBean implements ReportFacade {
 				filter.getFloorId(),
 				from,
 				to,
-				filter.getTagsIds().stream().map(String::valueOf).collect(Collectors.joining(", "))
+				filter.getTagsIds()
 			);
 		} else if (filter.getFloorId() != null) {
 			filteredCoordinates = coordinatesRepository.findByFloorIdAndInDateRange(filter.getFloorId(), from, to);
