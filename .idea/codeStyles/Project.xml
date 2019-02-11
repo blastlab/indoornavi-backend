@@ -3,24 +3,85 @@
     <option name="OTHER_INDENT_OPTIONS">
       <value>
         <option name="USE_TAB_CHARACTER" value="true" />
+        <option name="SMART_TABS" value="true" />
       </value>
     </option>
-    <option name="RIGHT_MARGIN" value="160" />
+    <option name="RIGHT_MARGIN" value="999" />
+    <option name="SOFT_MARGINS" value="120" />
     <CssCodeStyleSettings>
       <option name="HEX_COLOR_LOWER_CASE" value="true" />
       <option name="KEEP_SINGLE_LINE_BLOCKS" value="true" />
     </CssCodeStyleSettings>
-    <HTMLCodeStyleSettings>
-      <option name="HTML_ATTRIBUTE_WRAP" value="0" />
-      <option name="HTML_TEXT_WRAP" value="0" />
-      <option name="HTML_KEEP_BLANK_LINES" value="1" />
-      <option name="HTML_ENFORCE_QUOTES" value="true" />
-    </HTMLCodeStyleSettings>
-    <SqlCodeStyleSettings>
+    <Objective-C-extensions>
+      <file>
+        <option name="com.jetbrains.cidr.lang.util.OCDeclarationKind" value="Import" />
+        <option name="com.jetbrains.cidr.lang.util.OCDeclarationKind" value="Macro" />
+        <option name="com.jetbrains.cidr.lang.util.OCDeclarationKind" value="Typedef" />
+        <option name="com.jetbrains.cidr.lang.util.OCDeclarationKind" value="Enum" />
+        <option name="com.jetbrains.cidr.lang.util.OCDeclarationKind" value="Constant" />
+        <option name="com.jetbrains.cidr.lang.util.OCDeclarationKind" value="Global" />
+        <option name="com.jetbrains.cidr.lang.util.OCDeclarationKind" value="Struct" />
+        <option name="com.jetbrains.cidr.lang.util.OCDeclarationKind" value="FunctionPredecl" />
+        <option name="com.jetbrains.cidr.lang.util.OCDeclarationKind" value="Function" />
+      </file>
+      <class>
+        <option name="com.jetbrains.cidr.lang.util.OCDeclarationKind" value="Property" />
+        <option name="com.jetbrains.cidr.lang.util.OCDeclarationKind" value="Synthesize" />
+        <option name="com.jetbrains.cidr.lang.util.OCDeclarationKind" value="InitMethod" />
+        <option name="com.jetbrains.cidr.lang.util.OCDeclarationKind" value="StaticMethod" />
+        <option name="com.jetbrains.cidr.lang.util.OCDeclarationKind" value="InstanceMethod" />
+        <option name="com.jetbrains.cidr.lang.util.OCDeclarationKind" value="DeallocMethod" />
+      </class>
+      <extensions>
+        <pair source="cpp" header="hpp" />
+        <pair source="c" header="h" />
+      </extensions>
+    </Objective-C-extensions>
+    <PHPCodeStyleSettings>
+      <option name="COMMA_AFTER_LAST_ARRAY_ELEMENT" value="true" />
+      <option name="LOWER_CASE_BOOLEAN_CONST" value="true" />
+      <option name="LOWER_CASE_NULL_CONST" value="true" />
+      <option name="KEEP_BLANK_LINES_AFTER_LBRACE" value="1" />
+    </PHPCodeStyleSettings>
+    <SqlCodeStyleSettings version="0">
+      <option name="myVersion" value="0" />
+      <option name="ALIAS_CASE" value="4" />
+      <option name="TYPE_CASE" value="3" />
+      <option name="QUERY_TRUE_INDENT" value="false" />
+      <option name="QUERY_ALIGN_ELEMENTS" value="false" />
+      <option name="QUERY_ALIGN_LINE_COMMENTS" value="false" />
+      <option name="INSERT_EL_COMMA" value="2" />
+      <option name="SET_EL_WRAP" value="0" />
+      <option name="SET_EL_COMMA" value="0" />
+      <option name="WITH_EL_WRAP" value="0" />
+      <option name="WITH_EL_COMMA" value="0" />
+      <option name="SELECT_EL_WRAP" value="3" />
+      <option name="SELECT_EL_COMMA" value="2" />
+      <option name="FROM_EL_WRAP" value="2" />
+      <option name="FROM_EL_COMMA" value="2" />
+      <option name="FROM_PLACE_ON" value="10" />
+      <option name="WHERE_EL_WRAP" value="3" />
+      <option name="WHERE_EL_BOUND" value="2" />
+      <option name="ORDER_EL_COMMA" value="2" />
+      <option name="TABLE_OPENING" value="1" />
+      <option name="TABLE_CONTENT" value="2" />
+      <option name="TABLE_CLOSING" value="3" />
+      <option name="TABLE_ALTER_INSTRUCTION_ALIGN" value="false" />
+      <option name="POST_OPT_WRAP_1" value="true" />
+      <option name="POST_OPT_ALIGN" value="false" />
+      <option name="ROUTINE_ARG_COMMA" value="2" />
+      <option name="ROUTINE_ARG_ALIGN_TYPES" value="true" />
+      <option name="IMP_COMMON_KEEP_BLANK_LINES_IN_CODE" value="1" />
+      <option name="IMP_DECLARE_EL_WRAP" value="1" />
+      <option name="IMP_IF_THEN_WRAP_THEN" value="true" />
+      <option name="CORTEGE_SPACE_BEFORE_L_PAREN" value="false" />
+      <option name="EXPR_CASE_WHEN_WRAP" value="false" />
+      <option name="EXPR_CASE_THEN_WRAP" value="true" />
+      <option name="PRIMARY_KEY_NAME_TEMPLATE" value="{table}_{columns}_pk" />
       <option name="NEW_LINE_AFTER_SELECT_ITEM" value="false" />
     </SqlCodeStyleSettings>
     <XML>
-      <option name="XML_LEGACY_SETTINGS_IMPORTED" value="true" />
+      <option name="XML_KEEP_BLANK_LINES" value="1" />
     </XML>
     <codeStyleSettings language="CMake">
       <option name="KEEP_BLANK_LINES_IN_CODE" value="1" />
@@ -49,7 +110,6 @@
       <option name="KEEP_BLANK_LINES_IN_DECLARATIONS" value="1" />
       <option name="KEEP_BLANK_LINES_IN_CODE" value="1" />
       <option name="KEEP_BLANK_LINES_BEFORE_RBRACE" value="0" />
-      <option name="BLANK_LINES_AFTER_CLASS_HEADER" value="1" />
       <option name="KEEP_SIMPLE_LAMBDAS_IN_ONE_LINE" value="true" />
       <option name="KEEP_SIMPLE_CLASSES_IN_ONE_LINE" value="true" />
       <option name="IF_BRACE_FORCE" value="3" />
@@ -110,12 +170,8 @@
       <option name="KEEP_BLANK_LINES_IN_DECLARATIONS" value="1" />
       <option name="KEEP_BLANK_LINES_IN_CODE" value="1" />
       <option name="KEEP_BLANK_LINES_BEFORE_RBRACE" value="0" />
-      <option name="BLANK_LINES_AFTER_PACKAGE" value="1" />
-      <option name="BLANK_LINES_AFTER_CLASS_HEADER" value="1" />
       <option name="CLASS_BRACE_STYLE" value="1" />
       <option name="METHOD_BRACE_STYLE" value="1" />
-      <option name="SPECIAL_ELSE_IF_TREATMENT" value="true" />
-      <option name="SPACE_AFTER_TYPE_CAST" value="true" />
       <option name="IF_BRACE_FORCE" value="3" />
       <option name="DOWHILE_BRACE_FORCE" value="3" />
       <option name="WHILE_BRACE_FORCE" value="3" />
