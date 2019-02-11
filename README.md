@@ -44,3 +44,6 @@ Only issue for which code fulfills above rules can be found as done.
 ##### Deployment aplikacji
 
 ``` mvn package ```
+
+##### Submodule init
+```$ git submodule update --init```
