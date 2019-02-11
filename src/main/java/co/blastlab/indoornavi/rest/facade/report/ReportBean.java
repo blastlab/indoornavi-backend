@@ -53,7 +53,7 @@ public class ReportBean implements ReportFacade {
 			filteredCoordinates = coordinatesRepository.findByTagsAndInDateRange(
 				from,
 				to,
-				filter.getTagsIds().stream().map(String::valueOf).collect(Collectors.joining(", "))
+				filter.getTagsIds()
 			);
 		} else {
 			filteredCoordinates = coordinatesRepository.findByDateRange(from, to);
