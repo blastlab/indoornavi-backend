@@ -17,12 +17,12 @@ public interface UwbCoordinatesRepository extends EntityRepository<UwbCoordinate
 		value =
 			"select " + REQUIRED_FIELDS + " " +
 				"from coordinates c inner join uwbcoordinates uc on c.id = uc.id " +
-				"where c.floor_id = ?1 and c.creationDate >= ?2 and c.creationDate <= ?3 and uc.tag_id in (?4)" +
+				"where c.floor_id = ?1 and c.creationDate >= ?2 and c.creationDate <= ?3 and uc.tag_id in (?4) " +
 				"group by c.creationDate " +
 				"order by c.creationDate",
 		isNative = true
 	)
-	List<UwbCoordinates> findByFloorAndTagsAndInDateRange(Long floorId, LocalDateTime dateFrom, LocalDateTime dateTo, String commaSeparatedIds);
+	List<UwbCoordinates> findByFloorAndTagsAndInDateRange(Long floorId, LocalDateTime dateFrom, LocalDateTime dateTo, List<Long> tagsIds);
 
 	@Query(
 		value =
