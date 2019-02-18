@@ -1,5 +1,6 @@
 package co.blastlab.indoornavi.rest.facade.report;
 
+import co.blastlab.indoornavi.dto.phone.PhoneCoordinatesDto;
 import co.blastlab.indoornavi.dto.report.ReportFilterDto;
 import co.blastlab.indoornavi.dto.report.UwbCoordinatesDto;
 import co.blastlab.indoornavi.ext.filter.AuthorizedAccess;
@@ -20,9 +21,15 @@ import java.util.List;
 public interface ReportFacade {
 	@POST
 	@Path("/coordinates")
-	@ApiOperation(value = "get coordinates", response = UwbCoordinatesDto.class, responseContainer = "List")
+	@ApiOperation(value = "get uwb coordinates", response = UwbCoordinatesDto.class, responseContainer = "List")
 	@AuthorizedAccess
-	List<UwbCoordinatesDto> getCoordinates(@ApiParam(value = "filter", required = true) @Valid ReportFilterDto filter);
+	List<UwbCoordinatesDto> getUwbCoordinates(@ApiParam(value = "filter", required = true) @Valid ReportFilterDto filter);
+
+	@POST
+	@Path("/coordinates/phone")
+	@ApiOperation(value = "get phone coordinates", response = UwbCoordinatesDto.class, responseContainer = "List")
+	@AuthorizedAccess
+	List<PhoneCoordinatesDto> getPhoneCoordinates(@ApiParam(value = "filter", required = true) @Valid ReportFilterDto filter);
 
 	@POST
 	@Path("/events")
