@@ -11,24 +11,28 @@ import co.blastlab.indoornavi.dto.report.UwbCoordinatesDto;
 import co.blastlab.indoornavi.dto.tag.TagDto;
 import co.blastlab.indoornavi.socket.tagTracer.TagTraceDto;
 import co.blastlab.indoornavi.utils.Logger;
+import com.google.common.collect.Lists;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.math3.fitting.PolynomialCurveFitter;
+import org.apache.commons.math3.fitting.WeightedObservedPoint;
 import org.ejml.simple.SimpleMatrix;
 
 import javax.ejb.Singleton;
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Singleton
 public class CoordinatesCalculator {
 
 	// tag short id, anchor short id, measure list
-	private Map<Integer, Map<Integer, List<Measure>>> measureStorage = new LinkedHashMap<>();
+	private Map<Integer, Map<Integer, PolyMeasure>> measureStorage = new LinkedHashMap<>();
 
 	// 10 seconds
 	private final static long OLD_DATA_IN_MILISECONDS = 10_000;
@@ -67,7 +71,7 @@ public class CoordinatesCalculator {
 		return tagToSinkMapping.containsKey(tagShortId) ? Optional.of(tagToSinkMapping.get(tagShortId)) : Optional.empty();
 	}
 
-	public Optional<UwbCoordinatesDto> calculateTagPosition(int firstDeviceId, int secondDeviceId, int distance, boolean is3D) {
+	public Optional<UwbCoordinatesDto> calculateTagPosition(int firstDeviceId, int secondDeviceId, int distance, AlgorithmType algorithmType) {
 		logger.trace("Measure storage tags: {}", measureStorage.keySet().size());
 
 		Integer tagId = getTagId(firstDeviceId, secondDeviceId);
@@ -85,7 +89,21 @@ public class CoordinatesCalculator {
 
 		Set<Integer> connectedAnchors = getConnectedAnchors(tagId);
 
-		Optional<Point3D> calculatedPointOptional = is3D ? calculate3d(connectedAnchors, tagId) : calculate2d(connectedAnchors, tagId);
+		Optional<Point3D> calculatedPointOptional = Optional.empty();
+
+		switch (algorithmType) {
+			case TAYLOR:
+				calculatedPointOptional = calculateTaylor(connectedAnchors, tagId);
+				break;
+			case GEO_N_2D:
+				calculatedPointOptional = calculate2d(connectedAnchors, tagId);
+				break;
+			case GEO_N_3D:
+				calculatedPointOptional = calculate3d(connectedAnchors, tagId);
+				break;
+			default:
+				calculatedPointOptional = calculate2d(connectedAnchors, tagId);
+		}
 
 		if (!calculatedPointOptional.isPresent()) {
 			return Optional.empty();
@@ -109,7 +127,7 @@ public class CoordinatesCalculator {
 		Optional.ofNullable(previousCoorinates.get(tagId)).ifPresent((previousPoint) -> {
 			calculatedPoint.setX((calculatedPoint.getX() + previousPoint.getPoint().getX()) / 2);
 			calculatedPoint.setY((calculatedPoint.getY() + previousPoint.getPoint().getY()) / 2);
-			calculatedPoint.setZ((calculatedPoint.getZ() + previousPoint.getPoint().getZ())/ 2);
+			calculatedPoint.setZ((calculatedPoint.getZ() + previousPoint.getPoint().getZ()) / 2);
 		});
 		Date currentDate = new Date();
 		previousCoorinates.put(tagId, new PointAndTime(calculatedPoint, currentDate.getTime()));
@@ -121,7 +139,7 @@ public class CoordinatesCalculator {
 		return anchorOptional.filter(anchor -> anchor instanceof Sink).isPresent();
 	}
 
-	private Optional<Point3D> calculate3d(Set<Integer> connectedAnchors, Integer tagId) {
+	private Optional<Point3D> calculateTaylor(Set<Integer> connectedAnchors, Integer tagId) {
 		int N = connectedAnchors.size();
 
 		if (N < 4) {
@@ -245,7 +263,6 @@ public class CoordinatesCalculator {
 		return !(tooFar || badValue);
 	}
 
-
 	private Optional<Point3D> calculate2d(Set<Integer> connectedAnchors, Integer tagId) {
 		if (connectedAnchors.size() < 3) {
 			logger.trace("Not enough connected anchors to calculate position. Currently connected anchors: {}", connectedAnchors.size());
@@ -296,6 +313,53 @@ public class CoordinatesCalculator {
 		y /= j;
 
 		return Optional.of(new Point3D(x, y, 0));
+	}
+
+	private Optional<Point3D> calculate3d(List<Integer> connectedAnchors, Integer tagId) {
+		List<Pair<SimpleMatrix, Double>> pairs = new ArrayList<>();
+
+		// get time of last measure
+		long minTimestamp = new Date().getTime();
+		for (Map.Entry<Integer, PolyMeasure> entry : measureStorage.get(tagId).entrySet()) {
+			List<Measure> measures = entry.getValue().getMeasures();
+			Optional<Measure> maxTimestampMeasure = measures.stream().max(Comparator.comparing(Measure::getTimestamp));
+			if (maxTimestampMeasure.isPresent()) {
+				minTimestamp = Math.min(minTimestamp, maxTimestampMeasure.get().getTimestamp());
+			}
+		}
+
+		for (int i = 1; i < connectedAnchors.size(); ++i) {
+			Integer anchorId = connectedAnchors.get(i);
+			float dist1 = measures[i].GetRange(timestamp);
+			Device_t anc1 = db.GetDevice(anc1_did);
+
+			for (int indo = 0; indo < i; ++indo) {
+				ushort anc2_did = connectedAnchorsDid[indo];
+				Device_t anc2 = db.GetDevice(anc2_did);
+				float dist2 = measures[indo].GetRange(timestamp);
+
+				if (full3D) {
+					for (int indu = 0; indu < indo; ++indu) {
+						ushort anc3_did = connectedAnchorsDid[indu];
+						Device_t anc3 = db.GetDevice(anc3_did);
+						float dist3 = measures[indu].GetRange(timestamp);
+						GetIntersections3d(anc1, dist1, anc2, dist2, anc3, dist3, ref ip);
+					}
+				} else {
+					GetIntersections(anc1, dist1, anc2, dist2, ref ip);
+				}
+			}
+		}
+	}
+
+	private double getInterpolatedDistance(Integer tagId, Integer anchorId, long timestamp) {
+		List<Measure> measures = measureStorage.get(tagId).get(anchorId).getMeasures();
+		if (measures.size() < 2 || measures.get(measures.size() - 1).getTimestamp() == timestamp) {
+			return measures.get(measures.size() - 1).getDistance();
+		}
+		List<Measure> sorted = measures.stream().filter(measure -> measure.getTimestamp() < timestamp).sorted(Comparator.comparing(Measure::getTimestamp)).collect(Collectors.toList());
+		Measure first = sorted.get(sorted.size() - 1);
+		Measure last = measures.get(measures.size() - 1);
 	}
 
 	private double calculatePitagoras(Anchor anchor, double distance) {
@@ -369,26 +433,44 @@ public class CoordinatesCalculator {
 
 	private void setConnection(int tagId, int anchorId, double distance) {
 		long now = new Date().getTime();
+
 		if (measureStorage.containsKey(tagId)) {
-			Map<Integer, List<Measure>> anchorsMeasures = measureStorage.get(tagId);
+			Map<Integer, PolyMeasure> anchorsMeasures = measureStorage.get(tagId);
 			if (anchorsMeasures.containsKey(anchorId)) {
-				List<Measure> measures = anchorsMeasures.get(anchorId);
+				List<Measure> measures = anchorsMeasures.get(anchorId).getMeasures();
+				anchorsMeasures.get(anchorId).setPoly(calculatePoly(measures, now));
 				measures.add(new Measure(distance, now));
 			} else {
-				anchorsMeasures.put(anchorId, new LinkedList<>(Collections.singletonList(new Measure(distance, now))));
+				anchorsMeasures.put(anchorId, new PolyMeasure(new LinkedList<>(Collections.singletonList(new Measure(distance, now))), new double[]{distance}));
 			}
 		} else {
-			Map<Integer, List<Measure>> anchorsMeasures = new LinkedHashMap<>();
-			anchorsMeasures.put(anchorId, new LinkedList<>(Collections.singletonList(new Measure(distance, now))));
+			Map<Integer, PolyMeasure> anchorsMeasures = new LinkedHashMap<>();
+			anchorsMeasures.put(anchorId, new PolyMeasure(new LinkedList<>(Collections.singletonList(new Measure(distance, now))), new double[]{distance}));
 			measureStorage.put(tagId, anchorsMeasures);
 		}
+
+	}
+
+	private double[] calculatePoly(List<Measure> measures, long now) {
+		double T = measures.get(measures.size() - 1).getTimestamp() - measures.get(0).getTimestamp();
+		List<WeightedObservedPoint> points = new ArrayList<>();
+		double weightMin = 0.3;
+		for (Measure measure : measures) {
+			double x = measure.getTimestamp() - now;
+			double y = measure.getDistance();
+			double weight = (1 - weightMin) * (measure.getTimestamp() - measures.get(0).getTimestamp()) / T + weightMin;
+			points.add(new WeightedObservedPoint(weight, x, y));
+		}
+
+		PolynomialCurveFitter polyFitter = PolynomialCurveFitter.create(2);
+		return polyFitter.fit(points);
 	}
 
 	private void cleanOldData() {
 		long now = new Date().getTime();
 		measureStorage.entrySet()
 			.removeIf(tagEntry -> tagEntry.getValue().entrySet()
-				.removeIf(anchorEntry -> anchorEntry.getValue()
+				.removeIf(anchorEntry -> anchorEntry.getValue().getMeasures()
 					.removeIf(measure -> new Date((now - OLD_DATA_IN_MILISECONDS)).after(new Date(measure.getTimestamp())))
 				)
 			);
@@ -406,9 +488,9 @@ public class CoordinatesCalculator {
 	private double getDistance(Integer tagId, Integer anchorId) {
 		double meanDistance = 0d;
 		if (measureStorage.containsKey(tagId)) {
-			Map<Integer, List<Measure>> anchorsMeasures = measureStorage.get(tagId);
+			Map<Integer, PolyMeasure> anchorsMeasures = measureStorage.get(tagId);
 			if (anchorsMeasures.containsKey(anchorId)) {
-				List<Measure> measures = anchorsMeasures.get(anchorId);
+				List<Measure> measures = anchorsMeasures.get(anchorId).getMeasures();
 				meanDistance = measures.stream().mapToDouble(Measure::getDistance).sum() / measures.size();
 			}
 		}
@@ -466,5 +548,13 @@ public class CoordinatesCalculator {
 		private SimpleMatrix anchorPositions;
 		private SimpleMatrix measures;
 		private SimpleMatrix tagPosition;
+	}
+
+	@Getter
+	@Setter
+	@AllArgsConstructor
+	private static class PolyMeasure {
+		private List<Measure> measures = new ArrayList<>();
+		private double[] poly;
 	}
 }
