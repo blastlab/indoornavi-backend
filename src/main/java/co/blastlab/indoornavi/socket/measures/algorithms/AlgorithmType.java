@@ -1,4 +1,4 @@
-package co.blastlab.indoornavi.socket.measures;
+package co.blastlab.indoornavi.socket.measures.algorithms;
 
 public enum AlgorithmType {
 	GEO_N_2D,
