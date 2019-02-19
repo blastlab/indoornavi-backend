@@ -10,8 +10,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-class IntersectionsCalculator {
-	static List<Point> getIntersections(Anchor firstAnchor, double firstAnchorDistance, Anchor secondAnchor, double secondAnchorDistance) {
+public class IntersectionsCalculator {
+	public static List<Point> getIntersections(Anchor firstAnchor, double firstAnchorDistance, Anchor secondAnchor, double secondAnchorDistance) {
 		List<Point> res = new ArrayList<>();
 		double dx = secondAnchor.getX() - firstAnchor.getX();
 		double dy = secondAnchor.getY() - firstAnchor.getY();
@@ -52,7 +52,7 @@ class IntersectionsCalculator {
 		return res;
 	}
 
-	static List<Double> calculateSumDistanceBetweenIntersectionPoints(List<Point> points) {
+	public static List<Double> calculateSumDistanceBetweenIntersectionPoints(List<Point> points) {
 		Double[] IPdistance = new Double[points.size()];
 		Arrays.fill(IPdistance, 0.0);
 		for (int indn = 0; indn < points.size(); ++indn) {
