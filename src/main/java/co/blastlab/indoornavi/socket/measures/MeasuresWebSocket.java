@@ -170,7 +170,7 @@ public class MeasuresWebSocket extends WebSocket {
 				}
 			} else {
 				logger.trace("Trying to calculate coordinates");
-				Optional<UwbCoordinatesDto> coords = coordinatesCalculator.calculateTagPosition(distanceMessage.getDid1(), distanceMessage.getDid2(), distanceMessage.getDist(), false);
+				Optional<UwbCoordinatesDto> coords = coordinatesCalculator.calculateTagPosition(distanceMessage.getDid1(), distanceMessage.getDid2(), distanceMessage.getDist(), AlgorithmType.GEO_N_3D);
 				coords.ifPresent(coordinatesDto -> {
 					if (isDebugMode) {
 						coordinatesDtoEvent.fire(coordinatesDto);
