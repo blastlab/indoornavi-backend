@@ -53,7 +53,7 @@ public class Storage {
 		return minTimestamp;
 	}
 
-	void setConnection(int tagId, int anchorId, double distance) {
+	public void setConnection(int tagId, int anchorId, double distance) {
 		long now = new Date().getTime();
 
 		if (measures.containsKey(tagId)) {
