@@ -2,13 +2,14 @@ package co.blastlab.indoornavi.socket.measures;
 
 import co.blastlab.indoornavi.domain.Anchor;
 import co.blastlab.indoornavi.dto.Point;
-import javafx.util.Pair;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.ejml.simple.SimpleMatrix;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 public class IntersectionsCalculator {
 	public static List<Point> getIntersections(Anchor firstAnchor, double firstAnchorDistance, Anchor secondAnchor, double secondAnchorDistance) {
@@ -65,7 +66,22 @@ public class IntersectionsCalculator {
 		return Arrays.asList(IPdistance);
 	}
 
-	static boolean doSpheresIntersect(double distanceBetweenOneAndOtherAnchorCenter, double firstAnchorDistanceToTag, double secondAnchorDistanceToTag) {
+	public static Double calculateThres(List<Double> intersectionPointsDistances, int connectedAnchorsCount) {
+		List<Double> sortedIntersectionPointsDistance = new ArrayList<>(intersectionPointsDistances);
+		Collections.sort(sortedIntersectionPointsDistance);
+		Double thresBase = sortedIntersectionPointsDistance.get(connectedAnchorsCount - 1);
+		Double thres = thresBase;
+		for (int i = connectedAnchorsCount; i < intersectionPointsDistances.size(); i++) {
+			if (sortedIntersectionPointsDistance.get(i) / thresBase - 1 < 0.10) {
+				thres = sortedIntersectionPointsDistance.get(i);
+			} else {
+				break;
+			}
+		}
+		return thres;
+	}
+
+	private static boolean doSpheresIntersect(double distanceBetweenOneAndOtherAnchorCenter, double firstAnchorDistanceToTag, double secondAnchorDistanceToTag) {
 		return !(distanceBetweenOneAndOtherAnchorCenter > firstAnchorDistanceToTag + secondAnchorDistanceToTag)
 			&& !(distanceBetweenOneAndOtherAnchorCenter < Math.abs(firstAnchorDistanceToTag - secondAnchorDistanceToTag));
 	}
@@ -90,17 +106,17 @@ public class IntersectionsCalculator {
 		return radiusInFirstAnchorDirection.scale(0.5).plus(radiusInSecondAnchorDirection.scale(0.5));
 	}
 
-	static List<Pair<SimpleMatrix, Float>> calculateTwoSpheresPlanarIntersections(SimpleMatrix firstAnchorPosition,
-	                                                                              double firstAnchorDistanceToTag,
-	                                                                              SimpleMatrix secondAnchorPosition,
-	                                                                              double secondAnchorDistanceToTag,
-	                                                                              SimpleMatrix thirdAnchorPosition) {
+	private static List<Pair<SimpleMatrix, Float>> calculateTwoSpheresPlanarIntersections(SimpleMatrix firstAnchorPosition,
+	                                                                                      double firstAnchorDistanceToTag,
+	                                                                                      SimpleMatrix secondAnchorPosition,
+	                                                                                      double secondAnchorDistanceToTag,
+	                                                                                      SimpleMatrix thirdAnchorPosition) {
 		List<Pair<SimpleMatrix, Float>> pairs = new ArrayList<>();
 		double distanceBetweenOneAndOtherAnchorCenter = (firstAnchorPosition.minus(secondAnchorPosition)).normF();
 
-		if (IntersectionsCalculator.doSpheresIntersect(distanceBetweenOneAndOtherAnchorCenter, firstAnchorDistanceToTag, secondAnchorDistanceToTag)) {
+		if (!IntersectionsCalculator.doSpheresIntersect(distanceBetweenOneAndOtherAnchorCenter, firstAnchorDistanceToTag, secondAnchorDistanceToTag)) {
 			pairs.add(
-				new Pair<>(
+				new ImmutablePair<>(
 					IntersectionsCalculator.calculateTwoSpheresPlanarMiddle(firstAnchorPosition, firstAnchorDistanceToTag, secondAnchorPosition, secondAnchorDistanceToTag),
 					2f
 				)
@@ -121,25 +137,26 @@ public class IntersectionsCalculator {
 			SimpleMatrix vortho = IntersectionsCalculator.crossProduct(planeDirection, firstAnchorPosition.minus(secondAnchorPosition));
 			vortho = vortho.scale(h / vortho.normF());
 			pairs.add(
-				new Pair<>(
+				new ImmutablePair<>(
 					middlePoint.plus(vortho),
 					1f
 				)
 			);
-			pairs.add(new Pair<>(
-				middlePoint.minus(vortho),
-				1f
-			));
+			pairs.add(
+				new ImmutablePair<>(
+					middlePoint.minus(vortho),
+					1f
+				));
 		}
 		return pairs;
 	}
 
 	static List<Pair<SimpleMatrix, Float>> calculateThreeSpheresPlanarIntersections(SimpleMatrix firstAnchorPosition,
-	                                                                              double firstAnchorDistanceToTag,
-	                                                                              SimpleMatrix secondAnchorPosition,
-	                                                                              double secondAnchorDistanceToTag,
-	                                                                              SimpleMatrix thirdAnchorPosition,
-	                                                                              double thirdAnchorDistanceToTag) {
+	                                                                                double firstAnchorDistanceToTag,
+	                                                                                SimpleMatrix secondAnchorPosition,
+	                                                                                double secondAnchorDistanceToTag,
+	                                                                                SimpleMatrix thirdAnchorPosition,
+	                                                                                double thirdAnchorDistanceToTag) {
 		List<Pair<SimpleMatrix, Float>> pairs = new ArrayList<>();
 		SimpleMatrix ex = secondAnchorPosition.minus(firstAnchorPosition);
 		ex = ex.scale(1 / ex.normF());
@@ -159,28 +176,28 @@ public class IntersectionsCalculator {
 		double z = Math.sqrt(zz);
 		SimpleMatrix p = firstAnchorPosition.plus(ex.scale(x).plus(ey.scale(y)));
 		pairs.add(
-			new Pair<>(
+			new ImmutablePair<>(
 				p.plus(ez.scale(z)),
 				1f
 			)
 		);
-		pairs.add(new Pair<>(
+		pairs.add(new ImmutablePair<>(
 			p.minus(ez.scale(z)),
 			1f
 		));
 		return pairs;
 	}
 
-	static List<Pair<SimpleMatrix, Float>> getIntersections3d(Anchor firstAnchor,
-	                                                          double firstAnchorDistanceToTag,
-	                                                          Anchor secondAnchor,
-	                                                          double secondAnchorDistanceToTag,
-	                                                          Anchor thirdAnchor,
-	                                                          double thirdAnchorDistanceToTag) {
+	public static List<Pair<SimpleMatrix, Float>> getIntersections3d(Anchor firstAnchor,
+	                                                                 double firstAnchorDistanceToTag,
+	                                                                 Anchor secondAnchor,
+	                                                                 double secondAnchorDistanceToTag,
+	                                                                 Anchor thirdAnchor,
+	                                                                 double thirdAnchorDistanceToTag) {
 		List<Pair<SimpleMatrix, Float>> pairs = new ArrayList<>();
-		SimpleMatrix firstAnchorPosition = IntersectionsCalculator.buildAnchorPositionMatrix(firstAnchor.getX(), firstAnchor.getY(), firstAnchor.getZ());
-		SimpleMatrix secondAnchorPosition = IntersectionsCalculator.buildAnchorPositionMatrix(secondAnchor.getX(), secondAnchor.getY(), secondAnchor.getZ());
-		SimpleMatrix thirdAnchorPosition = IntersectionsCalculator.buildAnchorPositionMatrix(thirdAnchor.getX(), thirdAnchor.getY(), thirdAnchor.getZ());
+		SimpleMatrix firstAnchorPosition = IntersectionsCalculator.buildAnchorPositionMatrix(firstAnchor.getX().doubleValue(), firstAnchor.getY().doubleValue(), firstAnchor.getZ().doubleValue());
+		SimpleMatrix secondAnchorPosition = IntersectionsCalculator.buildAnchorPositionMatrix(secondAnchor.getX().doubleValue(), secondAnchor.getY().doubleValue(), secondAnchor.getZ().doubleValue());
+		SimpleMatrix thirdAnchorPosition = IntersectionsCalculator.buildAnchorPositionMatrix(thirdAnchor.getX().doubleValue(), thirdAnchor.getY().doubleValue(), thirdAnchor.getZ().doubleValue());
 		double distanceBetweenFirstAndSecondAnchor = (firstAnchorPosition.minus(secondAnchorPosition)).normF();
 		double distanceBetweenFirstAndThirdAnchor = (firstAnchorPosition.minus(thirdAnchorPosition)).normF();
 		double distanceBetweenSecondAndThirdAnchor = (secondAnchorPosition.minus(thirdAnchorPosition)).normF();
@@ -189,8 +206,7 @@ public class IntersectionsCalculator {
 		// wtedy wszystkie punkty przeciec sa rozlozone planarnie
 		if (!IntersectionsCalculator.doSpheresIntersect(distanceBetweenFirstAndSecondAnchor, firstAnchorDistanceToTag, secondAnchorDistanceToTag) ||
 			!IntersectionsCalculator.doSpheresIntersect(distanceBetweenFirstAndThirdAnchor, firstAnchorDistanceToTag, thirdAnchorDistanceToTag) ||
-			!IntersectionsCalculator.doSpheresIntersect(distanceBetweenSecondAndThirdAnchor, secondAnchorDistanceToTag, thirdAnchorDistanceToTag))
-		{
+			!IntersectionsCalculator.doSpheresIntersect(distanceBetweenSecondAndThirdAnchor, secondAnchorDistanceToTag, thirdAnchorDistanceToTag)) {
 			pairs.addAll(IntersectionsCalculator.calculateTwoSpheresPlanarIntersections(
 				firstAnchorPosition, firstAnchorDistanceToTag, secondAnchorPosition, secondAnchorDistanceToTag, thirdAnchorPosition)
 			);
@@ -200,9 +216,7 @@ public class IntersectionsCalculator {
 			pairs.addAll(IntersectionsCalculator.calculateTwoSpheresPlanarIntersections(
 				secondAnchorPosition, secondAnchorDistanceToTag, thirdAnchorPosition, thirdAnchorDistanceToTag, firstAnchorPosition)
 			);
-		}
-		else
-		{
+		} else {
 			pairs.addAll(IntersectionsCalculator.calculateThreeSpheresPlanarIntersections(
 				firstAnchorPosition, firstAnchorDistanceToTag, secondAnchorPosition, secondAnchorDistanceToTag, thirdAnchorPosition, thirdAnchorDistanceToTag)
 			);
@@ -210,7 +224,7 @@ public class IntersectionsCalculator {
 		return pairs;
 	}
 
-	private static SimpleMatrix crossProduct(SimpleMatrix left, SimpleMatrix right) {
+	static SimpleMatrix crossProduct(SimpleMatrix left, SimpleMatrix right) {
 		SimpleMatrix result = new SimpleMatrix(3, 1);
 		result.set(0, left.get(1) * right.get(2) - left.get(2) * right.get(1));
 		result.set(1, -left.get(0) * right.get(2) + left.get(2) * right.get(0));
@@ -218,7 +232,7 @@ public class IntersectionsCalculator {
 		return result;
 	}
 
-	private static SimpleMatrix buildAnchorPositionMatrix(Integer x, Integer y, Integer z) {
+	static SimpleMatrix buildAnchorPositionMatrix(Double x, Double y, Double z) {
 		SimpleMatrix result = new SimpleMatrix(3, 1);
 		result.set(0, x);
 		result.set(1, y);

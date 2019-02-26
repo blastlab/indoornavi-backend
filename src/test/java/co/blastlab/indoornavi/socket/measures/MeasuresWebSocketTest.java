@@ -2,6 +2,7 @@ package co.blastlab.indoornavi.socket.measures;
 
 import co.blastlab.indoornavi.socket.bridge.AnchorPositionBridge;
 import co.blastlab.indoornavi.socket.bridge.SinkAnchorsDistanceBridge;
+import co.blastlab.indoornavi.socket.measures.algorithms.AlgorithmType;
 import co.blastlab.indoornavi.utils.Logger;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
@@ -49,17 +50,6 @@ public class MeasuresWebSocketTest {
 	@Before
 	public void setUp() {
 		when(session.getId()).thenReturn("sessionId");
-	}
-
-	@Test
-	public void handleMessageWhenMeasureIsSent() throws Exception {
-		when(session.getRequestParameterMap()).thenReturn(new HashMap<String, List<String>>(){{
-			this.put("server", new ArrayList<>());
-		}});
-
-		measuresWebSocket.handleMessage("[{\"did1\": 1, \"did2\": 100501, \"dist\": 100}]", session);
-
-		verify(coordinatesCalculator).calculateTagPosition(eq(1), eq(100501), eq(100), isA(Boolean.class));
 	}
 
 	@Test
