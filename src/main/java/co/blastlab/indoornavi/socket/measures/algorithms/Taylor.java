@@ -16,7 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class Taylor implements Algorithm {
+@UseTaylor
+public class Taylor extends Algorithm3d implements Algorithm {
 	@Inject
 	private AnchorRepository anchorRepository;
 	@Inject
@@ -26,29 +27,16 @@ public class Taylor implements Algorithm {
 
 	@Override
 	public Optional<Point3D> calculate(List<Integer> connectedAnchors, Integer tagId) {
+		List<Anchor> anchors;
+		try {
+			anchors = getAnchors(connectedAnchors);
+		} catch (Algorithm3d.NotEnoughAnchors notEnoughAnchors) {
+			return Optional.empty();
+		}
+
 		int N = connectedAnchors.size();
 
-		if (N < 4) {
-			logger.trace("Not enough connected anchors to calculate position. Currently connected anchors: {}", connectedAnchors.size());
-			return Optional.empty();
-		}
-
-		logger.trace("Connected anchors: {}", connectedAnchors.size());
-
-		List<Anchor> anchors = new ArrayList<>();
-		for (Integer connectedAnchorShortId : connectedAnchors) {
-			Optional<Anchor> anchorOptional = anchorRepository.findByShortId(connectedAnchorShortId);
-			anchorOptional.ifPresent(anchors::add);
-		}
-
-		if (anchors.size() < 4) {
-			logger.trace("Not enough connected and in database anchors to calculate position. Currently connected anchors: {}", connectedAnchors.size());
-			return Optional.empty();
-		}
-
 		Taylor.StateMatrix stateMatrix = getStateMatrix(anchors, tagId);
-
-//		logger.trace("State matrix: {}", stateMatrix);
 
 		SimpleMatrix A = new SimpleMatrix(N, 3);
 		SimpleMatrix b = new SimpleMatrix(N, 1);
@@ -74,7 +62,6 @@ public class Taylor implements Algorithm {
 			SimpleMatrix p = (aa).solve(ab);
 
 			stateMatrix.tagPosition = stateMatrix.tagPosition.plus(p);
-//			logger.trace("Tag position calculated matrix: {}", stateMatrix.tagPosition.toString());
 
 			if (p.normF() < 10) {
 				logger.trace("Less than 10 iteration was needed: {}", taylorIter);
@@ -132,7 +119,10 @@ public class Taylor implements Algorithm {
 		for (int i = 0; i < N; ++i) {
 			Anchor currentAnchor = anchors[i];
 			anchorPositions.setRow(i, 0, currentAnchor.getX(), currentAnchor.getY(), currentAnchor.getZ());
-			measures.setRow(i, 0, storage.getDistance(tagId, currentAnchor.getShortId()));
+			measures.setRow(i, 0, useInterpolation ?
+				storage.getInterpolatedDistance(tagId, currentAnchor.getShortId(), storage.getTimeOfLastMeasure(tagId)) :
+				storage.getDistance(tagId, currentAnchor.getShortId())
+			);
 		}
 
 		return new StateMatrix(anchorPositions, measures, tagPosition);

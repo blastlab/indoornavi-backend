@@ -24,7 +24,7 @@ public abstract class BaseIT extends RestAssuredIT {
 	static final String FILE_VIOLATION_ERROR_NAME = "file_violation";
 
 	private static final String JDBC_DRIVER_CLASS = "org.mariadb.jdbc.Driver";
-	private static final String DATABASE_URL = "jdbc:mysql://db:3306/Navi";
+	private static final String DATABASE_URL = "jdbc:mysql://localhost:3306/Navi";
 	private static final String DATABASE_USER = "root";
 	private static final String DATABASE_PASSWORD = "password";
 	private static final String CHANGELOG_FILE = "database/src/main/resources/db.changelog-test.relative.xml";

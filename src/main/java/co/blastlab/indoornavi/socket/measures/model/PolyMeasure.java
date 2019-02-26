@@ -13,4 +13,5 @@ import java.util.List;
 public class PolyMeasure {
 	private List<Measure> measures = new ArrayList<>();
 	private double[] poly;
+	private long polyCalculationTimestamp;
 }

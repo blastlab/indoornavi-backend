@@ -3,8 +3,6 @@ package co.blastlab.indoornavi.socket.measures.algorithms;
 import co.blastlab.indoornavi.dao.repository.AnchorRepository;
 import co.blastlab.indoornavi.domain.Anchor;
 import co.blastlab.indoornavi.dto.Point;
-import co.blastlab.indoornavi.socket.measures.CoordinatesCalculator;
-import co.blastlab.indoornavi.socket.measures.IntersectionsCalculator;
 import co.blastlab.indoornavi.socket.measures.Point3D;
 import co.blastlab.indoornavi.socket.measures.Storage;
 import co.blastlab.indoornavi.socket.measures.model.AnchorDistance;
@@ -17,6 +15,7 @@ import java.util.*;
 
 import static co.blastlab.indoornavi.socket.measures.IntersectionsCalculator.*;
 
+@UseGeoN2d
 public class GeoN2d implements Algorithm {
 	private final static int TAG_Z = 100;
 
@@ -82,14 +81,25 @@ public class GeoN2d implements Algorithm {
 		return Optional.of(new Point3D(x, y, 0));
 	}
 
-	private Set<Pair<AnchorDistance, AnchorDistance>> getAnchorDistancePairs(Set<Integer> connectedAnchors, Integer tagId) {
+	private Set<Pair<AnchorDistance, AnchorDistance>> getAnchorDistancePairs(List<Integer> connectedAnchors, Integer tagId) {
 		Set<Pair<AnchorDistance, AnchorDistance>> pairs = new HashSet<>();
 		Integer[] connectedAnchorsArray = connectedAnchors.toArray(new Integer[0]);
+		long minTimestamp = storage.getTimeOfLastMeasure(tagId);
 		for (int i = 0; i < connectedAnchors.size() - 1; i++) {
 			for (int j = i + 1; j < connectedAnchors.size(); j++) {
 				pairs.add(new ImmutablePair<>(
-						new AnchorDistance(connectedAnchorsArray[i], storage.getDistance(tagId, connectedAnchorsArray[i])),
-						new AnchorDistance(connectedAnchorsArray[j], storage.getDistance(tagId, connectedAnchorsArray[j]))
+						new AnchorDistance(
+							connectedAnchorsArray[i],
+							useInterpolation ?
+								storage.getInterpolatedDistance(tagId, connectedAnchorsArray[i], minTimestamp) :
+								storage.getDistance(tagId, connectedAnchorsArray[i])
+						),
+						new AnchorDistance(
+							connectedAnchorsArray[j],
+							useInterpolation ?
+								storage.getInterpolatedDistance(tagId, connectedAnchorsArray[j], minTimestamp) :
+								storage.getDistance(tagId, connectedAnchorsArray[j])
+						)
 					)
 				);
 			}
@@ -108,20 +118,5 @@ public class GeoN2d implements Algorithm {
 		if (z > distance + MAX_DIFFERENCE_BETWEEN_DISTANCE_AND_ANCHOR_HEIGHT) {
 			logger.trace("Warning! Anchor shortId = {} height is higher than distance +100cm", anchor.getShortId());
 		}
-	}
-
-	private Double calculateThres(List<Double> intersectionPointsDistances, int connectedAnchorsCount) {
-		List<Double> sortedIntersectionPointsDistance = new ArrayList<>(intersectionPointsDistances);
-		Collections.sort(sortedIntersectionPointsDistance);
-		Double thresBase = sortedIntersectionPointsDistance.get(connectedAnchorsCount - 1);
-		Double thres = thresBase;
-		for (int i = connectedAnchorsCount; i < intersectionPointsDistances.size(); i++) {
-			if (sortedIntersectionPointsDistance.get(i) / thresBase - 1 < 0.10) {
-				thres = sortedIntersectionPointsDistance.get(i);
-			} else {
-				break;
-			}
-		}
-		return thres;
 	}
 }
