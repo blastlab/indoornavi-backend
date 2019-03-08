@@ -43,10 +43,12 @@ public class TaylorTest {
 		Floor floor = new Floor();
 		floor.setId(1L);
 
-		when(anchorRepository.findByShortId(32768)).thenReturn(Optional.of(new Anchor(0, 0, 100, floor, 32768)));
-		when(anchorRepository.findByShortId(32769)).thenReturn(Optional.of(new Anchor(100, 0, 0, floor, 32769)));
-		when(anchorRepository.findByShortId(32770)).thenReturn(Optional.of(new Anchor(0, 100, 0, floor, 32770)));
-		when(anchorRepository.findByShortId(32771)).thenReturn(Optional.of(new Anchor(0, 0, 0, floor, 32771)));
+		when(anchorRepository.findByShortIdIn(ImmutableList.of(32768, 32769, 32770, 32771))).thenReturn(ImmutableList.of(
+			new Anchor(0, 0, 100, floor, 32768),
+			new Anchor(100, 0, 0, floor, 32769),
+			new Anchor(0, 100, 0, floor, 32770),
+			new Anchor(0, 0, 0, floor, 32771)
+		));
 
 		if (taylor.useInterpolation) {
 			when(storage.getInterpolatedDistance(eq(1), eq(32768), anyLong())).thenReturn(141d);
