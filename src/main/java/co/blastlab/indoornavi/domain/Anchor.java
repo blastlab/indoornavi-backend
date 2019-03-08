@@ -14,6 +14,11 @@ import javax.persistence.*;
 		name = Anchor.BY_SHORT_ID_AND_POSITION_NOT_NULL,
 		query = "FROM Anchor as a WHERE a.shortId = ?1 AND a.x IS NOT NULL AND a.y IS NOT NULL",
 		hints = {@QueryHint(name = "org.hibernate.cacheable", value = "true")}
+	),
+	@NamedQuery(
+		name = Anchor.BY_SHORT_ID_IN,
+		query = "FROM Anchor as a WHERE a.shortId in ?1",
+		hints = {@QueryHint(name = "org.hibernate.cacheable", value = "true")}
 	)
 })
 @ToString(callSuper = true)
@@ -46,4 +51,5 @@ public class Anchor extends Uwb {
 	}
 
 	public static final String BY_SHORT_ID_AND_POSITION_NOT_NULL = "byShortIdAndPositionIsNotNull";
+	public static final String BY_SHORT_ID_IN = "byShortIdIn";
 }
