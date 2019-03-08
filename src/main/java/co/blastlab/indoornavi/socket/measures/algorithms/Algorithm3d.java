@@ -16,20 +16,16 @@ public class Algorithm3d {
 	private Logger logger;
 
 	protected List<Anchor> getAnchors(List<Integer> connectedAnchors) throws NotEnoughAnchors {
-		int N = connectedAnchors.size();
+		int connectedAnchorsCount = connectedAnchors.size();
 
-		if (N < 4) {
+		if (connectedAnchorsCount < 4) {
 			logger.trace("Not enough connected anchors to calculate position. Currently connected anchors: {}", connectedAnchors.size());
 			throw new NotEnoughAnchors();
 		}
 
 		logger.trace("Connected anchors: {}", connectedAnchors.size());
 
-		List<Anchor> anchors = new ArrayList<>();
-		for (Integer connectedAnchorShortId : connectedAnchors) {
-			Optional<Anchor> anchorOptional = anchorRepository.findByShortId(connectedAnchorShortId);
-			anchorOptional.ifPresent(anchors::add);
-		}
+		List<Anchor> anchors = anchorRepository.findByShortIdIn(connectedAnchors);
 
 		if (anchors.size() < 4) {
 			logger.trace("Not enough connected and in database anchors to calculate position. Currently connected anchors: {}", connectedAnchors.size());
