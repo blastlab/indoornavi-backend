@@ -163,13 +163,12 @@ public class InfoWebSocket extends WebSocket {
 	@PostConstruct
 	void init() {
 		logger.trace("Creating interval timer");
-		TimerConfig timerConfig = new TimerConfig();
-		timerConfig.setPersistent(false);
-		timerService.createIntervalTimer(0, OUTDATED_DEVICE_STATUS_MILISECONDS, timerConfig);
+		timerService.createIntervalTimer(0, OUTDATED_DEVICE_STATUS_MILISECONDS, new TimerConfig(null, false));
 	}
 
 	@Timeout
-	public void updateStatuses(Timer timer) {
+	public void updateStatuses() {
+		Logger logger = new Logger();
 		logger.trace("Updating device statuses");
 		networkController.getNetworks().forEach(network -> {
 			for (DeviceStatus anchorStatus : network.getAnchors()) {

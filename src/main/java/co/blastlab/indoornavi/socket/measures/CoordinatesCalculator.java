@@ -35,7 +35,7 @@ public class CoordinatesCalculator {
 	private Storage storage;
 
 	@Inject
-	@UseGeoN3d
+	@AlgorithmSelector
 	private Algorithm algorithm;
 
 	@Inject

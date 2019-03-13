@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-@UseTaylor
 public class Taylor extends Algorithm3d implements Algorithm {
 	@Inject
 	private AnchorRepository anchorRepository;

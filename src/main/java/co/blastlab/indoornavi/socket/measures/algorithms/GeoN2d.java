@@ -15,7 +15,6 @@ import java.util.*;
 
 import static co.blastlab.indoornavi.socket.measures.IntersectionsCalculator.*;
 
-@UseGeoN2d
 public class GeoN2d implements Algorithm {
 	private final static int TAG_Z = 100;
 

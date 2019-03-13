@@ -15,7 +15,6 @@ import co.blastlab.indoornavi.socket.bridge.AnchorPositionBridge;
 import co.blastlab.indoornavi.socket.bridge.SinkAnchorsDistanceBridge;
 import co.blastlab.indoornavi.socket.bridge.UnrecognizedDeviceException;
 import co.blastlab.indoornavi.socket.filters.*;
-import co.blastlab.indoornavi.socket.measures.algorithms.AlgorithmType;
 import co.blastlab.indoornavi.socket.wrappers.AnchorsWrapper;
 import co.blastlab.indoornavi.socket.wrappers.AreaEventWrapper;
 import co.blastlab.indoornavi.socket.wrappers.CoordinatesWrapper;
