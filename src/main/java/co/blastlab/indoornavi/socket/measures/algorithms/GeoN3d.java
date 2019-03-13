@@ -18,7 +18,6 @@ import java.util.*;
 import static co.blastlab.indoornavi.socket.measures.IntersectionsCalculator.calculateThres;
 import static co.blastlab.indoornavi.socket.measures.IntersectionsCalculator.getIntersections3d;
 
-@UseGeoN3d
 public class GeoN3d extends Algorithm3d implements Algorithm {
 	@Inject
 	private Storage storage;
@@ -29,7 +28,7 @@ public class GeoN3d extends Algorithm3d implements Algorithm {
 		try {
 			anchors = getAnchors(connectedAnchors);
 		} catch (NotEnoughAnchors notEnoughAnchors) {
-			return Optional.empty();
+			return Optional.empty(); 
 		}
 
 		List<Pair<SimpleMatrix, Float>> pairs = new ArrayList<>();

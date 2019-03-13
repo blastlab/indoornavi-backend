@@ -49,6 +49,9 @@ services:
       APP_LOG_LEVEL: TRACE # will log all actions taken by user and hardware communication
 #      APP_LOG_LEVEL: DEBUG # will log all actions taken by user
 #      APP_LOG_LEVEL: INFO # will only log most important messages
+      ALGORITHM: GeoN2d
+#      ALGORITHM: GeoN3d
+#      ALGORITHM: Taylor
     entrypoint: ["wait-for-it", "liquibase:80", "-t", "0", "--", "/start-server.sh"]
 
 volumes:
