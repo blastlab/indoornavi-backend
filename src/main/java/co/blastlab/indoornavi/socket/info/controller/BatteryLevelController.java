@@ -57,7 +57,7 @@ public class BatteryLevelController extends WebSocketCommunication {
 	@PostConstruct
 	private void init() {
 		logger.trace("Creating timer for battery level controller");
-		timerService.createIntervalTimer(0, 100, new TimerConfig());
+		timerService.createIntervalTimer(0, 100, new TimerConfig(null, false));
 	}
 
 	public void updateBatteryLevel(BatteryLevel batteryLevel) {
