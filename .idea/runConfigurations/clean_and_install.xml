@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="diff" type="MavenRunConfiguration" factoryName="Maven">
+  <configuration default="false" name="clean and install" type="MavenRunConfiguration" factoryName="Maven">
     <MavenSettings>
       <option name="myGeneralSettings" />
       <option name="myRunnerSettings" />
@@ -10,9 +10,12 @@
           </option>
           <option name="goals">
             <list>
-              <option value="liquibase:diff" />
+              <option value="clean" />
+              <option value="install" />
+              <option value="-DskipTests" />
             </list>
           </option>
+          <option name="pomFileName" />
           <option name="profilesMap">
             <map />
           </option>
@@ -21,6 +24,6 @@
         </MavenRunnerParameters>
       </option>
     </MavenSettings>
-    <method />
+    <method v="2" />
   </configuration>
 </component>

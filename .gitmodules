@@ -1,0 +1,3 @@
+[submodule "solver"]
+	path = solver
+	url = git@gitlab.blastlab.local:indoornavi/solver.git

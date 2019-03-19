@@ -17,8 +17,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -49,17 +47,6 @@ public class MeasuresWebSocketTest {
 	@Before
 	public void setUp() {
 		when(session.getId()).thenReturn("sessionId");
-	}
-
-	@Test
-	public void handleMessageWhenMeasureIsSent() throws Exception {
-		when(session.getRequestParameterMap()).thenReturn(new HashMap<String, List<String>>(){{
-			this.put("server", new ArrayList<>());
-		}});
-
-		measuresWebSocket.handleMessage("[{\"did1\": 1, \"did2\": 100501, \"dist\": 100}]", session);
-
-		verify(coordinatesCalculator).calculateTagPosition(eq(1), eq(100501), eq(100), isA(Boolean.class));
 	}
 
 	@Test

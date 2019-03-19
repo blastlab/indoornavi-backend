@@ -78,6 +78,9 @@ public class InfoWebSocket extends WebSocket {
 	@Inject
 	private Logger logger;
 
+	// this logger is used by callback executed by timer outside the context
+	private Logger loggerNoCDI = new Logger();
+
 	/*
 		Error codes and explanation:
 		IWS_001 - At least one of requested devices to update has not been found in the DB.
@@ -163,14 +166,12 @@ public class InfoWebSocket extends WebSocket {
 	@PostConstruct
 	void init() {
 		logger.trace("Creating interval timer");
-		TimerConfig timerConfig = new TimerConfig();
-		timerConfig.setPersistent(false);
-		timerService.createIntervalTimer(0, OUTDATED_DEVICE_STATUS_MILISECONDS, timerConfig);
+		timerService.createIntervalTimer(0, OUTDATED_DEVICE_STATUS_MILISECONDS, new TimerConfig(null, false));
 	}
 
 	@Timeout
-	public void updateStatuses(Timer timer) {
-		logger.trace("Updating device statuses");
+	public void updateStatuses() {
+		loggerNoCDI.trace("Updating device statuses");
 		networkController.getNetworks().forEach(network -> {
 			for (DeviceStatus anchorStatus : network.getAnchors()) {
 				checkOutdatedDeviceStatus(anchorStatus);
