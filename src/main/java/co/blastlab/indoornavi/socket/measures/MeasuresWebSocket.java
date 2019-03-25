@@ -15,6 +15,7 @@ import co.blastlab.indoornavi.socket.bridge.AnchorPositionBridge;
 import co.blastlab.indoornavi.socket.bridge.SinkAnchorsDistanceBridge;
 import co.blastlab.indoornavi.socket.bridge.UnrecognizedDeviceException;
 import co.blastlab.indoornavi.socket.filters.*;
+import co.blastlab.indoornavi.socket.info.controller.NetworkController;
 import co.blastlab.indoornavi.socket.wrappers.AnchorsWrapper;
 import co.blastlab.indoornavi.socket.wrappers.AreaEventWrapper;
 import co.blastlab.indoornavi.socket.wrappers.CoordinatesWrapper;
@@ -88,6 +89,9 @@ public class MeasuresWebSocket extends WebSocket {
 	@Inject
 	private AreaEventController areaEventController;
 
+	@Inject
+	private NetworkController networkController;
+
 	private Map<FilterType, Filter> activeFilters = new HashMap<>();
 
 	@OnOpen
@@ -160,6 +164,10 @@ public class MeasuresWebSocket extends WebSocket {
 				distanceMessageEvent.fire(distanceMessage);
 			}
 			logger.trace("Will analyze distance message: {}", distanceMessage);
+
+			networkController.updateLastTimeUpdated(distanceMessage.getDid1());
+			networkController.updateLastTimeUpdated(distanceMessage.getDid2());
+
 			if (bothDevicesAreAnchors(distanceMessage)) {
 				try {
 					logger.trace("Distance message is about two anchors. Transfering it to wizard bridges.");

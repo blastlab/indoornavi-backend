@@ -4,10 +4,7 @@ import co.blastlab.indoornavi.socket.WebSocketCommunication;
 import co.blastlab.indoornavi.socket.info.InfoWebSocket;
 import co.blastlab.indoornavi.socket.info.client.RawCommand;
 import co.blastlab.indoornavi.socket.info.server.Info;
-import co.blastlab.indoornavi.socket.info.server.command.BatteryLevel;
-import co.blastlab.indoornavi.socket.info.server.command.CommandResponseBase;
-import co.blastlab.indoornavi.socket.info.server.command.DeviceTurnOn;
-import co.blastlab.indoornavi.socket.info.server.command.Version;
+import co.blastlab.indoornavi.socket.info.server.command.*;
 import co.blastlab.indoornavi.socket.info.server.handshake.Handshake;
 import co.blastlab.indoornavi.socket.wrappers.CommandErrorWrapper;
 import co.blastlab.indoornavi.socket.wrappers.InfoErrorWrapper;
@@ -38,6 +35,9 @@ public class CommandController extends WebSocketCommunication {
 
 	@Inject
 	private Logger logger;
+
+	@Inject
+	private NetworkController networkController;
 
 	public void sendHandShake(Session serverSession) {
 		sendHandShake(serverSession, null);
@@ -76,6 +76,10 @@ public class CommandController extends WebSocketCommunication {
 				Version version = new Version();
 				version.fromDescriptor(descriptor);
 				infoWebSocket.assignSinkShortIdToSession(serverSession, version.getShortId());
+			case "I1103":
+				Beacon beacon = new Beacon();
+				beacon.fromDescriptor(descriptor);
+				networkController.updateLastTimeUpdated(beacon.getDeviceShortId());
 				break;
 		}
 

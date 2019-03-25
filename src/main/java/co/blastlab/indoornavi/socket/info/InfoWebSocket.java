@@ -47,7 +47,6 @@ import org.apache.commons.codec.binary.Hex;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
-import javax.ejb.Timer;
 import javax.ejb.*;
 import javax.enterprise.concurrent.ManagedExecutorService;
 import javax.inject.Inject;
@@ -100,7 +99,7 @@ public class InfoWebSocket extends WebSocket {
 
 	private final static long TIMEOUT_SECONDS_ACK = 30;
 	private final static long AFTER_UPDATE_WAIT_TIME_SECONDS = 60;
-	private final static long OUTDATED_DEVICE_STATUS_MILISECONDS = 150000;
+	private final static long OUTDATED_DEVICE_STATUS_MILLISECONDS = 150_000;
 
 	@Inject
 	private DeviceRepository deviceRepository;
@@ -166,7 +165,7 @@ public class InfoWebSocket extends WebSocket {
 	@PostConstruct
 	void init() {
 		logger.trace("Creating interval timer");
-		timerService.createIntervalTimer(0, OUTDATED_DEVICE_STATUS_MILISECONDS, new TimerConfig(null, false));
+		timerService.createIntervalTimer(0, OUTDATED_DEVICE_STATUS_MILLISECONDS, new TimerConfig(null, false));
 	}
 
 	@Timeout
@@ -293,7 +292,7 @@ public class InfoWebSocket extends WebSocket {
 
 	private void checkOutdatedDeviceStatus(DeviceStatus deviceStatus) {
 		long now = new Date().getTime();
-		if (new Date((now - InfoWebSocket.OUTDATED_DEVICE_STATUS_MILISECONDS)).after(deviceStatus.getLastTimeUpdated())) {
+		if (new Date((now - InfoWebSocket.OUTDATED_DEVICE_STATUS_MILLISECONDS)).after(deviceStatus.getLastTimeUpdated())) {
 			deviceStatus.setStatus(DeviceStatus.Status.OFFLINE);
 		}
 	}
