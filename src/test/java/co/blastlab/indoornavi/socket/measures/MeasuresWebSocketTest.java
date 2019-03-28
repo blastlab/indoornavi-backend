@@ -2,6 +2,7 @@ package co.blastlab.indoornavi.socket.measures;
 
 import co.blastlab.indoornavi.socket.bridge.AnchorPositionBridge;
 import co.blastlab.indoornavi.socket.bridge.SinkAnchorsDistanceBridge;
+import co.blastlab.indoornavi.socket.info.controller.NetworkController;
 import co.blastlab.indoornavi.utils.Logger;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
@@ -43,6 +44,9 @@ public class MeasuresWebSocketTest {
 
 	@Spy
 	private ObjectMapper objectMapper;
+
+	@Spy
+	private NetworkController networkController;
 
 	@Before
 	public void setUp() {
