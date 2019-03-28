@@ -17,6 +17,8 @@ public class DeviceStatus {
 	private UwbDto device;
 	private Status status;
 	private Date lastTimeUpdated;
+	private Date restartingStartedTime;
+	private Integer checkVersionAfterRestartCount = 0;
 	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	private CompletableFuture<Void> updateFinished = new CompletableFuture<>();
 	private Integer restartCount = 0;
