@@ -19,6 +19,7 @@ import co.blastlab.indoornavi.socket.info.server.InfoCode;
 import co.blastlab.indoornavi.socket.info.server.broadcast.DeviceConnected;
 import co.blastlab.indoornavi.socket.info.server.command.BatteryLevel;
 import co.blastlab.indoornavi.socket.info.server.command.DeviceTurnOn;
+import co.blastlab.indoornavi.socket.info.server.command.VersionCommand;
 import co.blastlab.indoornavi.socket.info.server.file.FileInfo;
 import co.blastlab.indoornavi.socket.info.server.file.FileInfo.FileInfoType;
 import co.blastlab.indoornavi.socket.info.server.file.in.Deleted;
@@ -44,7 +45,6 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableSet;
 import org.apache.commons.codec.binary.Hex;
-import sun.nio.ch.Net;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
@@ -97,12 +97,13 @@ public class InfoWebSocket extends WebSocket {
 		IWS_011 - The firmware is invalid.
 		IWS_012 - The file format is invalid. Only IHS files are allowed.
 		IWS_013 - Firmware version or given partition is wrong.
-		IWS_014 - Device didn't answer after 3 times asked about version during restart.
+		IWS_014 - Device didn't answer after 2 times asked about version during restart.
 	 */
 
 	private final static long TIMEOUT_SECONDS_ACK = 30;
 	private final static long AFTER_UPDATE_WAIT_TIME_SECONDS = 60;
-	private final static long OUTDATED_DEVICE_STATUS_MILLISECONDS = 150_000;
+	private final static long OUTDATED_DEVICE_STATUS_MILLISECONDS = 30_000;
+	private final static long OUTDATED_DEVICE_STATUS_CHECK_MILLISECONDS = 90_000;
 
 	@Inject
 	private DeviceRepository deviceRepository;
@@ -168,7 +169,7 @@ public class InfoWebSocket extends WebSocket {
 	@PostConstruct
 	void init() {
 		logger.trace("Creating interval timer");
-		timerService.createIntervalTimer(0, OUTDATED_DEVICE_STATUS_MILLISECONDS, new TimerConfig(null, false));
+		timerService.createIntervalTimer(0, OUTDATED_DEVICE_STATUS_CHECK_MILLISECONDS, new TimerConfig(null, false));
 	}
 
 	@Timeout
@@ -259,38 +260,53 @@ public class InfoWebSocket extends WebSocket {
 	}
 
 	public void onDeviceTurnOn(Session session, DeviceTurnOn deviceTurnOn) {
-		networkController.getDeviceStatus(deviceTurnOn.getDeviceShortId()).ifPresent(deviceStatus -> {
+		Optional<DeviceStatus> deviceStatusOptional = networkController.getDeviceStatus(deviceTurnOn.getDeviceShortId());
+		deviceStatusOptional.ifPresent(deviceStatus -> {
 			if (deviceStatus.getStatus() == RESTARTING) {
 				logger.trace("Device is restarting after update ({})", deviceStatus.getRestartCount());
 				deviceStatus.setRestartCount(deviceStatus.getRestartCount() + 1);
 				if (isProperFirmwareVersion(deviceTurnOn) && deviceStatus.getRestartCount() == 2) {
 					deviceStatus.setRestartCount(0);
-					Optional<? extends Uwb> optionalByShortId = uwbService.findOptionalByShortId(deviceTurnOn.getDeviceShortId());
-					if (optionalByShortId.isPresent()) {
-						optionalByShortId.get().setPartition(Uwb.getPartition(deviceTurnOn.getFirmwareMinor()));
-						deviceRepository.save(optionalByShortId.get());
+					uwbService.findOptionalByShortId(deviceTurnOn.getDeviceShortId()).ifPresent((device) -> {
+						device.setMinor(deviceTurnOn.getFirmwareMinor());
+						deviceRepository.save(device);
 						deviceStatus.getUpdateFinished().complete(null);
 						logger.trace("Device {} has been updated", deviceStatus.getDevice());
-					}
+					});
 				} else if (deviceStatus.getRestartCount() == 2) {
 					logger.trace("Device restarted 2 times but has wrong firmware");
 					deviceStatus.setStatus(ONLINE);
 					deviceStatus.setRestartCount(0);
 					sendErrorCode("IWS_011");
 				}
+			} else if (deviceStatus.getStatus() == OFFLINE) {
+				deviceStatus.setStatus(ONLINE);
+				deviceStatus.setRestartCount(0);
+				deviceStatus.setCheckVersionAfterRestartCount(0);
+				uwbService.findOptionalByShortId(deviceTurnOn.getDeviceShortId()).ifPresent((device) -> {
+					device.setMinor(deviceTurnOn.getFirmwareMinor());
+					deviceRepository.save(device);
+				});
+				broadCastMessage(getClientSessions(), new InfoWrapper(Collections.singleton(deviceStatus)));
+			} else if (deviceStatus.getStatus() == ONLINE) {
+				uwbService.findOptionalByShortId(deviceTurnOn.getDeviceShortId()).ifPresent((device) -> {
+					device.setMinor(deviceTurnOn.getFirmwareMinor());
+					deviceRepository.save(device);
+				});
 			}
 		});
 
-		final Optional<DeviceStatus> newDeviceOptional = registerNewDevice(session, deviceTurnOn);
-		newDeviceOptional.ifPresent(
-			deviceStatus ->
-				broadCastMessage(
-					getClientSessions(),
-					new InfoWrapper(Collections.singleton(deviceStatus)),
-					() -> sendErrorCode("IWS_010")
-				)
-		);
-
+		if (!deviceStatusOptional.isPresent()) {
+			final Optional<DeviceStatus> newDeviceOptional = registerNewDevice(session, deviceTurnOn);
+			newDeviceOptional.ifPresent(
+				deviceStatus ->
+					broadCastMessage(
+						getClientSessions(),
+						new InfoWrapper(Collections.singleton(deviceStatus)),
+						() -> sendErrorCode("IWS_010")
+					)
+			);
+		}
 	}
 
 	private void checkOutdatedDeviceStatus(DeviceStatus deviceStatus, Session session) {
@@ -301,12 +317,17 @@ public class InfoWebSocket extends WebSocket {
 				deviceStatus.setCheckVersionAfterRestartCount(deviceStatus.getCheckVersionAfterRestartCount() + 1);
 				commandController.sendHandShake(session, deviceStatus.getDevice().getShortId());
 			} else {
+				deviceStatus.setCheckVersionAfterRestartCount(0);
+				deviceStatus.setStatus(OFFLINE);
 				sendErrorCode("IWS_014", deviceStatus);
 			}
 		}
 	}
 
 	private boolean isOutdated(Date dateToCheck) {
+		if (dateToCheck == null) {
+			return false;
+		}
 		long now = new Date().getTime();
 		return new Date((now - InfoWebSocket.OUTDATED_DEVICE_STATUS_MILLISECONDS)).after(dateToCheck);
 	}
@@ -582,7 +603,7 @@ public class InfoWebSocket extends WebSocket {
 		Optional<? extends Uwb> deviceOptional = uwbService.findOptionalByShortId(deviceTurnOn.getDeviceShortId());
 		if (deviceOptional.isPresent()) {
 			Uwb uwb = deviceOptional.get();
-			return uwb.getPartition() != Uwb.getPartition(deviceTurnOn.getFirmwareMinor());
+			return Uwb.getPartition(uwb.getMinor()) != Uwb.getPartition(deviceTurnOn.getFirmwareMinor());
 		}
 		return false;
 	}
@@ -603,6 +624,7 @@ public class InfoWebSocket extends WebSocket {
 						deviceStatus.setStatus(Status.UPDATED);
 						broadCastMessage(getClientSessions(), new InfoWrapper(Collections.singleton(deviceStatus)));
 						deviceStatus.setStatus(ONLINE);
+						commandController.sendHandShake(session, deviceStatus.getDevice().getShortId());
 						deviceStatus.setLastTimeUpdated(new Date());
 
 						Optional<Network> bySession = networkController.getBySession(session);
@@ -630,7 +652,7 @@ public class InfoWebSocket extends WebSocket {
 	}
 
 	private Optional<DeviceStatus> registerNewDevice(Session session, DeviceTurnOn deviceTurnOn) {
- 		logger.setId(getSessionId());
+		logger.setId(getSessionId());
 		Optional<? extends Uwb> uwbOptional = uwbService.findOptionalByShortId(deviceTurnOn.getDeviceShortId());
 		if (uwbOptional.isPresent()) {
 			Uwb uwb = uwbOptional.get();
@@ -649,6 +671,8 @@ public class InfoWebSocket extends WebSocket {
 				} else {
 					deviceStatus = null;
 				}
+
+				deviceRepository.save(uwb);
 				commandController.sendHandShake(session, deviceTurnOn.getDeviceShortId());
 			} else if (uwb instanceof Anchor) {
 				Optional<Network> networkOptional = networkController.getBySession(session);
@@ -660,13 +684,10 @@ public class InfoWebSocket extends WebSocket {
 				} else {
 					deviceStatus = null;
 				}
+
+				deviceRepository.save(uwb);
 				commandController.sendHandShake(session, deviceTurnOn.getDeviceShortId());
 			}
-
-			if (uwb.getPartition() == null) {
-				uwb.setPartition(Uwb.getPartition(deviceTurnOn.getFirmwareMinor()));
-			}
-
 			return Optional.ofNullable(deviceStatus);
 		}
 		logger.trace("Device not found in database");
@@ -808,11 +829,28 @@ public class InfoWebSocket extends WebSocket {
 
 	private void sendErrorCode(String code, DeviceStatus deviceStatus) {
 		logger.setId(getSessionId()).warn("Sending error code: {}", code);
-		if (deviceStatus != null) {
-			deviceStatus.setStatus(ONLINE);
-		}
 		InfoErrorWrapper infoErrorWrapper;
 		infoErrorWrapper = Optional.ofNullable(deviceStatus).map(ds -> new InfoErrorWrapper(code, ds)).orElseGet(() -> new InfoErrorWrapper(code));
 		broadCastMessage(getClientSessions(), infoErrorWrapper);
+	}
+
+	public void updateVersion(VersionCommand versionCommand) {
+		networkController.getDeviceStatus(versionCommand.getShortId()).ifPresent(deviceStatus -> {
+			if (deviceStatus.getStatus() == ONLINE || deviceStatus.getStatus() == RESTARTING) {
+				Optional<? extends Uwb> optionalByShortId = uwbService.findOptionalByShortId(versionCommand.getShortId());
+				if (optionalByShortId.isPresent()) {
+					final Uwb device = optionalByShortId.get();
+					device.setMajor(versionCommand.getMajor());
+					device.setMinor(versionCommand.getMinor());
+					device.setCommitHash(versionCommand.getCommitHash());
+					deviceRepository.save(device);
+
+					deviceStatus.setDevice(new UwbDto(device));
+					deviceStatus.setCheckVersionAfterRestartCount(0);
+					deviceStatus.setRestartCount(0);
+					broadCastMessage(getClientSessions(), new InfoWrapper(Collections.singleton(deviceStatus)));
+				}
+			}
+		});
 	}
 }

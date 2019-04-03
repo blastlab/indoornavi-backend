@@ -9,10 +9,13 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Version implements CommandResponse {
+public class VersionCommand implements CommandResponse {
 
 	private String serial;
 	private Integer shortId;
+	private Integer minor;
+	private Integer major;
+	private String commitHash;
 
 	@Override
 	public void fromDescriptor(List<String> descriptor) {
@@ -23,6 +26,12 @@ public class Version implements CommandResponse {
 			}
 			if (key.toLowerCase().equals("did")) {
 				this.shortId = Integer.parseInt(value, 16);
+			}
+			if (key.toLowerCase().equals("fv")) {
+				String[] split = value.split("\\.");
+				this.major = Integer.valueOf(split[0]);
+				this.minor = Integer.valueOf(split[1]);
+				this.commitHash = split[2];
 			}
 		});
 	}

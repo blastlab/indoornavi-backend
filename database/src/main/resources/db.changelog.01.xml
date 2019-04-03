@@ -812,4 +812,7 @@
 			<column name="polygonInPixels" type="POLYGON"/>
 		</addColumn>
 	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-615-1">
+		<dropColumn columnName="firmwarePartition" tableName="uwb"/>
+	</changeSet>
 </databaseChangeLog>

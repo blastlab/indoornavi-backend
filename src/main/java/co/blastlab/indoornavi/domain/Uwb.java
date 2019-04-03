@@ -21,10 +21,6 @@ public class Uwb extends Device {
 
 	// firmware
 
-	@Enumerated(EnumType.ORDINAL)
-	@Column(name = "firmwarePartition")
-	private Partition partition = Partition.A;
-
 	@OneToMany(mappedBy = "owner", cascade = {CascadeType.MERGE, CascadeType.REMOVE})
 	private Set<RoutePart> route = new HashSet<>();
 
@@ -42,7 +38,7 @@ public class Uwb extends Device {
 	}
 
 	public Partition getReversedPartition() {
-		return this.partition == Partition.A ? Partition.B : Partition.A;
+		return minor % 2 == 0 ? Partition.B : Partition.A;
 	}
 
 	public enum Partition {
