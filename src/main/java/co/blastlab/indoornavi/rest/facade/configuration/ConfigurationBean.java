@@ -61,23 +61,9 @@ public class ConfigurationBean implements ConfigurationFacade {
 		PrePublishReport report = new PrePublishReport();
 		logger.debug("Checking if devices are published in a different floor");
 		configurationData.getSinks().forEach((sinkDto) -> {
-			if (configurationExtractor.isAnchorAlreadyPublishedOnDiffMap(sinkDto, floorId)) {
-				report.getItems().add(
-					new PrePublishReportItem(
-						PrePublishReportItemCode.PPRC_001,
-						ImmutableMap.of("device", sinkDto, "floor", new FloorDto(floor))
-					)
-				);
-			}
+			configurationExtractor.checkIsAnchorAlreadyPublishedOnDiffMap(sinkDto, floor, report);
 			sinkDto.getAnchors().forEach((anchorDto -> {
-				if (configurationExtractor.isAnchorAlreadyPublishedOnDiffMap(anchorDto, floorId)) {
-					report.getItems().add(
-						new PrePublishReportItem(
-							PrePublishReportItemCode.PPRC_001,
-							ImmutableMap.of("device", anchorDto, "floor", new FloorDto(floor))
-						)
-					);
-				}
+				configurationExtractor.checkIsAnchorAlreadyPublishedOnDiffMap(anchorDto, floor, report);
 			}));
 		});
 

@@ -7,11 +7,16 @@ import co.blastlab.indoornavi.dao.repository.SinkRepository;
 import co.blastlab.indoornavi.domain.*;
 import co.blastlab.indoornavi.dto.anchor.AnchorDto;
 import co.blastlab.indoornavi.dto.configuration.ConfigurationDto;
+import co.blastlab.indoornavi.dto.configuration.PrePublishReport;
+import co.blastlab.indoornavi.dto.configuration.PrePublishReportItem;
+import co.blastlab.indoornavi.dto.configuration.PrePublishReportItemCode;
 import co.blastlab.indoornavi.dto.device.DeviceDto;
+import co.blastlab.indoornavi.dto.floor.FloorDto;
 import co.blastlab.indoornavi.dto.floor.ScaleDto;
 import co.blastlab.indoornavi.dto.uwb.UwbDto;
 import co.blastlab.indoornavi.service.AreaService;
 import co.blastlab.indoornavi.service.UwbService;
+import com.google.common.collect.ImmutableMap;
 
 import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
@@ -115,13 +120,22 @@ public class ConfigurationExtractor {
 		areasOnTheFloor.forEach((area -> areaRepository.remove(area)));
 	}
 
-	public boolean isAnchorAlreadyPublishedOnDiffMap(AnchorDto anchor, Long floorId) {
+	public void checkIsAnchorAlreadyPublishedOnDiffMap(AnchorDto anchor, Floor floor, PrePublishReport report) {
+		if (this.isAnchorAlreadyPublishedOnDiffMap(anchor, floor.getId())) {
+			report.getItems().add(
+				new PrePublishReportItem(
+					PrePublishReportItemCode.PPRC_001,
+					ImmutableMap.of("device", anchor, "floor", new FloorDto(floor))
+				)
+			);
+		}
+	}
+
+	private boolean isAnchorAlreadyPublishedOnDiffMap(AnchorDto anchor, Long floorId) {
 		AtomicBoolean result = new AtomicBoolean(false);
-		anchorRepository.findOptionalByShortId(anchor.getShortId()).ifPresent(anchorEntity -> {
-			if (anchorEntity.getFloor() != null && !Objects.equals(anchorEntity.getFloor().getId(), floorId)) {
-				result.set(true);
-			}
-		});
+		anchorRepository.findOptionalByShortId(anchor.getShortId()).ifPresent(
+			anchorEntity -> result.set(anchorEntity.getFloor() != null && !Objects.equals(anchorEntity.getFloor().getId(), floorId))
+		);
 		return result.get();
 	}
 }
