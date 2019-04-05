@@ -52,6 +52,7 @@ services:
       APP_DB_USER: root
       APP_DB_PASSWORD: password
       APP_LOG_LEVEL: INFO # will log all actions taken by user and hardware communication
+      SOLVER_URL: "http://192.168.255.232:8000"
       ALGORITHM: GeoN3d
     #      ALGORITHM: Taylor
     #      ALGORITHM: GeoN2d

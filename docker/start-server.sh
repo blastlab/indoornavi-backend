@@ -4,6 +4,14 @@
 : ${APP_ENVIRONMENT:=development}
 : ${APP_DB_USER:=root}
 : ${APP_DB_PASSWORD:=password}
+: ${SOLVER_URL:='http://localhost:8000'}
+
+if [ -f /opt/jboss/wildfly/standalone/deployments/env.js ]; then
+	cd /opt/jboss/wildfly/standalone/deployments/
+	sed -i "s|http:\/\/localhost:8000|${SOLVER_URL}|" env.js
+	jar -uvf indoornavi_backend-*.war env.js
+	cd /
+fi
 
 if [ $APP_ENVIRONMENT = "development" ]; then
 	OPT_MANAGEMENT="--debug 8787 -bmanagement 0.0.0.0"
