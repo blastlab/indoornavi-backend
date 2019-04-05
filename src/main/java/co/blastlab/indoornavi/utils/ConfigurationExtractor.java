@@ -5,13 +5,19 @@ import co.blastlab.indoornavi.dao.repository.AreaRepository;
 import co.blastlab.indoornavi.dao.repository.FloorRepository;
 import co.blastlab.indoornavi.dao.repository.SinkRepository;
 import co.blastlab.indoornavi.domain.*;
+import co.blastlab.indoornavi.dto.anchor.AnchorDto;
 import co.blastlab.indoornavi.dto.configuration.ConfigurationDto;
+import co.blastlab.indoornavi.dto.device.DeviceDto;
 import co.blastlab.indoornavi.dto.floor.ScaleDto;
+import co.blastlab.indoornavi.dto.uwb.UwbDto;
 import co.blastlab.indoornavi.service.AreaService;
+import co.blastlab.indoornavi.service.UwbService;
 
 import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
 import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static co.blastlab.indoornavi.domain.Scale.scale;
 
@@ -107,5 +113,15 @@ public class ConfigurationExtractor {
 		List<Area> areasOnTheFloor = areaRepository.findByFloor(floor);
 		floor.getAreas().clear();
 		areasOnTheFloor.forEach((area -> areaRepository.remove(area)));
+	}
+
+	public boolean isAnchorAlreadyPublishedOnDiffMap(AnchorDto anchor, Long floorId) {
+		AtomicBoolean result = new AtomicBoolean(false);
+		anchorRepository.findOptionalByShortId(anchor.getShortId()).ifPresent(anchorEntity -> {
+			if (anchorEntity.getFloor() != null && !Objects.equals(anchorEntity.getFloor().getId(), floorId)) {
+				result.set(true);
+			}
+		});
+		return result.get();
 	}
 }
