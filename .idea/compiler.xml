@@ -12,7 +12,7 @@
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
-      <module name="indoornavi_backend" options="-endorseddirs C:\Users\kgebert\projects\backend\target/endorsed" />
+      <module name="indoornavi_backend" options="-endorseddirs /home/motlowski/Desktop/TestIndoornavi/frontend/backend/target/endorsed" />
     </option>
   </component>
 </project>

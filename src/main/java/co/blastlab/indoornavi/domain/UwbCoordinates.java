@@ -5,6 +5,7 @@ import lombok.Setter;
 
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
+import java.util.Date;
 
 @Entity
 @Getter
@@ -13,4 +14,5 @@ public class UwbCoordinates extends Coordinates {
 
 	@ManyToOne
 	private Tag tag;
+	private Date date;
 }

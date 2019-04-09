@@ -149,11 +149,11 @@ public class MeasuresWebSocket extends WebSocket {
 			}
 		} else if (isServerSession(session)) {
 			List<DistanceMessage> measures = objectMapper.readValue(message, new TypeReference<List<DistanceMessage>>(){});
-			handleMeasures(measures);
+			handleMeasures(measures, new Date());
 		}
 	}
 
-	private void handleMeasures(List<DistanceMessage> measures) {
+	private void handleMeasures(List<DistanceMessage> measures, Date date) {
 		logger.setId(getSessionId());
 		measures.forEach(distanceMessage -> {
 			if (isDebugMode) {
@@ -175,7 +175,7 @@ public class MeasuresWebSocket extends WebSocket {
 					if (isDebugMode) {
 						coordinatesDtoEvent.fire(coordinatesDto);
 					}
-					this.saveCoordinates(coordinatesDto, distanceMessage.getTime());
+					this.saveCoordinates(coordinatesDto, distanceMessage.getTime(), date);
 					Set<Session> sessions = this.filterSessions(coordinatesDto);
 					broadCastMessage(sessions, new CoordinatesWrapper(coordinatesDto));
 					this.sendAreaEvents(coordinatesDto);
@@ -188,7 +188,7 @@ public class MeasuresWebSocket extends WebSocket {
 		return distanceMessage.getDid1() > Short.MAX_VALUE && distanceMessage.getDid2() > Short.MAX_VALUE;
 	}
 
-	private void saveCoordinates(UwbCoordinatesDto coordinatesDto, Timestamp timestamp) {
+	private void saveCoordinates(UwbCoordinatesDto coordinatesDto, Timestamp timestamp, Date date) {
 		UwbCoordinates coordinates = new UwbCoordinates();
 		coordinates.setTag(tagRepository.findOptionalByShortId(coordinatesDto.getTagShortId()).orElseThrow(EntityNotFoundException::new));
 		coordinates.setX(coordinatesDto.getPoint().getX());
@@ -197,6 +197,7 @@ public class MeasuresWebSocket extends WebSocket {
 		coordinates.setFloor(floorRepository.findOptionalById(coordinatesDto.getFloorId()).orElseThrow(EntityNotFoundException::new));
 		Instant instant = Instant.ofEpochMilli(timestamp.getTime());
 		coordinates.setMeasurementTime(LocalDateTime.ofInstant(instant, ZoneId.systemDefault()));
+        coordinates.setDate(date);
 		coordinatesRepository.save(coordinates);
 	}
 
