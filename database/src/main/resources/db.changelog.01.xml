@@ -812,4 +812,9 @@
 			<column name="polygonInPixels" type="POLYGON"/>
 		</addColumn>
 	</changeSet>
+	<changeSet author="kgebert (generated)" id="profiler-1">
+		<addColumn tableName="UwbCoordinates">
+			<column name="arrived" type="datetime"/>
+		</addColumn>
+	</changeSet>
 </databaseChangeLog>
