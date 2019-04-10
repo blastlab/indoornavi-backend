@@ -11,7 +11,7 @@ import java.util.List;
 @Repository
 public interface UwbCoordinatesRepository extends EntityRepository<UwbCoordinates, Long> {
 
-	String REQUIRED_FIELDS = "c.id, c.creationDate, c.modificationDate, round(avg(c.x)) as x, round(avg(c.y)) as y, c.floor_id, c.measurementTime, round(avg(c.z)) as z, uc.tag_id";
+	String REQUIRED_FIELDS = "c.id, c.creationDate, c.modificationDate, round(avg(c.x)) as x, round(avg(c.y)) as y, c.floor_id, c.measurementTime, round(avg(c.z)) as z, uc.tag_id, uc.arrived";
 
 	@Query(
 		value =
