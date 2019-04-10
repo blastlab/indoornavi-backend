@@ -57,7 +57,8 @@ services:
   solver:
       build: solver
       environment:
-        - ROCKET_ENV=production
+          ROCKET_ENV: production
+          DB_URL: mysql://root:password@db:3306/navi
       ports:
         - "8000:8000"
       volumes:
