@@ -2,6 +2,8 @@ package co.blastlab.indoornavi.rest.facade.building;
 
 import co.blastlab.indoornavi.dao.repository.BuildingRepository;
 import co.blastlab.indoornavi.dao.repository.ComplexRepository;
+import co.blastlab.indoornavi.dao.repository.ConfigurationRepostiory;
+import co.blastlab.indoornavi.dao.repository.FloorRepository;
 import co.blastlab.indoornavi.domain.Building;
 import co.blastlab.indoornavi.domain.Complex;
 import co.blastlab.indoornavi.domain.Floor;
@@ -30,6 +32,12 @@ public class BuildingBean implements BuildingFacade {
 
 	@Inject
 	private FloorService floorService;
+
+	@Inject
+	private ConfigurationRepostiory configurationRepostiory;
+
+	@Inject
+	private FloorRepository floorRepository;
 
 	@Override
 	public BuildingDto create(BuildingDto building) {
@@ -83,7 +91,13 @@ public class BuildingBean implements BuildingFacade {
 	public BuildingDto.WithFloors find(Long id) {
 		Optional<Building> buildingEntity = buildingRepository.findOptionalById(id);
 		if (buildingEntity.isPresent()) {
-			return new BuildingDto.WithFloors(buildingEntity.get());
+			BuildingDto.WithFloors buildingDto = new BuildingDto.WithFloors(buildingEntity.get());
+			buildingDto.getFloors().forEach(floorDto -> {
+				floorRepository.findOptionalById(floorDto.getId()).ifPresent(floor -> {
+					floorDto.setPublished(configurationRepostiory.findTop1ByFloorAndPublishedDateIsNotNullOrderByVersionDesc(floor).isPresent());
+				});
+			});
+			return buildingDto;
 		}
 		throw new EntityNotFoundException();
 	}
