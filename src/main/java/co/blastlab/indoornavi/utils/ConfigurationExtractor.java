@@ -41,7 +41,7 @@ public class ConfigurationExtractor {
 	private AreaService areaService;
 
 	public void extractScale(ConfigurationDto.Data configuration, Floor floor) {
-		logger.debug("Trying to extract scale from configuartion");
+		logger.debug("Trying to extract scale from configuration");
 		ScaleDto scaleDto = configuration.getScale();
 		Scale scale = scale(floor.getScale())
 			.measure(scaleDto.getMeasure())
@@ -56,7 +56,7 @@ public class ConfigurationExtractor {
 	}
 
 	public void extractSinks(ConfigurationDto.Data configuration, Floor floor) {
-		logger.debug("Trying to extract sinks from configuartion ({})", configuration.getSinks().size());
+		logger.debug("Trying to extract sinks from configuration ({})", configuration.getSinks().size());
 		configuration.getSinks().forEach((sinkDto) -> {
 			Sink sink = sinkRepository.findOptionalByShortId(sinkDto.getShortId()).orElseThrow(EntityNotFoundException::new);
 			sink.setFloor(floor);
@@ -96,7 +96,7 @@ public class ConfigurationExtractor {
 			sink.setY(null);
 			sink.setZ(null);
 			sinkRepository.save(sink);
-			logger.debug("Sink reseted {}", sink);
+			logger.debug("Sink reset {}", sink);
 		}));
 	}
 
@@ -110,7 +110,7 @@ public class ConfigurationExtractor {
 			anchor.setZ(null);
 			anchor.setSink(null);
 			anchorRepository.save(anchor);
-			logger.debug("Anchor reseted {}", anchor);
+			logger.debug("Anchor reset {}", anchor);
 		}));
 	}
 
@@ -125,7 +125,7 @@ public class ConfigurationExtractor {
 			report.getItems().add(
 				new PrePublishReportItem(
 					PrePublishReportItemCode.PPRC_001,
-					ImmutableMap.of("device", anchor, "floor", new FloorDto(floor))
+					ImmutableMap.of("device", anchor, "floor", anchor.getFloor())
 				)
 			);
 		}
