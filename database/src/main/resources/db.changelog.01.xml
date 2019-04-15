@@ -814,7 +814,7 @@
 	</changeSet>
 	<changeSet author="kgebert (generated)" id="navi-623-1">
 		<addColumn tableName="Floor">
-			<column name="archived" type="bit">
+			<column name="archived" type="bit" defaultValue="false">
 				<constraints nullable="false"/>
 			</column>
 		</addColumn>
