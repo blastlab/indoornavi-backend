@@ -132,6 +132,7 @@ public class MeasuresWebSocket extends WebSocket {
 
 	@OnMessage
 	public void handleMessage(String message, Session session) throws IOException {
+    Date arrived = new Date();
 		setSessionThread(session);
 		if (isClientSession(session)) {
 			Command command = objectMapper.readValue(message, Command.class);
@@ -149,13 +150,13 @@ public class MeasuresWebSocket extends WebSocket {
 			}
 		} else if (isServerSession(session)) {
 			List<DistanceMessage> measures = objectMapper.readValue(message, new TypeReference<List<DistanceMessage>>(){});
-			handleMeasures(measures);
+			handleMeasures(measures, arrived);
 		}
 	}
 
-	private void handleMeasures(List<DistanceMessage> measures) {
+	private void handleMeasures(List<DistanceMessage> measures, Date arrived) {
 		logger.setId(getSessionId());
-		Date arrived = new Date();
+
 		measures.forEach(distanceMessage -> {
 			if (isDebugMode) {
 				distanceMessageEvent.fire(distanceMessage);
