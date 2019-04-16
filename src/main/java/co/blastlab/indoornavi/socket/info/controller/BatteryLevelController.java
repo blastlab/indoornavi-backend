@@ -57,13 +57,13 @@ public class BatteryLevelController extends WebSocketCommunication {
 	@PostConstruct
 	private void init() {
 		logger.trace("Creating timer for battery level controller");
-		timerService.createIntervalTimer(0, 100, new TimerConfig());
+		timerService.createIntervalTimer(0, 100, new TimerConfig(null, false));
 	}
 
 	public void updateBatteryLevel(BatteryLevel batteryLevel) {
 		LevelAndTime levelAndTime = new LevelAndTime(batteryLevel, new Date());
 		batteryLevelMapping.put(batteryLevel.getDeviceShortId(), levelAndTime);
-		broadCastMessage(infoWebSocket.getClientSessions(), new BatteryLevelsWrapper(Collections.singletonList(levelAndTime.getBatteryLevel())));
+		broadCastMessage(infoWebSocket.getFrontendSessions(), new BatteryLevelsWrapper(Collections.singletonList(levelAndTime.getBatteryLevel())));
 	}
 
 	/**
@@ -117,7 +117,7 @@ public class BatteryLevelController extends WebSocketCommunication {
 						info.setArgs(statusRequest);
 						broadCastMessage(Collections.singleton(sinkSession), objectMapper.writeValueAsString(Collections.singleton(info)));
 					} else {
-						broadCastMessage(infoWebSocket.getClientSessions(), new CommandErrorWrapper("BLC_002", sinkShortIdOptional.get()));
+						broadCastMessage(infoWebSocket.getFrontendSessions(), new CommandErrorWrapper("BLC_002", sinkShortIdOptional.get()));
 					}
 				}
 			} catch (JsonProcessingException e) {
@@ -125,7 +125,7 @@ public class BatteryLevelController extends WebSocketCommunication {
 				CommandErrorWrapper commandError = sinkShortIdOptional
 					.map(shortId -> new CommandErrorWrapper("BLC_001", shortId))
 					.orElseGet(() -> new CommandErrorWrapper("BLC_001"));
-				broadCastMessage(infoWebSocket.getClientSessions(), commandError);
+				broadCastMessage(infoWebSocket.getFrontendSessions(), commandError);
 			} finally {
 				iterator.remove();
 			}
@@ -135,7 +135,7 @@ public class BatteryLevelController extends WebSocketCommunication {
 	private Optional<Integer> getSinkShortIdForTag(Integer tagShortId) {
 		Optional<Integer> sinkShortId = coordinatesCalculator.findSinkForTag(tagShortId);
 		if (!sinkShortId.isPresent()) {
-			broadCastMessage(infoWebSocket.getClientSessions(), new CommandErrorWrapper("BLC_004", tagShortId));
+			broadCastMessage(infoWebSocket.getFrontendSessions(), new CommandErrorWrapper("BLC_004", tagShortId));
 		}
 		return sinkShortId;
 	}
@@ -149,7 +149,7 @@ public class BatteryLevelController extends WebSocketCommunication {
 				sinkShortIdOptional = Optional.of(anchor.getShortId());
 			} else {
 				if (anchor.getSink() == null) {
-					broadCastMessage(infoWebSocket.getClientSessions(), new CommandErrorWrapper("BLC_003", anchor.getShortId()));
+					broadCastMessage(infoWebSocket.getFrontendSessions(), new CommandErrorWrapper("BLC_003", anchor.getShortId()));
 				} else {
 					sinkShortIdOptional = Optional.of(anchor.getSink().getShortId());
 				}

@@ -47,7 +47,6 @@ import org.apache.commons.codec.binary.Hex;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
-import javax.ejb.Timer;
 import javax.ejb.*;
 import javax.enterprise.concurrent.ManagedExecutorService;
 import javax.inject.Inject;
@@ -77,6 +76,9 @@ public class InfoWebSocket extends WebSocket {
 
 	@Inject
 	private Logger logger;
+
+	// this logger is used by callback executed by timer outside the context
+	private Logger loggerNoCDI = new Logger();
 
 	/*
 		Error codes and explanation:
@@ -122,23 +124,23 @@ public class InfoWebSocket extends WebSocket {
 
 	// key: thread id, value: session id
 	private Map<Long, String> threadIdToSessionId = Collections.synchronizedMap(new HashMap<>());
-	private static Set<Session> clientSessions = Collections.synchronizedSet(new HashSet<>());
+	private static Set<Session> frontendSessions = Collections.synchronizedSet(new HashSet<>());
 
 	// key: sink shortId, value: session
-	private static Map<Integer, Session> serverSessions = Collections.synchronizedMap(new HashMap<>());
+	private static Map<Integer, Session> sinkSessions = Collections.synchronizedMap(new HashMap<>());
 
 	private ObjectMapper objectMapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
 	public void assignSinkShortIdToSession(Session session, Integer shortId) {
-		serverSessions.put(shortId, session);
+		sinkSessions.put(shortId, session);
 	}
 
 	public Session getSinkSession(Integer sinkShortId) {
-		return serverSessions.get(sinkShortId);
+		return sinkSessions.get(sinkShortId);
 	}
 
 	public Optional<Integer> getSinkShortIdBySession(Session session) {
-		Integer[] keys = serverSessions.entrySet()
+		Integer[] keys = sinkSessions.entrySet()
 			.stream()
 			.filter(entry -> Objects.equals(entry.getValue().getId(), session.getId()))
 			.map(Map.Entry::getKey).distinct().toArray(Integer[]::new);
@@ -146,13 +148,13 @@ public class InfoWebSocket extends WebSocket {
 	}
 
 	@Override
-	public Set<Session> getClientSessions() {
-		return clientSessions;
+	public Set<Session> getFrontendSessions() {
+		return frontendSessions;
 	}
 
 	@Override
-	protected Set<Session> getServerSessions() {
-		return new HashSet<>(serverSessions.values());
+	protected Set<Session> getSinkSessions() {
+		return new HashSet<>(sinkSessions.values());
 	}
 
 	@Override
@@ -163,14 +165,12 @@ public class InfoWebSocket extends WebSocket {
 	@PostConstruct
 	void init() {
 		logger.trace("Creating interval timer");
-		TimerConfig timerConfig = new TimerConfig();
-		timerConfig.setPersistent(false);
-		timerService.createIntervalTimer(0, OUTDATED_DEVICE_STATUS_MILISECONDS, timerConfig);
+		timerService.createIntervalTimer(0, OUTDATED_DEVICE_STATUS_MILISECONDS, new TimerConfig(null, false));
 	}
 
 	@Timeout
-	public void updateStatuses(Timer timer) {
-		logger.trace("Updating device statuses");
+	public void updateStatuses() {
+		loggerNoCDI.trace("Updating device statuses");
 		networkController.getNetworks().forEach(network -> {
 			for (DeviceStatus anchorStatus : network.getAnchors()) {
 				checkOutdatedDeviceStatus(anchorStatus);
@@ -179,7 +179,7 @@ public class InfoWebSocket extends WebSocket {
 				checkOutdatedDeviceStatus(tagStatus);
 			}
 		});
-		getClientSessions().forEach(this::sendInfoAboutConnectedDevices);
+		getFrontendSessions().forEach(this::sendInfoAboutConnectedDevices);
 	}
 
 	@OnOpen
@@ -203,7 +203,7 @@ public class InfoWebSocket extends WebSocket {
 		setSessionThread(session);
 		logger.setId(getSessionId());
 
-		if (isServerSession(session)) {
+		if (isSinkSession(session)) {
 			logger.trace("Received message from server {}", message);
 			List<Info> infos = objectMapper.readValue(message, new TypeReference<List<Info>>() {});
 			for (Info info : infos) {
@@ -233,7 +233,7 @@ public class InfoWebSocket extends WebSocket {
 					}
 				});
 			}
-		} else if (isClientSession(session)) {
+		} else if (isFrontendSession(session)) {
 			logger.trace("[{}] Received message from client {}", getSessionId(), message);
 			ClientRequest clientRequest = objectMapper.readValue(message, ClientRequest.class);
 			switch (clientRequest.getType()) {
@@ -282,7 +282,7 @@ public class InfoWebSocket extends WebSocket {
 		newDeviceOptional.ifPresent(
 			deviceStatus ->
 				broadCastMessage(
-					getClientSessions(),
+					getFrontendSessions(),
 					new InfoWrapper(Collections.singleton(deviceStatus)),
 					() -> sendErrorCode("IWS_010")
 				)
@@ -535,7 +535,7 @@ public class InfoWebSocket extends WebSocket {
 						if (deviceStatusOptional.isPresent()) {
 							DeviceStatus deviceStatus = deviceStatusOptional.get();
 							deviceStatus.setStatus(DeviceStatus.Status.ONLINE);
-							broadCastMessage(getClientSessions(), new InfoWrapper(Collections.singleton(deviceStatus)));
+							broadCastMessage(getFrontendSessions(), new InfoWrapper(Collections.singleton(deviceStatus)));
 							sendErrorCode(updateInfoCodeType.equals(UpdateInfoCodeType.ABORTED) ? "IWS_009" : "IWS_013", deviceStatus);
 						}
 					}
@@ -586,7 +586,7 @@ public class InfoWebSocket extends WebSocket {
 						deviceStatus.getUpdateFinished().get(AFTER_UPDATE_WAIT_TIME_SECONDS, TimeUnit.SECONDS);
 
 						deviceStatus.setStatus(DeviceStatus.Status.UPDATED);
-						broadCastMessage(getClientSessions(), new InfoWrapper(Collections.singleton(deviceStatus)));
+						broadCastMessage(getFrontendSessions(), new InfoWrapper(Collections.singleton(deviceStatus)));
 						deviceStatus.setStatus(DeviceStatus.Status.ONLINE);
 						deviceStatus.setLastTimeUpdated(new Date());
 
@@ -794,6 +794,6 @@ public class InfoWebSocket extends WebSocket {
 		}
 		InfoErrorWrapper infoErrorWrapper;
 		infoErrorWrapper = Optional.ofNullable(deviceStatus).map(ds -> new InfoErrorWrapper(code, ds)).orElseGet(() -> new InfoErrorWrapper(code));
-		broadCastMessage(getClientSessions(), infoErrorWrapper);
+		broadCastMessage(getFrontendSessions(), infoErrorWrapper);
 	}
 }

@@ -4,7 +4,7 @@ services:
   db:
     image: indoornavi.azurecr.io/db
     ports:
-      - '3306:3306'
+    - '3306:3306'
     restart: always
     environment:
       MYSQL_DATABASE: navi
@@ -13,12 +13,17 @@ services:
     container_name:
       db
     volumes:
-      - dbvolume:/var/lib/mysql
+    - dbvolume:/var/lib/mysql
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1g"
+        max-file: "5"
 
   liquibase:
     image: indoornavi.azurecr.io/liquibase
     ports:
-      - '2306:80'
+    - '2306:80'
     restart: always
     environment:
       HOST: db
@@ -32,25 +37,38 @@ services:
   indoornavi:
     image: indoornavi.azurecr.io/indoornavi
     container_name:
-      indoornavi
+      indoornavi_test
     ports:
-      - '90:8080'
-      - '8787:8787'
-      - '9990:9990'
+    - '90:8080'
+    - '8787:8787'
+    - '9990:9990'
     restart: always
     depends_on:
-      - db
+    - db
     environment:
       TZ: Europe/Warsaw
       APP_ENVIRONMENT: production
       APP_DB_HOST: db
       APP_DB_USER: root
       APP_DB_PASSWORD: password
-      APP_LOG_LEVEL: TRACE # will log all actions taken by user and hardware communication
-#      APP_LOG_LEVEL: DEBUG # will log all actions taken by user
-#      APP_LOG_LEVEL: INFO # will only log most important messages
+      APP_LOG_LEVEL: INFO # will log all actions taken by user and hardware communication
+      ALGORITHM: GeoN3d
+    #      ALGORITHM: Taylor
+    #      ALGORITHM: GeoN2d
+    #      APP_LOG_LEVEL: DEBUG # will log all actions taken by user
+    #      APP_LOG_LEVEL: INFO # will only log most important messages
     entrypoint: ["wait-for-it", "liquibase:80", "-t", "0", "--", "/start-server.sh"]
-
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1g"
+        max-file: "5"
+  solver:
+    image: indoornavi.azurecr.io/solver
+    environment:
+    - ROCKET_ENV=production
+    ports:
+    - "8000:8000"
 volumes:
   # For Liquibase container.
   m2:

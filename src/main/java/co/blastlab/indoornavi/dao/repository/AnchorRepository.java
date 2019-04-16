@@ -23,4 +23,7 @@ public interface AnchorRepository extends EntityRepository<Anchor, Long> {
 
 	List<Anchor> findByFloor(Floor floor);
 
+	@Query(named = Anchor.BY_SHORT_ID_IN)
+	List<Anchor> findByShortIdIn(List<Integer> shortIds);
+
 }
