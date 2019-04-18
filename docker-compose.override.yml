@@ -57,6 +57,8 @@ services:
       - m2:/root/.m2
     container_name:
       core_compiler
+
+
   solver:
       build: solver
       environment:
