@@ -15,6 +15,7 @@ import co.blastlab.indoornavi.socket.bridge.AnchorPositionBridge;
 import co.blastlab.indoornavi.socket.bridge.SinkAnchorsDistanceBridge;
 import co.blastlab.indoornavi.socket.bridge.UnrecognizedDeviceException;
 import co.blastlab.indoornavi.socket.filters.*;
+import co.blastlab.indoornavi.socket.measures.model.MeasuresPackage;
 import co.blastlab.indoornavi.socket.wrappers.AnchorsWrapper;
 import co.blastlab.indoornavi.socket.wrappers.AreaEventWrapper;
 import co.blastlab.indoornavi.socket.wrappers.CoordinatesWrapper;
@@ -40,9 +41,9 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-@ServerEndpoint("/measures")
+@ServerEndpoint("/measuresProto")
 @Singleton
-public class MeasuresWebSocket extends WebSocket {
+public class MeasuresWebSocketProto extends WebSocket {
 
 	private final static String EMULATOR = "emulator";
 
@@ -143,50 +144,42 @@ public class MeasuresWebSocket extends WebSocket {
 	}
 
 	@OnMessage
-	public void handleMessage(String message, Session session) throws IOException {
-//		MeasuresPackage.Measures measuress = MeasuresPackage.Measures.parseFrom(message);
-//		List<MeasuresPackage.Measures.Measure> measuresList = measuress.getMeasuresList();
-//		measuresList.forEach(measure -> {
-//			measure.
-//		});
+	public void handleMessage(byte[] message, Session session) throws IOException {
+		long start = System.nanoTime();
+		MeasuresPackage.Measures measuress = MeasuresPackage.Measures.parseFrom(message);
+		List<MeasuresPackage.Measures.Measure> measuresList = measuress.getMeasuresList();
+		logger.debug("Parsing to list took: {}ms", TimeUnit.MILLISECONDS.convert(System.nanoTime() - start, TimeUnit.NANOSECONDS));
 		setSessionThread(session);
 		if (isFrontendSession(session)) {
 			Command command = objectMapper.readValue(message, Command.class);
 			logger.setId(getSessionId()).trace("Received command: {}", command);
 			if (Command.Type.TOGGLE_TAG.equals(command.getType())) {
 				activeFilters.get(FilterType.TAG).update(session, objectMapper.readValue(command.getArgs(), Integer.class));
-			} else if (Command.Type.SET_FLOOR.equals(command.getType())) {
+			}
+			else if (Command.Type.SET_FLOOR.equals(command.getType())) {
 				activeFilters.get(FilterType.FLOOR).update(session, objectMapper.readValue(command.getArgs(), Long.class));
-			} else if (Command.Type.SET_TAGS.equals(command.getType())) {
+			}
+			else if (Command.Type.SET_TAGS.equals(command.getType())) {
 				for (Integer tagId : objectMapper.readValue(command.getArgs(), Integer[].class)) {
 					activeFilters.get(FilterType.TAG).update(session, tagId);
 				}
 			}
 		} else if (isSinkSession(session) || isEmulatorSession(session)) {
-			long start = System.nanoTime();
-			List<DistanceMessage> measures = objectMapper.readValue(message, new TypeReference<List<DistanceMessage>>() {});
-			logger.debug("Parsing to json took: {}ms", TimeUnit.MILLISECONDS.convert(System.nanoTime() - start, TimeUnit.NANOSECONDS));
-			handleMeasures(measures);
+
+//			List<DistanceMessage> measures = objectMapper.readValue(message, new TypeReference<List<DistanceMessage>>(){});
+
+			handleMeasures(measuresList);
 		}
 	}
 
-	private void handleMeasures(List<DistanceMessage> measures) {
+	private void handleMeasures(List<MeasuresPackage.Measures.Measure> measures) {
 		logger.setId(getSessionId());
 		long start = System.nanoTime();
 		measures.forEach(distanceMessage -> {
 			if (isDebugMode) {
-				distanceMessageEvent.fire(distanceMessage);
+//				distanceMessageEvent.fire(distanceMessage);
 			}
 			logger.trace("Will analyze distance message: {}", distanceMessage);
-//			if (bothDevicesAreAnchors(distanceMessage)) {
-//				try {
-//					logger.trace("Distance message is about two anchors. Transfering it to wizard bridges.");
-//					sinkAnchorsDistanceBridge.addDistance(distanceMessage.getDid1(), distanceMessage.getDid2(), distanceMessage.getDist());
-//					anchorPositionBridge.addDistance(distanceMessage.getDid1(), distanceMessage.getDid2(), distanceMessage.getDist());
-//				} catch (UnrecognizedDeviceException unrecognizedDevice) {
-//					unrecognizedDevice.printStackTrace();
-//				}
-//			} else {
 			logger.trace("Trying to calculate coordinates");
 			Optional<UwbCoordinatesDto> coords = coordinatesCalculator.calculateTagPosition(distanceMessage.getDid1(), distanceMessage.getDid2(), distanceMessage.getDist());
 			coords.ifPresent(coordinatesDto -> {
@@ -198,7 +191,6 @@ public class MeasuresWebSocket extends WebSocket {
 				broadCastMessage(sessions, new CoordinatesWrapper(coordinatesDto));
 				this.sendAreaEvents(coordinatesDto);
 			});
-//			}
 		});
 		logger.debug("Measures for each took: {}ms. Measures count: {}", TimeUnit.MILLISECONDS.convert(System.nanoTime() - start, TimeUnit.NANOSECONDS));
 	}
@@ -207,21 +199,20 @@ public class MeasuresWebSocket extends WebSocket {
 		return distanceMessage.getDid1() > Short.MAX_VALUE && distanceMessage.getDid2() > Short.MAX_VALUE;
 	}
 
-	private void saveCoordinates(UwbCoordinatesDto coordinatesDto, Timestamp timestamp) {
+	private void saveCoordinates(UwbCoordinatesDto coordinatesDto, Long time) {
 		UwbCoordinates coordinates = new UwbCoordinates();
 		coordinates.setTag(tagRepository.findOptionalByShortId(coordinatesDto.getTagShortId()).orElseThrow(EntityNotFoundException::new));
 		coordinates.setX(coordinatesDto.getPoint().getX());
 		coordinates.setY(coordinatesDto.getPoint().getY());
 		coordinates.setZ(coordinatesDto.getPoint().getZ());
 		coordinates.setFloor(floorRepository.findOptionalById(coordinatesDto.getFloorId()).orElseThrow(EntityNotFoundException::new));
-		Instant instant = Instant.ofEpochMilli(timestamp.getTime());
-		coordinates.setMeasurementTime(LocalDateTime.ofInstant(instant, ZoneId.systemDefault()));
+//		coordinates.setMeasurementTime(LocalDateTime.of);
 		coordinatesRepository.save(coordinates);
 	}
 
 	private Set<Session> filterSessions(UwbCoordinatesDto coordinatesDto) {
 		Set<Session> sessions = frontendSessions;
-		for (Map.Entry<FilterType, Filter> filterEntry : activeFilters.entrySet()) {
+		for(Map.Entry<FilterType, Filter> filterEntry : activeFilters.entrySet()) {
 			if (FilterType.TAG.equals(filterEntry.getKey())) {
 				sessions = filterEntry.getValue().filter(sessions, coordinatesDto.getTagShortId());
 			} else if (FilterType.FLOOR.equals(filterEntry.getKey())) {
