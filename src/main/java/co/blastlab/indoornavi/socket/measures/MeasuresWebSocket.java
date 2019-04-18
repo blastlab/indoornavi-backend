@@ -193,10 +193,10 @@ public class MeasuresWebSocket extends WebSocket {
 				if (isDebugMode) {
 					coordinatesDtoEvent.fire(coordinatesDto);
 				}
-				this.saveCoordinates(coordinatesDto, distanceMessage.getTime());
+				//this.saveCoordinates(coordinatesDto, distanceMessage.getTime());
 				Set<Session> sessions = this.filterSessions(coordinatesDto);
 				broadCastMessage(sessions, new CoordinatesWrapper(coordinatesDto));
-				this.sendAreaEvents(coordinatesDto);
+				//this.sendAreaEvents(coordinatesDto);
 			});
 //			}
 		});
