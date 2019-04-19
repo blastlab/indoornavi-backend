@@ -164,7 +164,7 @@ public class MeasuresWebSocket extends WebSocket {
 				broadCastMessage(sessions, new CoordinatesWrapper(coordinatesDto));
 			});
 		});
-		logger.debug("Measures for each took: {}ms. Measures count: {}", TimeUnit.MILLISECONDS.convert(System.nanoTime() - start, TimeUnit.NANOSECONDS));
+		logger.debug("Measures for each took: {}ms. Measures count: {}", TimeUnit.MILLISECONDS.convert(System.nanoTime() - start, TimeUnit.NANOSECONDS),measures.size());
 	}
 
 	private Set<Session> filterSessions(UwbCoordinatesDto coordinatesDto) {
