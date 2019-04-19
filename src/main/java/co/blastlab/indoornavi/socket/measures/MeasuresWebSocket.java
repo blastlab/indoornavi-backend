@@ -18,6 +18,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.ejb.Asynchronous;
 import javax.ejb.Singleton;
 import javax.enterprise.event.Event;
 import javax.enterprise.event.Observes;
@@ -139,6 +140,7 @@ public class MeasuresWebSocket extends WebSocket {
 		}
 	}
 
+	@Asynchronous
 	public void onAreaEventListGenerated(@Observes List<AreaEvent> areaEvents) {
 		for (AreaEvent event : areaEvents) {
 			broadCastMessage(this.getFrontendSessions(), new AreaEventWrapper(event));
