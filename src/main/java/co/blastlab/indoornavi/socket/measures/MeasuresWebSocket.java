@@ -5,6 +5,7 @@ import co.blastlab.indoornavi.dao.repository.TagRepository;
 import co.blastlab.indoornavi.dto.anchor.AnchorDto;
 import co.blastlab.indoornavi.dto.report.UwbCoordinatesDto;
 import co.blastlab.indoornavi.dto.tag.TagDto;
+import co.blastlab.indoornavi.rest.facade.debug.DebugBean;
 import co.blastlab.indoornavi.socket.WebSocket;
 import co.blastlab.indoornavi.socket.area.AreaEvent;
 import co.blastlab.indoornavi.socket.filters.*;
@@ -145,6 +146,14 @@ public class MeasuresWebSocket extends WebSocket {
 		}
 	}
 
+	/**
+	 * distanceMessage is fired to
+	 * @see DebugBean#rawMeasureEndpoint
+	 * coordinatesDto is fired to
+	 * @see DatabaseExecutor#afterCalculationDone
+	 * and
+	 * @see DebugBean#calculatedCoordinatesEndpoint
+	 */
 	private void handleMeasures(List<DistanceMessage> measures) {
 		logger.setId(getSessionId());
 		long start = System.nanoTime();
