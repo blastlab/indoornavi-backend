@@ -19,6 +19,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.ejb.Asynchronous;
 import javax.ejb.Singleton;
 import javax.enterprise.event.Event;
 import javax.enterprise.event.Observes;
@@ -140,6 +141,7 @@ public class MeasuresWebSocket extends WebSocket {
 		}
 	}
 
+	@Asynchronous
 	public void onAreaEventListGenerated(@Observes List<AreaEvent> areaEvents) {
 		for (AreaEvent event : areaEvents) {
 			broadCastMessage(this.getFrontendSessions(), new AreaEventWrapper(event));
@@ -171,7 +173,7 @@ public class MeasuresWebSocket extends WebSocket {
 				broadCastMessage(sessions, new CoordinatesWrapper(coordinatesDto));
 			});
 		});
-		logger.debug("Measures for each took: {}ms. Measures count: {}", TimeUnit.MILLISECONDS.convert(System.nanoTime() - start, TimeUnit.NANOSECONDS));
+		logger.debug("Measures for each took: {}ms. Measures count: {}", TimeUnit.MILLISECONDS.convert(System.nanoTime() - start, TimeUnit.NANOSECONDS),measures.size());
 	}
 
 	private Set<Session> filterSessions(UwbCoordinatesDto coordinatesDto) {

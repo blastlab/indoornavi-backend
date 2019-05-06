@@ -9,6 +9,7 @@ import co.blastlab.indoornavi.socket.area.AreaEvent;
 import co.blastlab.indoornavi.socket.area.AreaEventController;
 import co.blastlab.indoornavi.socket.wrappers.AreaEventWrapper;
 
+import javax.ejb.Asynchronous;
 import javax.ejb.Stateless;
 import javax.enterprise.event.Event;
 import javax.enterprise.event.Observes;
@@ -33,6 +34,7 @@ public class DatabaseExecutor {
 	@Inject
 	private Event<List<AreaEvent>> areaEventSender;
 
+	@Asynchronous
 	public void afterCalculationDone(@Observes UwbCoordinatesDto uwbCoordinatesDto) {
 		this.saveCoordinates(uwbCoordinatesDto);
 		this.sendAreaEvents(uwbCoordinatesDto);
