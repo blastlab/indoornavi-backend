@@ -53,22 +53,20 @@ public class Storage {
 		return minTimestamp;
 	}
 
-	public void setConnection(int tagId, int anchorId, double distance) {
-		long now = new Date().getTime();
-
+	public void setConnection(int tagId, int anchorId, double distance, long measurementTime) {
 		if (measures.containsKey(tagId)) {
 			Map<Integer, PolyMeasure> anchorsMeasures = measures.get(tagId);
 			if (anchorsMeasures.containsKey(anchorId)) {
 				List<Measure> measures = anchorsMeasures.get(anchorId).getMeasures();
-				anchorsMeasures.get(anchorId).setPoly(calculatePoly(measures, now));
-				anchorsMeasures.get(anchorId).setPolyCalculationTimestamp(now);
-				measures.add(new Measure(distance, now));
+				anchorsMeasures.get(anchorId).setPoly(calculatePoly(measures, measurementTime));
+				anchorsMeasures.get(anchorId).setPolyCalculationTimestamp(measurementTime);
+				measures.add(new Measure(distance, measurementTime));
 			} else {
-				anchorsMeasures.put(anchorId, new PolyMeasure(new LinkedList<>(Collections.singletonList(new Measure(distance, now))), new double[]{distance}, now));
+				anchorsMeasures.put(anchorId, new PolyMeasure(new LinkedList<>(Collections.singletonList(new Measure(distance, measurementTime))), new double[]{distance}, measurementTime));
 			}
 		} else {
 			Map<Integer, PolyMeasure> anchorsMeasures = new LinkedHashMap<>();
-			anchorsMeasures.put(anchorId, new PolyMeasure(new LinkedList<>(Collections.singletonList(new Measure(distance, now))), new double[]{distance}, now));
+			anchorsMeasures.put(anchorId, new PolyMeasure(new LinkedList<>(Collections.singletonList(new Measure(distance, measurementTime))), new double[]{distance}, measurementTime));
 			measures.put(tagId, anchorsMeasures);
 		}
 	}

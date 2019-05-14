@@ -27,8 +27,10 @@ import javax.inject.Inject;
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @ServerEndpoint("/measures")
@@ -134,9 +136,7 @@ public class MeasuresWebSocket extends WebSocket {
 				}
 			}
 		} else if (isSinkSession(session) || isEmulatorSession(session)) {
-			long start = System.nanoTime();
 			List<DistanceMessage> measures = objectMapper.readValue(message, new TypeReference<List<DistanceMessage>>() {});
-			logger.debug("Parsing to json took: {}ms", TimeUnit.MILLISECONDS.convert(System.nanoTime() - start, TimeUnit.NANOSECONDS));
 			handleMeasures(measures);
 		}
 	}
@@ -158,22 +158,25 @@ public class MeasuresWebSocket extends WebSocket {
 	 */
 	private void handleMeasures(List<DistanceMessage> measures) {
 		logger.setId(getSessionId());
-		long start = System.nanoTime();
+
 		measures.forEach(distanceMessage -> {
 			if (isDebugMode) {
 				distanceMessageEvent.fire(distanceMessage);
 			}
 			logger.trace("Will analyze distance message: {}", distanceMessage);
 			logger.trace("Trying to calculate coordinates");
-			Optional<UwbCoordinatesDto> coords = coordinatesCalculator.calculateTagPosition(distanceMessage.getDid1(), distanceMessage.getDid2(), distanceMessage.getDist());
+
+			Optional<UwbCoordinatesDto> coords = coordinatesCalculator.calculateTagPosition(distanceMessage);
+
 			coords.ifPresent(coordinatesDto -> {
+				Instant instant = Instant.ofEpochMilli(distanceMessage.getTime().getTime());
+				coordinatesDto.setMeasurementTime(LocalDateTime.ofInstant(instant, ZoneId.systemDefault()));
 				coordinatesDtoEvent.fire(coordinatesDto);
 
 				Set<Session> sessions = this.filterSessions(coordinatesDto);
 				broadCastMessage(sessions, new CoordinatesWrapper(coordinatesDto));
 			});
 		});
-		logger.debug("Measures for each took: {}ms. Measures count: {}", TimeUnit.MILLISECONDS.convert(System.nanoTime() - start, TimeUnit.NANOSECONDS),measures.size());
 	}
 
 	private Set<Session> filterSessions(UwbCoordinatesDto coordinatesDto) {
