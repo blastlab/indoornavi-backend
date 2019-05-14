@@ -43,14 +43,7 @@ public class ConfigurationExtractor {
 	public void extractScale(ConfigurationDto.Data configuration, Floor floor) {
 		logger.debug("Trying to extract scale from configuration");
 		ScaleDto scaleDto = configuration.getScale();
-		Scale scale = scale(floor.getScale())
-			.measure(scaleDto.getMeasure())
-			.distance(scaleDto.getRealDistance())
-			.startX(scaleDto.getStart().getX())
-			.startY(scaleDto.getStart().getY())
-			.stopX(scaleDto.getStop().getX())
-			.stopY(scaleDto.getStop().getY());
-		floor.setScale(scale);
+		floor.setScaleFromDto(scaleDto);
 		floorRepository.save(floor);
 		logger.debug("Scale saved {}", scaleDto);
 	}

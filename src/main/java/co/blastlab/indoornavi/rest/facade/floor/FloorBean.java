@@ -60,8 +60,9 @@ public class FloorBean implements FloorFacade {
 	public FloorDto update(Long id, FloorDto floor) {
 		logger.debug("Trying to update floor {}", floor);
 		Floor floorEntity = floorRepository.findOptionalById(id).orElseThrow(EntityNotFoundException::new);
-		floorEntity.setLevel(floor.getLevel());
 		floorEntity.setName(floor.getName());
+		floorEntity.setArchived(floor.isArchived());
+		floorEntity.setLevel(floor.isArchived() ? null : floor.getLevel());
 		Floor floorDb = floorRepository.save(floorEntity);
 		logger.debug("Floor updated");
 		return new FloorDto(floorDb);
@@ -84,14 +85,7 @@ public class FloorBean implements FloorFacade {
 	public FloorDto setScale(Long id, ScaleDto scaleDto) {
 		logger.debug("Trying to set scale {} to floor id {}", scaleDto, id);
 		Floor floor = floorRepository.findOptionalById(id).orElseThrow(EntityNotFoundException::new);
-		Scale scale = scale(floor.getScale())
-			.measure(scaleDto.getMeasure())
-			.distance(scaleDto.getRealDistance())
-			.startX(scaleDto.getStart().getX())
-			.startY(scaleDto.getStart().getY())
-			.stopX(scaleDto.getStop().getX())
-			.stopY(scaleDto.getStop().getY());
-		floor.setScale(scale);
+		floor.setScaleFromDto(scaleDto);
 		floor = floorRepository.save(floor);
 		logger.debug("Scale set");
 		return new FloorDto(floor);

@@ -43,8 +43,11 @@ import java.util.stream.Collectors;
 @Singleton
 public class MeasuresWebSocket extends WebSocket {
 
-	private static Set<Session> clientSessions = Collections.synchronizedSet(new HashSet<>());
-	private static Set<Session> serverSessions = Collections.synchronizedSet(new HashSet<>());
+	private final static String EMULATOR = "emulator";
+
+	private static Set<Session> frontendSessions = Collections.synchronizedSet(new HashSet<>());
+	private static Set<Session> sinkSessions = Collections.synchronizedSet(new HashSet<>());
+	private static Set<Session> emulatorSessions = Collections.synchronizedSet(new HashSet<>());
 	// key: thread id, value: session id
 	private Map<Long, String> threadIdToSessionId = Collections.synchronizedMap(new HashMap<>());
 
@@ -90,34 +93,42 @@ public class MeasuresWebSocket extends WebSocket {
 
 	private Map<FilterType, Filter> activeFilters = new HashMap<>();
 
+	private boolean isEmulatorSession(Session session) {
+		return session.getRequestParameterMap().containsKey(EMULATOR);
+	}
+
 	@OnOpen
 	public void open(Session session) {
 		super.open(session, () -> {
 			List<TagDto> tags = tagRepository.findAll().stream().map(TagDto::new).collect(Collectors.toList());
 			TagsWrapper tagsWrapper = new TagsWrapper(tags);
-			broadCastMessage(clientSessions, tagsWrapper);
+			broadCastMessage(frontendSessions, tagsWrapper);
 
 			activeFilters.putIfAbsent(FilterType.FLOOR, new FloorFilter());
 			activeFilters.putIfAbsent(FilterType.TAG, new TagFilter());
-		}, () -> {
+		}, () -> { });
+
+		if (isEmulatorSession(session)) {
+			emulatorSessions.add(session);
 			List<AnchorDto> anchors = anchorRepository.findAll().stream().map(AnchorDto::new).collect(Collectors.toList());
-			broadCastMessage(serverSessions, new AnchorsWrapper(anchors));
-		});
+			broadCastMessage(emulatorSessions, new AnchorsWrapper(anchors));
+		}
 	}
 
 	@OnClose
 	public void close(Session session) {
 		super.close(session);
+		emulatorSessions.remove(session);
 	}
 
 	@Override
-	protected Set<Session> getClientSessions() {
-		return clientSessions;
+	protected Set<Session> getFrontendSessions() {
+		return frontendSessions;
 	}
 
 	@Override
-	protected Set<Session> getServerSessions() {
-		return serverSessions;
+	protected Set<Session> getSinkSessions() {
+		return sinkSessions;
 	}
 
 	@Override
@@ -133,7 +144,7 @@ public class MeasuresWebSocket extends WebSocket {
 	@OnMessage
 	public void handleMessage(String message, Session session) throws IOException {
 		setSessionThread(session);
-		if (isClientSession(session)) {
+		if (isFrontendSession(session)) {
 			Command command = objectMapper.readValue(message, Command.class);
 			logger.setId(getSessionId()).trace("Received command: {}", command);
 			if (Command.Type.TOGGLE_TAG.equals(command.getType())) {
@@ -147,7 +158,7 @@ public class MeasuresWebSocket extends WebSocket {
 					activeFilters.get(FilterType.TAG).update(session, tagId);
 				}
 			}
-		} else if (isServerSession(session)) {
+		} else if (isSinkSession(session) || isEmulatorSession(session)) {
 			List<DistanceMessage> measures = objectMapper.readValue(message, new TypeReference<List<DistanceMessage>>(){});
 			handleMeasures(measures);
 		}
@@ -201,7 +212,7 @@ public class MeasuresWebSocket extends WebSocket {
 	}
 
 	private Set<Session> filterSessions(UwbCoordinatesDto coordinatesDto) {
-		Set<Session> sessions = clientSessions;
+		Set<Session> sessions = frontendSessions;
 		for(Map.Entry<FilterType, Filter> filterEntry : activeFilters.entrySet()) {
 			if (FilterType.TAG.equals(filterEntry.getKey())) {
 				sessions = filterEntry.getValue().filter(sessions, coordinatesDto.getTagShortId());
@@ -215,7 +226,7 @@ public class MeasuresWebSocket extends WebSocket {
 	private void sendAreaEvents(UwbCoordinatesDto coordinatesDto) {
 		List<AreaEvent> events = areaEventController.checkCoordinates(coordinatesDto);
 		for (AreaEvent event : events) {
-			broadCastMessage(this.getClientSessions(), new AreaEventWrapper(event));
+			broadCastMessage(this.getFrontendSessions(), new AreaEventWrapper(event));
 		}
 	}
 }

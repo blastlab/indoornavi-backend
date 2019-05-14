@@ -39,7 +39,9 @@
 	</changeSet>
 
 	<changeSet id="Floor" author="mcichosz" context="test" runOnChange="true" labels="Floor" runAlways="true">
-		<loadUpdateData tableName="floor" quotchar="'" file="test/demo/Floor.csv" primaryKey="id"/>
+		<loadUpdateData tableName="floor" quotchar="'" file="test/demo/Floor.csv" primaryKey="id">
+			<column name="archived" type="boolean" />
+		</loadUpdateData>
 	</changeSet>
 
 	<changeSet id="Device" author="jsmol" context="test" runOnChange="true" labels="Device" runAlways="true">
