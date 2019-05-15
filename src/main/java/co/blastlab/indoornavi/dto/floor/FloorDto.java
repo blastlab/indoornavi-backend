@@ -10,6 +10,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import javax.validation.constraints.NotNull;
+import java.util.Date;
 
 @Getter
 @Setter
@@ -36,6 +37,14 @@ public class FloorDto {
 
 	private String displayName;
 
+	private boolean archived;
+
+	private boolean published;
+
+	private Date archivedDate;
+
+	private Date creationDate;
+
 	public FloorDto(Long id, Integer level, String name, BuildingDto building, Long imageId, ScaleDto scale) {
 		this.setId(id);
 		this.setLevel(level);
@@ -53,6 +62,11 @@ public class FloorDto {
 		this.setImageId(floor.getImage() != null ? floor.getImage().getId() : null);
 		this.setScale(floor.getScale() != null ? new ScaleDto(floor.getScale()) : null);
 		this.setDisplayName(this.buildDisplayName(floor));
+		this.setArchived(floor.isArchived());
+		this.setCreationDate(floor.getCreationDate());
+		if (floor.isArchived()) {
+			this.setArchivedDate(floor.getModificationDate());
+		}
 	}
 
 	private String buildDisplayName(Floor floor) {

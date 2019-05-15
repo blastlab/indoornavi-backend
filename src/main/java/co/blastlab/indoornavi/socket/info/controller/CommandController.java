@@ -56,7 +56,7 @@ public class CommandController extends WebSocketCommunication {
 			);
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();
-			broadCastMessage(infoWebSocket.getClientSessions(), new CommandErrorWrapper("CC_001"));
+			broadCastMessage(infoWebSocket.getFrontendSessions(), new CommandErrorWrapper("CC_001"));
 		}
 	}
 
@@ -92,7 +92,7 @@ public class CommandController extends WebSocketCommunication {
 		}));
 
 		infoWebSocket.getSinkShortIdBySession(serverSession).ifPresent(sinkShortId -> {
-			broadCastMessage(infoWebSocket.getClientSessions(), new ServerCommandWrapper(message, sinkShortId));
+			broadCastMessage(infoWebSocket.getFrontendSessions(), new ServerCommandWrapper(message, sinkShortId));
 		});
 	}
 

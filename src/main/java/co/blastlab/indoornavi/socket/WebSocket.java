@@ -10,34 +10,34 @@ public abstract class WebSocket extends WebSocketCommunication {
 
 	private final Logger logger = new Logger();
 
-	private final static String CLIENT = "client";
-	private final static String SERVER = "server";
+	private final static String FRONTEND = "frontend";
+	private final static String SINK = "sink";
 
-	protected boolean isClientSession(Session session) {
-		return session.getRequestParameterMap().containsKey(CLIENT);
+	protected boolean isFrontendSession(Session session) {
+		return session.getRequestParameterMap().containsKey(FRONTEND);
 	}
 
-	protected boolean isServerSession(Session session) {
-		return session.getRequestParameterMap().containsKey(SERVER);
+	protected boolean isSinkSession(Session session) {
+		return session.getRequestParameterMap().containsKey(SINK);
 	}
 
 	protected void open(Session session) {
 		logger.setId(getSessionId()).trace("Session opened {}, query params = {}", session.getId(), session.getRequestParameterMap());
-		if (session.getRequestParameterMap().containsKey(CLIENT)) {
-			getClientSessions().add(session);
-		} else if (session.getRequestParameterMap().containsKey(SERVER)) {
-			getServerSessions().add(session);
+		if (session.getRequestParameterMap().containsKey(FRONTEND)) {
+			getFrontendSessions().add(session);
+		} else if (session.getRequestParameterMap().containsKey(SINK)) {
+			getSinkSessions().add(session);
 		}
 	}
 
-	protected void open(Session session, Runnable doForClients, Runnable doForServers) {
+	protected void open(Session session, Runnable doForFrontend, Runnable doForSinks) {
 		logger.setId(getSessionId()).trace("Session opened {}, query params = {}", session.getId(), session.getRequestParameterMap());
-		if (session.getRequestParameterMap().containsKey(CLIENT)) {
-			getClientSessions().add(session);
-			doForClients.run();
-		} else if (session.getRequestParameterMap().containsKey(SERVER)) {
-			getServerSessions().add(session);
-			doForServers.run();
+		if (session.getRequestParameterMap().containsKey(FRONTEND)) {
+			getFrontendSessions().add(session);
+			doForFrontend.run();
+		} else if (session.getRequestParameterMap().containsKey(SINK)) {
+			getSinkSessions().add(session);
+			doForSinks.run();
 		}
 	}
 
@@ -47,11 +47,11 @@ public abstract class WebSocket extends WebSocketCommunication {
 
 	protected void close(Session session, Runnable doForClients, Runnable doForServers) {
 		logger.setId(getSessionId()).trace("Session closed id = {}, query params = {}", session.getId(), session.getRequestParameterMap());
-		if (session.getRequestParameterMap().containsKey(CLIENT)) {
-			getClientSessions().remove(session);
+		if (session.getRequestParameterMap().containsKey(FRONTEND)) {
+			getFrontendSessions().remove(session);
 			doForClients.run();
-		} else if (session.getRequestParameterMap().containsKey(SERVER)) {
-			getServerSessions().remove(session);
+		} else if (session.getRequestParameterMap().containsKey(SINK)) {
+			getSinkSessions().remove(session);
 			doForServers.run();
 		}
 	}
@@ -64,7 +64,7 @@ public abstract class WebSocket extends WebSocketCommunication {
 		return getThreadToSessionMap().get(Thread.currentThread().getId());
 	}
 
-	protected abstract Set<Session> getClientSessions();
-	protected abstract Set<Session> getServerSessions();
+	protected abstract Set<Session> getFrontendSessions();
+	protected abstract Set<Session> getSinkSessions();
 	protected abstract Map<Long, String> getThreadToSessionMap();
 }
