@@ -1,6 +1,7 @@
 package co.blastlab.indoornavi.socket.measures;
 
 import co.blastlab.indoornavi.dao.repository.AnchorRepository;
+import co.blastlab.indoornavi.dao.repository.FloorRepository;
 import co.blastlab.indoornavi.dao.repository.TagRepository;
 import co.blastlab.indoornavi.domain.Anchor;
 import co.blastlab.indoornavi.domain.Floor;
@@ -38,8 +39,8 @@ public class CoordinatesCalculator {
 	@AlgorithmSelector
 	private Algorithm algorithm;
 
-	@Inject
-	private Logger logger;
+//	@Inject
+//	private Logger logger;
 
 	@Inject
 	private AnchorRepository anchorRepository;
@@ -67,7 +68,7 @@ public class CoordinatesCalculator {
 	}
 
 	public Optional<UwbCoordinatesDto> calculateTagPosition(int firstDeviceId, int secondDeviceId, int distance) {
-		logger.trace("Measure storage tags: {}", storage.getMeasures().keySet().size());
+//		logger.trace("Measure storage tags: {}", storage.getMeasures().keySet().size());
 
 		try {
 			validateDevicesIds(firstDeviceId, secondDeviceId);
@@ -91,17 +92,21 @@ public class CoordinatesCalculator {
 
 			Point3D calculatedPoint = calculatedPointOptional.get();
 
-			logger.trace("Current position: X: {}, Y: {}, Z: {}", calculatedPoint.getX(), calculatedPoint.getY(), calculatedPoint.getZ());
+//			logger.trace("Current position: X: {}, Y: {}, Z: {}", calculatedPoint.getX(), calculatedPoint.getY(), calculatedPoint.getZ());
 
-			Floor floor = anchorRepository.findByShortId(anchorId)
-				.map(Anchor::getFloor)
+//			Floor floor = anchorRepository.findByShortId(anchorId)
+//				.map(Anchor::getFloor)
+//				.orElse(null);
+//			Floor floor = floorRepository.findOptionalByAnchorShortId(anchorId).orElse(null);
+			Long floorId = anchorRepository.findFloorIdByAnchorShortId(anchorId)
 				.orElse(null);
-			if (floor == null) {
+
+			if (floorId == null) {
 				return Optional.empty();
 			}
 
 			if (traceTags) {
-				this.sendEventToTagTracer(tagId, floor);
+//				this.sendEventToTagTracer(tagId, floor);
 			}
 
 			Optional.ofNullable(storage.getPreviousCoordinates().get(tagId)).ifPresent((previousPoint) -> {
@@ -111,9 +116,9 @@ public class CoordinatesCalculator {
 			});
 			Date currentDate = new Date();
 			storage.getPreviousCoordinates().put(tagId, new PointAndTime(calculatedPoint, currentDate.getTime()));
-			return Optional.of(new UwbCoordinatesDto(tagId, anchorId, floor.getId(), calculatedPoint, currentDate));
+			return Optional.of(new UwbCoordinatesDto(tagId, anchorId, floorId, calculatedPoint, currentDate));
 		} catch (DeviceIdOutOfRangeException e) {
-			logger.trace("One of the devices' ids is out of range. Ids are: {}, {} and range is (1, {})", firstDeviceId, secondDeviceId, Short.MAX_VALUE);
+//			logger.trace("One of the devices' ids is out of range. Ids are: {}, {} and range is (1, {})", firstDeviceId, secondDeviceId, Short.MAX_VALUE);
 			return Optional.empty();
 		}
 	}

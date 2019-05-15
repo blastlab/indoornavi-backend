@@ -19,11 +19,12 @@ import co.blastlab.indoornavi.socket.wrappers.AnchorsWrapper;
 import co.blastlab.indoornavi.socket.wrappers.AreaEventWrapper;
 import co.blastlab.indoornavi.socket.wrappers.CoordinatesWrapper;
 import co.blastlab.indoornavi.socket.wrappers.TagsWrapper;
-import co.blastlab.indoornavi.utils.Logger;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import lombok.Setter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.ejb.Singleton;
 import javax.enterprise.event.Event;
@@ -37,6 +38,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @ServerEndpoint("/measures")
@@ -64,8 +66,8 @@ public class MeasuresWebSocket extends WebSocket {
 	@Inject
 	private Event<UwbCoordinatesDto> coordinatesDtoEvent;
 
-	@Inject
-	private Logger logger;
+//	@Inject
+//	private Logger logger;
 
 	@Inject
 	private UwbCoordinatesRepository coordinatesRepository;
@@ -87,6 +89,8 @@ public class MeasuresWebSocket extends WebSocket {
 
 	@Inject
 	private FloorRepository floorRepository;
+
+	private static Logger logger = LoggerFactory.getLogger("_________________MyLogger__________________");
 
 	@Inject
 	private AreaEventController areaEventController;
@@ -110,7 +114,7 @@ public class MeasuresWebSocket extends WebSocket {
 
 		if (isEmulatorSession(session)) {
 			emulatorSessions.add(session);
-			List<AnchorDto> anchors = anchorRepository.findAll().stream().map(AnchorDto::new).collect(Collectors.toList());
+			List<AnchorDto> anchors = anchorRepository.findAllWithFloor().stream().map(AnchorDto::new).collect(Collectors.toList());
 			broadCastMessage(emulatorSessions, new AnchorsWrapper(anchors));
 		}
 	}
@@ -146,7 +150,7 @@ public class MeasuresWebSocket extends WebSocket {
 		setSessionThread(session);
 		if (isFrontendSession(session)) {
 			Command command = objectMapper.readValue(message, Command.class);
-			logger.setId(getSessionId()).trace("Received command: {}", command);
+//			logger.setId(getSessionId()).trace("Received command: {}", command);
 			if (Command.Type.TOGGLE_TAG.equals(command.getType())) {
 				activeFilters.get(FilterType.TAG).update(session, objectMapper.readValue(command.getArgs(), Integer.class));
 			}
@@ -165,23 +169,26 @@ public class MeasuresWebSocket extends WebSocket {
 	}
 
 	private void handleMeasures(List<DistanceMessage> measures) {
-		logger.setId(getSessionId());
+//		logger.setId(getSessionId());
 		measures.forEach(distanceMessage -> {
 			if (isDebugMode) {
 				distanceMessageEvent.fire(distanceMessage);
 			}
-			logger.trace("Will analyze distance message: {}", distanceMessage);
+//			logger.trace("Will analyze distance message: {}", distanceMessage);
 			if (bothDevicesAreAnchors(distanceMessage)) {
 				try {
-					logger.trace("Distance message is about two anchors. Transfering it to wizard bridges.");
+//					logger.trace("Distance message is about two anchors. Transfering it to wizard bridges.");
 					sinkAnchorsDistanceBridge.addDistance(distanceMessage.getDid1(), distanceMessage.getDid2(), distanceMessage.getDist());
 					anchorPositionBridge.addDistance(distanceMessage.getDid1(), distanceMessage.getDid2(), distanceMessage.getDist());
 				} catch (UnrecognizedDeviceException unrecognizedDevice) {
 					unrecognizedDevice.printStackTrace();
 				}
 			} else {
-				logger.trace("Trying to calculate coordinates");
+//				logger.trace("Trying to calculate coordinates");
+//				long start = System.nanoTime();
+				logger.debug("Time diff: {}", Math.abs(distanceMessage.getTime().getTime() - new Date().getTime()));
 				Optional<UwbCoordinatesDto> coords = coordinatesCalculator.calculateTagPosition(distanceMessage.getDid1(), distanceMessage.getDid2(), distanceMessage.getDist());
+//				logger.debug("______________________________________)__)_)_)_)_)_)_)_)_)_ {} microseconds", TimeUnit.MICROSECONDS.convert((System.nanoTime() - start), TimeUnit.NANOSECONDS));
 				coords.ifPresent(coordinatesDto -> {
 					if (isDebugMode) {
 						coordinatesDtoEvent.fire(coordinatesDto);

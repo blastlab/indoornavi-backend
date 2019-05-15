@@ -2,6 +2,7 @@ package co.blastlab.indoornavi.rest.facade.floor;
 
 import co.blastlab.indoornavi.dao.repository.BuildingRepository;
 import co.blastlab.indoornavi.dao.repository.FloorRepository;
+import co.blastlab.indoornavi.dao.repository.ImageRepository;
 import co.blastlab.indoornavi.domain.Building;
 import co.blastlab.indoornavi.domain.Floor;
 import co.blastlab.indoornavi.domain.Scale;
@@ -32,15 +33,15 @@ public class FloorBean implements FloorFacade {
 	private BuildingRepository buildingRepository;
 
 	@Inject
+	private ImageRepository imageRepository;
+
+	@Inject
 	private FloorService floorService;
 
 	@Override
 	public FloorDto get(Long id) {
-		Optional<Floor> floorEntity = floorRepository.findOptionalById(id);
-		if (floorEntity.isPresent()) {
-			return new FloorDto(floorEntity.get());
-		}
-		throw new EntityNotFoundException();
+		Floor floorEntity = floorRepository.findOptionalById(id).orElseThrow(EntityNotFoundException::new);
+		return new FloorDto(floorEntity);
 	}
 
 	@Override

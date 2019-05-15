@@ -38,8 +38,8 @@ import static co.blastlab.indoornavi.domain.AreaConfiguration.Mode.ON_LEAVE;
 @Startup
 public class AreaEventController {
 
-	@Inject
-	private Logger logger;
+//	@Inject
+//	private Logger logger;
 
 	@Inject
 	private AreaRepository areaRepository;
@@ -81,29 +81,29 @@ public class AreaEventController {
 	public List<AreaEvent> checkCoordinates(UwbCoordinatesDto coordinatesData) {
 		List<AreaEvent> events = new ArrayList<>();
 		try {
-			logger.trace("Checking if coordinates {} are within any areas", coordinatesData);
+//			logger.trace("Checking if coordinates {} are within any areas", coordinatesData);
 			Map<Area, List<AreaConfiguration>> areas = getFilteredAreas(coordinatesData);
-			logger.trace("Areas found: {}", areas.size());
+//			logger.trace("Areas found: {}", areas.size());
 			if (areas.size() > 0) {
 				Point point = (Point) wktReader.read(buildPoint(coordinatesData));
 
 				for (Map.Entry<Area, List<AreaConfiguration>> areaEntry : areas.entrySet()) {
 					for (AreaConfiguration areaConfiguration : areaEntry.getValue()) {
 						if (isWithin(areaEntry.getKey(), point, areaConfiguration.getOffset(), coordinatesData.getPoint())) {
-							logger.trace("The point {} is within area {}", coordinatesData.getPoint(), areaEntry.getKey().getName());
+//							logger.trace("The point {} is within area {}", coordinatesData.getPoint(), areaEntry.getKey().getName());
 							if (shouldSendOnEnterEvent(coordinatesData, areaEntry.getKey(), areaConfiguration)) {
-								logger.trace("Sending event area {}", areaConfiguration.getMode());
+//								logger.trace("Sending event area {}", areaConfiguration.getMode());
 								addNew(coordinatesData, areaEntry.getKey(), areaConfiguration, events);
 							} else if (tagCoordinatesHistory.contains(coordinatesData.getTagShortId(), areaEntry.getKey())) {
-								logger.trace("Updating coordinates history");
+//								logger.trace("Updating coordinates history");
 								updateTime(coordinatesData, areaEntry.getKey());
 							} else if (tagCoordinatesHistory.containsRow(coordinatesData.getTagShortId())) {
-								logger.trace("The point {} is within area {} but different than previous");
+//								logger.trace("The point {} is within area {} but different than previous");
 								addNew(coordinatesData, areaEntry.getKey(), areaConfiguration, events);
 							}
 						} else {
 							if (shouldSendOnLeaveEvent(coordinatesData, areaEntry.getKey(), areaConfiguration)) {
-								logger.trace("Tag has left area {}", areaEntry.getKey().getName());
+//								logger.trace("Tag has left area {}", areaEntry.getKey().getName());
 								events.add(createEvent(coordinatesData, areaEntry.getKey(), areaConfiguration));
 								tagCoordinatesHistory.remove(coordinatesData.getTagShortId(), areaEntry.getKey());
 							}

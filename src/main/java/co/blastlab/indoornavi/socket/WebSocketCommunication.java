@@ -17,27 +17,27 @@ public abstract class WebSocketCommunication {
 
 	protected void broadCastMessage(final Set<Session> sessions, final MessageWrapper message, Runnable onError) {
 		ObjectMapper objectMapper = new ObjectMapper();
-		Logger logger = new Logger();
+//		Logger logger = new Logger();
 		try {
 			String messageAsString = objectMapper.writeValueAsString(message);
 			broadCastMessage(sessions, messageAsString);
 		} catch (JsonProcessingException e) {
-			logger.warn("Could not parse message wrapper: {}", message);
+//			logger.warn("Could not parse message wrapper: {}", message);
 			e.printStackTrace();
 			onError.run();
 		}
 	}
 
 	protected static void broadCastMessage(final Set<Session> sessions, final String message) {
-		Logger logger = new Logger();
+//		Logger logger = new Logger();
 		sessions.forEach(session -> {
 			try {
 				if (session.isOpen()) {
-					logger.trace("Sending message to session {}: {}", session.getId(), message);
+//					logger.trace("Sending message to session {}: {}", session.getId(), message);
 					session.getBasicRemote().sendText(message);
 				}
 			} catch (IOException e) {
-				logger.warn("Could not send text: {}", message);
+//				logger.warn("Could not send text: {}", message);
 				e.printStackTrace();
 			}
 		});

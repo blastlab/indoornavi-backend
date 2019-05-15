@@ -12,23 +12,23 @@ import java.util.Optional;
 public class Algorithm3d {
 	@Inject
 	private AnchorRepository anchorRepository;
-	@Inject
-	private Logger logger;
+//	@Inject
+//	private Logger logger;
 
 	protected List<Anchor> getAnchors(List<Integer> connectedAnchors) throws NotEnoughAnchors {
 		int connectedAnchorsCount = connectedAnchors.size();
 
 		if (connectedAnchorsCount < 4) {
-			logger.trace("Not enough connected anchors to calculate position. Currently connected anchors: {}", connectedAnchors.size());
+//			logger.trace("Not enough connected anchors to calculate position. Currently connected anchors: {}", connectedAnchors.size());
 			throw new NotEnoughAnchors();
 		}
 
-		logger.trace("Connected anchors: {}", connectedAnchors.size());
+//		logger.trace("Connected anchors: {}", connectedAnchors.size());
 
 		List<Anchor> anchors = anchorRepository.findByShortIdIn(connectedAnchors);
 
 		if (anchors.size() < 4) {
-			logger.trace("Not enough connected and in database anchors to calculate position. Currently connected anchors: {}", connectedAnchors.size());
+//			logger.trace("Not enough connected and in database anchors to calculate position. Currently connected anchors: {}", connectedAnchors.size());
 			throw new NotEnoughAnchors();
 		}
 
