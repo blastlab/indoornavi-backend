@@ -287,7 +287,7 @@ public class InfoWebSocket extends WebSocket {
 					device.setMinor(deviceTurnOn.getFirmwareMinor());
 					deviceRepository.save(device);
 				});
-				broadCastMessage(getClientSessions(), new InfoWrapper(Collections.singleton(deviceStatus)));
+				broadCastMessage(getFrontendSessions(), new InfoWrapper(Collections.singleton(deviceStatus)));
 			} else if (deviceStatus.getStatus() == ONLINE) {
 				uwbService.findOptionalByShortId(deviceTurnOn.getDeviceShortId()).ifPresent((device) -> {
 					device.setMinor(deviceTurnOn.getFirmwareMinor());
@@ -848,7 +848,7 @@ public class InfoWebSocket extends WebSocket {
 					deviceStatus.setDevice(new UwbDto(device));
 					deviceStatus.setCheckVersionAfterRestartCount(0);
 					deviceStatus.setRestartCount(0);
-					broadCastMessage(getClientSessions(), new InfoWrapper(Collections.singleton(deviceStatus)));
+					broadCastMessage(getFrontendSessions(), new InfoWrapper(Collections.singleton(deviceStatus)));
 				}
 			}
 		});
