@@ -9,6 +9,7 @@ import co.blastlab.indoornavi.domain.Sink;
 import co.blastlab.indoornavi.dto.floor.FloorDto;
 import co.blastlab.indoornavi.dto.report.UwbCoordinatesDto;
 import co.blastlab.indoornavi.dto.tag.TagDto;
+import co.blastlab.indoornavi.socket.LoggerController;
 import co.blastlab.indoornavi.socket.measures.algorithms.*;
 import co.blastlab.indoornavi.socket.measures.model.PointAndTime;
 import co.blastlab.indoornavi.socket.measures.model.PolyMeasure;
@@ -23,6 +24,7 @@ import org.apache.commons.math3.fitting.WeightedObservedPoint;
 import javax.ejb.Singleton;
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
+import javax.websocket.Session;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -39,11 +41,14 @@ public class CoordinatesCalculator {
 	@AlgorithmSelector
 	private Algorithm algorithm;
 
-//	@Inject
-//	private Logger logger;
+	@Inject
+	private LoggerController logger;
 
 	@Inject
 	private AnchorRepository anchorRepository;
+	
+	@Inject
+	private FloorRepository floorRepository;
 
 	@Inject
 	private TagRepository tagRepository;
@@ -67,8 +72,8 @@ public class CoordinatesCalculator {
 		return tagToSinkMapping.containsKey(tagShortId) ? Optional.of(tagToSinkMapping.get(tagShortId)) : Optional.empty();
 	}
 
-	public Optional<UwbCoordinatesDto> calculateTagPosition(int firstDeviceId, int secondDeviceId, int distance) {
-//		logger.trace("Measure storage tags: {}", storage.getMeasures().keySet().size());
+	public Optional<UwbCoordinatesDto> calculateTagPosition(String sessionId, int firstDeviceId, int secondDeviceId, int distance) {
+		logger.trace(sessionId, "Measure storage tags: {}", storage.getMeasures().keySet().size());
 
 		try {
 			validateDevicesIds(firstDeviceId, secondDeviceId);
@@ -84,7 +89,7 @@ public class CoordinatesCalculator {
 
 			List<Integer> connectedAnchors = new ArrayList<>(getConnectedAnchors(tagId));
 
-			Optional<Point3D> calculatedPointOptional = algorithm.calculate(connectedAnchors, tagId);
+			Optional<Point3D> calculatedPointOptional = algorithm.calculate(sessionId, connectedAnchors, tagId);
 
 			if (!calculatedPointOptional.isPresent()) {
 				return Optional.empty();
@@ -92,12 +97,8 @@ public class CoordinatesCalculator {
 
 			Point3D calculatedPoint = calculatedPointOptional.get();
 
-//			logger.trace("Current position: X: {}, Y: {}, Z: {}", calculatedPoint.getX(), calculatedPoint.getY(), calculatedPoint.getZ());
+			logger.trace(sessionId,"Current position: X: {}, Y: {}, Z: {}", calculatedPoint.getX(), calculatedPoint.getY(), calculatedPoint.getZ());
 
-//			Floor floor = anchorRepository.findByShortId(anchorId)
-//				.map(Anchor::getFloor)
-//				.orElse(null);
-//			Floor floor = floorRepository.findOptionalByAnchorShortId(anchorId).orElse(null);
 			Long floorId = anchorRepository.findFloorIdByAnchorShortId(anchorId)
 				.orElse(null);
 
@@ -106,7 +107,7 @@ public class CoordinatesCalculator {
 			}
 
 			if (traceTags) {
-//				this.sendEventToTagTracer(tagId, floor);
+				this.sendEventToTagTracer(tagId, floorRepository.findBy(floorId));
 			}
 
 			Optional.ofNullable(storage.getPreviousCoordinates().get(tagId)).ifPresent((previousPoint) -> {
@@ -118,7 +119,7 @@ public class CoordinatesCalculator {
 			storage.getPreviousCoordinates().put(tagId, new PointAndTime(calculatedPoint, currentDate.getTime()));
 			return Optional.of(new UwbCoordinatesDto(tagId, anchorId, floorId, calculatedPoint, currentDate));
 		} catch (DeviceIdOutOfRangeException e) {
-//			logger.trace("One of the devices' ids is out of range. Ids are: {}, {} and range is (1, {})", firstDeviceId, secondDeviceId, Short.MAX_VALUE);
+			logger.trace(sessionId, "One of the devices' ids is out of range. Ids are: {}, {} and range is (1, {})", firstDeviceId, secondDeviceId, Short.MAX_VALUE);
 			return Optional.empty();
 		}
 	}

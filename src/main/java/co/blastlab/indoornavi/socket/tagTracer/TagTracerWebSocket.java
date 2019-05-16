@@ -1,5 +1,6 @@
 package co.blastlab.indoornavi.socket.tagTracer;
 
+import co.blastlab.indoornavi.socket.LoggerController;
 import co.blastlab.indoornavi.socket.WebSocket;
 import co.blastlab.indoornavi.socket.measures.CoordinatesCalculator;
 import co.blastlab.indoornavi.utils.Logger;
@@ -21,7 +22,7 @@ import java.util.*;
 public class TagTracerWebSocket extends WebSocket {
 
 	@Inject
-	private Logger logger;
+	private LoggerController logger;
 
 	@Inject
 	private ObjectMapper objectMapper;
@@ -29,9 +30,9 @@ public class TagTracerWebSocket extends WebSocket {
 	@Inject
 	private CoordinatesCalculator coordinatesCalculator;
 
-	private static Set<Session> frontendSessions = Collections.synchronizedSet(new HashSet<>());
+	private static Set<Session> frontendSessions = new HashSet<>();
 	// key: thread id, value: session id
-	private Map<Long, String> threadIdToSessionId = Collections.synchronizedMap(new HashMap<>());
+	private Map<Long, String> threadIdToSessionId = new HashMap<>();
 
 	@Override
 	protected Set<Session> getFrontendSessions() {
@@ -52,18 +53,20 @@ public class TagTracerWebSocket extends WebSocket {
 	@OnOpen
 	public void open(Session session) {
 		setSessionThread(session);
+		logger.create(session);
 		coordinatesCalculator.startTracingTags();
 		super.open(session);
 	}
 
 	@OnClose
 	public void close(Session session) {
+		logger.remove(session);
 		coordinatesCalculator.stopTracingTags();
 		super.close(session);
 	}
 
 	public void tagTraceAdded(@Observes TagTraceDto tagTrace) throws JsonProcessingException {
-		logger.setId(getSessionId()).trace("Tag trace added {}", tagTrace);
+		logger.trace(getSessionId(), "Tag trace added {}", tagTrace);
 		broadCastMessage(getFrontendSessions(), objectMapper.writeValueAsString(tagTrace));
 	}
 }

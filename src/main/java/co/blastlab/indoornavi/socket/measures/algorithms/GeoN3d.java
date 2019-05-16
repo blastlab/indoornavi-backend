@@ -1,18 +1,15 @@
 package co.blastlab.indoornavi.socket.measures.algorithms;
 
-import co.blastlab.indoornavi.dao.repository.AnchorRepository;
 import co.blastlab.indoornavi.domain.Anchor;
 import co.blastlab.indoornavi.socket.measures.Point3D;
-import co.blastlab.indoornavi.socket.measures.model.Measure;
 import co.blastlab.indoornavi.socket.measures.model.PointAndTime;
-import co.blastlab.indoornavi.socket.measures.model.PolyMeasure;
 import co.blastlab.indoornavi.socket.measures.Storage;
-import co.blastlab.indoornavi.utils.Logger;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.ejml.simple.SimpleMatrix;
 
 import javax.inject.Inject;
+import javax.websocket.Session;
 import java.util.*;
 
 import static co.blastlab.indoornavi.socket.measures.IntersectionsCalculator.calculateThres;
@@ -23,10 +20,10 @@ public class GeoN3d extends Algorithm3d implements Algorithm {
 	private Storage storage;
 
 	@Override
-	public Optional<Point3D> calculate(List<Integer> connectedAnchors, Integer tagId) {
+	public Optional<Point3D> calculate(String sessionId, List<Integer> connectedAnchors, Integer tagId) {
 		List<Anchor> anchors;
 		try {
-			anchors = getAnchors(connectedAnchors);
+			anchors = getAnchors(sessionId, connectedAnchors);
 		} catch (NotEnoughAnchors notEnoughAnchors) {
 			return Optional.empty(); 
 		}

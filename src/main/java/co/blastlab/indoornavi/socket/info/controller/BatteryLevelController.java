@@ -51,6 +51,8 @@ public class BatteryLevelController extends WebSocketCommunication {
 	@Inject
 	private Logger logger;
 
+	private Logger loggerNoCdi = new Logger();
+
 	@Resource
 	private TimerService timerService;
 
@@ -97,11 +99,9 @@ public class BatteryLevelController extends WebSocketCommunication {
 	@Timeout
 	public void askServerAboutBatteryLevel() {
 		Iterator<CheckBatteryLevel> iterator = batteryLevelsToCheck.iterator();
-		// we need an instance of logger created here, otherwise it throws an exception about being out of context
-		Logger logger = new Logger();
 		if (iterator.hasNext()) {
 			CheckBatteryLevel toCheck = iterator.next();
-			logger.trace("Timer executes in battery level controller to check battery level for {}", toCheck.getShortId());
+			loggerNoCdi.trace("Timer executes in battery level controller to check battery level for {}", toCheck.getShortId());
 			String statusRequest = toCheck.toStringCommand();
 			Optional<Integer> sinkShortIdOptional = Optional.empty();
 			try {
@@ -142,7 +142,7 @@ public class BatteryLevelController extends WebSocketCommunication {
 
 	private Optional<Integer> getSinkShortIdForAnchor(Integer anchorShortId) {
 		Optional<Integer> sinkShortIdOptional = Optional.empty();
-		Optional<Anchor> anchorOptional = anchorRepository.findByShortId(anchorShortId);
+		Optional<Anchor> anchorOptional = anchorRepository.findByShortIdWithSink(anchorShortId);
 		if (anchorOptional.isPresent()) {
 			Anchor anchor = anchorOptional.get();
 			if (anchor instanceof Sink) {

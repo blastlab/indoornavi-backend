@@ -61,7 +61,7 @@ public class GeoN2dTest {
 		}
 
 		// WHEN
-		Optional<Point3D> point = geoN2d.calculate(ImmutableList.of(32768, 32769, 32770), 1);
+		Optional<Point3D> point = geoN2d.calculate("Test", ImmutableList.of(32768, 32769, 32770), 1);
 
 		// THEN
 		assertTrue(point.isPresent());
@@ -103,7 +103,7 @@ public class GeoN2dTest {
 		}
 
 		// WHEN
-		Optional<Point3D> point = geoN2d.calculate(ImmutableList.of(32768, 32769, 32770, 42555, 42556, 42557), 1);
+		Optional<Point3D> point = geoN2d.calculate("Test", ImmutableList.of(32768, 32769, 32770, 42555, 42556, 42557), 1);
 
 		// THEN
 		assertThat(point.isPresent(), is(true));
@@ -134,7 +134,7 @@ public class GeoN2dTest {
 		}
 
 		// when
-		Optional<Point3D> point = geoN2d.calculate(ImmutableList.of(32769, 32770, 32771), 1);
+		Optional<Point3D> point = geoN2d.calculate("Test", ImmutableList.of(32769, 32770, 32771), 1);
 
 		// then
 		assertThat(point.isPresent(), is(true));

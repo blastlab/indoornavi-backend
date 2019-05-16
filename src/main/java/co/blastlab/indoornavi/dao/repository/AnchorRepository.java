@@ -31,4 +31,7 @@ public interface AnchorRepository extends EntityRepository<Anchor, Long> {
 
 	@Query(named = Anchor.ALL_WITH_FLOOR)
 	List<Anchor> findAllWithFloor();
+
+	@Query(named = Anchor.BY_SHORT_ID_WITH_SINK)
+	Optional<Anchor> findByShortIdWithSink(Integer shortId);
 }
