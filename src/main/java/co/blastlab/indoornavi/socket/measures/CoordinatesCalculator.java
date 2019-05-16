@@ -66,7 +66,12 @@ public class CoordinatesCalculator {
 		return tagToSinkMapping.containsKey(tagShortId) ? Optional.of(tagToSinkMapping.get(tagShortId)) : Optional.empty();
 	}
 
-	public Optional<UwbCoordinatesDto> calculateTagPosition(int firstDeviceId, int secondDeviceId, int distance) {
+	public Optional<UwbCoordinatesDto> calculateTagPosition(DistanceMessage distanceMessage) {
+		int firstDeviceId = distanceMessage.getDid1();
+		int secondDeviceId = distanceMessage.getDid2();
+		int distance = distanceMessage.getDist();
+		long measurementTime = distanceMessage.getTime().getTime();
+
 		logger.trace("Measure storage tags: {}", storage.getMeasures().keySet().size());
 
 		try {
@@ -79,7 +84,7 @@ public class CoordinatesCalculator {
 				tagToSinkMapping.put(tagId, anchorId);
 			}
 
-			storage.setConnection(tagId, anchorId, distance);
+			storage.setConnection(tagId, anchorId, distance, measurementTime);
 
 			List<Integer> connectedAnchors = new ArrayList<>(getConnectedAnchors(tagId));
 
@@ -91,11 +96,10 @@ public class CoordinatesCalculator {
 
 			Point3D calculatedPoint = calculatedPointOptional.get();
 
-			logger.trace("Current position: X: {}, Y: {}, Z: {}", calculatedPoint.getX(), calculatedPoint.getY(), calculatedPoint.getZ());
-
 			Floor floor = anchorRepository.findByShortId(anchorId)
 				.map(Anchor::getFloor)
 				.orElse(null);
+
 			if (floor == null) {
 				return Optional.empty();
 			}
@@ -140,12 +144,19 @@ public class CoordinatesCalculator {
 
 	private void cleanOldData() {
 		long now = new Date().getTime();
-		storage.getMeasures().entrySet()
-			.removeIf(tagEntry -> tagEntry.getValue().entrySet()
-				.removeIf(anchorEntry -> anchorEntry.getValue().getMeasures()
-					.removeIf(measure -> new Date((now - OLD_DATA_IN_MILLISECONDS)).after(new Date(measure.getTimestamp())))
-				)
-			);
+
+		storage.getMeasures().forEach((tagId, anchorPolyMeasure) -> {
+			anchorPolyMeasure.forEach((anchor, polyMeasure) -> {
+				polyMeasure.getMeasures().removeIf(measure -> new Date((now - OLD_DATA_IN_MILLISECONDS)).after(new Date(measure.getTimestamp())));
+				while (polyMeasure.getMeasures().size() > 4) {
+					polyMeasure.getMeasures().remove(0);
+				}
+			});
+			anchorPolyMeasure.values().removeIf((polyMeasure ->
+				polyMeasure.getMeasures().isEmpty()
+			));
+		});
+
 	}
 
 	private Set<Integer> getConnectedAnchors(Integer tagId) {
