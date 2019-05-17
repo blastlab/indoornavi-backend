@@ -18,7 +18,7 @@ import java.util.List;
 @ToString(callSuper = true, exclude = "anchors")
 @NamedQueries({
 	@NamedQuery(
-		name = Sink.ALL_WITH_FLOOR,
+		name = Sink.ALL_SINKS_WITH_FLOOR,
 		query = "FROM Sink AS s JOIN FETCH s.floor"
 	)
 })
@@ -48,4 +48,6 @@ public class Sink extends Anchor {
 		super.broadcast();
 		WizardWebSocket.broadcastNewSink(this);
 	}
+
+	public static final String ALL_SINKS_WITH_FLOOR = "allSinksWithFloor";
 }

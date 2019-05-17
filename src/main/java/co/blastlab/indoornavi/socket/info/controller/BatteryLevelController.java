@@ -48,17 +48,15 @@ public class BatteryLevelController extends WebSocketCommunication {
 
 	private Set<CheckBatteryLevel> batteryLevelsToCheck = new HashSet<>();
 
-	@Inject
-	private Logger logger;
-
-	private Logger loggerNoCdi = new Logger();
+	private Logger loggerNoCdi;
 
 	@Resource
 	private TimerService timerService;
 
 	@PostConstruct
 	private void init() {
-		logger.trace("Creating timer for battery level controller");
+		loggerNoCdi = new Logger();
+		loggerNoCdi.trace("Creating timer for battery level controller");
 		timerService.createIntervalTimer(0, 100, new TimerConfig(null, false));
 	}
 

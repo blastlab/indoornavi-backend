@@ -123,11 +123,11 @@ public class InfoWebSocket extends WebSocket {
 	private TimerService timerService;
 
 	// key: thread id, value: session id
-	private Map<Long, String> threadIdToSessionId = Collections.synchronizedMap(new HashMap<>());
-	private static Set<Session> frontendSessions = Collections.synchronizedSet(new HashSet<>());
+	private Map<Long, String> threadIdToSessionId = new HashMap<>();
+	private static Set<Session> frontendSessions = new HashSet<>();
 
 	// key: sink shortId, value: session
-	private static Map<Integer, Session> sinkSessions = Collections.synchronizedMap(new HashMap<>());
+	private static Map<Integer, Session> sinkSessions = new HashMap<>();
 
 	private ObjectMapper objectMapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 

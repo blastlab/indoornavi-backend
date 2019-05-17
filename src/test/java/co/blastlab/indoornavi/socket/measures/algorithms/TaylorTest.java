@@ -3,6 +3,7 @@ package co.blastlab.indoornavi.socket.measures.algorithms;
 import co.blastlab.indoornavi.dao.repository.AnchorRepository;
 import co.blastlab.indoornavi.domain.Anchor;
 import co.blastlab.indoornavi.domain.Floor;
+import co.blastlab.indoornavi.socket.LoggerController;
 import co.blastlab.indoornavi.socket.measures.Point3D;
 import co.blastlab.indoornavi.socket.measures.Storage;
 import co.blastlab.indoornavi.utils.Logger;
@@ -35,7 +36,7 @@ public class TaylorTest {
 	private AnchorRepository anchorRepository;
 
 	@Mock
-	private Logger logger;
+	private LoggerController logger;
 
 	@Test
 	public void shouldCalculateProperPositionInSimpleScenario() {

@@ -15,6 +15,6 @@ public interface SinkRepository extends EntityRepository<Sink, Long> {
 	Optional<Sink> findOptionalById(Long id);
 	List<Sink> findByConfigured(boolean configured);
 	List<Sink> findByFloor(Floor floor);
-	@Query(named = Sink.ALL_WITH_FLOOR)
+	@Query(named = Sink.ALL_SINKS_WITH_FLOOR)
 	List<Sink> findAllWithFloor();
 }

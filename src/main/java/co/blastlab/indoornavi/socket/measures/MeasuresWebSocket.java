@@ -165,19 +165,15 @@ public class MeasuresWebSocket extends WebSocket {
 				distanceMessageEvent.fire(distanceMessage);
 			}
 			logger.trace(getSessionId(), "Will analyze distance message: {}", distanceMessage);
-//				logger.trace("Trying to calculate coordinates");
-//				long start = System.nanoTime();
 			logger.debug(getSessionId(), "Time diff: {}", Math.abs(distanceMessage.getTime().getTime() - new Date().getTime()));
-			Optional<UwbCoordinatesDto> coords = coordinatesCalculator.calculateTagPosition(getSessionId(), distanceMessage.getDid1(), distanceMessage.getDid2(), distanceMessage.getDist());
-//				logger.debug("______________________________________)__)_)_)_)_)_)_)_)_)_ {} microseconds", TimeUnit.MICROSECONDS.convert((System.nanoTime() - start), TimeUnit.NANOSECONDS));
+			Optional<UwbCoordinatesDto> coords = coordinatesCalculator.calculateTagPosition(getSessionId(), distanceMessage);
 			coords.ifPresent(coordinatesDto -> {
-				if (isDebugMode) {
-					coordinatesDtoEvent.fire(coordinatesDto);
-				}
-				this.saveCoordinates(coordinatesDto, distanceMessage.getTime());
+				Instant instant = Instant.ofEpochMilli(distanceMessage.getTime().getTime());
+				coordinatesDto.setMeasurementTime(LocalDateTime.ofInstant(instant, ZoneId.systemDefault()));
+				coordinatesDtoEvent.fire(coordinatesDto);
+
 				Set<Session> sessions = this.filterSessions(coordinatesDto);
 				broadCastMessage(sessions, new CoordinatesWrapper(coordinatesDto));
-				this.sendAreaEvents(coordinatesDto);
 			});
 		});
 	}
