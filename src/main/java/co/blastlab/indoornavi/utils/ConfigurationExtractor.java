@@ -5,13 +5,24 @@ import co.blastlab.indoornavi.dao.repository.AreaRepository;
 import co.blastlab.indoornavi.dao.repository.FloorRepository;
 import co.blastlab.indoornavi.dao.repository.SinkRepository;
 import co.blastlab.indoornavi.domain.*;
+import co.blastlab.indoornavi.dto.anchor.AnchorDto;
 import co.blastlab.indoornavi.dto.configuration.ConfigurationDto;
+import co.blastlab.indoornavi.dto.configuration.PrePublishReport;
+import co.blastlab.indoornavi.dto.configuration.PrePublishReportItem;
+import co.blastlab.indoornavi.dto.configuration.PrePublishReportItemCode;
+import co.blastlab.indoornavi.dto.device.DeviceDto;
+import co.blastlab.indoornavi.dto.floor.FloorDto;
 import co.blastlab.indoornavi.dto.floor.ScaleDto;
+import co.blastlab.indoornavi.dto.uwb.UwbDto;
 import co.blastlab.indoornavi.service.AreaService;
+import co.blastlab.indoornavi.service.UwbService;
+import com.google.common.collect.ImmutableMap;
 
 import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
 import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static co.blastlab.indoornavi.domain.Scale.scale;
 
@@ -30,7 +41,7 @@ public class ConfigurationExtractor {
 	private AreaService areaService;
 
 	public void extractScale(ConfigurationDto.Data configuration, Floor floor) {
-		logger.debug("Trying to extract scale from configuartion");
+		logger.debug("Trying to extract scale from configuration");
 		ScaleDto scaleDto = configuration.getScale();
 		floor.setScaleFromDto(scaleDto);
 		floorRepository.save(floor);
@@ -38,7 +49,7 @@ public class ConfigurationExtractor {
 	}
 
 	public void extractSinks(ConfigurationDto.Data configuration, Floor floor) {
-		logger.debug("Trying to extract sinks from configuartion ({})", configuration.getSinks().size());
+		logger.debug("Trying to extract sinks from configuration ({})", configuration.getSinks().size());
 		configuration.getSinks().forEach((sinkDto) -> {
 			Sink sink = sinkRepository.findOptionalByShortId(sinkDto.getShortId()).orElseThrow(EntityNotFoundException::new);
 			sink.setFloor(floor);
@@ -78,7 +89,7 @@ public class ConfigurationExtractor {
 			sink.setY(null);
 			sink.setZ(null);
 			sinkRepository.save(sink);
-			logger.debug("Sink reseted {}", sink);
+			logger.debug("Sink reset {}", sink);
 		}));
 	}
 
@@ -92,7 +103,7 @@ public class ConfigurationExtractor {
 			anchor.setZ(null);
 			anchor.setSink(null);
 			anchorRepository.save(anchor);
-			logger.debug("Anchor reseted {}", anchor);
+			logger.debug("Anchor reset {}", anchor);
 		}));
 	}
 
@@ -100,5 +111,24 @@ public class ConfigurationExtractor {
 		List<Area> areasOnTheFloor = areaRepository.findByFloor(floor);
 		floor.getAreas().clear();
 		areasOnTheFloor.forEach((area -> areaRepository.remove(area)));
+	}
+
+	public void checkIsAnchorAlreadyPublishedOnDiffMap(AnchorDto anchor, Floor floor, PrePublishReport report) {
+		if (this.isAnchorAlreadyPublishedOnDiffMap(anchor, floor.getId())) {
+			report.getItems().add(
+				new PrePublishReportItem(
+					PrePublishReportItemCode.PPRC_001,
+					ImmutableMap.of("device", anchor, "floor", anchor.getFloor())
+				)
+			);
+		}
+	}
+
+	private boolean isAnchorAlreadyPublishedOnDiffMap(AnchorDto anchor, Long floorId) {
+		AtomicBoolean result = new AtomicBoolean(false);
+		anchorRepository.findOptionalByShortId(anchor.getShortId()).ifPresent(
+			anchorEntity -> result.set(anchorEntity.getFloor() != null && !Objects.equals(anchorEntity.getFloor().getId(), floorId))
+		);
+		return result.get();
 	}
 }

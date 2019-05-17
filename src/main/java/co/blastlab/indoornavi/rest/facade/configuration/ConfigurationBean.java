@@ -5,9 +5,15 @@ import co.blastlab.indoornavi.domain.Configuration;
 import co.blastlab.indoornavi.domain.Floor;
 import co.blastlab.indoornavi.domain.Publication;
 import co.blastlab.indoornavi.dto.configuration.ConfigurationDto;
+import co.blastlab.indoornavi.dto.configuration.PrePublishReport;
+import co.blastlab.indoornavi.dto.configuration.PrePublishReportItem;
+import co.blastlab.indoornavi.dto.configuration.PrePublishReportItemCode;
+import co.blastlab.indoornavi.dto.floor.FloorDto;
 import co.blastlab.indoornavi.utils.ConfigurationExtractor;
 import co.blastlab.indoornavi.utils.Logger;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
@@ -42,6 +48,28 @@ public class ConfigurationBean implements ConfigurationFacade {
 	@Inject
 	private UserRepository userRepository;
 
+	@Inject
+	private ObjectMapper objectMapper;
+
+	@Override
+	public PrePublishReport prePublish(Long floorId) throws IOException {
+		logger.debug("Doing pre publish checks configuration of the floor id {}", floorId);
+		final Floor floor = floorRepository.findOptionalById(floorId).orElseThrow(EntityNotFoundException::new);
+		Configuration configurationEntity = configurationRepostiory.findTop1ByFloorOrderByVersionDesc(floor).orElseThrow(EntityNotFoundException::new);
+		ConfigurationDto.Data configurationData = objectMapper.readValue(configurationEntity.getData(), ConfigurationDto.Data.class);
+
+		PrePublishReport report = new PrePublishReport();
+		logger.debug("Checking if devices are published in a different floor");
+		configurationData.getSinks().forEach((sinkDto) -> {
+			configurationExtractor.checkIsAnchorAlreadyPublishedOnDiffMap(sinkDto, floor, report);
+			sinkDto.getAnchors().forEach((anchorDto -> {
+				configurationExtractor.checkIsAnchorAlreadyPublishedOnDiffMap(anchorDto, floor, report);
+			}));
+		});
+
+		return report;
+	}
+
 	@Override
 	public ConfigurationDto.Data publish(Long floorId) throws IOException {
 		logger.debug("Trying to publish configuration of the floor id {}", floorId);
@@ -56,7 +84,6 @@ public class ConfigurationBean implements ConfigurationFacade {
 			publicationRepository.save(publication);
 		}
 		Configuration configurationEntity = configurationRepostiory.findTop1ByFloorOrderByVersionDesc(floor).orElseThrow(EntityNotFoundException::new);
-		ObjectMapper objectMapper = new ObjectMapper();
 		ConfigurationDto.Data configurationData = objectMapper.readValue(configurationEntity.getData(), ConfigurationDto.Data.class);
 
 		logger.debug("Configuration data to extract: {}", configurationData);

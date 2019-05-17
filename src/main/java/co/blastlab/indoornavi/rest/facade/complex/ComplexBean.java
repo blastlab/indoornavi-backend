@@ -43,12 +43,11 @@ public class ComplexBean implements ComplexFacade {
 		return new ComplexDto(complexEntity);
 	}
 
-
 	@Override
 	public ComplexDto update(Long id, ComplexDto complex) {
 		logger.debug("Trying to update complex {}", complex);
 		Optional<Complex> complexEntity = complexRepository.findById(id);
-		if (complexEntity.isPresent()){
+		if (complexEntity.isPresent()) {
 			complexEntity.get().setName(complex.getName());
 			Complex complexDb = complexRepository.save(complexEntity.get());
 			logger.debug("Complex updated");
@@ -56,7 +55,6 @@ public class ComplexBean implements ComplexFacade {
 		}
 		throw new EntityNotFoundException();
 	}
-
 
 	@Override
 	public Response delete(Long id) {
@@ -72,7 +70,6 @@ public class ComplexBean implements ComplexFacade {
 		return Response.status(HttpStatus.SC_NO_CONTENT).build();
 	}
 
-
 	@Override
 	public List<ComplexDto.WithBuildings.WithFloors> findAll() {
 		List<ComplexDto.WithBuildings.WithFloors> complexes = new ArrayList<>();
@@ -80,7 +77,6 @@ public class ComplexBean implements ComplexFacade {
 			.forEach(complexEntity -> complexes.add(new ComplexDto.WithBuildings.WithFloors(complexEntity)));
 		return complexes;
 	}
-
 
 	@Override
 	public ComplexDto.WithBuildings findWithBuildings(Long id) {

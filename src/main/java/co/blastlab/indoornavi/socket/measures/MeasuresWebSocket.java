@@ -1,20 +1,14 @@
 package co.blastlab.indoornavi.socket.measures;
 
 import co.blastlab.indoornavi.dao.repository.AnchorRepository;
-import co.blastlab.indoornavi.dao.repository.FloorRepository;
 import co.blastlab.indoornavi.dao.repository.TagRepository;
-import co.blastlab.indoornavi.dao.repository.UwbCoordinatesRepository;
-import co.blastlab.indoornavi.domain.UwbCoordinates;
 import co.blastlab.indoornavi.dto.anchor.AnchorDto;
 import co.blastlab.indoornavi.dto.report.UwbCoordinatesDto;
 import co.blastlab.indoornavi.dto.tag.TagDto;
 import co.blastlab.indoornavi.socket.LoggerController;
+import co.blastlab.indoornavi.rest.facade.debug.DebugBean;
 import co.blastlab.indoornavi.socket.WebSocket;
 import co.blastlab.indoornavi.socket.area.AreaEvent;
-import co.blastlab.indoornavi.socket.area.AreaEventController;
-import co.blastlab.indoornavi.socket.bridge.AnchorPositionBridge;
-import co.blastlab.indoornavi.socket.bridge.SinkAnchorsDistanceBridge;
-import co.blastlab.indoornavi.socket.bridge.UnrecognizedDeviceException;
 import co.blastlab.indoornavi.socket.filters.*;
 import co.blastlab.indoornavi.socket.wrappers.AnchorsWrapper;
 import co.blastlab.indoornavi.socket.wrappers.AreaEventWrapper;
@@ -25,14 +19,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.ejb.Asynchronous;
 import javax.ejb.Singleton;
 import javax.enterprise.event.Event;
+import javax.enterprise.event.Observes;
 import javax.inject.Inject;
-import javax.persistence.EntityNotFoundException;
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
-import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -68,15 +62,6 @@ public class MeasuresWebSocket extends WebSocket {
 	private LoggerController logger;
 
 	@Inject
-	private UwbCoordinatesRepository coordinatesRepository;
-
-	@Inject
-	private SinkAnchorsDistanceBridge sinkAnchorsDistanceBridge;
-
-	@Inject
-	private AnchorPositionBridge anchorPositionBridge;
-
-	@Inject
 	private CoordinatesCalculator coordinatesCalculator;
 
 	@Inject
@@ -84,12 +69,6 @@ public class MeasuresWebSocket extends WebSocket {
 
 	@Inject
 	private AnchorRepository anchorRepository;
-
-	@Inject
-	private FloorRepository floorRepository;
-
-	@Inject
-	private AreaEventController areaEventController;
 
 	private Map<FilterType, Filter> activeFilters = new HashMap<>();
 
@@ -151,73 +130,61 @@ public class MeasuresWebSocket extends WebSocket {
 			logger.trace(getSessionId(), "Received command: {}", command);
 			if (Command.Type.TOGGLE_TAG.equals(command.getType())) {
 				activeFilters.get(FilterType.TAG).update(session, objectMapper.readValue(command.getArgs(), Integer.class));
-			}
-			else if (Command.Type.SET_FLOOR.equals(command.getType())) {
+			} else if (Command.Type.SET_FLOOR.equals(command.getType())) {
 				activeFilters.get(FilterType.FLOOR).update(session, objectMapper.readValue(command.getArgs(), Long.class));
-			}
-			else if (Command.Type.SET_TAGS.equals(command.getType())) {
+			} else if (Command.Type.SET_TAGS.equals(command.getType())) {
 				for (Integer tagId : objectMapper.readValue(command.getArgs(), Integer[].class)) {
 					activeFilters.get(FilterType.TAG).update(session, tagId);
 				}
 			}
 		} else if (isSinkSession(session) || isEmulatorSession(session)) {
-			List<DistanceMessage> measures = objectMapper.readValue(message, new TypeReference<List<DistanceMessage>>(){});
+			List<DistanceMessage> measures = objectMapper.readValue(message, new TypeReference<List<DistanceMessage>>() {});
 			handleMeasures(measures);
 		}
 	}
 
+	@Asynchronous
+	public void onAreaEventListGenerated(@Observes List<AreaEvent> areaEvents) {
+		for (AreaEvent event : areaEvents) {
+			broadCastMessage(this.getFrontendSessions(), new AreaEventWrapper(event));
+		}
+	}
+
+	/**
+	 * distanceMessage is fired to
+	 *
+	 * @see DebugBean#rawMeasureEndpoint
+	 * coordinatesDto is fired to
+	 * @see DatabaseExecutor#afterCalculationDone
+	 * and
+	 * @see DebugBean#calculatedCoordinatesEndpoint
+	 */
 	private void handleMeasures(List<DistanceMessage> measures) {
 		measures.forEach(distanceMessage -> {
 			if (isDebugMode) {
 				distanceMessageEvent.fire(distanceMessage);
 			}
 			logger.trace(getSessionId(), "Will analyze distance message: {}", distanceMessage);
-			if (bothDevicesAreAnchors(distanceMessage)) {
-				try {
-//					logger.trace("Distance message is about two anchors. Transfering it to wizard bridges.");
-					sinkAnchorsDistanceBridge.addDistance(distanceMessage.getDid1(), distanceMessage.getDid2(), distanceMessage.getDist());
-					anchorPositionBridge.addDistance(distanceMessage.getDid1(), distanceMessage.getDid2(), distanceMessage.getDist());
-				} catch (UnrecognizedDeviceException unrecognizedDevice) {
-					unrecognizedDevice.printStackTrace();
-				}
-			} else {
 //				logger.trace("Trying to calculate coordinates");
 //				long start = System.nanoTime();
-				logger.debug(getSessionId(), "Time diff: {}", Math.abs(distanceMessage.getTime().getTime() - new Date().getTime()));
-				Optional<UwbCoordinatesDto> coords = coordinatesCalculator.calculateTagPosition(getSessionId(), distanceMessage.getDid1(), distanceMessage.getDid2(), distanceMessage.getDist());
+			logger.debug(getSessionId(), "Time diff: {}", Math.abs(distanceMessage.getTime().getTime() - new Date().getTime()));
+			Optional<UwbCoordinatesDto> coords = coordinatesCalculator.calculateTagPosition(getSessionId(), distanceMessage.getDid1(), distanceMessage.getDid2(), distanceMessage.getDist());
 //				logger.debug("______________________________________)__)_)_)_)_)_)_)_)_)_ {} microseconds", TimeUnit.MICROSECONDS.convert((System.nanoTime() - start), TimeUnit.NANOSECONDS));
-				coords.ifPresent(coordinatesDto -> {
-					if (isDebugMode) {
-						coordinatesDtoEvent.fire(coordinatesDto);
-					}
-					this.saveCoordinates(coordinatesDto, distanceMessage.getTime());
-					Set<Session> sessions = this.filterSessions(coordinatesDto);
-					broadCastMessage(sessions, new CoordinatesWrapper(coordinatesDto));
-					this.sendAreaEvents(coordinatesDto);
-				});
-			}
+			coords.ifPresent(coordinatesDto -> {
+				if (isDebugMode) {
+					coordinatesDtoEvent.fire(coordinatesDto);
+				}
+				this.saveCoordinates(coordinatesDto, distanceMessage.getTime());
+				Set<Session> sessions = this.filterSessions(coordinatesDto);
+				broadCastMessage(sessions, new CoordinatesWrapper(coordinatesDto));
+				this.sendAreaEvents(coordinatesDto);
+			});
 		});
-	}
-
-	private boolean bothDevicesAreAnchors(DistanceMessage distanceMessage) {
-		return distanceMessage.getDid1() > Short.MAX_VALUE && distanceMessage.getDid2() > Short.MAX_VALUE;
-	}
-
-	private void saveCoordinates(UwbCoordinatesDto coordinatesDto, Timestamp timestamp) {
-		UwbCoordinates coordinates = new UwbCoordinates();
-		coordinates.setTag(tagRepository.findOptionalByShortId(coordinatesDto.getTagShortId()).orElseThrow(EntityNotFoundException::new));
-		coordinates.setX(coordinatesDto.getPoint().getX());
-		coordinates.setY(coordinatesDto.getPoint().getY());
-		coordinates.setZ(coordinatesDto.getPoint().getZ());
-		coordinates.setFloor(floorRepository.findOptionalById(coordinatesDto.getFloorId()).orElseThrow(EntityNotFoundException::new));
-		Instant instant = Instant.ofEpochMilli(timestamp.getTime());
-		coordinates.setMeasurementTime(LocalDateTime.ofInstant(instant, ZoneId.systemDefault()));
-		coordinatesRepository.save(coordinates);
 	}
 
 	private Set<Session> filterSessions(UwbCoordinatesDto coordinatesDto) {
 		Set<Session> sessions = frontendSessions;
-		for(Map.Entry<FilterType, Filter> filterEntry : activeFilters.entrySet()) {
+		for (Map.Entry<FilterType, Filter> filterEntry : activeFilters.entrySet()) {
 			if (FilterType.TAG.equals(filterEntry.getKey())) {
 				sessions = filterEntry.getValue().filter(sessions, coordinatesDto.getTagShortId());
 			} else if (FilterType.FLOOR.equals(filterEntry.getKey())) {
@@ -225,12 +192,5 @@ public class MeasuresWebSocket extends WebSocket {
 			}
 		}
 		return sessions;
-	}
-
-	private void sendAreaEvents(UwbCoordinatesDto coordinatesDto) {
-		List<AreaEvent> events = areaEventController.checkCoordinates(coordinatesDto);
-		for (AreaEvent event : events) {
-			broadCastMessage(this.getFrontendSessions(), new AreaEventWrapper(event));
-		}
 	}
 }
