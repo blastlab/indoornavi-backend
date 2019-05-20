@@ -182,6 +182,7 @@ public class InfoWebSocket extends WebSocket {
 			for (DeviceStatus tagStatus : network.getTags()) {
 				checkOutdatedDeviceStatus(tagStatus, network.getSession());
 			}
+			checkOutdatedDeviceStatus(network.getSink(), network.getSession());
 		});
 		getFrontendSessions().forEach(this::sendInfoAboutConnectedDevices);
 	}
