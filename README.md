@@ -47,3 +47,57 @@ Only issue for which code fulfills above rules can be found as done.
 
 ##### Submodule init
 ```$ git submodule update --init```
+
+## Debugging
+
+### VisualVM
+
+Download and unpack VisualVM: https://github.com/oracle/visualvm/releases
+
+Launch VisualVM with WildFly client libraries:
+
+```bash
+CORE_ID=$(docker-compose ps -q core)
+docker cp ${CORE_ID}:/opt/jboss/wildfly /tmp/wildfly
+./bin/visualvm -cp:a /tmp/wildfly/bin/client/jboss-cli-client.jar -J-Dmodule.path=/tmp/wildfly/modules
+```
+
+In VisualVM select File -> Add JMX Connection and pass parameters:
+
+- Connection: service:jmx:remote+http://localhost:9990
+- Use security credentials: check
+- Username: admin
+- Pasword: admin
+- Do not require SSL connection: check
+
+### async-profiler
+
+Enter the core Docker container
+
+```bash
+docker-compose exec core bash
+```
+
+and run:
+
+```bash
+cd /opt
+curl -OL https://github.com/jvm-profiling-tools/async-profiler/releases/download/v1.5/async-profiler-1.5-linux-x64.tar.gz
+mkdir async-profiler
+tar xf async-profiler-1.5-linux-x64.tar.gz -C async-profiler
+cd async-profiler
+
+PID=$(pgrep -f java)
+./profiler.sh start ${PID}
+# ...
+./profiler.sh stop -f /tmp/flamegraph.svg ${PID}
+```
+
+Outside the Docker container run commands to extract SVG output graph:
+
+```bash
+CORE_ID=$(docker-compose ps -q core)
+docker cp ${CORE_ID}:/tmp/flamegraph.svg .
+```
+
+Open `flamegraph.svg` file in browser for interactive graph.

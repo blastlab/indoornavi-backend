@@ -5,8 +5,6 @@ services:
     extends:
       file: database/docker-compose.yml
       service: db
-    container_name:
-      db
 
 
   liquibase:
@@ -25,8 +23,6 @@ services:
 
   core:
     build: .
-    container_name:
-      core
     ports:
       - '90:8080'
       - '8787:8787'
@@ -48,6 +44,8 @@ services:
       ALGORITHM: GeoN3d
 #      ALGORITHM: Taylor
     entrypoint: ["wait-for-it", "liquibase:80", "-t", "0", "--", "/start-server.sh"]
+    security_opt:
+      - seccomp:unconfined # disabled for async-profiler, don't repeat in on production env!
 
 
   core_compiler:
@@ -55,8 +53,6 @@ services:
     volumes:
       - ./:/app
       - m2:/root/.m2
-    container_name:
-      core_compiler
 
 
   solver:
