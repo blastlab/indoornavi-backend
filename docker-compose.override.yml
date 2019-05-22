@@ -45,7 +45,7 @@ services:
 #      ALGORITHM: Taylor
     entrypoint: ["wait-for-it", "liquibase:80", "-t", "0", "--", "/start-server.sh"]
     security_opt:
-      - seccomp:unconfined # disabled for async-profiler, don't repeat in on production env!
+      - seccomp:unconfined # disabled for async-profiler, don't repeat on production env!
 
 
   core_compiler:

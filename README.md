@@ -50,6 +50,9 @@ Only issue for which code fulfills above rules can be found as done.
 
 ## Debugging
 
+When profiling application, disable logging / raise log level to production value
+to prevent GC and performance overhead from logger.
+
 ### VisualVM
 
 Download and unpack VisualVM: https://github.com/oracle/visualvm/releases
@@ -71,6 +74,13 @@ In VisualVM select File -> Add JMX Connection and pass parameters:
 - Do not require SSL connection: check
 
 ### async-profiler
+
+Change kernel variables as `root`:
+
+```bash
+echo 1 > /proc/sys/kernel/perf_event_paranoid
+echo 0 > /proc/sys/kernel/kptr_restrict
+```
 
 Enter the core Docker container
 
