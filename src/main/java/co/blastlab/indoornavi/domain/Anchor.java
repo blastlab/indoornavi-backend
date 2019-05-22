@@ -22,15 +22,12 @@ import javax.persistence.*;
 	),
 	@NamedQuery(
 		name = Anchor.FLOOR_ID_BY_ANCHOR_SHORT_ID,
-		query = "SELECT f.id FROM Anchor AS a JOIN a.floor AS f WHERE a.shortId = ?1"
+		query = "SELECT f.id FROM Anchor AS a JOIN a.floor AS f WHERE a.shortId = ?1",
+		hints = {@QueryHint(name = "org.hibernate.cacheable", value = "true")}
 	),
 	@NamedQuery(
 		name = Anchor.ALL_WITH_FLOOR,
 		query = "FROM Anchor as a JOIN FETCH a.floor"
-	),
-	@NamedQuery(
-		name = Anchor.BY_SHORT_ID_WITH_SINK,
-		query = "FROM Anchor as a JOIN FETCH a.sink WHERE a.shortId = ?1"
 	)
 })
 @ToString(callSuper = true)
@@ -66,5 +63,4 @@ public class Anchor extends Uwb {
 	public static final String BY_SHORT_ID_IN = "byShortIdIn";
 	public static final String FLOOR_ID_BY_ANCHOR_SHORT_ID = "floorIdByAnchorShortId";
 	public static final String ALL_WITH_FLOOR = "allWithFloor";
-	public static final String BY_SHORT_ID_WITH_SINK = "byShortIdWithSink";
 }

@@ -8,5 +8,5 @@ import java.util.Optional;
 
 public interface Algorithm {
 	boolean useInterpolation = true;
-	Optional<Point3D> calculate(String sessionId, List<Integer> connectedAnchors, Integer tagId);
+	Optional<Point3D> calculate(List<Integer> connectedAnchors, Integer tagId);
 }

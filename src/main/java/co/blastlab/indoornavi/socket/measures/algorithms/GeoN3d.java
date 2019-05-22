@@ -20,10 +20,10 @@ public class GeoN3d extends Algorithm3d implements Algorithm {
 	private Storage storage;
 
 	@Override
-	public Optional<Point3D> calculate(String sessionId, List<Integer> connectedAnchors, Integer tagId) {
+	public Optional<Point3D> calculate(List<Integer> connectedAnchors, Integer tagId) {
 		List<Anchor> anchors;
 		try {
-			anchors = getAnchors(sessionId, connectedAnchors);
+			anchors = getAnchors(connectedAnchors);
 		} catch (NotEnoughAnchors notEnoughAnchors) {
 			return Optional.empty(); 
 		}

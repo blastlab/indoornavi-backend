@@ -7,6 +7,8 @@ import lombok.Getter;
 import org.apache.commons.math3.analysis.polynomials.PolynomialFunction;
 import org.apache.commons.math3.fitting.PolynomialCurveFitter;
 import org.apache.commons.math3.fitting.WeightedObservedPoint;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.ejb.Singleton;
 import java.util.*;
@@ -18,6 +20,7 @@ public class Storage {
 	private Map<Integer, Map<Integer, PolyMeasure>> measures = new LinkedHashMap<>();
 	@Getter
 	private Map<Integer, PointAndTime> previousCoordinates = new HashMap<>();
+	private static Logger logger = LoggerFactory.getLogger("TEST");
 
 	public double getDistance(Integer tagId, Integer anchorId) {
 		double meanDistance = 0d;
@@ -60,7 +63,7 @@ public class Storage {
 				List<Measure> measures = anchorsMeasures.get(anchorId).getMeasures();
 				anchorsMeasures.get(anchorId).setPoly(calculatePoly(measures, measurementTime));
 				anchorsMeasures.get(anchorId).setPolyCalculationTimestamp(measurementTime);
-				measures.add(new Measure(distance, measurementTime));
+				measures.add(0, new Measure(distance, measurementTime));
 			} else {
 				anchorsMeasures.put(anchorId, new PolyMeasure(new LinkedList<>(Collections.singletonList(new Measure(distance, measurementTime))), new double[]{distance}, measurementTime));
 			}

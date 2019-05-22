@@ -18,6 +18,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import lombok.Setter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.ejb.Asynchronous;
 import javax.ejb.Singleton;
@@ -31,6 +33,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @ServerEndpoint("/measures")
@@ -58,8 +61,9 @@ public class MeasuresWebSocket extends WebSocket {
 	@Inject
 	private Event<UwbCoordinatesDto> coordinatesDtoEvent;
 
-	@Inject
-	private LoggerController logger;
+	//	@Inject
+//	private LoggerController logger;
+	private Logger logger = LoggerFactory.getLogger("TEST");
 
 	@Inject
 	private CoordinatesCalculator coordinatesCalculator;
@@ -78,7 +82,7 @@ public class MeasuresWebSocket extends WebSocket {
 
 	@OnOpen
 	public void open(Session session) {
-		logger.create(session);
+//		logger.create(session);
 
 		super.open(session, () -> {
 			List<TagDto> tags = tagRepository.findAll().stream().map(TagDto::new).collect(Collectors.toList());
@@ -94,6 +98,10 @@ public class MeasuresWebSocket extends WebSocket {
 			List<AnchorDto> anchors = anchorRepository.findAllWithFloor().stream().map(AnchorDto::new).collect(Collectors.toList());
 			broadCastMessage(emulatorSessions, new AnchorsWrapper(anchors));
 		}
+
+//		if (isEmulatorSession(session) || isSinkSession(session)) {
+//			coordinatesCalculator.addSink(session.getRequestParameterMap().get("sink"));
+//		}
 	}
 
 	@OnClose
@@ -124,6 +132,7 @@ public class MeasuresWebSocket extends WebSocket {
 
 	@OnMessage
 	public void handleMessage(String message, Session session) throws IOException {
+		long start = System.nanoTime();
 		setSessionThread(session);
 		if (isFrontendSession(session)) {
 			Command command = objectMapper.readValue(message, Command.class);
@@ -138,8 +147,19 @@ public class MeasuresWebSocket extends WebSocket {
 				}
 			}
 		} else if (isSinkSession(session) || isEmulatorSession(session)) {
+			long startRead = System.nanoTime();
 			List<DistanceMessage> measures = objectMapper.readValue(message, new TypeReference<List<DistanceMessage>>() {});
-			handleMeasures(measures);
+			long stopRead = System.nanoTime();
+			long startHandle = System.nanoTime();
+			handleMeasures(session, measures);
+			long stopHandle = System.nanoTime();
+
+			logger.debug("ALL {}, READ {}, HANDLE {}", new Object[]{
+					TimeUnit.MICROSECONDS.convert(System.nanoTime() - start, TimeUnit.NANOSECONDS),
+					TimeUnit.MICROSECONDS.convert(stopRead - startRead, TimeUnit.NANOSECONDS),
+					TimeUnit.MICROSECONDS.convert(stopHandle - startHandle, TimeUnit.NANOSECONDS)
+				}
+			);
 		}
 	}
 
@@ -159,14 +179,20 @@ public class MeasuresWebSocket extends WebSocket {
 	 * and
 	 * @see DebugBean#calculatedCoordinatesEndpoint
 	 */
-	private void handleMeasures(List<DistanceMessage> measures) {
+	private long before = 0;
+
+	private void handleMeasures(Session session, List<DistanceMessage> measures) {
+		logger.debug("Measures: {}", measures.size());
 		measures.forEach(distanceMessage -> {
 			if (isDebugMode) {
 				distanceMessageEvent.fire(distanceMessage);
 			}
-			logger.trace(getSessionId(), "Will analyze distance message: {}", distanceMessage);
-			logger.debug(getSessionId(), "Time diff: {}", Math.abs(distanceMessage.getTime().getTime() - new Date().getTime()));
-			Optional<UwbCoordinatesDto> coords = coordinatesCalculator.calculateTagPosition(getSessionId(), distanceMessage);
+//			logger.trace("TEST Will analyze distance message: {}", distanceMessage);
+			logger.debug("TEST Time diff: {}", Math.abs(distanceMessage.getTime().getTime() - new Date().getTime()));
+			long start = System.nanoTime();
+			Optional<UwbCoordinatesDto> coords = coordinatesCalculator.calculateTagPosition(session, distanceMessage);
+			logger.debug("CALC {}", TimeUnit.MICROSECONDS.convert(System.nanoTime() - start, TimeUnit.NANOSECONDS));
+//			logger.debug("TEST Coordinates calculated {}", coords.isPresent());
 			coords.ifPresent(coordinatesDto -> {
 				Instant instant = Instant.ofEpochMilli(distanceMessage.getTime().getTime());
 				coordinatesDto.setMeasurementTime(LocalDateTime.ofInstant(instant, ZoneId.systemDefault()));

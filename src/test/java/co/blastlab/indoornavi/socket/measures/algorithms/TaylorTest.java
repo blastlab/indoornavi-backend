@@ -64,7 +64,7 @@ public class TaylorTest {
 		}
 
 		// WHEN
-		Optional<Point3D> point = taylor.calculate("Test", ImmutableList.of(32768, 32769, 32770, 32771), 1);
+		Optional<Point3D> point = taylor.calculate(ImmutableList.of(32768, 32769, 32770, 32771), 1);
 
 		// THEN
 		assertThat(point.isPresent(), is(true));

@@ -26,10 +26,10 @@ public class Taylor extends Algorithm3d implements Algorithm {
 	private Storage storage;
 
 	@Override
-	public Optional<Point3D> calculate(String sessionId, List<Integer> connectedAnchors, Integer tagId) {
+	public Optional<Point3D> calculate(List<Integer> connectedAnchors, Integer tagId) {
 		List<Anchor> anchors;
 		try {
-			anchors = getAnchors(sessionId, connectedAnchors);
+			anchors = getAnchors(connectedAnchors);
 		} catch (Algorithm3d.NotEnoughAnchors notEnoughAnchors) {
 			return Optional.empty();
 		}
@@ -64,7 +64,7 @@ public class Taylor extends Algorithm3d implements Algorithm {
 			stateMatrix.tagPosition = stateMatrix.tagPosition.plus(p);
 
 			if (p.normF() < 10) {
-				logger.trace(sessionId, "Less than 10 iteration was needed: {}", taylorIter);
+//				logger.trace(sessionId, "Less than 10 iteration was needed: {}", taylorIter);
 				break;
 			}
 		}
@@ -90,12 +90,12 @@ public class Taylor extends Algorithm3d implements Algorithm {
 		}
 
 		if (!isTagPositionGood(stateMatrix)) {
-			logger.trace(sessionId, "Tag position calculated far too far: x = {}, y = {}, z = {}", x, y, z);
+//			logger.trace(sessionId, "Tag position calculated far too far: x = {}, y = {}, z = {}", x, y, z);
 			return Optional.empty();
 		}
 
-		logger.trace(sessionId, "Tag position calculated: x = {}, y = {}, z = {}, res = {}, max = {} from = {}"
-			, (int) Math.round(x), (int) Math.round(y), (int) Math.round(z), res, max, maxA.getShortId());
+//		logger.trace(sessionId, "Tag position calculated: x = {}, y = {}, z = {}, res = {}, max = {} from = {}"
+//			, (int) Math.round(x), (int) Math.round(y), (int) Math.round(z), res, max, maxA.getShortId());
 
 		return Optional.of(new Point3D((int) Math.round(x), (int) Math.round(y), (int) Math.round(z)));
 	}
