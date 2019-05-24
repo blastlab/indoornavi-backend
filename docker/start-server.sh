@@ -7,6 +7,9 @@
 
 if [ $APP_ENVIRONMENT = "development" ]; then
 	OPT_MANAGEMENT="--debug 8787 -bmanagement 0.0.0.0"
+
+	# additional debug JVM options for async-profiler
+	echo "JAVA_OPTS=\"\$JAVA_OPTS -XX:+UnlockDiagnosticVMOptions -XX:+DebugNonSafepoints\"" >> ${JBOSS_HOME}/bin/standalone.conf
 fi
 
 exec $JBOSS_HOME/bin/standalone.sh \
