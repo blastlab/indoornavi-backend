@@ -27,9 +27,6 @@ public class Algorithm3d {
 
 	private static Logger logger = LoggerFactory.getLogger("TEST");
 
-	@Inject
-	SessionFactory sessionFactory;
-
 	protected List<Anchor> getAnchors(List<Integer> connectedAnchors) throws NotEnoughAnchors {
 		int connectedAnchorsCount = connectedAnchors.size();
 
@@ -39,17 +36,7 @@ public class Algorithm3d {
 		}
 
 		logger.trace("Connected anchors: {}", connectedAnchors.size());
-		long start = System.nanoTime();
 		List<Anchor> anchors = anchorRepository.findByShortIdIn(connectedAnchors);
-		logger.debug("GETTING ANCHORS {}", TimeUnit.MICROSECONDS.convert(System.nanoTime() - start, TimeUnit.NANOSECONDS));
-		logger.debug("GETTING ANCHORS CACHE HIT {}", sessionFactory.getStatistics().getSecondLevelCacheHitCount());
-		logger.debug("GETTING ANCHORS CACHE MISS {}", sessionFactory.getStatistics().getSecondLevelCacheMissCount());
-		StringBuilder s = new StringBuilder();
-		for (String query : sessionFactory.getStatistics().getQueries()) {
-			s.append(query);
-			s.append("\n");
-		}
-		logger.debug("GETTING ANCHORS QUERIES {}", s.toString());
 
 		if (anchors.size() < 4) {
 			logger.trace("Not enough connected and in database anchors to calculate position. Currently connected anchors: {}", connectedAnchors.size());

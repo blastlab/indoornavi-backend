@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ejb.Singleton;
+import javax.ejb.Stateless;
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
 import javax.websocket.Session;
@@ -31,7 +32,8 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-@Singleton
+//@Singleton
+//@Stateless
 public class CoordinatesCalculator {
 
 	// 10 seconds
@@ -82,7 +84,7 @@ public class CoordinatesCalculator {
 		int distance = distanceMessage.getDist();
 		long measurementTime = distanceMessage.getTime().getTime();
 
-		logger.trace("TEST Measure storage tags: {}", storage.getMeasures().keySet().size());
+//		logger.trace("TEST Measure storage tags: {}", storage.getMeasures().keySet().size());
 
 		try {
 			validateDevicesIds(firstDeviceId, secondDeviceId);
@@ -94,11 +96,17 @@ public class CoordinatesCalculator {
 			tagToSessionMapping.put(tagId, session);
 			tagToSessionMapping.put(anchorId, session);
 
+//			long start = System.nanoTime();
 			storage.setConnection(tagId, anchorId, distance, measurementTime);
+//			logger.debug("KAROL setConnection {}", TimeUnit.MICROSECONDS.convert(System.nanoTime() - start, TimeUnit.NANOSECONDS));
 
+//			start = System.nanoTime();
 			List<Integer> connectedAnchors = new ArrayList<>(getConnectedAnchors(tagId, measurementTime));
+//			logger.debug("KAROL getConnectedAnchors {}", TimeUnit.MICROSECONDS.convert(System.nanoTime() - start, TimeUnit.NANOSECONDS));
 
+//			start = System.nanoTime();
 			Optional<Point3D> calculatedPointOptional = algorithm.calculate(connectedAnchors, tagId);
+//			logger.debug("KAROL calculate {}", TimeUnit.MICROSECONDS.convert(System.nanoTime() - start, TimeUnit.NANOSECONDS));
 
 			if (!calculatedPointOptional.isPresent()) {
 				return Optional.empty();
@@ -108,8 +116,10 @@ public class CoordinatesCalculator {
 
 //			logger.trace("Current position: X: {}, Y: {}, Z: {}", calculatedPoint.getX(), calculatedPoint.getY(), calculatedPoint.getZ());
 
+//			start = System.nanoTime();
 			Long floorId = anchorRepository.findFloorIdByAnchorShortId(anchorId)
 				.orElse(null);
+//			logger.debug("KAROL findFloor {}", TimeUnit.MICROSECONDS.convert(System.nanoTime() - start, TimeUnit.NANOSECONDS));
 
 			if (floorId == null) {
 				return Optional.empty();
@@ -119,6 +129,7 @@ public class CoordinatesCalculator {
 				this.sendEventToTagTracer(tagId, floorRepository.findBy(floorId));
 			}
 
+//			start = System.nanoTime();
 			Optional.ofNullable(storage.getPreviousCoordinates().get(tagId)).ifPresent((previousPoint) -> {
 				calculatedPoint.setX((calculatedPoint.getX() + previousPoint.getPoint().getX()) / 2);
 				calculatedPoint.setY((calculatedPoint.getY() + previousPoint.getPoint().getY()) / 2);
@@ -126,7 +137,7 @@ public class CoordinatesCalculator {
 			});
 			Date currentDate = new Date();
 			storage.getPreviousCoordinates().put(tagId, new PointAndTime(calculatedPoint, currentDate.getTime()));
-			logger.debug("PREVIOUS {}", storage.getPreviousCoordinates().size());
+//			logger.debug("KAROL finishing {}", TimeUnit.MICROSECONDS.convert(System.nanoTime() - start, TimeUnit.NANOSECONDS));
 			return Optional.of(new UwbCoordinatesDto(tagId, anchorId, floorId, calculatedPoint, currentDate));
 		} catch (DeviceIdOutOfRangeException e) {
 //			logger.trace(sessionId, "One of the devices' ids is out of range. Ids are: {}, {} and range is (1, {})", firstDeviceId, secondDeviceId, Short.MAX_VALUE);

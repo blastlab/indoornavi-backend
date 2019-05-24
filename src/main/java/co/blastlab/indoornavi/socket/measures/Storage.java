@@ -11,15 +11,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ejb.Singleton;
+import javax.ejb.Stateless;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 @Singleton
+//@Stateless
 public class Storage {
 	// tag short id, anchor short id, measure list
 	@Getter
-	private Map<Integer, Map<Integer, PolyMeasure>> measures = new LinkedHashMap<>();
+	private Map<Integer, Map<Integer, PolyMeasure>> measures = new ConcurrentHashMap<>();
 	@Getter
-	private Map<Integer, PointAndTime> previousCoordinates = new HashMap<>();
+	private Map<Integer, PointAndTime> previousCoordinates = new ConcurrentHashMap<>();
 	private static Logger logger = LoggerFactory.getLogger("TEST");
 
 	public double getDistance(Integer tagId, Integer anchorId) {
@@ -57,21 +61,26 @@ public class Storage {
 	}
 
 	public void setConnection(int tagId, int anchorId, double distance, long measurementTime) {
+		long start = System.nanoTime();
 		if (measures.containsKey(tagId)) {
 			Map<Integer, PolyMeasure> anchorsMeasures = measures.get(tagId);
 			if (anchorsMeasures.containsKey(anchorId)) {
+				logger.debug("SET CONNECTION __1__");
 				List<Measure> measures = anchorsMeasures.get(anchorId).getMeasures();
 				anchorsMeasures.get(anchorId).setPoly(calculatePoly(measures, measurementTime));
 				anchorsMeasures.get(anchorId).setPolyCalculationTimestamp(measurementTime);
 				measures.add(0, new Measure(distance, measurementTime));
 			} else {
-				anchorsMeasures.put(anchorId, new PolyMeasure(new LinkedList<>(Collections.singletonList(new Measure(distance, measurementTime))), new double[]{distance}, measurementTime));
+				logger.debug("SET CONNECTION __2__");
+				anchorsMeasures.put(anchorId, new PolyMeasure(new ArrayList<>(Collections.singletonList(new Measure(distance, measurementTime))), new double[]{distance}, measurementTime));
 			}
 		} else {
-			Map<Integer, PolyMeasure> anchorsMeasures = new LinkedHashMap<>();
-			anchorsMeasures.put(anchorId, new PolyMeasure(new LinkedList<>(Collections.singletonList(new Measure(distance, measurementTime))), new double[]{distance}, measurementTime));
+			logger.debug("SET CONNECTION __3__");
+			Map<Integer, PolyMeasure> anchorsMeasures = new HashMap<>();
+			anchorsMeasures.put(anchorId, new PolyMeasure(new ArrayList<>(Collections.singletonList(new Measure(distance, measurementTime))), new double[]{distance}, measurementTime));
 			measures.put(tagId, anchorsMeasures);
 		}
+		logger.debug("SET CONNECTION {}", TimeUnit.MICROSECONDS.convert(System.nanoTime() - start, TimeUnit.NANOSECONDS));
 	}
 
 	private double[] calculatePoly(List<Measure> measures, long now) {

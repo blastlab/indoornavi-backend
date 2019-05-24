@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Singleton
+//@Singleton
 public class TagFilter implements Filter {
 	/**
 	 * The key is: {@link Session} and value is a set of active tags ids

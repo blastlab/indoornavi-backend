@@ -11,7 +11,7 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 public class PolyMeasure {
-	private List<Measure> measures = new ArrayList<>();
+	private List<Measure> measures;
 	private double[] poly;
 	private long polyCalculationTimestamp;
 }

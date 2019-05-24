@@ -7,7 +7,6 @@ services:
       service: db
     container_name:
       db
-    cpus: .5
 
 
   liquibase:
@@ -49,7 +48,6 @@ services:
       ALGORITHM: GeoN3d
 #      ALGORITHM: Taylor
     entrypoint: ["wait-for-it", "liquibase:80", "-t", "0", "--", "/start-server.sh"]
-    cpus: .5
 
 
   core_compiler:
