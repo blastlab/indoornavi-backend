@@ -47,8 +47,7 @@ public class CalculateMeasuresTask extends WebSocketCommunication implements Cal
 //			logger.trace("TEST Will analyze distance message: {}", distanceMessage);
 			logger.debug("TEST Time diff: {}", Math.abs(distanceMessage.getTime().getTime() - new Date().getTime()));
 			coordinatesCalculator.calculateTagPosition(session, distanceMessage).ifPresent(coordinatesDto -> {
-				Instant instant = Instant.ofEpochMilli(distanceMessage.getTime().getTime());
-				coordinatesDto.setMeasurementTime(LocalDateTime.ofInstant(instant, ZoneId.systemDefault()));
+				coordinatesDto.setMeasurementTime(new Date(distanceMessage.getTime().getTime()));
 				coordinatesDtoEvent.fire(coordinatesDto);
 
 				Set<Session> sessions = this.filterSessions(coordinatesDto);

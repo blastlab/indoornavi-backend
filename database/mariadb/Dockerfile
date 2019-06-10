@@ -1,4 +1,4 @@
-FROM mariadb:10.1.18
+FROM mariadb:10.3.15
 
 ENV LANG C.UTF-8
 

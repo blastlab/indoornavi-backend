@@ -16,7 +16,7 @@ import java.util.Date;
 public class UwbCoordinatesDto extends CoordinatesDto {
 	private Integer tagShortId;
 	private Integer anchorShortId;
-	private LocalDateTime measurementTime;
+	private Date measurementTime;
 
 	public UwbCoordinatesDto(UwbCoordinates uwbCoordinates) {
 		super(uwbCoordinates);

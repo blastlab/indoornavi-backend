@@ -11,13 +11,13 @@ import java.util.List;
 @Repository
 public interface UwbCoordinatesRepository extends EntityRepository<UwbCoordinates, Long> {
 
-	String REQUIRED_FIELDS = "c.id, c.creationDate, c.modificationDate, round(avg(c.x)) as x, round(avg(c.y)) as y, c.floor_id, c.measurementTime, round(avg(c.z)) as z, uc.tag_id";
+	String REQUIRED_FIELDS = "c.id, c.creationDate, c.modificationDate, round(avg(c.x)) as x, round(avg(c.y)) as y, c.floor_id, c.measurementTime, round(avg(c.z)) as z, c.tag_id";
 
 	@Query(
 		value =
 			"select " + REQUIRED_FIELDS + " " +
-				"from coordinates c inner join uwbcoordinates uc on c.id = uc.id " +
-				"where c.floor_id = ?1 and c.creationDate >= ?2 and c.creationDate <= ?3 and uc.tag_id in (?4) " +
+				"from uwbcoordinates c " +
+				"where c.floor_id = ?1 and c.creationDate >= ?2 and c.creationDate <= ?3 and c.tag_id in (?4) " +
 				"group by c.creationDate " +
 				"order by c.creationDate",
 		isNative = true
@@ -27,7 +27,7 @@ public interface UwbCoordinatesRepository extends EntityRepository<UwbCoordinate
 	@Query(
 		value =
 			"select " + REQUIRED_FIELDS + " " +
-				"from coordinates c inner join uwbcoordinates uc on c.id = uc.id " +
+				"from uwbcoordinates c " +
 				"where c.floor_id = ?1 and c.creationDate >= ?2 and c.creationDate <= ?3 " +
 				"group by c.creationDate " +
 				"order by c.creationDate",
@@ -38,7 +38,7 @@ public interface UwbCoordinatesRepository extends EntityRepository<UwbCoordinate
 	@Query(
 		value =
 			"select " + REQUIRED_FIELDS + " " +
-				"from coordinates c inner join uwbcoordinates uc on c.id = uc.id " +
+				"from uwbcoordinates c  " +
 				"where c.creationDate >= ?1 and c.creationDate <= ?2 " +
 				"group by c.creationDate " +
 				"order by c.creationDate",
@@ -49,8 +49,8 @@ public interface UwbCoordinatesRepository extends EntityRepository<UwbCoordinate
 	@Query(
 		value =
 			"select " + REQUIRED_FIELDS + " " +
-				"from coordinates c inner join uwbcoordinates uc on c.id = uc.id " +
-				"where c.creationDate >= ?1 and c.creationDate <= ?2 and uc.tag_id in ?3 " +
+				"from uwbcoordinates c " +
+				"where c.creationDate >= ?1 and c.creationDate <= ?2 and c.tag_id in ?3 " +
 				"group by c.creationDate " +
 				"order by c.creationDate",
 		isNative = true

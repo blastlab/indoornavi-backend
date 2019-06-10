@@ -2,6 +2,7 @@ package co.blastlab.indoornavi.socket.measures;
 
 import co.blastlab.indoornavi.dao.repository.AnchorRepository;
 import co.blastlab.indoornavi.dao.repository.TagRepository;
+import co.blastlab.indoornavi.domain.Anchor;
 import co.blastlab.indoornavi.dto.anchor.AnchorDto;
 import co.blastlab.indoornavi.dto.report.UwbCoordinatesDto;
 import co.blastlab.indoornavi.dto.tag.TagDto;
@@ -81,6 +82,9 @@ public class MeasuresWebSocket extends WebSocket {
 	@Inject
 	private AnchorRepository anchorRepository;
 
+	@Inject
+	private AnchorRepository anchorRepositoryFake;
+
 	private Map<FilterType, Filter> activeFilters = new HashMap<>();
 
 	private boolean isEmulatorSession(Session session) {
@@ -102,7 +106,8 @@ public class MeasuresWebSocket extends WebSocket {
 
 		if (isEmulatorSession(session)) {
 			emulatorSessions.add(session);
-			List<AnchorDto> anchors = anchorRepository.findAllWithFloor().stream().map(AnchorDto::new).collect(Collectors.toList());
+			List<Anchor> allWithFloor = anchorRepository.findAllWithFloor();
+			List<AnchorDto> anchors = allWithFloor.stream().map(AnchorDto::new).collect(Collectors.toList());
 			broadCastMessage(emulatorSessions, new AnchorsWrapper(anchors));
 		}
 	}

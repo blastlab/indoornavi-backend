@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import javax.ejb.Singleton;
 import javax.ejb.Stateless;
 import javax.enterprise.event.Event;
+import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 import javax.websocket.Session;
 import java.math.BigInteger;
@@ -32,12 +33,9 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-//@Singleton
+@Singleton
 //@Stateless
 public class CoordinatesCalculator {
-
-	// 10 seconds
-	private final static long OLD_DATA_IN_MILLISECONDS = 10_000;
 
 	@Inject
 	private Storage storage;
@@ -84,14 +82,13 @@ public class CoordinatesCalculator {
 		int distance = distanceMessage.getDist();
 		long measurementTime = distanceMessage.getTime().getTime();
 
-//		logger.trace("TEST Measure storage tags: {}", storage.getMeasures().keySet().size());
+		logger.trace("TEST Measure storage tags: {}", storage.getMeasures().keySet().size());
 
 		try {
 			validateDevicesIds(firstDeviceId, secondDeviceId);
 
 			Integer tagId = firstDeviceId <= Short.MAX_VALUE ? firstDeviceId : secondDeviceId;
 			Integer anchorId = secondDeviceId > Short.MAX_VALUE ? secondDeviceId : firstDeviceId;
-
 
 			tagToSessionMapping.put(tagId, session);
 			tagToSessionMapping.put(anchorId, session);
@@ -101,7 +98,7 @@ public class CoordinatesCalculator {
 //			logger.debug("KAROL setConnection {}", TimeUnit.MICROSECONDS.convert(System.nanoTime() - start, TimeUnit.NANOSECONDS));
 
 //			start = System.nanoTime();
-			List<Integer> connectedAnchors = new ArrayList<>(getConnectedAnchors(tagId, measurementTime));
+			List<Integer> connectedAnchors = new ArrayList<>(storage.getConnectedAnchors(tagId, measurementTime));
 //			logger.debug("KAROL getConnectedAnchors {}", TimeUnit.MICROSECONDS.convert(System.nanoTime() - start, TimeUnit.NANOSECONDS));
 
 //			start = System.nanoTime();
@@ -114,7 +111,7 @@ public class CoordinatesCalculator {
 
 			Point3D calculatedPoint = calculatedPointOptional.get();
 
-//			logger.trace("Current position: X: {}, Y: {}, Z: {}", calculatedPoint.getX(), calculatedPoint.getY(), calculatedPoint.getZ());
+			logger.trace("Current position: X: {}, Y: {}, Z: {}", new Object[] {calculatedPoint.getX(), calculatedPoint.getY(), calculatedPoint.getZ() });
 
 //			start = System.nanoTime();
 			Long floorId = anchorRepository.findFloorIdByAnchorShortId(anchorId)
@@ -140,7 +137,7 @@ public class CoordinatesCalculator {
 //			logger.debug("KAROL finishing {}", TimeUnit.MICROSECONDS.convert(System.nanoTime() - start, TimeUnit.NANOSECONDS));
 			return Optional.of(new UwbCoordinatesDto(tagId, anchorId, floorId, calculatedPoint, currentDate));
 		} catch (DeviceIdOutOfRangeException e) {
-//			logger.trace(sessionId, "One of the devices' ids is out of range. Ids are: {}, {} and range is (1, {})", firstDeviceId, secondDeviceId, Short.MAX_VALUE);
+			logger.trace("One of the devices' ids is out of range. Ids are: {}, {} and range is (1, {})", new Object[] { firstDeviceId, secondDeviceId, Short.MAX_VALUE });
 			return Optional.empty();
 		}
 	}
@@ -158,30 +155,6 @@ public class CoordinatesCalculator {
 		if (!((firstDeviceId <= Short.MAX_VALUE && secondDeviceId > Short.MAX_VALUE) || (firstDeviceId > Short.MAX_VALUE && secondDeviceId <= Short.MAX_VALUE))) {
 			throw new DeviceIdOutOfRangeException();
 		}
-	}
-
-	private void cleanOldData(Long measurementTime) {
-		storage.getMeasures().forEach((tagId, anchorPolyMeasure) -> {
-			anchorPolyMeasure.forEach((anchor, polyMeasure) -> {
-				polyMeasure.getMeasures().removeIf(measure -> (new Date(measurementTime - OLD_DATA_IN_MILLISECONDS)).after(new Date(measure.getTimestamp())));
-				while (polyMeasure.getMeasures().size() > 4) {
-					polyMeasure.getMeasures().remove(polyMeasure.getMeasures().size() - 1);
-				}
-			});
-			anchorPolyMeasure.values().removeIf((polyMeasure ->
-				polyMeasure.getMeasures().isEmpty()
-			));
-		});
-
-	}
-
-	private Set<Integer> getConnectedAnchors(Integer tagId, Long measurementTime) {
-		this.cleanOldData(measurementTime);
-		Set<Integer> connectedAnchors = new HashSet<>();
-		if (storage.getMeasures().containsKey(tagId)) {
-			connectedAnchors.addAll(storage.getMeasures().get(tagId).keySet());
-		}
-		return connectedAnchors;
 	}
 
 	private static class DeviceIdOutOfRangeException extends Exception {}

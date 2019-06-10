@@ -16,7 +16,6 @@
 		<delete tableName="areaconfiguration" />
 		<delete tableName="uwbcoordinates" />
 		<delete tableName="phonecoordinates" />
-		<delete tableName="coordinates"/>
 		<delete tableName="tag"/>
 		<delete tableName="sink"/>
 		<delete tableName="anchor"/>
@@ -151,12 +150,6 @@
 		<loadData tableName="publication_floor" file="test/PublicationFloor.csv" relativeToChangelogFile="true" />
 	</changeSet>
 	
-	<changeSet id="Coordinates" author="kgebert" context="test" runOnChange="true" labels="Coordinates" runAlways="true">
-		<loadData tableName="coordinates" file="test/Coordinates.csv" relativeToChangelogFile="true">
-			<column name="creation_date" type="DATE" />
-		</loadData>
-	</changeSet>
-
 	<changeSet id="Phone" author="kgebert" context="test" runOnChange="true" labels="Phone" runAlways="true">
 		<loadData tableName="phone" file="test/Phone.csv" relativeToChangelogFile="true" />
 	</changeSet>
