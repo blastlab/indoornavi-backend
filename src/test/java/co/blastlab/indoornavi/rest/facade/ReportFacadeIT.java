@@ -13,7 +13,7 @@ public class ReportFacadeIT extends BaseIT {
 	@Override
 	public ImmutableList<String> getAdditionalLabels() {
 		return ImmutableList.of(
-			"Building", "Floor", "Device", "Tag", "Uwb", "Coordinates", "UwbCoordinates", "Phone", "PhoneCoordinates",
+			"Building", "Floor", "Device", "Tag", "Uwb", "UwbCoordinates", "Phone", "PhoneCoordinates",
 			"Area", "AreaConfiguration", "Area_AreaConfiguration", "AreaConfiguration_Tag"
 		);
 	}

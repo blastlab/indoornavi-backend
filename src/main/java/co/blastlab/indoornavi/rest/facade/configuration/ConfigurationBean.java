@@ -145,7 +145,7 @@ public class ConfigurationBean implements ConfigurationFacade {
 		} else {
 			Configuration configuration = latestConfigurations.get(0);
 			if (latestConfigurations.size() == 1) {
-				logger.debug("There is only one configuration, so it's inital state");
+				logger.debug("There is only one configuration, so it's initial state");
 				ObjectMapper objectMapper = new ObjectMapper();
 				configuration.setPublishedDate(null);
 				configuration.setSaveDraftDate(null);
