@@ -6,18 +6,19 @@ import co.blastlab.indoornavi.domain.Floor;
 import co.blastlab.indoornavi.domain.Publication;
 import co.blastlab.indoornavi.dto.configuration.ConfigurationDto;
 import co.blastlab.indoornavi.dto.configuration.PrePublishReport;
-import co.blastlab.indoornavi.dto.configuration.PrePublishReportItem;
-import co.blastlab.indoornavi.dto.configuration.PrePublishReportItemCode;
-import co.blastlab.indoornavi.dto.floor.FloorDto;
 import co.blastlab.indoornavi.utils.ConfigurationExtractor;
 import co.blastlab.indoornavi.utils.Logger;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
+import org.jboss.resteasy.util.HttpResponseCodes;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -97,6 +98,11 @@ public class ConfigurationBean implements ConfigurationFacade {
 		configurationExtractor.extractAreas(configurationData, floor);
 
 		configurationEntity.setPublishedDate(new Date());
+
+		if (!evictCacheInCalculator()) {
+			logger.debug("Evict cache in calculator returned unexpected httpCode");
+		}
+
 		return objectMapper.readValue(configurationEntity.getData(), ConfigurationDto.Data.class);
 	}
 
@@ -164,5 +170,12 @@ public class ConfigurationBean implements ConfigurationFacade {
 			configurationDtos.add(configurationDto);
 		}
 		return configurationDtos;
+	}
+
+	private boolean evictCacheInCalculator() {
+		Client client = ClientBuilder.newClient();
+		WebTarget target = client.target("http://calculator:8081/clearCache");
+		Response response = target.request().post(Entity.json(""));
+		return response.getStatus() == HttpResponseCodes.SC_NO_CONTENT;
 	}
 }

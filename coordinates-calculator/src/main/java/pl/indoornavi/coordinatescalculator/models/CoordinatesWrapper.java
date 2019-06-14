@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.Date;
 import java.util.List;
 
 @Getter
@@ -11,9 +12,9 @@ import java.util.List;
 @NoArgsConstructor
 public class CoordinatesWrapper {
     private String type = "COORDINATES";
-    private List<UwbCoordinatesDto> coordinates;
+    private List<UwbCoordinates> coordinates;
 
-    public CoordinatesWrapper(List<UwbCoordinatesDto> coordinates) {
+    public CoordinatesWrapper(List<UwbCoordinates> coordinates) {
         this.coordinates = coordinates;
     }
 }

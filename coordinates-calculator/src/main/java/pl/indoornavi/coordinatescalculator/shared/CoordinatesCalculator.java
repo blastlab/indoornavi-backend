@@ -5,11 +5,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import pl.indoornavi.coordinatescalculator.algorithms.Algorithm;
-import pl.indoornavi.coordinatescalculator.algorithms.GeoN3d;
 import pl.indoornavi.coordinatescalculator.models.DistanceMessage;
 import pl.indoornavi.coordinatescalculator.models.Point3D;
 import pl.indoornavi.coordinatescalculator.models.PointAndTime;
-import pl.indoornavi.coordinatescalculator.models.UwbCoordinatesDto;
+import pl.indoornavi.coordinatescalculator.models.UwbCoordinates;
 import pl.indoornavi.coordinatescalculator.repositories.AnchorRepository;
 
 import java.util.*;
@@ -32,7 +31,7 @@ public class CoordinatesCalculator {
     private final Algorithm algorithm;
     private final AnchorRepository anchorRepository;
 
-    public Optional<UwbCoordinatesDto> calculateTagPosition(DistanceMessage distanceMessage) {
+    public Optional<UwbCoordinates> calculateTagPosition(DistanceMessage distanceMessage) {
         int firstDeviceId = distanceMessage.getDid1();
         int secondDeviceId = distanceMessage.getDid2();
         int distance = distanceMessage.getDist();
@@ -78,7 +77,15 @@ public class CoordinatesCalculator {
             }
 
             storage.getPreviousCoordinates().put(tagId, new PointAndTime(calculatedPoint, measurementTime));
-            return Optional.of(new UwbCoordinatesDto(tagId, anchorId, floorId, calculatedPoint, new Date(measurementTime)));
+            return Optional.of(new UwbCoordinates(
+                    tagId,
+                    anchorId,
+                    floorId,
+                    (int) Math.round(calculatedPoint.getX()),
+                    (int) Math.round(calculatedPoint.getY()),
+                    (int) Math.round(calculatedPoint.getZ()),
+                    new Date(measurementTime))
+            );
         } catch (DeviceIdOutOfRangeException e) {
             logger.trace("One of the devices' ids is out of range. Ids are: {}, {} and range is (1, {})", firstDeviceId, secondDeviceId, Short.MAX_VALUE);
             return Optional.empty();

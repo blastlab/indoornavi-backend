@@ -9,14 +9,14 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class AnchorDto {
+public class Anchor {
     private Integer shortId;
     private Integer x;
     private Integer y;
     private Integer z;
-    private FloorDto floor;
+    private Floor floor;
 
-    public AnchorDto(Integer shortId, Integer x, Integer y, Integer z) {
+    public Anchor(Integer shortId, Integer x, Integer y, Integer z) {
         this.shortId = shortId;
         this.x = x;
         this.y = y;

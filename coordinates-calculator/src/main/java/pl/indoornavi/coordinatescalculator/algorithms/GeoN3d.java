@@ -4,7 +4,7 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.ejml.simple.SimpleMatrix;
 import org.springframework.beans.factory.annotation.Autowired;
-import pl.indoornavi.coordinatescalculator.models.AnchorDto;
+import pl.indoornavi.coordinatescalculator.models.Anchor;
 import pl.indoornavi.coordinatescalculator.models.Point3D;
 import pl.indoornavi.coordinatescalculator.models.PointAndTime;
 import pl.indoornavi.coordinatescalculator.repositories.AnchorRepository;
@@ -33,7 +33,7 @@ public class GeoN3d extends Algorithm3d implements Algorithm {
 
 	@Override
 	public Optional<Point3D> calculate(List<Integer> connectedAnchors, Integer tagId) {
-		List<AnchorDto> anchors;
+		List<Anchor> anchors;
 		try {
 			anchors = getAnchors(connectedAnchors);
 		} catch (NotEnoughAnchors notEnoughAnchors) {
@@ -45,19 +45,19 @@ public class GeoN3d extends Algorithm3d implements Algorithm {
 		long minTimestamp = storage.getTimeOfLastMeasure(tagId);
 
 		for (int i = 1; i < anchors.size(); i++) {
-			AnchorDto firstAnchor = anchors.get(i);
+			Anchor firstAnchor = anchors.get(i);
 			double firstDistance = useInterpolation ?
 				storage.getInterpolatedDistance(tagId, firstAnchor.getShortId(), minTimestamp) :
 				storage.getDistance(tagId, firstAnchor.getShortId());
 
 			for (int j = 0; j < i; j++) {
-				AnchorDto secondAnchor = anchors.get(j);
+				Anchor secondAnchor = anchors.get(j);
 				double secondDistance = useInterpolation ?
 					storage.getInterpolatedDistance(tagId, secondAnchor.getShortId(), minTimestamp) :
 					storage.getDistance(tagId, secondAnchor.getShortId());
 
 				for (int k = 0; k < j; k++) {
-					AnchorDto thirdAnchor = anchors.get(k);
+					Anchor thirdAnchor = anchors.get(k);
 					double thirdDistance = useInterpolation ?
 						storage.getInterpolatedDistance(tagId, thirdAnchor.getShortId(), minTimestamp) :
 						storage.getDistance(tagId, thirdAnchor.getShortId());

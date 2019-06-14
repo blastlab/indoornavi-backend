@@ -11,9 +11,9 @@ import java.util.List;
 @NoArgsConstructor
 public class AnchorsWrapper {
     private String type = "ANCHORS";
-    private List<AnchorDto> anchors;
+    private List<Anchor> anchors;
 
-    public AnchorsWrapper(List<AnchorDto> anchors) {
+    public AnchorsWrapper(List<Anchor> anchors) {
         this.anchors = anchors;
     }
 }

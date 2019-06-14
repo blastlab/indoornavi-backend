@@ -15,5 +15,5 @@ public class Command {
 		TOGGLE_TAG,
 		SET_FLOOR,
 		SET_TAGS
-	}
+    }
 }

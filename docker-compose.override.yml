@@ -65,7 +65,7 @@ services:
   calculator:
       build: coordinates-calculator
       ports:
-        - "99:8080"
+        - "99:8081"
         - "9797:8000"
       volumes: 
         - ./coordinates-calculator/target:/app

@@ -6,7 +6,7 @@ import lombok.Setter;
 import lombok.ToString;
 import org.ejml.simple.SimpleMatrix;
 import org.springframework.beans.factory.annotation.Autowired;
-import pl.indoornavi.coordinatescalculator.models.AnchorDto;
+import pl.indoornavi.coordinatescalculator.models.Anchor;
 import pl.indoornavi.coordinatescalculator.models.Point3D;
 import pl.indoornavi.coordinatescalculator.repositories.AnchorRepository;
 import pl.indoornavi.coordinatescalculator.shared.Storage;
@@ -30,7 +30,7 @@ public class Taylor extends Algorithm3d implements Algorithm {
 
 	@Override
 	public Optional<Point3D> calculate(List<Integer> connectedAnchors, Integer tagId) {
-		List<AnchorDto> anchors;
+		List<Anchor> anchors;
 		try {
 			anchors = getAnchors(connectedAnchors);
 		} catch (Algorithm3d.NotEnoughAnchors notEnoughAnchors) {
@@ -77,7 +77,7 @@ public class Taylor extends Algorithm3d implements Algorithm {
 
 		double max = 0;
 		for (int i = 0; i < anchors.size(); i++) {
-			AnchorDto anchor = anchors.get(i);
+			Anchor anchor = anchors.get(i);
 			double _x = Math.pow(anchor.getX() - x, 2);
 			double _y = Math.pow(anchor.getY() - y, 2);
 			double _z = Math.pow(anchor.getZ() - z, 2);
@@ -94,7 +94,7 @@ public class Taylor extends Algorithm3d implements Algorithm {
 		return Optional.of(new Point3D((int) Math.round(x), (int) Math.round(y), (int) Math.round(z)));
 	}
 
-	private StateMatrix getStateMatrix(List<AnchorDto> connectedAnchors, Integer tagId) {
+	private StateMatrix getStateMatrix(List<Anchor> connectedAnchors, Integer tagId) {
 		int N = connectedAnchors.size();
 		SimpleMatrix anchorPositions = new SimpleMatrix(N, 3);
 		SimpleMatrix measures = new SimpleMatrix(N, 1);
@@ -104,14 +104,14 @@ public class Taylor extends Algorithm3d implements Algorithm {
 			Point3D tagPreviousCoordinates = storage.getPreviousCoordinates().get(tagId).getPoint();
 			tagPosition.setColumn(0, 0, tagPreviousCoordinates.getX(), tagPreviousCoordinates.getY(), tagPreviousCoordinates.getZ());
 		} else {
-			connectedAnchors.stream().findFirst().ifPresent((AnchorDto firstAnchor) -> {
+			connectedAnchors.stream().findFirst().ifPresent((Anchor firstAnchor) -> {
 				tagPosition.setColumn(0, 0, firstAnchor.getX(), firstAnchor.getY(), firstAnchor.getZ());
 			});
 		}
 
-		AnchorDto[] anchors = connectedAnchors.toArray(new AnchorDto[0]);
+		Anchor[] anchors = connectedAnchors.toArray(new Anchor[0]);
 		for (int i = 0; i < N; ++i) {
-			AnchorDto currentAnchor = anchors[i];
+			Anchor currentAnchor = anchors[i];
 			anchorPositions.setRow(i, 0, currentAnchor.getX(), currentAnchor.getY(), currentAnchor.getZ());
 			measures.setRow(i, 0, useInterpolation ?
 				storage.getInterpolatedDistance(tagId, currentAnchor.getShortId(), storage.getTimeOfLastMeasure(tagId)) :

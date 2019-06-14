@@ -9,10 +9,12 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class UwbCoordinatesDto {
-	private Integer tagShortId;
-	private Integer anchorShortId;
+public class UwbCoordinates {
+	private Integer tagId;
+	private Integer anchorId;
 	private Long floorId;
-	private Point3D point;
-	private Date measurementTime;
+	private int x;
+	private int y;
+	private int z;
+	private Date time;
 }

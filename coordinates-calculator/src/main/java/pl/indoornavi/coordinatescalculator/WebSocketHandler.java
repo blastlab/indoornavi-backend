@@ -2,6 +2,7 @@ package pl.indoornavi.coordinatescalculator;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,17 +13,20 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
-import pl.indoornavi.coordinatescalculator.filters.*;
+import pl.indoornavi.coordinatescalculator.filters.Command;
+import pl.indoornavi.coordinatescalculator.filters.Filter;
 import pl.indoornavi.coordinatescalculator.models.AnchorsWrapper;
 import pl.indoornavi.coordinatescalculator.models.CoordinatesWrapper;
 import pl.indoornavi.coordinatescalculator.models.DistanceMessage;
-import pl.indoornavi.coordinatescalculator.models.UwbCoordinatesDto;
+import pl.indoornavi.coordinatescalculator.models.UwbCoordinates;
 import pl.indoornavi.coordinatescalculator.repositories.AnchorRepository;
 import pl.indoornavi.coordinatescalculator.repositories.CoordinatesRepository;
+import pl.indoornavi.coordinatescalculator.services.CoordinatesService;
 import pl.indoornavi.coordinatescalculator.shared.CoordinatesCalculator;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 public class WebSocketHandler extends TextWebSocketHandler {
@@ -36,17 +40,21 @@ public class WebSocketHandler extends TextWebSocketHandler {
     @Autowired
     public WebSocketHandler(AnchorRepository anchorRepository,
                             ObjectMapper objectMapper,
-                            CoordinatesCalculator coordinatesCalculator, CoordinatesRepository coordinatesRepository) {
+                            CoordinatesCalculator coordinatesCalculator,
+                            CoordinatesRepository coordinatesRepository,
+                            CoordinatesService coordinatesService) {
         this.anchorRepository = anchorRepository;
         this.objectMapper = objectMapper;
         this.coordinatesCalculator = coordinatesCalculator;
         this.coordinatesRepository = coordinatesRepository;
+        this.coordinatesService = coordinatesService;
     }
 
     private final AnchorRepository anchorRepository;
     private final ObjectMapper objectMapper;
     private final CoordinatesCalculator coordinatesCalculator;
     private final CoordinatesRepository coordinatesRepository;
+    private final CoordinatesService coordinatesService;
 
     @Override
     public boolean supportsPartialMessages() {
@@ -92,7 +100,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
         logger.debug("Session disconnected: {}", session.getUri());
-        logger.info(status.getReason());
+        logger.debug(status.getReason());
 
         executeForSpecificSession(session, () -> {
             frontendSessions.remove(session);
@@ -110,12 +118,12 @@ public class WebSocketHandler extends TextWebSocketHandler {
         coordinatesRepository.saveStoredCoordinates();
     }
 
-    @Scheduled(fixedRate = 1000)
+    @Scheduled(fixedDelay = 1000)
     public void sendCoordinates() {
-        Map<Integer, UwbCoordinatesDto> allCoordinates = coordinatesRepository.getCoordinatesToSend();
+        List<UwbCoordinates> allCoordinates = coordinatesService.getCoordinatesToSend();
         frontendSessions.keySet().forEach(frontendSession -> {
-            List<UwbCoordinatesDto> sessionCoordinates = new ArrayList<>();
-            allCoordinates.forEach((tagShortId, coordinatesDto) -> {
+            List<UwbCoordinates> sessionCoordinates = new ArrayList<>();
+            allCoordinates.forEach((coordinatesDto) -> {
                 if (isSessionAllowedToReceiveCoordinates(frontendSession, coordinatesDto)) {
                     sessionCoordinates.add(coordinatesDto);
                 }
@@ -125,10 +133,10 @@ public class WebSocketHandler extends TextWebSocketHandler {
                         new TextMessage(objectMapper.writeValueAsString(new CoordinatesWrapper(sessionCoordinates)))
                 );
             } catch (IOException e) {
+                logger.info(e.getLocalizedMessage());
                 e.printStackTrace();
             }
         });
-        coordinatesRepository.clearCoordinatesToSend();
     }
 
     private List<DistanceMessage> parseJsonToDistanceMessages(StringBuffer sessionBuffer) throws IOException {
@@ -154,6 +162,8 @@ public class WebSocketHandler extends TextWebSocketHandler {
         });
     }
 
+    private Map<Long, List<Long>> timeDifferencesPerThread = new ConcurrentHashMap<>();
+
     private void handleMeasuresMessage(WebSocketSession session, WebSocketMessage message) {
         StringBuffer sessionBuffer = payloadBuffer.get(session.getId());
         if (sessionBuffer != null) {
@@ -163,13 +173,16 @@ public class WebSocketHandler extends TextWebSocketHandler {
                 try {
                     List<DistanceMessage> distanceMessages = parseJsonToDistanceMessages(sessionBuffer);
                     distanceMessages.forEach(distanceMessage -> {
-                        logger.trace("Time difference between measurement time and time get right before calculation: {}ms", Math.abs(distanceMessage.getTime() - new Date().getTime()));
-                        coordinatesCalculator.calculateTagPosition(distanceMessage).ifPresent(coordinatesRepository::addToSave);
+                        addTime(distanceMessage.getTime());
+                        coordinatesCalculator.calculateTagPosition(distanceMessage).ifPresent(coordinatesService::add);
                     });
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+
                 payloadBuffer.put(session.getId(), new StringBuffer());
+                displayTime();
+                clearTime();
             }
         }
     }
@@ -198,11 +211,36 @@ public class WebSocketHandler extends TextWebSocketHandler {
         }
     }
 
-    private boolean isSessionAllowedToReceiveCoordinates(WebSocketSession session, UwbCoordinatesDto coordinatesDto) {
+    private boolean isSessionAllowedToReceiveCoordinates(WebSocketSession session, UwbCoordinates coordinatesDto) {
         Filter filter = frontendSessions.get(session);
         if (!filter.getFloorId().equals(coordinatesDto.getFloorId())) {
             return false;
         }
-        return filter.getTagsShortId().contains(coordinatesDto.getTagShortId());
+        return filter.getTagsShortId().contains(coordinatesDto.getTagId());
+    }
+
+    private void addTime(Long time) {
+        if (!logger.isDebugEnabled()) {
+            return;
+        }
+        List<Long> times = timeDifferencesPerThread.get(Thread.currentThread().getId());
+        if (times != null) {
+            timeDifferencesPerThread.get(Thread.currentThread().getId()).add(Math.abs(time - new Date().getTime()));
+        } else {
+            timeDifferencesPerThread.put(Thread.currentThread().getId(), Lists.newArrayList(Math.abs(time - new Date().getTime())));
+        }
+    }
+
+    private void clearTime() {
+        if (!logger.isDebugEnabled()) {
+            return;
+        }
+        timeDifferencesPerThread.remove(Thread.currentThread().getId());
+    }
+
+    private void displayTime() {
+        logger.debug("Time difference between measurement time and time get right before calculation: {}ms",
+                timeDifferencesPerThread.get(Thread.currentThread().getId()).stream().mapToLong(t -> t).average().orElse(0L)
+        );
     }
 }

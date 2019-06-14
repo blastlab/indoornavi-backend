@@ -3,7 +3,7 @@ package pl.indoornavi.coordinatescalculator.shared;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.ejml.simple.SimpleMatrix;
-import pl.indoornavi.coordinatescalculator.models.AnchorDto;
+import pl.indoornavi.coordinatescalculator.models.Anchor;
 import pl.indoornavi.coordinatescalculator.models.Point3D;
 
 import java.util.ArrayList;
@@ -12,7 +12,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class IntersectionsCalculator {
-    public static List<Point3D> getIntersections(AnchorDto firstAnchor, double firstAnchorDistance, AnchorDto secondAnchor, double secondAnchorDistance) {
+    public static List<Point3D> getIntersections(Anchor firstAnchor, double firstAnchorDistance, Anchor secondAnchor, double secondAnchorDistance) {
         List<Point3D> res = new ArrayList<>();
         double dx = secondAnchor.getX() - firstAnchor.getX();
         double dy = secondAnchor.getY() - firstAnchor.getY();
@@ -192,11 +192,11 @@ public class IntersectionsCalculator {
         return pairs;
     }
 
-    public static List<Pair<SimpleMatrix, Float>> getIntersections3d(AnchorDto firstAnchor,
+    public static List<Pair<SimpleMatrix, Float>> getIntersections3d(Anchor firstAnchor,
                                                                      double firstAnchorDistanceToTag,
-                                                                     AnchorDto secondAnchor,
+                                                                     Anchor secondAnchor,
                                                                      double secondAnchorDistanceToTag,
-                                                                     AnchorDto thirdAnchor,
+                                                                     Anchor thirdAnchor,
                                                                      double thirdAnchorDistanceToTag) {
         List<Pair<SimpleMatrix, Float>> pairs = new ArrayList<>();
         SimpleMatrix firstAnchorPosition = IntersectionsCalculator.buildAnchorPositionMatrix(firstAnchor.getX().doubleValue(), firstAnchor.getY().doubleValue(), firstAnchor.getZ().doubleValue());

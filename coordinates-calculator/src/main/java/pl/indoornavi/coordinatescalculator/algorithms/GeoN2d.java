@@ -5,7 +5,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pl.indoornavi.coordinatescalculator.models.AnchorDistance;
-import pl.indoornavi.coordinatescalculator.models.AnchorDto;
+import pl.indoornavi.coordinatescalculator.models.Anchor;
 import pl.indoornavi.coordinatescalculator.models.Point3D;
 import pl.indoornavi.coordinatescalculator.repositories.AnchorRepository;
 import pl.indoornavi.coordinatescalculator.shared.Storage;
@@ -43,8 +43,8 @@ public class GeoN2d implements Algorithm {
 		List<Point3D> intersectionPoints = new ArrayList<>();
 		int validAnchorsCount = 0;
 		for (Pair<AnchorDistance, AnchorDistance> pair : pairs) {
-			Optional<AnchorDto> left = anchorRepository.findByShortIdAndPositionNotNull(pair.getLeft().getAnchorId());
-			Optional<AnchorDto> right = anchorRepository.findByShortIdAndPositionNotNull(pair.getRight().getAnchorId());
+			Optional<Anchor> left = anchorRepository.findByShortIdAndPositionNotNull(pair.getLeft().getAnchorId());
+			Optional<Anchor> right = anchorRepository.findByShortIdAndPositionNotNull(pair.getRight().getAnchorId());
 			if (!left.isPresent() || !right.isPresent()) {
 				continue;
 			}
@@ -109,14 +109,14 @@ public class GeoN2d implements Algorithm {
 		return pairs;
 	}
 
-	private double calculatePythagoras(AnchorDto anchor, double distance) {
+	private double calculatePythagoras(Anchor anchor, double distance) {
 		int z = anchor.getZ();
 		checkAnchorIsInProperHeight(anchor, z, distance);
 		double result = Math.pow(distance, 2) - Math.pow(z - TAG_Z, 2);
 		return result < 0 ? 0 : Math.sqrt(result);
 	}
 
-	private void checkAnchorIsInProperHeight(AnchorDto anchor, int z, double distance) {
+	private void checkAnchorIsInProperHeight(Anchor anchor, int z, double distance) {
 		if (z > distance + MAX_DIFFERENCE_BETWEEN_DISTANCE_AND_ANCHOR_HEIGHT) {
 			logger.trace("Warning! Anchor shortId = {} height is higher than distance +100cm", anchor.getShortId());
 		}
