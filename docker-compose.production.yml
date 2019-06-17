@@ -63,12 +63,25 @@ services:
       options:
         max-size: "1g"
         max-file: "5"
+
+
   solver:
     image: indoornavi.azurecr.io/solver
     environment:
     - ROCKET_ENV=production
     ports:
     - "8000:8000"
+
+
+  calculator:
+    image: indoornavi.azurecr.io/coordinates-calculator
+    ports:
+      - "99:8081"
+      - "9797:8000"
+    environment:
+      APP_ENVIRONMENT: production
+
+
 volumes:
   # For Liquibase container.
   m2:

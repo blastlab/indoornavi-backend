@@ -69,6 +69,8 @@ services:
         - "9797:8000"
       volumes: 
         - ./coordinates-calculator/target:/app
+      environment:
+        APP_ENVIRONMENT: development
 
 volumes:
   # For Liquibase container.

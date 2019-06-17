@@ -10,4 +10,4 @@ character_set_server	= utf8
 collation_server		= utf8_unicode_ci
 
 max_allowed_packet      = 1073741824
-net_buffer_length       = 256M
+net_buffer_length       = 1048576

@@ -71,7 +71,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
             payloadBuffer.put(session.getId(), new StringBuffer());
             try {
                 String anchorsJsonString = objectMapper.writeValueAsString(new AnchorsWrapper(anchorRepository.findAll()));
-                logger.info(anchorsJsonString);
+                logger.debug(anchorsJsonString);
                 session.sendMessage(new TextMessage(anchorsJsonString));
             } catch (IOException e) {
                 e.printStackTrace();
@@ -93,7 +93,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
 
     @Override
     public void handleTransportError(WebSocketSession session, Throwable exception) throws Exception {
-        logger.info(exception.getLocalizedMessage());
+        logger.debug(exception.getLocalizedMessage());
         super.handleTransportError(session, exception);
     }
 
@@ -239,8 +239,11 @@ public class WebSocketHandler extends TextWebSocketHandler {
     }
 
     private void displayTime() {
-        logger.debug("Time difference between measurement time and time get right before calculation: {}ms",
-                timeDifferencesPerThread.get(Thread.currentThread().getId()).stream().mapToLong(t -> t).average().orElse(0L)
-        );
+        List<Long> times = timeDifferencesPerThread.get(Thread.currentThread().getId());
+        if (times != null) {
+            logger.debug("Time difference between measurement time and time get right before calculation: {}ms",
+                    timeDifferencesPerThread.get(Thread.currentThread().getId()).stream().mapToLong(t -> t).average().orElse(0L)
+            );
+        }
     }
 }
