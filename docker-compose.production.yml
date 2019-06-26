@@ -4,7 +4,7 @@ services:
   db:
     image: indoornavi.azurecr.io/db
     ports:
-    - '3306:3306'
+      - '3306:3306'
     restart: always
     environment:
       MYSQL_DATABASE: navi
@@ -13,7 +13,7 @@ services:
     container_name:
       db
     volumes:
-    - dbvolume:/var/lib/mysql
+      - dbvolume:/var/lib/mysql
     logging:
       driver: "json-file"
       options:
@@ -23,7 +23,7 @@ services:
   liquibase:
     image: indoornavi.azurecr.io/liquibase
     ports:
-    - '2306:80'
+      - '2306:80'
     restart: always
     environment:
       HOST: db
@@ -39,12 +39,12 @@ services:
     container_name:
       indoornavi_test
     ports:
-    - '90:8080'
-    - '8787:8787'
-    - '9990:9990'
+      - '90:8080'
+      - '8787:8787'
+      - '9990:9990'
     restart: always
     depends_on:
-    - db
+      - db
     environment:
       TZ: Europe/Warsaw
       APP_ENVIRONMENT: production
@@ -68,9 +68,10 @@ services:
   solver:
     image: indoornavi.azurecr.io/solver
     environment:
-    - ROCKET_ENV=production
+      - ROCKET_ENV=production
     ports:
-    - "8000:8000"
+      - "8000:8000"
+    restart: always
 
 
   calculator:
@@ -78,6 +79,7 @@ services:
     ports:
       - "99:8081"
       - "9797:8000"
+    restart: always
     environment:
       APP_ENVIRONMENT: production
 
