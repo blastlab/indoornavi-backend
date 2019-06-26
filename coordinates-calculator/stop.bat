@@ -1,1 +1,0 @@
-docker stop backend_calculator_1
