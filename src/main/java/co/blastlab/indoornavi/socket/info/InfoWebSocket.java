@@ -210,7 +210,11 @@ public class InfoWebSocket extends WebSocket {
 			logger.trace("Received message from server {}", message);
 			List<Info> infos = objectMapper.readValue(message, new TypeReference<List<Info>>() {});
 			for (Info info : infos) {
-				Optional.ofNullable(InfoType.from(info.getCode())).ifPresent(infoType -> {
+				if (info.getCode() == null) {
+					logger.debug("This message is invalid {}", message);
+					continue;
+				}
+ 				Optional.ofNullable(InfoType.from(info.getCode())).ifPresent(infoType -> {
 					switch (infoType) {
 						case STATION_WAKE_UP:
 							break;
