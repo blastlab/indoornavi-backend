@@ -39,6 +39,7 @@ import co.blastlab.indoornavi.socket.wrappers.BatteryLevelsWrapper;
 import co.blastlab.indoornavi.socket.wrappers.InfoErrorWrapper;
 import co.blastlab.indoornavi.socket.wrappers.InfoWrapper;
 import co.blastlab.indoornavi.utils.Logger;
+import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -129,7 +130,9 @@ public class InfoWebSocket extends WebSocket {
 	// key: sink shortId, value: session
 	private static Map<Integer, Session> sinkSessions = new HashMap<>();
 
-	private ObjectMapper objectMapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+	private ObjectMapper objectMapper = new ObjectMapper()
+		.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+		.configure(JsonParser.Feature.ALLOW_UNQUOTED_CONTROL_CHARS, true);;
 
 	public void assignSinkShortIdToSession(Session session, Integer shortId) {
 		sinkSessions.put(shortId, session);
