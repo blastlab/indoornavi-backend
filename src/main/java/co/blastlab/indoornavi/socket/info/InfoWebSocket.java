@@ -70,7 +70,7 @@ import java.util.stream.Collectors;
 
 import static co.blastlab.indoornavi.socket.info.controller.DeviceStatus.Status.RESTARTING;
 
-@ServerEndpoint("/info")
+@ServerEndpoint(value = "/info", decoders = {InfoMessageDecoder.class})
 @Singleton
 @Startup
 public class InfoWebSocket extends WebSocket {
@@ -132,7 +132,7 @@ public class InfoWebSocket extends WebSocket {
 
 	private ObjectMapper objectMapper = new ObjectMapper()
 		.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-		.configure(JsonParser.Feature.ALLOW_UNQUOTED_CONTROL_CHARS, true);;
+		.configure(JsonParser.Feature.ALLOW_UNQUOTED_CONTROL_CHARS, true);
 
 	public void assignSinkShortIdToSession(Session session, Integer shortId) {
 		sinkSessions.put(shortId, session);
@@ -202,16 +202,16 @@ public class InfoWebSocket extends WebSocket {
 	}
 
 	@OnMessage
-	public void handleMessage(String message, Session session) throws IOException {
+	public void handleMessage(List<Info> infos, Session session) throws IOException {
 		setSessionThread(session);
 		logger.setId(getSessionId());
 
 		if (isSinkSession(session)) {
-			logger.trace("Received message from server {}", message);
-			List<Info> infos = objectMapper.readValue(message, new TypeReference<List<Info>>() {});
+//			logger.trace("Received message from server {}", message);
+//			List<Info> infos = objectMapper.readValue(message, new TypeReference<List<Info>>() {});
 			for (Info info : infos) {
 				if (info.getCode() == null) {
-					logger.debug("This message is invalid {}", message);
+//					logger.debug("This message is invalid {}", message);
 					continue;
 				}
  				Optional.ofNullable(InfoType.from(info.getCode())).ifPresent(infoType -> {
@@ -241,24 +241,24 @@ public class InfoWebSocket extends WebSocket {
 				});
 			}
 		} else if (isFrontendSession(session)) {
-			logger.trace("[{}] Received message from client {}", getSessionId(), message);
-			ClientRequest clientRequest = objectMapper.readValue(message, ClientRequest.class);
-			switch (clientRequest.getType()) {
-				case CHECK_BATTERY_LEVEL:
-					List<CheckBatteryLevel> checkBatteryLevel = objectMapper.convertValue(clientRequest.getArgs(), new TypeReference<List<CheckBatteryLevel>>() {});
-					List<BatteryLevel> batteryLevels = batteryLevelController.checkBatteryLevels(checkBatteryLevel);
-					if (batteryLevels.size() > 0) {
-						broadCastMessage(Collections.singleton(session), new BatteryLevelsWrapper(batteryLevels));
-					}
-					break;
-				case RAW_COMMAND:
-					RawCommand rawCommand = objectMapper.convertValue(clientRequest.getArgs(), RawCommand.class);
-					commandController.handleRawCommand(rawCommand, session);
-					break;
-				case UPDATE_FIRMWARE:
-					prepareUpload(clientRequest);
-					break;
-			}
+//			logger.trace("[{}] Received message from client {}", getSessionId(), message);
+//			ClientRequest clientRequest = objectMapper.readValue(message, ClientRequest.class);
+//			switch (clientRequest.getType()) {
+//				case CHECK_BATTERY_LEVEL:
+//					List<CheckBatteryLevel> checkBatteryLevel = objectMapper.convertValue(clientRequest.getArgs(), new TypeReference<List<CheckBatteryLevel>>() {});
+//					List<BatteryLevel> batteryLevels = batteryLevelController.checkBatteryLevels(checkBatteryLevel);
+//					if (batteryLevels.size() > 0) {
+//						broadCastMessage(Collections.singleton(session), new BatteryLevelsWrapper(batteryLevels));
+//					}
+//					break;
+//				case RAW_COMMAND:
+//					RawCommand rawCommand = objectMapper.convertValue(clientRequest.getArgs(), RawCommand.class);
+//					commandController.handleRawCommand(rawCommand, session);
+//					break;
+//				case UPDATE_FIRMWARE:
+//					prepareUpload(clientRequest);
+//					break;
+//			}
 		}
 	}
 
