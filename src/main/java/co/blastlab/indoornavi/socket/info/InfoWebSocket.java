@@ -70,7 +70,7 @@ import java.util.stream.Collectors;
 
 import static co.blastlab.indoornavi.socket.info.controller.DeviceStatus.Status.RESTARTING;
 
-@ServerEndpoint(value = "/info")
+@ServerEndpoint(value = "/info", decoders = InfoDecoder.class)
 @Singleton
 @Startup
 public class InfoWebSocket extends WebSocket {
