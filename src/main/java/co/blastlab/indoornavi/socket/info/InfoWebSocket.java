@@ -70,7 +70,7 @@ import java.util.stream.Collectors;
 
 import static co.blastlab.indoornavi.socket.info.controller.DeviceStatus.Status.RESTARTING;
 
-@ServerEndpoint(value = "/info", decoders = InfoDecoder.class)
+@ServerEndpoint(value = "/info")
 @Singleton
 @Startup
 public class InfoWebSocket extends WebSocket {
@@ -199,6 +199,11 @@ public class InfoWebSocket extends WebSocket {
 		super.close(session, () -> {}, () -> {
 			networkController.unregister(session);
 		});
+	}
+
+	@OnMessage
+	public void handleMessage(byte[] bytes, Session session) throws IOException {
+		handleMessage(new String(bytes).replaceAll("//", "////"), session);
 	}
 
 	@OnMessage
