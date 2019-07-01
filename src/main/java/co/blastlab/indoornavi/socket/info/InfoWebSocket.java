@@ -202,11 +202,6 @@ public class InfoWebSocket extends WebSocket {
 	}
 
 	@OnMessage
-	public void handleMessage(byte[] bytes, Session session) throws IOException {
-		handleMessage(new String(bytes).replaceAll("//", "////"), session);
-	}
-
-	@OnMessage
 	public void handleMessage(String message, Session session) throws IOException {
 		setSessionThread(session);
 		logger.setId(getSessionId());
