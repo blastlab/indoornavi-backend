@@ -27,7 +27,7 @@ import javax.persistence.*;
 	),
 	@NamedQuery(
 		name = Anchor.ALL_WITH_FLOOR,
-		query = "FROM Anchor as a JOIN FETCH a.floor"
+		query = "FROM Anchor as a LEFT JOIN FETCH a.floor"
 	)
 })
 @ToString(callSuper = true)

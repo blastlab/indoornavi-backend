@@ -68,13 +68,11 @@ public class Storage {
 			Map<Integer, PolyMeasure> anchorsMeasures = measures.get(tagId);
 			if (anchorsMeasures.containsKey(anchorId)) {
 				List<Measure> measures = anchorsMeasures.get(anchorId).getMeasures();
-				try {
-					anchorsMeasures.get(anchorId).setPoly(calculatePoly(measures, measurementTime));
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-				anchorsMeasures.get(anchorId).setPolyCalculationTimestamp(measurementTime);
-				measures.add(0, new Measure(distance, measurementTime));
+				calculatePoly(measures, measurementTime).ifPresent(poly -> {
+					anchorsMeasures.get(anchorId).setPoly(poly);
+					anchorsMeasures.get(anchorId).setPolyCalculationTimestamp(measurementTime);
+					measures.add(0, new Measure(distance, measurementTime));
+				});
 			} else {
 				anchorsMeasures.put(anchorId, new PolyMeasure(
 					new LinkedList<>(Collections.singletonList(new Measure(distance, measurementTime))),
@@ -96,9 +94,9 @@ public class Storage {
 		return connectedAnchors;
 	}
 
-	private double[] calculatePoly(List<Measure> measures, long measurementTime) throws Exception {
+	private Optional<double[]> calculatePoly(List<Measure> measures, long measurementTime) {
 		if (measures.size() == 1) {
-			return new double[] {measures.get(0).getDistance()};
+			return Optional.of(new double[] {measures.get(0).getDistance()});
 		}
 		int polyOrder = 2;
 		if (measures.size() < polyOrder) {
@@ -120,10 +118,10 @@ public class Storage {
 			}
 
 			PolynomialCurveFitter polyFitter = PolynomialCurveFitter.create(polyOrder - 1);
-			return polyFitter.fit(points);
+			return Optional.of(polyFitter.fit(points));
 		}
 
-		throw new Exception();
+		return Optional.empty();
 	}
 
 	private void cleanOldData(Integer tagId, Long measurementTime) {
@@ -138,7 +136,6 @@ public class Storage {
 		tagMeasures.values().removeIf((polyMeasure ->
 			polyMeasure.getMeasures().isEmpty()
 		));
-
 	}
 
 }

@@ -19,7 +19,7 @@ import java.util.List;
 @NamedQueries({
 	@NamedQuery(
 		name = Sink.ALL_SINKS_WITH_FLOOR,
-		query = "FROM Sink AS s JOIN FETCH s.floor"
+		query = "FROM Sink AS s LEFT JOIN FETCH s.floor"
 	)
 })
 public class Sink extends Anchor {

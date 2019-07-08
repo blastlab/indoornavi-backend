@@ -33,7 +33,7 @@ public class AnchorRepository {
                 .from(ANCHOR)
                 .join(UWB)
                 .on(UWB.ID.eq(ANCHOR.ID))
-                .where(UWB.SHORTID.in(connectedAnchors))
+                .where(UWB.SHORTID.in(connectedAnchors).and(ANCHOR.X.isNotNull()).and(ANCHOR.Y.isNotNull()))
                 .fetchInto(Anchor.class);
     }
 
@@ -53,7 +53,7 @@ public class AnchorRepository {
             .select(UWB.SHORTID, ANCHOR.X, ANCHOR.Y, ANCHOR.Z, ANCHOR.FLOOR_ID)
             .from(ANCHOR)
             .join(UWB)
-            .on(UWB.ID.eq(ANCHOR.ID))
+            .on(UWB.ID.eq(ANCHOR.ID).and(ANCHOR.X.isNotNull()).and(ANCHOR.Y.isNotNull()))
             .fetch(anchorRecord -> modelMapper.map(anchorRecord, Anchor.class));
     }
 
