@@ -165,40 +165,42 @@ public class MeasuresWebSocket extends WebSocket {
 //			long startHandle = System.nanoTime();
 			handleMeasures(session, measures);
 //			long stopHandle = System.nanoTime();
+		}
+	}
 
 	private void handleMeasures(List<DistanceMessage> measures) {
-		logger.setId(getSessionId());
-		measures.forEach(distanceMessage -> {
-			if (isDebugMode) {
-				distanceMessageEvent.fire(distanceMessage);
-			}
-			logger.trace("Will analyze distance message: {}", distanceMessage);
-
-			networkController.updateLastTimeUpdated(distanceMessage.getDid1());
-			networkController.updateLastTimeUpdated(distanceMessage.getDid2());
-
-			if (bothDevicesAreAnchors(distanceMessage)) {
-				try {
-					logger.trace("Distance message is about two anchors. Transfering it to wizard bridges.");
-					sinkAnchorsDistanceBridge.addDistance(distanceMessage.getDid1(), distanceMessage.getDid2(), distanceMessage.getDist());
-					anchorPositionBridge.addDistance(distanceMessage.getDid1(), distanceMessage.getDid2(), distanceMessage.getDist());
-				} catch (UnrecognizedDeviceException unrecognizedDevice) {
-					unrecognizedDevice.printStackTrace();
-				}
-			} else {
-				logger.trace("Trying to calculate coordinates");
-				Optional<UwbCoordinatesDto> coords = coordinatesCalculator.calculateTagPosition(distanceMessage.getDid1(), distanceMessage.getDid2(), distanceMessage.getDist());
-				coords.ifPresent(coordinatesDto -> {
-					if (isDebugMode) {
-						coordinatesDtoEvent.fire(coordinatesDto);
-					}
-					this.saveCoordinates(coordinatesDto, distanceMessage.getTime());
-					Set<Session> sessions = this.filterSessions(coordinatesDto);
-					broadCastMessage(sessions, new CoordinatesWrapper(coordinatesDto));
-					this.sendAreaEvents(coordinatesDto);
-				});
-			}
-		});
+//		logger.setId(getSessionId());
+//		measures.forEach(distanceMessage -> {
+//			if (isDebugMode) {
+//				distanceMessageEvent.fire(distanceMessage);
+//			}
+//			logger.trace("Will analyze distance message: {}", distanceMessage);
+//
+//			networkController.updateLastTimeUpdated(distanceMessage.getDid1());
+//			networkController.updateLastTimeUpdated(distanceMessage.getDid2());
+//
+//			if (bothDevicesAreAnchors(distanceMessage)) {
+//				try {
+//					logger.trace("Distance message is about two anchors. Transfering it to wizard bridges.");
+//					sinkAnchorsDistanceBridge.addDistance(distanceMessage.getDid1(), distanceMessage.getDid2(), distanceMessage.getDist());
+//					anchorPositionBridge.addDistance(distanceMessage.getDid1(), distanceMessage.getDid2(), distanceMessage.getDist());
+//				} catch (UnrecognizedDeviceException unrecognizedDevice) {
+//					unrecognizedDevice.printStackTrace();
+//				}
+//			} else {
+//				logger.trace("Trying to calculate coordinates");
+//				Optional<UwbCoordinatesDto> coords = coordinatesCalculator.calculateTagPosition(distanceMessage.getDid1(), distanceMessage.getDid2(), distanceMessage.getDist());
+//				coords.ifPresent(coordinatesDto -> {
+//					if (isDebugMode) {
+//						coordinatesDtoEvent.fire(coordinatesDto);
+//					}
+//					this.saveCoordinates(coordinatesDto, distanceMessage.getTime());
+//					Set<Session> sessions = this.filterSessions(coordinatesDto);
+//					broadCastMessage(sessions, new CoordinatesWrapper(coordinatesDto));
+//					this.sendAreaEvents(coordinatesDto);
+//				});
+//			}
+//		});
 	}
 
 	@Asynchronous
