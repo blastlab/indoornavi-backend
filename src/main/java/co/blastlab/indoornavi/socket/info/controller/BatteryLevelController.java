@@ -40,30 +40,24 @@ public class BatteryLevelController extends WebSocketCommunication {
 	@Inject
 	private ObjectMapper objectMapper;
 
-	@Inject
-	private CoordinatesCalculator coordinatesCalculator;
-
-	@Inject
-	private AnchorRepository anchorRepository;
-
 	private Set<CheckBatteryLevel> batteryLevelsToCheck = new HashSet<>();
 
-	@Inject
-	private Logger logger;
+	private Logger loggerNoCdi;
 
 	@Resource
 	private TimerService timerService;
 
 	@PostConstruct
 	private void init() {
-		logger.trace("Creating timer for battery level controller");
+		loggerNoCdi = new Logger();
+		loggerNoCdi.trace("Creating timer for battery level controller");
 		timerService.createIntervalTimer(0, 100, new TimerConfig(null, false));
 	}
 
 	public void updateBatteryLevel(BatteryLevel batteryLevel) {
 		LevelAndTime levelAndTime = new LevelAndTime(batteryLevel, new Date());
 		batteryLevelMapping.put(batteryLevel.getDeviceShortId(), levelAndTime);
-		broadCastMessage(infoWebSocket.getClientSessions(), new BatteryLevelsWrapper(Collections.singletonList(levelAndTime.getBatteryLevel())));
+		broadCastMessage(infoWebSocket.getFrontendSessions(), new BatteryLevelsWrapper(Collections.singletonList(levelAndTime.getBatteryLevel())));
 	}
 
 	/**
@@ -97,65 +91,35 @@ public class BatteryLevelController extends WebSocketCommunication {
 	@Timeout
 	public void askServerAboutBatteryLevel() {
 		Iterator<CheckBatteryLevel> iterator = batteryLevelsToCheck.iterator();
-		// we need an instance of logger created here, otherwise it throws an exception about being out of context
-		Logger logger = new Logger();
 		if (iterator.hasNext()) {
 			CheckBatteryLevel toCheck = iterator.next();
-			logger.trace("Timer executes in battery level controller to check battery level for {}", toCheck.getShortId());
+			loggerNoCdi.trace("Timer executes in battery level controller to check battery level for {}", toCheck.getShortId());
 			String statusRequest = toCheck.toStringCommand();
-			Optional<Integer> sinkShortIdOptional = Optional.empty();
+//			Optional<Integer> sinkShortIdOptional = Optional.empty();
 			try {
-				if (isTag(toCheck)) {
-					sinkShortIdOptional = getSinkShortIdForTag(toCheck.getShortId());
-				} else {
-					sinkShortIdOptional = getSinkShortIdForAnchor(toCheck.getShortId());
-				}
-				if (sinkShortIdOptional.isPresent()) {
-					Session sinkSession = infoWebSocket.getSinkSession(sinkShortIdOptional.get());
+//				if (isTag(toCheck)) {
+//					sinkShortIdOptional = getSinkShortIdForTag(toCheck.getShortId());
+//				} else {
+//					sinkShortIdOptional = getSinkShortIdForAnchor(toCheck.getShortId());
+//				}
+//				if (sinkShortIdOptional.isPresent()) {
+					Session sinkSession = infoWebSocket.getSinkSession(toCheck.getShortId());
 					if (sinkSession != null) {
 						Info info = new Info(Info.InfoType.COMMAND.getValue());
 						info.setArgs(statusRequest);
 						broadCastMessage(Collections.singleton(sinkSession), objectMapper.writeValueAsString(Collections.singleton(info)));
 					} else {
-						broadCastMessage(infoWebSocket.getClientSessions(), new CommandErrorWrapper("BLC_002", sinkShortIdOptional.get()));
+						broadCastMessage(infoWebSocket.getFrontendSessions(), new CommandErrorWrapper("BLC_002"));
 					}
-				}
+//				}
 			} catch (JsonProcessingException e) {
 				e.printStackTrace();
-				CommandErrorWrapper commandError = sinkShortIdOptional
-					.map(shortId -> new CommandErrorWrapper("BLC_001", shortId))
-					.orElseGet(() -> new CommandErrorWrapper("BLC_001"));
-				broadCastMessage(infoWebSocket.getClientSessions(), commandError);
+				CommandErrorWrapper commandError = new CommandErrorWrapper("BLC_001");
+				broadCastMessage(infoWebSocket.getFrontendSessions(), commandError);
 			} finally {
 				iterator.remove();
 			}
 		}
-	}
-
-	private Optional<Integer> getSinkShortIdForTag(Integer tagShortId) {
-		Optional<Integer> sinkShortId = coordinatesCalculator.findSinkForTag(tagShortId);
-		if (!sinkShortId.isPresent()) {
-			broadCastMessage(infoWebSocket.getClientSessions(), new CommandErrorWrapper("BLC_004", tagShortId));
-		}
-		return sinkShortId;
-	}
-
-	private Optional<Integer> getSinkShortIdForAnchor(Integer anchorShortId) {
-		Optional<Integer> sinkShortIdOptional = Optional.empty();
-		Optional<Anchor> anchorOptional = anchorRepository.findByShortId(anchorShortId);
-		if (anchorOptional.isPresent()) {
-			Anchor anchor = anchorOptional.get();
-			if (anchor instanceof Sink) {
-				sinkShortIdOptional = Optional.of(anchor.getShortId());
-			} else {
-				if (anchor.getSink() == null) {
-					broadCastMessage(infoWebSocket.getClientSessions(), new CommandErrorWrapper("BLC_003", anchor.getShortId()));
-				} else {
-					sinkShortIdOptional = Optional.of(anchor.getSink().getShortId());
-				}
-			}
-		}
-		return sinkShortIdOptional;
 	}
 
 	private boolean isTag(CheckBatteryLevel toCheck) {

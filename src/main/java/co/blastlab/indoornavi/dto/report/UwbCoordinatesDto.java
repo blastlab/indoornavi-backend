@@ -5,6 +5,7 @@ import co.blastlab.indoornavi.dto.CoordinatesDto;
 import co.blastlab.indoornavi.socket.measures.Point3D;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Getter
@@ -15,6 +16,7 @@ import java.util.Date;
 public class UwbCoordinatesDto extends CoordinatesDto {
 	private Integer tagShortId;
 	private Integer anchorShortId;
+	private Date measurementTime;
 
 	public UwbCoordinatesDto(UwbCoordinates uwbCoordinates) {
 		super(uwbCoordinates);

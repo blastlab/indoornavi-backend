@@ -7,6 +7,7 @@ import javax.annotation.PostConstruct;
 import javax.enterprise.context.RequestScoped;
 import java.util.UUID;
 
+
 @Getter
 @RequestScoped
 public class Logger {

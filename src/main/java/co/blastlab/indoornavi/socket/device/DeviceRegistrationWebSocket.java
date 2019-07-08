@@ -28,10 +28,10 @@ import java.util.stream.Collectors;
 @ServerEndpoint("/devices/registration")
 public class DeviceRegistrationWebSocket extends WebSocketCommunication {
 
-	private static Set<Session> anchorSessions = Collections.synchronizedSet(new HashSet<>());
-	private static Set<Session> tagSessions = Collections.synchronizedSet(new HashSet<>());
-	private static Set<Session> sinkSessions = Collections.synchronizedSet(new HashSet<>());
-	private static Set<Session> bluetoothSessions = Collections.synchronizedSet(new HashSet<>());
+	private static Set<Session> anchorSessions = new HashSet<>();
+	private static Set<Session> tagSessions = new HashSet<>();
+	private static Set<Session> sinkSessions = new HashSet<>();
+	private static Set<Session> bluetoothSessions = new HashSet<>();
 
 	@Inject
 	private AnchorRepository anchorRepository;
@@ -69,13 +69,13 @@ public class DeviceRegistrationWebSocket extends WebSocketCommunication {
 			sinkSessions.add(session);
 			broadCastMessage(
 				sinkSessions,
-				objectMapper.writeValueAsString(sinkRepository.findAll().stream().map(SinkDto::new).collect(Collectors.toList()))
+				objectMapper.writeValueAsString(sinkRepository.findAllWithFloor().stream().map(SinkDto::new).collect(Collectors.toList()))
 			);
 		} else if (SessionType.ANCHOR.getName().equals(queryString)) {
 			anchorSessions.add(session);
 			broadCastMessage(
 				anchorSessions,
-				objectMapper.writeValueAsString(anchorRepository.findAll().stream().filter((anchor -> !(anchor instanceof Sink)))
+				objectMapper.writeValueAsString(anchorRepository.findAllWithFloor().stream().filter((anchor -> !(anchor instanceof Sink)))
 					.map(AnchorDto::new).collect(Collectors.toList()))
 			);
 		} else if (SessionType.TAG.getName().equals(queryString)) {

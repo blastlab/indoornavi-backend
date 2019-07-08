@@ -5,24 +5,19 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.Entity;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 import java.time.LocalDateTime;
-
+import java.util.Date;
 
 @Getter
 @Setter
-@Entity
-@AllArgsConstructor
-@NoArgsConstructor
-@Inheritance(strategy = InheritanceType.JOINED)
-public class Coordinates extends TrackedEntity {
+@MappedSuperclass
+public abstract class Coordinates extends TrackedEntity {
 	private int x;
 	private int y;
 	private int z;
 	@ManyToOne
 	private Floor floor;
-	private LocalDateTime measurementTime;
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date measurementTime;
 }

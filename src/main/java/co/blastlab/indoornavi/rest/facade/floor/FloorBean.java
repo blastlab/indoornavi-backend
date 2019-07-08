@@ -2,6 +2,7 @@ package co.blastlab.indoornavi.rest.facade.floor;
 
 import co.blastlab.indoornavi.dao.repository.BuildingRepository;
 import co.blastlab.indoornavi.dao.repository.FloorRepository;
+import co.blastlab.indoornavi.dao.repository.ImageRepository;
 import co.blastlab.indoornavi.domain.Building;
 import co.blastlab.indoornavi.domain.Floor;
 import co.blastlab.indoornavi.domain.Scale;
@@ -32,15 +33,15 @@ public class FloorBean implements FloorFacade {
 	private BuildingRepository buildingRepository;
 
 	@Inject
+	private ImageRepository imageRepository;
+
+	@Inject
 	private FloorService floorService;
 
 	@Override
 	public FloorDto get(Long id) {
-		Optional<Floor> floorEntity = floorRepository.findOptionalById(id);
-		if (floorEntity.isPresent()) {
-			return new FloorDto(floorEntity.get());
-		}
-		throw new EntityNotFoundException();
+		Floor floorEntity = floorRepository.findOptionalById(id).orElseThrow(EntityNotFoundException::new);
+		return new FloorDto(floorEntity);
 	}
 
 	@Override
@@ -60,8 +61,9 @@ public class FloorBean implements FloorFacade {
 	public FloorDto update(Long id, FloorDto floor) {
 		logger.debug("Trying to update floor {}", floor);
 		Floor floorEntity = floorRepository.findOptionalById(id).orElseThrow(EntityNotFoundException::new);
-		floorEntity.setLevel(floor.getLevel());
 		floorEntity.setName(floor.getName());
+		floorEntity.setArchived(floor.isArchived());
+		floorEntity.setLevel(floor.isArchived() ? null : floor.getLevel());
 		Floor floorDb = floorRepository.save(floorEntity);
 		logger.debug("Floor updated");
 		return new FloorDto(floorDb);
@@ -84,14 +86,7 @@ public class FloorBean implements FloorFacade {
 	public FloorDto setScale(Long id, ScaleDto scaleDto) {
 		logger.debug("Trying to set scale {} to floor id {}", scaleDto, id);
 		Floor floor = floorRepository.findOptionalById(id).orElseThrow(EntityNotFoundException::new);
-		Scale scale = scale(floor.getScale())
-			.measure(scaleDto.getMeasure())
-			.distance(scaleDto.getRealDistance())
-			.startX(scaleDto.getStart().getX())
-			.startY(scaleDto.getStart().getY())
-			.stopX(scaleDto.getStop().getX())
-			.stopY(scaleDto.getStop().getY());
-		floor.setScale(scale);
+		floor.setScaleFromDto(scaleDto);
 		floor = floorRepository.save(floor);
 		logger.debug("Scale set");
 		return new FloorDto(floor);

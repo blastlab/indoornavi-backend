@@ -812,4 +812,126 @@
 			<column name="polygonInPixels" type="POLYGON"/>
 		</addColumn>
 	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-615-1">
+		<dropColumn columnName="firmwarePartition" tableName="uwb"/>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-623-1">
+		<addColumn tableName="Floor">
+			<column name="archived" type="bit" defaultValue="false">
+				<constraints nullable="false"/>
+			</column>
+		</addColumn>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-655-1">
+		<addColumn tableName="PhoneCoordinates">
+			<column name="creationDate" type="datetime"/>
+		</addColumn>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-655-2">
+		<addColumn tableName="UwbCoordinates">
+			<column name="creationDate" type="datetime"/>
+		</addColumn>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-655-3">
+		<addColumn tableName="PhoneCoordinates">
+			<column name="floor_id" type="bigint"/>
+		</addColumn>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-655-4">
+		<addColumn tableName="UwbCoordinates">
+			<column name="floor_id" type="bigint"/>
+		</addColumn>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-655-5">
+		<addColumn tableName="PhoneCoordinates">
+			<column name="measurementTime" type="datetime"/>
+		</addColumn>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-655-6">
+		<addColumn tableName="UwbCoordinates">
+			<column name="measurementTime" type="datetime"/>
+		</addColumn>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-655-7">
+		<addColumn tableName="PhoneCoordinates">
+			<column name="modificationDate" type="datetime"/>
+		</addColumn>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-655-8">
+		<addColumn tableName="UwbCoordinates">
+			<column name="modificationDate" type="datetime"/>
+		</addColumn>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-655-9">
+		<addColumn tableName="PhoneCoordinates">
+			<column name="x" type="integer">
+				<constraints nullable="false"/>
+			</column>
+		</addColumn>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-655-10">
+		<addColumn tableName="UwbCoordinates">
+			<column name="x" type="integer">
+				<constraints nullable="false"/>
+			</column>
+		</addColumn>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-655-11">
+		<addColumn tableName="PhoneCoordinates">
+			<column name="y" type="integer">
+				<constraints nullable="false"/>
+			</column>
+		</addColumn>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-655-12">
+		<addColumn tableName="UwbCoordinates">
+			<column name="y" type="integer">
+				<constraints nullable="false"/>
+			</column>
+		</addColumn>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-655-13">
+		<addColumn tableName="PhoneCoordinates">
+			<column name="z" type="integer">
+				<constraints nullable="false"/>
+			</column>
+		</addColumn>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-655-14">
+		<addColumn tableName="UwbCoordinates">
+			<column name="z" type="integer">
+				<constraints nullable="false"/>
+			</column>
+		</addColumn>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-655-15">
+		<addForeignKeyConstraint baseColumnNames="tag_id" baseTableName="UwbCoordinates" constraintName="FK_UwbCoordinatesTag"  referencedColumnNames="id" referencedTableName="Tag"/>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-655-16">
+		<addForeignKeyConstraint baseColumnNames="phone_id" baseTableName="PhoneCoordinates" constraintName="FK_PhoneCoordinatesPhone"  referencedColumnNames="id" referencedTableName="Phone"/>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-655-17">
+		<addForeignKeyConstraint baseColumnNames="floor_id" baseTableName="UwbCoordinates" constraintName="FK_UwbCoordinatesFloor"  referencedColumnNames="id" referencedTableName="Floor"/>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-655-18">
+		<addForeignKeyConstraint baseColumnNames="floor_id" baseTableName="PhoneCoordinates" constraintName="FK_PhoneCoordinatesFloor"  referencedColumnNames="id" referencedTableName="Floor"/>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-655-19">
+		<dropForeignKeyConstraint baseTableName="coordinates" constraintName="FK_Coordiantes_Floor"/>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-655-20">
+		<dropForeignKeyConstraint baseTableName="phonecoordinates" constraintName="FK_PhoneCoordinates_Coordinates"/>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-655-21">
+		<dropForeignKeyConstraint baseTableName="uwbcoordinates" constraintName="FK_UwbCoordinates_Coordinates"/>
+	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-655-22">
+		<dropTable tableName="coordinates"/>
+	</changeSet>
+	<changeSet id="navi-655-23" author="kgebert">
+		<addAutoIncrement columnDataType="BIGINT" tableName="uwbcoordinates" columnName="id" />
+	</changeSet>
+	<changeSet id="navi-655-24" author="kgebert">
+		<addAutoIncrement columnDataType="BIGINT" tableName="phonecoordinates" columnName="id" />
+	</changeSet>
 </databaseChangeLog>

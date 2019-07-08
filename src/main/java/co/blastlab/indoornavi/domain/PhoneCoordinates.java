@@ -1,5 +1,6 @@
 package co.blastlab.indoornavi.domain;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -11,12 +12,8 @@ import javax.persistence.ManyToOne;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 public class PhoneCoordinates extends Coordinates {
 	@ManyToOne
 	private Phone phone;
-
-	public PhoneCoordinates(Coordinates coordinates, Phone phone) {
-		super(coordinates.getX(), coordinates.getY(), 0, coordinates.getFloor(), coordinates.getMeasurementTime());
-		setPhone(phone);
-	}
 }

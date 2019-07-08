@@ -4,10 +4,7 @@ import co.blastlab.indoornavi.socket.WebSocketCommunication;
 import co.blastlab.indoornavi.socket.info.InfoWebSocket;
 import co.blastlab.indoornavi.socket.info.client.RawCommand;
 import co.blastlab.indoornavi.socket.info.server.Info;
-import co.blastlab.indoornavi.socket.info.server.command.BatteryLevel;
-import co.blastlab.indoornavi.socket.info.server.command.CommandResponseBase;
-import co.blastlab.indoornavi.socket.info.server.command.DeviceTurnOn;
-import co.blastlab.indoornavi.socket.info.server.command.Version;
+import co.blastlab.indoornavi.socket.info.server.command.*;
 import co.blastlab.indoornavi.socket.info.server.handshake.Handshake;
 import co.blastlab.indoornavi.socket.wrappers.CommandErrorWrapper;
 import co.blastlab.indoornavi.socket.wrappers.InfoErrorWrapper;
@@ -22,6 +19,7 @@ import javax.websocket.Session;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Singleton
@@ -39,20 +37,26 @@ public class CommandController extends WebSocketCommunication {
 	@Inject
 	private Logger logger;
 
+	// this logger is used by callback executed by timer outside the context
+	private Logger loggerNoCDI = new Logger();
+
+	@Inject
+	private NetworkController networkController;
+
 	public void sendHandShake(Session serverSession) {
 		sendHandShake(serverSession, null);
 	}
 
 	public void sendHandShake(Session serverSession, Integer shortId) {
 		try {
-			logger.trace("Sending handshake to {}", serverSession.getId());
+			loggerNoCDI.trace("Sending handshake to {}", serverSession.getId());
 			broadCastMessage(
 				Collections.singleton(serverSession),
 				objectMapper.writeValueAsString(Collections.singleton(shortId == null ? new Handshake() : new Handshake(shortId)))
 			);
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();
-			broadCastMessage(infoWebSocket.getClientSessions(), new CommandErrorWrapper("CC_001"));
+			broadCastMessage(infoWebSocket.getFrontendSessions(), new CommandErrorWrapper("CC_001"));
 		}
 	}
 
@@ -61,26 +65,34 @@ public class CommandController extends WebSocketCommunication {
 		String[] parts = message.split(" ");
 		String code = parts[0];
 		List<String> descriptor = Arrays.stream(parts).filter(value -> value.contains(":")).collect(Collectors.toList());
-		switch (code) {
-			case "I1101":
-				DeviceTurnOn deviceTurnOn = new DeviceTurnOn();
-				deviceTurnOn.fromDescriptor(descriptor);
-				infoWebSocket.onDeviceTurnOn(serverSession, deviceTurnOn);
-				break;
-			case "I1111":
-				BatteryLevel batteryLevel = new BatteryLevel();
-				batteryLevel.fromDescriptor(descriptor);
-				batteryLevelController.updateBatteryLevel(batteryLevel);
-				break;
-			case "I1112":
-				Version version = new Version();
-				version.fromDescriptor(descriptor);
-				infoWebSocket.assignSinkShortIdToSession(serverSession, version.getShortId());
-				break;
-		}
+		Optional<CommandType> commandTypeOptional = Optional.ofNullable(CommandType.byCode(code));
+		commandTypeOptional.ifPresent((commandType -> {
+			switch (commandType) {
+				case DEVICE_TURN_ON:
+					DeviceTurnOn deviceTurnOn = new DeviceTurnOn();
+					deviceTurnOn.fromDescriptor(descriptor);
+					infoWebSocket.onDeviceTurnOn(serverSession, deviceTurnOn);
+					break;
+				case BATTERY_LEVEL:
+					BatteryLevel batteryLevel = new BatteryLevel();
+					batteryLevel.fromDescriptor(descriptor);
+					batteryLevelController.updateBatteryLevel(batteryLevel);
+					break;
+				case VERSION:
+					VersionCommand versionCommand = new VersionCommand();
+					versionCommand.fromDescriptor(descriptor);
+					infoWebSocket.updateVersion(versionCommand);
+					infoWebSocket.assignSinkShortIdToSession(serverSession, versionCommand.getShortId());
+				case BEACON:
+					Beacon beacon = new Beacon();
+					beacon.fromDescriptor(descriptor);
+					networkController.updateLastTimeUpdated(beacon.getDeviceShortId());
+					break;
+			}
+		}));
 
 		infoWebSocket.getSinkShortIdBySession(serverSession).ifPresent(sinkShortId -> {
-			broadCastMessage(infoWebSocket.getClientSessions(), new ServerCommandWrapper(message, sinkShortId));
+			broadCastMessage(infoWebSocket.getFrontendSessions(), new ServerCommandWrapper(message, sinkShortId));
 		});
 	}
 

@@ -4,6 +4,7 @@ import co.blastlab.indoornavi.dao.repository.AnchorRepository;
 import co.blastlab.indoornavi.domain.Anchor;
 import co.blastlab.indoornavi.domain.Floor;
 import co.blastlab.indoornavi.dto.report.UwbCoordinatesDto;
+import co.blastlab.indoornavi.socket.LoggerController;
 import co.blastlab.indoornavi.socket.measures.Point3D;
 import co.blastlab.indoornavi.socket.measures.Storage;
 import co.blastlab.indoornavi.utils.Logger;
@@ -31,7 +32,7 @@ public class GeoN2dTest {
 	private GeoN2d geoN2d;
 
 	@Mock
-	private Logger logger;
+	private LoggerController logger;
 
 	@Mock
 	private Storage storage;

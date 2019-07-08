@@ -5,13 +5,20 @@ import co.blastlab.indoornavi.domain.Configuration;
 import co.blastlab.indoornavi.domain.Floor;
 import co.blastlab.indoornavi.domain.Publication;
 import co.blastlab.indoornavi.dto.configuration.ConfigurationDto;
+import co.blastlab.indoornavi.dto.configuration.PrePublishReport;
 import co.blastlab.indoornavi.utils.ConfigurationExtractor;
 import co.blastlab.indoornavi.utils.Logger;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.jboss.resteasy.util.HttpResponseCodes;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -42,6 +49,28 @@ public class ConfigurationBean implements ConfigurationFacade {
 	@Inject
 	private UserRepository userRepository;
 
+	@Inject
+	private ObjectMapper objectMapper;
+
+	@Override
+	public PrePublishReport prePublish(Long floorId) throws IOException {
+		logger.debug("Doing pre publish checks configuration of the floor id {}", floorId);
+		final Floor floor = floorRepository.findOptionalById(floorId).orElseThrow(EntityNotFoundException::new);
+		Configuration configurationEntity = configurationRepostiory.findTop1ByFloorOrderByVersionDesc(floor).orElseThrow(EntityNotFoundException::new);
+		ConfigurationDto.Data configurationData = objectMapper.readValue(configurationEntity.getData(), ConfigurationDto.Data.class);
+
+		PrePublishReport report = new PrePublishReport();
+		logger.debug("Checking if devices are published in a different floor");
+		configurationData.getSinks().forEach((sinkDto) -> {
+			configurationExtractor.checkIsAnchorAlreadyPublishedOnDiffMap(sinkDto, floor, report);
+			sinkDto.getAnchors().forEach((anchorDto -> {
+				configurationExtractor.checkIsAnchorAlreadyPublishedOnDiffMap(anchorDto, floor, report);
+			}));
+		});
+
+		return report;
+	}
+
 	@Override
 	public ConfigurationDto.Data publish(Long floorId) throws IOException {
 		logger.debug("Trying to publish configuration of the floor id {}", floorId);
@@ -56,7 +85,6 @@ public class ConfigurationBean implements ConfigurationFacade {
 			publicationRepository.save(publication);
 		}
 		Configuration configurationEntity = configurationRepostiory.findTop1ByFloorOrderByVersionDesc(floor).orElseThrow(EntityNotFoundException::new);
-		ObjectMapper objectMapper = new ObjectMapper();
 		ConfigurationDto.Data configurationData = objectMapper.readValue(configurationEntity.getData(), ConfigurationDto.Data.class);
 
 		logger.debug("Configuration data to extract: {}", configurationData);
@@ -70,6 +98,11 @@ public class ConfigurationBean implements ConfigurationFacade {
 		configurationExtractor.extractAreas(configurationData, floor);
 
 		configurationEntity.setPublishedDate(new Date());
+
+		if (!evictCacheInCalculator()) {
+			logger.debug("Evict cache in calculator returned unexpected httpCode");
+		}
+
 		return objectMapper.readValue(configurationEntity.getData(), ConfigurationDto.Data.class);
 	}
 
@@ -112,7 +145,7 @@ public class ConfigurationBean implements ConfigurationFacade {
 		} else {
 			Configuration configuration = latestConfigurations.get(0);
 			if (latestConfigurations.size() == 1) {
-				logger.debug("There is only one configuration, so it's inital state");
+				logger.debug("There is only one configuration, so it's initial state");
 				ObjectMapper objectMapper = new ObjectMapper();
 				configuration.setPublishedDate(null);
 				configuration.setSaveDraftDate(null);
@@ -137,5 +170,12 @@ public class ConfigurationBean implements ConfigurationFacade {
 			configurationDtos.add(configurationDto);
 		}
 		return configurationDtos;
+	}
+
+	private boolean evictCacheInCalculator() {
+		Client client = ClientBuilder.newClient();
+		WebTarget target = client.target("http://calculator:8081/clearCache");
+		Response response = target.request().post(Entity.json(""));
+		return response.getStatus() == HttpResponseCodes.SC_NO_CONTENT;
 	}
 }

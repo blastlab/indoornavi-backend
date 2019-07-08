@@ -2,6 +2,7 @@ package co.blastlab.indoornavi.socket.measures.algorithms;
 
 import co.blastlab.indoornavi.dao.repository.AnchorRepository;
 import co.blastlab.indoornavi.domain.Anchor;
+import co.blastlab.indoornavi.socket.LoggerController;
 import co.blastlab.indoornavi.socket.measures.Point3D;
 import co.blastlab.indoornavi.socket.measures.Storage;
 import co.blastlab.indoornavi.utils.Logger;
@@ -20,7 +21,7 @@ public class Taylor extends Algorithm3d implements Algorithm {
 	@Inject
 	private AnchorRepository anchorRepository;
 	@Inject
-	private Logger logger;
+	private LoggerController logger;
 	@Inject
 	private Storage storage;
 
@@ -63,7 +64,7 @@ public class Taylor extends Algorithm3d implements Algorithm {
 			stateMatrix.tagPosition = stateMatrix.tagPosition.plus(p);
 
 			if (p.normF() < 10) {
-				logger.trace("Less than 10 iteration was needed: {}", taylorIter);
+//				logger.trace(sessionId, "Less than 10 iteration was needed: {}", taylorIter);
 				break;
 			}
 		}
@@ -89,12 +90,12 @@ public class Taylor extends Algorithm3d implements Algorithm {
 		}
 
 		if (!isTagPositionGood(stateMatrix)) {
-			logger.trace("Tag position calculated far too far: x = {}, y = {}, z = {}", x, y, z);
+//			logger.trace(sessionId, "Tag position calculated far too far: x = {}, y = {}, z = {}", x, y, z);
 			return Optional.empty();
 		}
 
-		logger.trace("Tag position calculated: x = {}, y = {}, z = {}, res = {}, max = {} from = {}"
-			, (int) Math.round(x), (int) Math.round(y), (int) Math.round(z), res, max, maxA.getShortId());
+//		logger.trace(sessionId, "Tag position calculated: x = {}, y = {}, z = {}, res = {}, max = {} from = {}"
+//			, (int) Math.round(x), (int) Math.round(y), (int) Math.round(z), res, max, maxA.getShortId());
 
 		return Optional.of(new Point3D((int) Math.round(x), (int) Math.round(y), (int) Math.round(z)));
 	}

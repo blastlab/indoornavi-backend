@@ -19,6 +19,15 @@ import javax.persistence.*;
 		name = Anchor.BY_SHORT_ID_IN,
 		query = "FROM Anchor as a WHERE a.shortId in ?1",
 		hints = {@QueryHint(name = "org.hibernate.cacheable", value = "true")}
+	),
+	@NamedQuery(
+		name = Anchor.FLOOR_ID_BY_ANCHOR_SHORT_ID,
+		query = "SELECT f.id FROM Anchor AS a JOIN a.floor AS f WHERE a.shortId = ?1",
+		hints = {@QueryHint(name = "org.hibernate.cacheable", value = "true")}
+	),
+	@NamedQuery(
+		name = Anchor.ALL_WITH_FLOOR,
+		query = "FROM Anchor as a LEFT JOIN FETCH a.floor"
 	)
 })
 @ToString(callSuper = true)
@@ -30,10 +39,10 @@ public class Anchor extends Uwb {
 
 	private Integer z;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	private Floor floor;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	private Sink sink;
 
 	public Anchor(Integer x, Integer y, Floor floor) {
@@ -52,4 +61,6 @@ public class Anchor extends Uwb {
 
 	public static final String BY_SHORT_ID_AND_POSITION_NOT_NULL = "byShortIdAndPositionIsNotNull";
 	public static final String BY_SHORT_ID_IN = "byShortIdIn";
+	public static final String FLOOR_ID_BY_ANCHOR_SHORT_ID = "floorIdByAnchorShortId";
+	public static final String ALL_WITH_FLOOR = "allWithFloor";
 }

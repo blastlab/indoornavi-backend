@@ -1,6 +1,7 @@
 package co.blastlab.indoornavi.rest.facade.configuration;
 
 import co.blastlab.indoornavi.dto.configuration.ConfigurationDto;
+import co.blastlab.indoornavi.dto.configuration.PrePublishReport;
 import co.blastlab.indoornavi.ext.filter.AuthorizedAccess;
 import co.blastlab.indoornavi.ext.filter.SetOperationId;
 import io.swagger.annotations.*;
@@ -15,6 +16,14 @@ import java.util.List;
 @Api("/configurations")
 @SetOperationId
 public interface ConfigurationFacade {
+	@Path("/{floorId: \\d+}/pre")
+	@POST
+	@ApiOperation(value = "pre publish to get a report about what will happen after you publish", response = PrePublishReport.class)
+	@ApiResponses({
+		@ApiResponse(code = 404, message = "Floor not found in a database")
+	})
+	PrePublishReport prePublish(@ApiParam(value = "floorId", required = true) @PathParam("floorId") @Valid @NotNull Long floorId) throws IOException;
+
 	@Path("/{floorId: \\d+}")
 	@POST
 	@ApiOperation(value = "publish floor's configuration", response = ConfigurationDto.Data.class)

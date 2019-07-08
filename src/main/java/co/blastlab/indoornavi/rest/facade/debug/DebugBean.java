@@ -62,16 +62,18 @@ public class DebugBean implements DebugFacade {
 	}
 
 	public void calculatedCoordinatesEndpoint(@Observes UwbCoordinatesDto coordinatesDto) {
-		logger.trace("Adding coordinates to file: {}", coordinatesDto.toString());
-		coordinatesStreamBuilder.add(
-			String.format("%s; %s; %s; %s; %s\n\r",
-				convertToSeconds(coordinatesDto.getDate().getTime()),
-				Integer.toHexString(coordinatesDto.getTagShortId()),
-				coordinatesDto.getPoint().getX(),
-				coordinatesDto.getPoint().getY(),
-				coordinatesDto.getPoint().getZ()
-			)
-		);
+		if (measuresWebSocket.isDebugMode()) {
+			logger.trace("Adding coordinates to file: {}", coordinatesDto.toString());
+			coordinatesStreamBuilder.add(
+				String.format("%s; %s; %s; %s; %s\n\r",
+					convertToSeconds(coordinatesDto.getDate().getTime()),
+					Integer.toHexString(coordinatesDto.getTagShortId()),
+					coordinatesDto.getPoint().getX(),
+					coordinatesDto.getPoint().getY(),
+					coordinatesDto.getPoint().getZ()
+				)
+			);
+		}
 	}
 
 	@Override

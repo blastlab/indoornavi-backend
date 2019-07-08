@@ -16,7 +16,6 @@
 		<delete tableName="areaconfiguration" />
 		<delete tableName="uwbcoordinates" />
 		<delete tableName="phonecoordinates" />
-		<delete tableName="coordinates"/>
 		<delete tableName="tag"/>
 		<delete tableName="sink"/>
 		<delete tableName="anchor"/>
@@ -76,7 +75,9 @@
 	</changeSet>
 
 	<changeSet id="Floor" author="mcichosz" context="test" runOnChange="true" labels="Floor" runAlways="true">
-		<loadUpdateData tableName="floor" file="test/Floor.csv" primaryKey="id" relativeToChangelogFile="true"/>
+		<loadUpdateData tableName="floor" file="test/Floor.csv" primaryKey="id" relativeToChangelogFile="true">
+			<column name="archived" type="boolean" />
+		</loadUpdateData>
 	</changeSet>
 
 	<changeSet id="Device" author="jsmol" context="test" runOnChange="true" labels="Device" runAlways="true">
@@ -149,12 +150,6 @@
 		<loadData tableName="publication_floor" file="test/PublicationFloor.csv" relativeToChangelogFile="true" />
 	</changeSet>
 	
-	<changeSet id="Coordinates" author="kgebert" context="test" runOnChange="true" labels="Coordinates" runAlways="true">
-		<loadData tableName="coordinates" file="test/Coordinates.csv" relativeToChangelogFile="true">
-			<column name="creation_date" type="DATE" />
-		</loadData>
-	</changeSet>
-
 	<changeSet id="Phone" author="kgebert" context="test" runOnChange="true" labels="Phone" runAlways="true">
 		<loadData tableName="phone" file="test/Phone.csv" relativeToChangelogFile="true" />
 	</changeSet>

@@ -57,15 +57,12 @@ public class PhoneBean implements PhoneFacade {
 		coordinatesList.forEach((coordinatesDto -> {
 			Phone phone = phoneRepository.findOptionalById(coordinatesDto.getPhoneId()).orElseThrow(EntityNotFoundException::new);
 			Floor floor = floorRepository.findOptionalById(coordinatesDto.getFloorId()).orElseThrow(EntityNotFoundException::new);
-			Coordinates coordinates = new Coordinates(
-				coordinatesDto.getPoint().getX(),
-				coordinatesDto.getPoint().getY(),
-				0,
-				floor,
-				coordinatesDto.getDate() != null ? DateConverter.convertToLocalDateTimeViaSqlTimestamp(coordinatesDto.getDate()) : null
-			);
-			PhoneCoordinates phoneCoordinates = new PhoneCoordinates(coordinates, phone);
-			phoneCoordinates.setPhone(phone);
+			PhoneCoordinates phoneCoordinates = new PhoneCoordinates(phone);
+			phoneCoordinates.setX(coordinatesDto.getPoint().getX());
+			phoneCoordinates.setY(coordinatesDto.getPoint().getY());
+			phoneCoordinates.setZ(0);
+			phoneCoordinates.setFloor(floor);
+			phoneCoordinates.setMeasurementTime(coordinatesDto.getDate());
 			phoneCoordinatesRepository.save(phoneCoordinates);
 			savedCoordinates.add(new PhoneCoordinatesDto(phoneCoordinates));
 		}));

@@ -7,6 +7,7 @@ import lombok.Getter;
 
 import javax.ejb.Singleton;
 import javax.websocket.Session;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -66,6 +67,13 @@ public class NetworkController {
 			return byTagShortId.get().getTags().stream().filter(deviceStatus -> deviceStatus.getDevice().getShortId().equals(shortId)).findFirst();
 		}
 		return Optional.empty();
+	}
+
+	public void updateLastTimeUpdated(Integer shortId) {
+		Optional<DeviceStatus> deviceStatusOptional = this.getDeviceStatus(shortId);
+		deviceStatusOptional.ifPresent((deviceStatus -> {
+			deviceStatus.setLastTimeUpdated(new Date());
+		}));
 	}
 
 	private Optional<Network> getByAnchorShortId(Integer anchorShortId) {

@@ -1,6 +1,7 @@
 package co.blastlab.indoornavi.socket.measures;
 
 import co.blastlab.indoornavi.dao.repository.AnchorRepository;
+import co.blastlab.indoornavi.dao.repository.FloorRepository;
 import co.blastlab.indoornavi.dao.repository.TagRepository;
 import co.blastlab.indoornavi.domain.Anchor;
 import co.blastlab.indoornavi.domain.Floor;
@@ -8,28 +9,33 @@ import co.blastlab.indoornavi.domain.Sink;
 import co.blastlab.indoornavi.dto.floor.FloorDto;
 import co.blastlab.indoornavi.dto.report.UwbCoordinatesDto;
 import co.blastlab.indoornavi.dto.tag.TagDto;
+import co.blastlab.indoornavi.socket.LoggerController;
 import co.blastlab.indoornavi.socket.measures.algorithms.*;
 import co.blastlab.indoornavi.socket.measures.model.PointAndTime;
 import co.blastlab.indoornavi.socket.measures.model.PolyMeasure;
 import co.blastlab.indoornavi.socket.tagTracer.TagTraceDto;
-import co.blastlab.indoornavi.utils.Logger;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.math3.fitting.PolynomialCurveFitter;
 import org.apache.commons.math3.fitting.WeightedObservedPoint;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.ejb.Singleton;
+import javax.ejb.Stateless;
 import javax.enterprise.event.Event;
+import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
+import javax.websocket.Session;
+import java.math.BigInteger;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Singleton
+//@Stateless
 public class CoordinatesCalculator {
-
-	// 10 seconds
-	private final static long OLD_DATA_IN_MILLISECONDS = 10_000;
 
 	@Inject
 	private Storage storage;
@@ -38,16 +44,20 @@ public class CoordinatesCalculator {
 	@AlgorithmSelector
 	private Algorithm algorithm;
 
-	@Inject
-	private Logger logger;
+//	@Inject
+//	private LoggerController logger;
+	private static Logger logger = LoggerFactory.getLogger("TEST");
 
 	@Inject
 	private AnchorRepository anchorRepository;
 
 	@Inject
+	private FloorRepository floorRepository;
+
+	@Inject
 	private TagRepository tagRepository;
 
-	private Map<Integer, Integer> tagToSinkMapping = new HashMap<>();
+	private Map<Integer, Session> tagToSessionMapping = new HashMap<>();
 
 	private boolean traceTags;
 
@@ -62,12 +72,17 @@ public class CoordinatesCalculator {
 		this.traceTags = false;
 	}
 
-	public Optional<Integer> findSinkForTag(Integer tagShortId) {
-		return tagToSinkMapping.containsKey(tagShortId) ? Optional.of(tagToSinkMapping.get(tagShortId)) : Optional.empty();
+	public Optional<Session> findSinkForTag(Integer tagShortId) {
+		return Optional.ofNullable(tagToSessionMapping.get(tagShortId));
 	}
 
-	public Optional<UwbCoordinatesDto> calculateTagPosition(int firstDeviceId, int secondDeviceId, int distance) {
-		logger.trace("Measure storage tags: {}", storage.getMeasures().keySet().size());
+	public Optional<UwbCoordinatesDto> calculateTagPosition(Session session, DistanceMessage distanceMessage) {
+		int firstDeviceId = distanceMessage.getDid1();
+		int secondDeviceId = distanceMessage.getDid2();
+		int distance = distanceMessage.getDist();
+		long measurementTime = distanceMessage.getTime().getTime();
+
+		logger.trace("TEST Measure storage tags: {}", storage.getMeasures().keySet().size());
 
 		try {
 			validateDevicesIds(firstDeviceId, secondDeviceId);
@@ -75,15 +90,20 @@ public class CoordinatesCalculator {
 			Integer tagId = firstDeviceId <= Short.MAX_VALUE ? firstDeviceId : secondDeviceId;
 			Integer anchorId = secondDeviceId > Short.MAX_VALUE ? secondDeviceId : firstDeviceId;
 
-			if (isSink(anchorId)) {
-				tagToSinkMapping.put(tagId, anchorId);
-			}
+			tagToSessionMapping.put(tagId, session);
+			tagToSessionMapping.put(anchorId, session);
 
-			storage.setConnection(tagId, anchorId, distance);
+//			long start = System.nanoTime();
+			storage.setConnection(tagId, anchorId, distance, measurementTime);
+//			logger.debug("KAROL setConnection {}", TimeUnit.MICROSECONDS.convert(System.nanoTime() - start, TimeUnit.NANOSECONDS));
 
-			List<Integer> connectedAnchors = new ArrayList<>(getConnectedAnchors(tagId));
+//			start = System.nanoTime();
+			List<Integer> connectedAnchors = new ArrayList<>(storage.getConnectedAnchors(tagId, measurementTime));
+//			logger.debug("KAROL getConnectedAnchors {}", TimeUnit.MICROSECONDS.convert(System.nanoTime() - start, TimeUnit.NANOSECONDS));
 
+//			start = System.nanoTime();
 			Optional<Point3D> calculatedPointOptional = algorithm.calculate(connectedAnchors, tagId);
+//			logger.debug("KAROL calculate {}", TimeUnit.MICROSECONDS.convert(System.nanoTime() - start, TimeUnit.NANOSECONDS));
 
 			if (!calculatedPointOptional.isPresent()) {
 				return Optional.empty();
@@ -91,19 +111,22 @@ public class CoordinatesCalculator {
 
 			Point3D calculatedPoint = calculatedPointOptional.get();
 
-			logger.trace("Current position: X: {}, Y: {}, Z: {}", calculatedPoint.getX(), calculatedPoint.getY(), calculatedPoint.getZ());
+			logger.trace("Current position: X: {}, Y: {}, Z: {}", new Object[] {calculatedPoint.getX(), calculatedPoint.getY(), calculatedPoint.getZ() });
 
-			Floor floor = anchorRepository.findByShortId(anchorId)
-				.map(Anchor::getFloor)
+//			start = System.nanoTime();
+			Long floorId = anchorRepository.findFloorIdByAnchorShortId(anchorId)
 				.orElse(null);
-			if (floor == null) {
+//			logger.debug("KAROL findFloor {}", TimeUnit.MICROSECONDS.convert(System.nanoTime() - start, TimeUnit.NANOSECONDS));
+
+			if (floorId == null) {
 				return Optional.empty();
 			}
 
 			if (traceTags) {
-				this.sendEventToTagTracer(tagId, floor);
+				this.sendEventToTagTracer(tagId, floorRepository.findBy(floorId));
 			}
 
+//			start = System.nanoTime();
 			Optional.ofNullable(storage.getPreviousCoordinates().get(tagId)).ifPresent((previousPoint) -> {
 				calculatedPoint.setX((calculatedPoint.getX() + previousPoint.getPoint().getX()) / 2);
 				calculatedPoint.setY((calculatedPoint.getY() + previousPoint.getPoint().getY()) / 2);
@@ -111,16 +134,12 @@ public class CoordinatesCalculator {
 			});
 			Date currentDate = new Date();
 			storage.getPreviousCoordinates().put(tagId, new PointAndTime(calculatedPoint, currentDate.getTime()));
-			return Optional.of(new UwbCoordinatesDto(tagId, anchorId, floor.getId(), calculatedPoint, currentDate));
+//			logger.debug("KAROL finishing {}", TimeUnit.MICROSECONDS.convert(System.nanoTime() - start, TimeUnit.NANOSECONDS));
+			return Optional.of(new UwbCoordinatesDto(tagId, anchorId, floorId, calculatedPoint, currentDate));
 		} catch (DeviceIdOutOfRangeException e) {
-			logger.trace("One of the devices' ids is out of range. Ids are: {}, {} and range is (1, {})", firstDeviceId, secondDeviceId, Short.MAX_VALUE);
+			logger.trace("One of the devices' ids is out of range. Ids are: {}, {} and range is (1, {})", new Object[] { firstDeviceId, secondDeviceId, Short.MAX_VALUE });
 			return Optional.empty();
 		}
-	}
-
-	private boolean isSink(Integer anchorId) {
-		Optional<Anchor> anchorOptional = anchorRepository.findByShortId(anchorId);
-		return anchorOptional.filter(anchor -> anchor instanceof Sink).isPresent();
 	}
 
 	private void sendEventToTagTracer(Integer tagId, final Floor floor) {
@@ -136,25 +155,6 @@ public class CoordinatesCalculator {
 		if (!((firstDeviceId <= Short.MAX_VALUE && secondDeviceId > Short.MAX_VALUE) || (firstDeviceId > Short.MAX_VALUE && secondDeviceId <= Short.MAX_VALUE))) {
 			throw new DeviceIdOutOfRangeException();
 		}
-	}
-
-	private void cleanOldData() {
-		long now = new Date().getTime();
-		storage.getMeasures().entrySet()
-			.removeIf(tagEntry -> tagEntry.getValue().entrySet()
-				.removeIf(anchorEntry -> anchorEntry.getValue().getMeasures()
-					.removeIf(measure -> new Date((now - OLD_DATA_IN_MILLISECONDS)).after(new Date(measure.getTimestamp())))
-				)
-			);
-	}
-
-	private Set<Integer> getConnectedAnchors(Integer tagId) {
-		this.cleanOldData();
-		Set<Integer> connectedAnchors = new HashSet<>();
-		if (storage.getMeasures().containsKey(tagId)) {
-			connectedAnchors.addAll(storage.getMeasures().get(tagId).keySet());
-		}
-		return connectedAnchors;
 	}
 
 	private static class DeviceIdOutOfRangeException extends Exception {}

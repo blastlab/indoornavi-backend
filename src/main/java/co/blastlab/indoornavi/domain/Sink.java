@@ -8,10 +8,7 @@ import lombok.ToString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.persistence.Entity;
-import javax.persistence.OneToMany;
-import javax.persistence.PostPersist;
-import javax.persistence.PostUpdate;
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,6 +16,12 @@ import java.util.List;
 @Setter
 @Entity
 @ToString(callSuper = true, exclude = "anchors")
+@NamedQueries({
+	@NamedQuery(
+		name = Sink.ALL_SINKS_WITH_FLOOR,
+		query = "FROM Sink AS s LEFT JOIN FETCH s.floor"
+	)
+})
 public class Sink extends Anchor {
 	private final static Logger LOGGER = LoggerFactory.getLogger(Sink.class);
 
@@ -45,4 +48,6 @@ public class Sink extends Anchor {
 		super.broadcast();
 		WizardWebSocket.broadcastNewSink(this);
 	}
+
+	public static final String ALL_SINKS_WITH_FLOOR = "allSinksWithFloor";
 }

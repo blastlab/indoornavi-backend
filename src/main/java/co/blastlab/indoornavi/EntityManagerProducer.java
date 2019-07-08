@@ -1,5 +1,8 @@
 package co.blastlab.indoornavi;
 
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+
 import javax.ejb.Stateless;
 import javax.enterprise.inject.Produces;
 import javax.persistence.EntityManager;
@@ -15,4 +18,7 @@ public class EntityManagerProducer {
 	public EntityManager produceNaviEM() {
 		return entityManager;
 	}
+
+	@Produces
+	public SessionFactory produceSessionFactory() { return entityManager.unwrap(Session.class).getSessionFactory(); }
 }

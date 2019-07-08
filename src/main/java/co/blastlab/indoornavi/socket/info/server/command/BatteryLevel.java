@@ -41,7 +41,7 @@ public class BatteryLevel implements CommandResponse {
 				if (isWithBattery(mV)) {
 					percentage = (double) ((mV - MIN_MV_WITH_BATTERY) * 100) / (MAX_MV_WITH_BATTERY - MIN_MV_WITH_BATTERY);
 				} else {
-					percentage = (double) (mV > MAX_MV_WITH_BATTERY ? 100 : 0);
+					percentage = (double) (mV > MAX_MV_WITH_BATTERY || mV == 0 ? 100 : 0);
 				}
 			}
 		});
