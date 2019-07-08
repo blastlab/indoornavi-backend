@@ -812,6 +812,9 @@
 			<column name="polygonInPixels" type="POLYGON"/>
 		</addColumn>
 	</changeSet>
+	<changeSet author="kgebert (generated)" id="navi-615-1">
+		<dropColumn columnName="firmwarePartition" tableName="uwb"/>
+	</changeSet>
 	<changeSet author="kgebert (generated)" id="navi-623-1">
 		<addColumn tableName="Floor">
 			<column name="archived" type="bit" defaultValue="false">
