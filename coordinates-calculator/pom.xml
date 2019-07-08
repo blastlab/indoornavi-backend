@@ -10,7 +10,7 @@
     </parent>
     <groupId>pl.indoornavi</groupId>
     <artifactId>coordinates-calculator</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.12.0</version>
     <name>coordinates-calculator</name>
     <description>Coordinates Calculator WebSocket Server</description>
     <packaging>
