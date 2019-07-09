@@ -6,7 +6,7 @@
 : ${APP_DB_PASSWORD:=password}
 : ${CALCULATOR_URL:='ws://localhost:99'}
 
-f [ -f /opt/jboss/wildfly/standalone/deployments/env.js ]; then
+if [ -f /opt/jboss/wildfly/standalone/deployments/env.js ]; then
 	cd /opt/jboss/wildfly/standalone/deployments/
 	sed -i "s|ws:\/\/localhost:99|${CALCULATOR_URL}|" env.js
 	jar -uvf indoornavi_backend-*.war env.js
