@@ -44,7 +44,7 @@ public class GeoN3d extends Algorithm3d implements Algorithm {
 
 		long minTimestamp = storage.getTimeOfLastMeasure(tagId);
 
-		for (int i = 1; i < anchors.size(); i++) {
+		for (int i = 1, size = anchors.size(); i < size; i++) {
 			Anchor firstAnchor = anchors.get(i);
 			double firstDistance = useInterpolation ?
 				storage.getInterpolatedDistance(tagId, firstAnchor.getShortId(), minTimestamp) :
@@ -75,7 +75,7 @@ public class GeoN3d extends Algorithm3d implements Algorithm {
 		}
 
 		List<Double> distances = new ArrayList<>(pairs.size());
-		for (int i = 0; i < pairs.size(); i++) {
+		for (int i = 0, size = pairs.size(); i < size; i++) {
 			distances.add(0d);
 			for (Pair<SimpleMatrix, Float> pair : pairs) {
 				Double newDistance = distances.get(i) + (pairs.get(i).getKey().minus(pair.getKey())).normF();
@@ -89,7 +89,7 @@ public class GeoN3d extends Algorithm3d implements Algorithm {
 		SimpleMatrix sum = new SimpleMatrix(new double[][]{
 			new double[]{0, 0, 0}
 		}).transpose();
-		for (int i = 0; i < pairs.size(); i++) {
+		for (int i = 0, size = pairs.size(); i < size; i++) {
 			if (distances.get(i) <= thres) {
 				sum = sum.plus(pairs.get(i).getKey());
 				weight += 1;

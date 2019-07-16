@@ -70,7 +70,7 @@ public class GeoN2d implements Algorithm {
 		logger.trace("Intersection points found: {}", intersectionPoints.size());
 
 		int x = 0, y = 0, j = 0;
-		for (int ip = 0; ip < intersectionPoints.size(); ++ip) {
+		for (int ip = 0, size = intersectionPoints.size(); ip < size; ++ip) {
 			if (intersectionPointsDistance.get(ip) <= thres) {
 				x += intersectionPoints.get(ip).getX();
 				y += intersectionPoints.get(ip).getY();
@@ -87,8 +87,8 @@ public class GeoN2d implements Algorithm {
 		Set<Pair<AnchorDistance, AnchorDistance>> pairs = new HashSet<>();
 		Integer[] connectedAnchorsArray = connectedAnchors.toArray(new Integer[0]);
 		long minTimestamp = storage.getTimeOfLastMeasure(tagId);
-		for (int i = 0; i < connectedAnchors.size() - 1; i++) {
-			for (int j = i + 1; j < connectedAnchors.size(); j++) {
+		for (int i = 0, size = connectedAnchors.size(); i < size - 1; i++) {
+			for (int j = i + 1; j < size; j++) {
 				pairs.add(new ImmutablePair<>(
 						new AnchorDistance(
 							connectedAnchorsArray[i],

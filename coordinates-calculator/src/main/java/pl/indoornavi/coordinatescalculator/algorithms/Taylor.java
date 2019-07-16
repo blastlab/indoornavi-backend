@@ -76,7 +76,7 @@ public class Taylor extends Algorithm3d implements Algorithm {
 		double z = stateMatrix.tagPosition.get(2) < 0 ? 0 : stateMatrix.tagPosition.get(2);
 
 		double max = 0;
-		for (int i = 0; i < anchors.size(); i++) {
+		for (int i = 0, size = anchors.size(); i < size; i++) {
 			Anchor anchor = anchors.get(i);
 			double _x = Math.pow(anchor.getX() - x, 2);
 			double _y = Math.pow(anchor.getY() - y, 2);

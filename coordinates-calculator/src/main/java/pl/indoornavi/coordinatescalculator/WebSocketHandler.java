@@ -34,7 +34,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
     private static final String SINK_SESSION_QUERY_STRING = "sink";
     private static final String EMULATOR_SESSION_QUERY_STRING = "emulator";
     private static final String FRONTEND_SESSION_QUERY_STRING = "frontend";
-    private Map<String, StringBuffer> payloadBuffer = new HashMap<>();
+    private Map<String, StringBuilder> payloadBuffer = new HashMap<>();
     private Map<WebSocketSession, Filter> frontendSessions = new HashMap<>();
 
     @Autowired
@@ -68,7 +68,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
         executeForSpecificSession(session, () -> {
             frontendSessions.put(session, new Filter());
         }, () -> {
-            payloadBuffer.put(session.getId(), new StringBuffer());
+            payloadBuffer.put(session.getId(), new StringBuilder());
             try {
                 String anchorsJsonString = objectMapper.writeValueAsString(new AnchorsWrapper(anchorRepository.findAll()));
                 logger.debug(anchorsJsonString);
@@ -76,7 +76,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        }, () -> payloadBuffer.put(session.getId(), new StringBuffer()));
+        }, () -> payloadBuffer.put(session.getId(), new StringBuilder()));
 
     }
 
@@ -139,7 +139,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
         });
     }
 
-    private List<DistanceMessage> parseJsonToDistanceMessages(StringBuffer sessionBuffer) throws IOException {
+    private List<DistanceMessage> parseJsonToDistanceMessages(StringBuilder sessionBuffer) throws IOException {
         return objectMapper.readValue(
                 sessionBuffer.toString(), new TypeReference<List<DistanceMessage>>() {
                 }
@@ -165,7 +165,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
     private Map<Long, List<Long>> timeDifferencesPerThread = new ConcurrentHashMap<>();
 
     private void handleMeasuresMessage(WebSocketSession session, WebSocketMessage message) {
-        StringBuffer sessionBuffer = payloadBuffer.get(session.getId());
+        StringBuilder sessionBuffer = payloadBuffer.get(session.getId());
         if (sessionBuffer != null) {
             sessionBuffer.append(message.getPayload());
 
@@ -180,7 +180,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
                     e.printStackTrace();
                 }
 
-                payloadBuffer.put(session.getId(), new StringBuffer());
+                payloadBuffer.put(session.getId(), new StringBuilder());
                 displayTime();
                 clearTime();
             }
@@ -190,7 +190,9 @@ public class WebSocketHandler extends TextWebSocketHandler {
     private void handleFrontendMessage(WebSocketSession session, WebSocketMessage<String> message) {
         try {
             Command command = objectMapper.readValue(message.getPayload(), Command.class);
-            logger.trace("Received command: {}", command);
+            if (logger.isTraceEnabled()) {
+                logger.trace("Received command: {}", command);
+            }
             if (Command.Type.TOGGLE_TAG.equals(command.getType())) {
                 Integer tagShortId = objectMapper.readValue(command.getArgs(), Integer.class);
                 List<Integer> tagsShortId = frontendSessions.get(session).getTagsShortId();
@@ -239,6 +241,9 @@ public class WebSocketHandler extends TextWebSocketHandler {
     }
 
     private void displayTime() {
+        if (!logger.isDebugEnabled()) {
+            return;
+        }
         List<Long> times = timeDifferencesPerThread.get(Thread.currentThread().getId());
         if (times != null) {
             logger.debug("Time difference between measurement time and time get right before calculation: {}ms",

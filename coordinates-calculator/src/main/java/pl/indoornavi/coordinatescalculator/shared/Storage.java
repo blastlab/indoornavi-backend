@@ -127,7 +127,7 @@ public class Storage {
 	private void cleanOldData(Integer tagId, Long measurementTime) {
 		Map<Integer, PolyMeasure> tagMeasures = getMeasures().get(tagId);
 		tagMeasures.forEach((anchor, polyMeasure) -> {
-			polyMeasure.getMeasures().removeIf((measure) -> new Date(measurementTime - OLD_DATA_IN_MILLISECONDS).after(new Date(measure.getTimestamp())));
+			polyMeasure.getMeasures().removeIf((measure) -> measurementTime - OLD_DATA_IN_MILLISECONDS > measure.getTimestamp());
 			while (polyMeasure.getMeasures().size() > 4) {
 				polyMeasure.getMeasures().remove(polyMeasure.getMeasures().size() - 1);
 			}

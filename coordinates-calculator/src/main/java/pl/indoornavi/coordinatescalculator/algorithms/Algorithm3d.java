@@ -16,19 +16,26 @@ public abstract class Algorithm3d {
 		int connectedAnchorsCount = connectedAnchors.size();
 
 		if (connectedAnchorsCount < 4) {
-			logger.trace("Not enough connected anchors to calculate position. Currently connected anchors: {}", connectedAnchors.size());
+			log("Not enough connected anchors to calculate position. Currently connected anchors: {}", connectedAnchors.size());
 			throw new NotEnoughAnchors();
 		}
 
-		logger.trace("Connected anchors: {}", connectedAnchors.size());
+		log("Connected anchors: {}", connectedAnchorsCount);
 		List<Anchor> anchors = getAnchorRepository().findByShortIdIn(connectedAnchors);
+		int dbConnectedAnchorsCount = anchors.size();
 
-		if (anchors.size() < 4) {
-			logger.trace("Not enough connected and in database anchors to calculate position. Currently connected anchors: {}", connectedAnchors.size());
+		if (dbConnectedAnchorsCount < 4) {
+			log("Not enough connected and in database anchors to calculate position. Currently connected anchors: {}", dbConnectedAnchorsCount);
 			throw new NotEnoughAnchors();
 		}
 
 		return anchors;
+	}
+
+	private void log(String message, Object... args) {
+		if (logger.isTraceEnabled()) {
+			logger.trace(message, args);
+		}
 	}
 
 	class NotEnoughAnchors extends Exception {}

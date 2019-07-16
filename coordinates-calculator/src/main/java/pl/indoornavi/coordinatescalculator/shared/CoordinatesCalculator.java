@@ -37,12 +37,12 @@ public class CoordinatesCalculator {
         int distance = distanceMessage.getDist();
         long measurementTime = distanceMessage.getTime();
 
-        logger.trace("Measure storage tags: {}", storage.getMeasures().keySet().size());
+        log("Measure storage tags: {}", storage.getMeasures().keySet().size());
 
         try {
             validateDevicesIds(firstDeviceId, secondDeviceId);
 
-            Integer tagId = firstDeviceId <= Short.MAX_VALUE ? firstDeviceId : secondDeviceId;
+            int tagId = firstDeviceId <= Short.MAX_VALUE ? firstDeviceId : secondDeviceId;
             int anchorId = secondDeviceId > Short.MAX_VALUE ? secondDeviceId : firstDeviceId;
 
             storage.setConnection(tagId, anchorId, distance, measurementTime);
@@ -57,7 +57,7 @@ public class CoordinatesCalculator {
 
             Point3D calculatedPoint = calculatedPointOptional.get();
 
-            logger.trace("Current position: X: {}, Y: {}, Z: {}", calculatedPoint.getX(), calculatedPoint.getY(), calculatedPoint.getZ());
+            log("Current position: X: {}, Y: {}, Z: {}", calculatedPoint.getX(), calculatedPoint.getY(), calculatedPoint.getZ());
 
             Long floorId = anchorRepository.findFloorIdByAnchorShortId(anchorId)
                     .orElse(null);
@@ -87,7 +87,7 @@ public class CoordinatesCalculator {
                     new Date(measurementTime))
             );
         } catch (DeviceIdOutOfRangeException e) {
-            logger.trace("One of the devices' ids is out of range. Ids are: {}, {} and range is (1, {})", firstDeviceId, secondDeviceId, Short.MAX_VALUE);
+            log("One of the devices' ids is out of range. Ids are: {}, {} and range is (1, {})", firstDeviceId, secondDeviceId, Short.MAX_VALUE);
             return Optional.empty();
         }
     }
@@ -95,6 +95,12 @@ public class CoordinatesCalculator {
     private void validateDevicesIds(int firstDeviceId, int secondDeviceId) throws DeviceIdOutOfRangeException {
         if (!((firstDeviceId <= Short.MAX_VALUE && secondDeviceId > Short.MAX_VALUE) || (firstDeviceId > Short.MAX_VALUE && secondDeviceId <= Short.MAX_VALUE))) {
             throw new DeviceIdOutOfRangeException();
+        }
+    }
+
+    private void log(String message, Object... args) {
+        if (logger.isTraceEnabled()) {
+            logger.trace(message, args);
         }
     }
 

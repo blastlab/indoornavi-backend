@@ -60,7 +60,7 @@ public class IntersectionsCalculator {
     public static List<Double> calculateSumDistanceBetweenIntersectionPoints(List<Point3D> points) {
         Double[] IPdistance = new Double[points.size()];
         Arrays.fill(IPdistance, 0.0);
-        for (int indn = 0; indn < points.size(); ++indn) {
+        for (int indn = 0, size = points.size(); indn < size; ++indn) {
             for (Point3D point : points) {
                 double dx = points.get(indn).getX() - point.getX();
                 double dy = points.get(indn).getY() - point.getY();
@@ -75,7 +75,7 @@ public class IntersectionsCalculator {
         Collections.sort(sortedIntersectionPointsDistance);
         Double thresBase = sortedIntersectionPointsDistance.get(connectedAnchorsCount - 1);
         Double thres = thresBase;
-        for (int i = connectedAnchorsCount; i < intersectionPointsDistances.size(); i++) {
+        for (int i = connectedAnchorsCount, size = intersectionPointsDistances.size(); i < size; i++) {
             if (sortedIntersectionPointsDistance.get(i) / thresBase - 1 < 0.10) {
                 thres = sortedIntersectionPointsDistance.get(i);
             } else {
