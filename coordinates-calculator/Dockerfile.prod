@@ -4,5 +4,5 @@ RUN apk update && apk add bash
 RUN mkdir app
 COPY start-server.sh /
 RUN chmod 777 start-server.sh
-COPY ./target/*.jar /app/
+COPY ./target/*.jar /app/target/
 CMD ["/start-server.sh"]
