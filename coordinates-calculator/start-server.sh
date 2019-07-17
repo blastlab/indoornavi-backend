@@ -9,10 +9,7 @@ if [[ ${APP_ENVIRONMENT} = "development" ]]; then
 fi
 
 if [ ! -f target/coordinates-calculator.jar ];then
-    cp pom.xml pom.xml.backup
-    sed -i "s|localhost:3306|${DB_HOST}|" pom.xml
-    mvn clean install spring-boot:repackage
-    mv pom.xml.backup pom.xml
+    mvn clean install spring-boot:repackage -Ddb.host=$DB_HOST
 fi
 
 java ${OPT_PARAMETERS} -Xms512m -Xmx2048m -jar target/coordinates-calculator.jar

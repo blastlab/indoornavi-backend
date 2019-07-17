@@ -30,6 +30,7 @@
         <mariadb.version>1.5.7</mariadb.version>
         <modelmapper-jooq.version>2.3.0</modelmapper-jooq.version>
         <google-collections.version>1.0</google-collections.version>
+        <db.host>localhost:3306</db.host>
     </properties>
 
     <dependencies>
@@ -126,7 +127,7 @@
                 <configuration>
                     <jdbc>
                         <driver>org.mariadb.jdbc.Driver</driver>
-                        <url>jdbc:mariadb://localhost:3306/navi</url>
+                        <url>jdbc:mariadb://${db.host}/navi</url>
                         <user>root</user>
                         <password>password</password>
                     </jdbc>
