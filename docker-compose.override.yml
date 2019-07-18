@@ -71,7 +71,7 @@ services:
         - ./coordinates-calculator/:/app
         - m2:/root/.m2
       environment:
-        APP_ENVIRONMENT: development
+        APP_ENVIRONMENT: production
         DB_HOST: "db:3306"
       entrypoint: ["wait-for-it", "liquibase:80", "-t", "0", "--", "./start-server.sh"]
 
