@@ -68,9 +68,12 @@ services:
         - "99:8081"
         - "9797:8000"
       volumes: 
-        - ./coordinates-calculator/target:/app
+        - ./coordinates-calculator/:/app
+        - m2:/root/.m2
       environment:
-        APP_ENVIRONMENT: development
+        APP_ENVIRONMENT: production
+        DB_HOST: "db:3306"
+      entrypoint: ["wait-for-it", "liquibase:80", "-t", "0", "--", "./start-server.sh"]
 
 volumes:
   # For Liquibase container.
