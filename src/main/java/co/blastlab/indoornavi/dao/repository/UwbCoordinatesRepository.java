@@ -12,13 +12,14 @@ import java.util.List;
 public interface UwbCoordinatesRepository extends EntityRepository<UwbCoordinates, Long> {
 
 	String REQUIRED_FIELDS = "c.id, c.creationDate, c.modificationDate, round(avg(c.x)) as x, round(avg(c.y)) as y, c.floor_id, c.measurementTime, round(avg(c.z)) as z, c.tag_id";
+	String GROUP_BY_FIELDS = "c.creationDate, c.floor_id, c.tag_id";
 
 	@Query(
 		value =
 			"select " + REQUIRED_FIELDS + " " +
 				"from uwbcoordinates c " +
 				"where c.floor_id = ?1 and c.creationDate >= ?2 and c.creationDate <= ?3 and c.tag_id in (?4) " +
-				"group by c.creationDate " +
+				"group by " + GROUP_BY_FIELDS + " " +
 				"order by c.creationDate",
 		isNative = true
 	)
@@ -29,7 +30,7 @@ public interface UwbCoordinatesRepository extends EntityRepository<UwbCoordinate
 			"select " + REQUIRED_FIELDS + " " +
 				"from uwbcoordinates c " +
 				"where c.floor_id = ?1 and c.creationDate >= ?2 and c.creationDate <= ?3 " +
-				"group by c.creationDate " +
+				"group by " + GROUP_BY_FIELDS + " " +
 				"order by c.creationDate",
 		isNative = true
 	)
@@ -40,7 +41,7 @@ public interface UwbCoordinatesRepository extends EntityRepository<UwbCoordinate
 			"select " + REQUIRED_FIELDS + " " +
 				"from uwbcoordinates c  " +
 				"where c.creationDate >= ?1 and c.creationDate <= ?2 " +
-				"group by c.creationDate " +
+				"group by " + GROUP_BY_FIELDS + " " +
 				"order by c.creationDate",
 		isNative = true
 	)
@@ -51,7 +52,7 @@ public interface UwbCoordinatesRepository extends EntityRepository<UwbCoordinate
 			"select " + REQUIRED_FIELDS + " " +
 				"from uwbcoordinates c " +
 				"where c.creationDate >= ?1 and c.creationDate <= ?2 and c.tag_id in ?3 " +
-				"group by c.creationDate " +
+				"group by " + GROUP_BY_FIELDS + " " +
 				"order by c.creationDate",
 		isNative = true
 	)
